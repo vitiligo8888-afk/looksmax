@@ -131,9 +131,9 @@
 .lmx-name.rk-gold     { color: var(--gold); } // was #e8c07d — that literal IS --gold's dark-scheme value; now tracks the light-scheme gold too
 .lmx-name.rk-platinum { color: var(--accent-2); } // was #8fd3e8 (1.7:1 on white); same cool-cyan family as --accent-2, now scheme-tracked
 .lmx-name.rk-diamond  { color: color-mix(in srgb, #1f8a7d 70%, var(--ink)); } // was #7ee0d3 (1.6:1 on white); deepened teal, no "diamond" token
-.lmx-name.rk-master   { color: var(--accent); font-weight: 700; } // was #a78bfa, effectively the house violet already; now literally IS it
-.lmx-name.rk-luminary { color: color-mix(in srgb, #b6488f 70%, var(--ink)); font-weight: 700; } // was #f0a5d0 (1.9:1 on white); deepened pink, no matching token
-.lmx-name.rk-ascended { color: var(--ink); font-weight: 700; } // was #ffffff (invisible on a white surface); --ink is the scheme's own max-contrast text colour
+.lmx-name.rk-master   { color: var(--accent); font-weight: 500; } // was #a78bfa, effectively the house violet already; now literally IS it
+.lmx-name.rk-luminary { color: color-mix(in srgb, #b6488f 70%, var(--ink)); font-weight: 500; } // was #f0a5d0 (1.9:1 on white); deepened pink, no matching token
+.lmx-name.rk-ascended { color: var(--ink); font-weight: 500; } // was #ffffff (invisible on a white surface); --ink is the scheme's own max-contrast text colour
 
 // =================================================================== solids
 // Same audit as the rank ladder above: these paint straight onto the page
@@ -259,7 +259,7 @@
 // ================================================================ legendary
 .lmx-name.ns-luminary {
   color: var(--ink); // was #ffffff — invisible on the light scheme's white surface; --ink is the scheme's own max-contrast text colour
-  font-weight: 700;
+  font-weight: 500;
   .ns-animate(ns-glow; 4.5s; ease-in-out);
   will-change: text-shadow;
 }
@@ -270,7 +270,7 @@
 // support the stroke property.
 .lmx-name.ns-obsidian {
   color: color-mix(in srgb, #15181f 70%, var(--ink));
-  font-weight: 800;
+  font-weight: 600;
   -webkit-text-stroke: 0.6px #e8c07d;
   text-shadow: 0 0 6px fade(#e8c07d, 35%);
 }

@@ -119,7 +119,13 @@
 
 
   /* type */
-  --brand-font-display    : "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  // FORMAL, not display. Archivo is a wide geometric grotesque with a lot of
+  // personality, which read as loud next to the operator's reference (a sober
+  // forum index in a plain system face). Operator: "usa un font mas formal".
+  // The system stack is the same one --font-ui uses, so headings and body now
+  // share a voice instead of arguing; the lockup keeps its own tracking below,
+  // which is what actually made it read as a wordmark.
+  --brand-font-display    : -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --brand-tracking-display: -0.02em;
   --brand-tracking-lockup : -0.032em;
 
