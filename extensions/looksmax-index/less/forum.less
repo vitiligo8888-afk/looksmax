@@ -1539,12 +1539,18 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   padding: var(--pad);
   border: 1px solid var(--line);
   border-radius: var(--card-radius);
-  // A violet plate, so the one card asking for something looks different from
-  // the eight cards offering something. --accent-deep carries light ink at
-  // 5.0:1; the 500 would need dark ink and would read as a button.
+  // This card still needs to look different from the eight cards offering
+  // something rather than asking — but a 34% violet plate was the largest
+  // remaining block of colour on a page the operator wants FULLY dark. The
+  // distinction is now carried by an accent EDGE and a barely-there wash
+  // instead of a filled plate: same "this one is different" signal, no colour
+  // field. The 5.0:1 light-ink pairing the plate existed to guarantee is no
+  // longer needed, because the ink now sits on --surface-1 like every other
+  // card.
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--accent-deep) 34%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--accent-a08), transparent 70%),
     var(--surface-1);
+  border-left: 2px solid var(--accent-a45);
   box-shadow: var(--e-1);
 }
 

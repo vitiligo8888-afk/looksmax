@@ -118,9 +118,12 @@ html {
 // The forum's front door. Branded here rather than in the theme because the
 // copy, the mark and the rule motif are the identity, not the layout.
 .Hero.WelcomeHero {
+  // Neutral fields, not gold + blue. These two tinted washes covered the whole
+  // front door and were a large part of why a true-black surface ramp still
+  // read as coloured. Luminance-only keeps the depth without the hue.
   background:
-    radial-gradient(900px 420px at 12% -30%, fade(#e8c07d, 12%), transparent 60%),
-    radial-gradient(700px 380px at 100% 130%, fade(#7aa2f7, 9%), transparent 58%),
+    radial-gradient(900px 420px at 12% -30%, fade(#ffffff, 5%), transparent 60%),
+    radial-gradient(700px 380px at 100% 130%, fade(#ffffff, 3%), transparent 58%),
     var(--brand-bg);
   border-bottom: 1px solid var(--brand-line);
   position: relative;

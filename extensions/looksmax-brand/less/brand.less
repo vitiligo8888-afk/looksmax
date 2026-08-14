@@ -15,14 +15,20 @@
 :root {
 
   /* surfaces — rich black, one hue, chroma rising with elevation */
-  --brand-void       : #030306;
-  --brand-header     : #0a0911;
-  --brand-bg         : #0e0c17;
-  --brand-surface    : #151322;
-  --brand-raised     : #1f1b30;
-  --brand-hover      : #2b2542;
-  --brand-line       : #2b2542;
-  --brand-line-strong: #747285;
+  // NEUTRAL BLACK, not violet-black. Every value here used to carry the house
+  // hue (bg #0e0c17, surface #151322, hover #2b2542), and because this layer
+  // paints the header, the hero and the footer, the forum still read as purple
+  // after looksmax-theme's own ramp went true black. Operator, with a
+  // screenshot: "mine isnt dark it still has purple its supposed to be fully
+  // dark". The ramp below rises in luminance ONLY, so elevation still reads.
+  --brand-void       : #000000;
+  --brand-header     : #050505;
+  --brand-bg         : #000000;
+  --brand-surface    : #0e0e0e;
+  --brand-raised     : #161616;
+  --brand-hover      : #212121;
+  --brand-line       : #2e2e2e;
+  --brand-line-strong: #6f6f6f;
 
 
   /* ink */

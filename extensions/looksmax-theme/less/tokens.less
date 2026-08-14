@@ -67,7 +67,19 @@
 // Neutralised with the surfaces. --line now does MORE work than it did on the
 // violet ramp: with surface-1 only 0.05 lightness off the page, the hairline is
 // the primary card boundary rather than a reinforcement of a fill difference.
-@c-line:       #2e2e2e;
+// FULLY DARK PASS. Operator: "make it FULLY dark it still has white outlines
+// and stuff". #2e2e2e read as a visible grey outline around every card, rail
+// and panel on a black page — the single most obvious remaining non-black
+// element. Dropped to #141414, which still separates a card from the page at a
+// glance without drawing a light box around it.
+//
+// --line-strong is deliberately NOT dropped with it. It is not decoration: it
+// is the boundary of interactive controls (inputs, selects, the composer), and
+// WCAG 1.4.11 requires 3:1 for those. #6f6f6f measures ~4.6:1 on a card;
+// anything near --line would fail that outright. Decorative edges go dark,
+// control edges stay visible — that distinction is the whole point of having
+// two line tokens.
+@c-line:       #141414;
 @c-line-strong:#6f6f6f;   // 4.6:1 on surface-1 — control boundaries (1.4.11 wants 3:1)
 @c-ink:        #f0eff4;
 @c-ink-dim:    #b6b4be;
@@ -271,16 +283,27 @@
   // recompiling lives here; base.less only reads them.
   --decor-opacity: 1;
   --decor-blur: 90px;
-  --decor-a: var(--accent-a22);        // warm field, top-left
-  --decor-b: var(--accent-2-a22);      // cool field, bottom-right
-  --decor-c: var(--purple-a14);        // third field, mid-right
+  // NEUTRAL, not accent-tinted. These three blurred fields cover the whole
+  // page, so at --accent-a22 / --accent-2-a22 they washed the entire surface
+  // violet and cyan -- which is why a "true black" surface ramp still read as
+  // purple to the operator. Depth is kept (the fields are still there, still
+  // blurred, still animated) but it is now luminance-only, so black stays
+  // black. The accent survives where an accent belongs: buttons, links, the
+  // active nav.
+  // Effectively off. Even as neutral white tints these three page-wide fields
+  // lifted the background off black, which is exactly what "fully dark" rules
+  // out. Kept as tokens (rather than deleted) so the `roomy`/`subtle` decor
+  // modes and any future scheme can still dial them back up.
+  --decor-a: transparent;              // field, top-left
+  --decor-b: transparent;              // field, bottom-right
+  --decor-c: transparent;              // third field, mid-right
   --decor-speed-a: 52s;
   --decor-speed-b: 68s;
   --decor-speed-c: 84s;
-  --decor-grid: fade(#8ea3c4, 5%);     // hairline grid over the page
+  --decor-grid: fade(#ffffff, 1.5%);   // hairline grid, barely there
   --decor-grid-size: 46px;
   --decor-noise-opacity: 0.028;
-  --decor-vignette: 0.55;
+  --decor-vignette: 0.85;   // deeper: pulls the page edges further toward black
 
   // ======================================================== core re-point
   // Flarum core components we never touch read these. Setting them from our
