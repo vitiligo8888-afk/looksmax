@@ -410,6 +410,22 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   margin: 0 auto;
 }
 
+// With every left-rail block disabled there is no left column at all, so the
+// grid drops the track rather than reserving 232px of nothing and squeezing
+// the main column. RenderIndex sets this class; it is not a :empty check,
+// because the aside is not emitted in the first place.
+.LmxIndex-inner.has-no-left {
+  grid-template-columns: minmax(0, 1fr) var(--lmx-side);
+  grid-template-areas: 'top top' 'main side';
+}
+
+@media (max-width: 1180px) {
+  .LmxIndex-inner.has-no-left {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'top' 'main' 'side';
+  }
+}
+
 .LmxIndex-top  { grid-area: top; }
 .LmxIndex-left { grid-area: left; position: sticky; top: ~"calc(var(--header-h, 52px) + var(--gap))"; }
 .LmxIndex-main { grid-area: main; min-width: 0; }
@@ -729,6 +745,16 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   gap: var(--gap);
 }
 
+// THREE columns once there is room, not auto-fill. With the left rail disabled
+// the main column got wide enough for four 240px tracks, and six sections into
+// four tracks is 4 + 2 — a ragged second row with two empty cells. Pinning it
+// to three gives two complete rows of three, which is what makes the set read
+// as one block instead of a leftover. Below this the auto-fill above takes
+// over and degrades to 2, then 1.
+@media (min-width: 760px) {
+  .LmxSections-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 // List view is a different job from cards — density for scanning, not
 // browsing — so it is a real alternative rather than cards squashed flat.
 .LmxSections[data-view='list'] .LmxSections-grid {
@@ -879,8 +905,12 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  padding: var(--pad);
+  // Tightened on operator instruction ("make it even even smaller so users can
+  // see everything"). The tile is a dense index entry now, not a card with
+  // breathing room: the whole set has to be scannable in one screen while the
+  // section still reads as the page's primary object.
+  gap: 5px;
+  padding: var(--pad-sm) var(--pad);
   border: 1px solid var(--line);
   border-radius: var(--card-radius);
   background: var(--surface-1);
@@ -911,17 +941,17 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 26px;
+  height: 26px;
   flex: none;
   background: none;
   box-shadow: none;
   color: var(--ink-dim);
   transition: color var(--t-fast) var(--ease);
 
-  // Bigger than the old 21px: with no tile behind it the glyph has to hold the
-  // left column on its own.
-  iconify-icon { font-size: 34px; }
+  // 34px -> 24px with the compaction pass. Line art at this size still reads
+  // as a distinct mark because it has no tile competing with it.
+  iconify-icon { font-size: 24px; }
 }
 
 // On hover the section's own colour comes back, so the hue still does work --
@@ -963,7 +993,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 .LmxTile-recent {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   margin: 0;
   padding: var(--gap-sm) 0 0;
   border-top: 1px solid var(--line-soft);

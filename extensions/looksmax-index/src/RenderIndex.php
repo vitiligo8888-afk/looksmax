@@ -134,10 +134,17 @@ class RenderIndex
         // to 1100px, which measured out at 1920 as 820px — 43% of the viewport —
         // of empty margin with no left rail at all. The breakout itself is in
         // the stylesheet; this is the element it applies to.
+        // The left rail is OMITTED, not emptied, when nothing is placed in it.
+        // An empty <aside> still occupies its 232px grid track, so disabling
+        // every left block (which the operator did, to give "Por dónde empezar"
+        // the room) would otherwise leave a dead column and a narrower main.
+        // The marker class lets the stylesheet drop the track entirely.
+        $hasLeft = $regions[Rails::SIDE_LEFT] !== '';
+
         return '<div class="LmxIndex" data-view="' . $ctx->view . '">'
-            . '<div class="LmxIndex-inner">'
+            . '<div class="LmxIndex-inner' . ($hasLeft ? '' : ' has-no-left') . '">'
             . ($regions[Rails::SIDE_TOP] !== '' ? '<div class="LmxIndex-top">' . $regions[Rails::SIDE_TOP] . '</div>' : '')
-            . '<aside class="LmxIndex-left">' . $regions[Rails::SIDE_LEFT] . '</aside>'
+            . ($hasLeft ? '<aside class="LmxIndex-left">' . $regions[Rails::SIDE_LEFT] . '</aside>' : '')
             . '<main class="LmxIndex-main" id="lmx-sections">' . $regions[Rails::SIDE_MAIN] . '</main>'
             . '<aside class="LmxIndex-side">' . $regions[Rails::SIDE_RIGHT] . '</aside>'
             . '</div></div>';
