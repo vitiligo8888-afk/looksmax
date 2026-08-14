@@ -29,10 +29,14 @@ class TrackStreak
 
         $length = mb_strlen(trim(strip_tags((string) $post->content)));
 
-        if ($length < Streaks::MIN_LENGTH) {
+        // Read through Streaks::minLength(), not the MIN_LENGTH constant
+        // directly, so this and the settings-driven admin control (and
+        // RevokeStreak's own qualifying check) can never disagree about the
+        // threshold.
+        if ($length < $this->streaks->minLength()) {
             return;
         }
 
-        $this->streaks->touch((int) $post->user_id);
+        $this->streaks->touch((int) $post->user_id, null, (int) $post->id);
     }
 }

@@ -20,3 +20,94 @@
   text-transform: uppercase;
   vertical-align: middle;
 }
+
+// ── the streak/progress widget (js/dist/forum.js) ──────────────────────────
+//
+// Fixed, self-contained, and never inline-styled with a literal colour — every
+// rule below reads a --token so the light scheme and the neon scheme both get
+// a correctly contrasted widget with zero JS changes. See CONSTRAINTS in the
+// mission this shipped under: fade() is banned repo-wide because it silently
+// breaks the whole stylesheet, so every translucency below is a precomputed
+// --token-aXX tint, never a fade() call written here.
+.lmx-econ-widget {
+  position: fixed;
+  right: var(--gap-lg);
+  bottom: var(--gap-lg);
+  z-index: var(--z-sticky);
+  font-family: var(--font-ui);
+}
+
+.lmx-econ-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--ink);
+  box-shadow: var(--e-2);
+  padding: 6px 12px 6px 8px;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+.lmx-econ-toggle:hover { background: var(--surface-3); transform: translateY(-1px); }
+.lmx-econ-toggle-count { font-weight: 700; font-size: var(--fs-md); }
+
+.lmx-econ-flame { font-size: 15px; filter: grayscale(1); opacity: 0.55; }
+.lmx-econ-flame.is-lit { filter: none; opacity: 1; }
+
+.lmx-econ-panel {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: 260px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-3);
+  padding: var(--pad);
+}
+.lmx-econ-widget.is-open .lmx-econ-panel { display: block; }
+
+.lmx-econ-row { display: flex; align-items: center; gap: var(--gap-sm); }
+.lmx-econ-streak-text { font-size: var(--fs-md); color: var(--ink); }
+.lmx-econ-streak-text strong { font-size: var(--fs-lg); }
+.lmx-econ-sub { font-size: var(--fs-xs); color: var(--ink-faint); margin: 2px 0 0 26px; }
+.lmx-econ-divider { height: 1px; background: var(--line); margin: var(--gap-sm) 0; }
+
+.lmx-econ-rank-label { display: flex; justify-content: space-between; align-items: baseline; width: 100%; font-size: var(--fs-sm); }
+.lmx-econ-rank-slug { color: var(--accent-2); font-weight: 700; text-transform: capitalize; }
+.lmx-econ-rank-next { color: var(--ink-faint); font-size: var(--fs-xs); }
+.lmx-econ-rank-track { margin-top: 6px; }
+
+.lmx-econ-goal { margin-top: var(--gap-sm); }
+.lmx-econ-goal-label { display: flex; justify-content: space-between; font-size: var(--fs-xs); color: var(--ink-dim); margin-bottom: 3px; }
+.lmx-econ-goal-count.is-full { color: var(--ok); font-weight: 700; }
+.lmx-econ-goal-track { height: 6px; border-radius: var(--r-pill); background: var(--surface-3); overflow: hidden; }
+.lmx-econ-goal-fill { height: 100%; background: var(--accent); border-radius: var(--r-pill); transition: width var(--t-slow) var(--ease); }
+.lmx-econ-goal-fill.is-full { background: var(--ok); }
+
+.lmx-econ-toast {
+  position: fixed;
+  right: var(--gap-lg);
+  bottom: calc(var(--gap-lg) + 60px);
+  z-index: var(--z-toast);
+  background: var(--gold);
+  color: var(--gold-ink);
+  border-radius: var(--r-md);
+  padding: 10px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  box-shadow: var(--e-3);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease);
+  max-width: 280px;
+}
+.lmx-econ-toast.is-shown { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 767px) {
+  .lmx-econ-widget { right: var(--gap-sm); bottom: var(--gap-sm); }
+  .lmx-econ-panel { width: 220px; }
+}

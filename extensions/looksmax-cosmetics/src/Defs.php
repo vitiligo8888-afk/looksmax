@@ -9,8 +9,9 @@ namespace Local\Cosmetics;
  * Adding a frame is adding an entry here — or an INSERT into that table with
  * `source` set to anything other than `shipped`, which sync will then leave
  * alone. Neither requires a line of renderer, stylesheet or JavaScript, because
- * the renderer is five parameterised CSS implementations and everything else is
- * a number in `spec`.
+ * the renderer is thirteen parameterised CSS implementations (plus four
+ * non-circular shapes, orthogonal to those) and everything else is a number
+ * in `spec`.
  *
  * ── what each field means ───────────────────────────────────────────────────
  *
@@ -25,7 +26,7 @@ namespace Local\Cosmetics;
  *          here. See Definitions::all().
  *  spec    the visual, plus the obtain rule. Never read by the store.
  *
- * ── spec.render, the five implementations ───────────────────────────────────
+ * ── spec.render, the thirteen implementations ───────────────────────────────
  *
  *  ring      one flat ring. colors[0].
  *  gradient  a static two-to-four-stop gradient ring, drawn with a border-box
@@ -34,6 +35,55 @@ namespace Local\Cosmetics;
  *  dashed    a rotating repeating-conic, i.e. a dashed ring that runs.
  *  dual      two counter-rotating rings at different radii.
  *  cover     (banners) a linear gradient plate with an optional tiled pattern.
+ *
+ *  — the elemental set, less/forum.less "elemental renderers" section. Each is
+ *    a genuinely different silhouette (an inline SVG mask or a hand-built
+ *    gradient recipe, never a recoloured ring) and a genuinely different
+ *    motion, and each stays inside the 2-animated-layer / is-live budget the
+ *    five renderers above already keep to —
+ *
+ *  blaze     fire. an SVG flame-lick annulus (jagged outer edge, round inner)
+ *            that slowly rolls (spin), plus the same mask flickering opacity.
+ *  frost     ice. an SVG angular-facet annulus, static, with a diagonal sheen
+ *            sweeping across it (drift) for a cold shimmer.
+ *  storm     lightning. a plain thin ring plus two SVG bolt glyphs that snap
+ *            in and out of opacity in hard steps (pulse), not an easing fade.
+ *  venom     toxic. a gradient annulus with radial "bubble" dots drifting
+ *            across it (drift).
+ *  void      shadow. a gradient annulus that itself slowly rotates (spin),
+ *            with a pulsing dark vignette (pulse) behind it.
+ *  blood     a gradient annulus with a repeating vertical drip pattern
+ *            sliding down it (drift).
+ *  cosmic    starfield. a slowly rotating nebula annulus (spin) with a second,
+ *            static, twinkling star-dot annulus layered over it (pulse).
+ *  glitch    cyber. a scanline-textured annulus plus a second colour's ring
+ *            (colors[1], --cf-c2) that jump-cuts sideways in hard steps
+ *            (pulse) for an RGB-split flicker.
+ *
+ * ── spec.shape, the four non-circular silhouettes ───────────────────────────
+ *
+ * Orthogonal to render — any renderer's colours can wear any shape — selected
+ * by data-cf-shape, defaulting to 'circle' (no attribute, no extra CSS).
+ *
+ *  hex       a flat-top hexagon, clip-path on the wrapper AND the ring, so the
+ *            avatar itself is cropped to it, not just the decoration.
+ *  notched   an eight-point beveled-corner clip, same wrapper-level crop.
+ *  ornate    an SVG corner-flourish annulus that REPLACES the render's own
+ *            ring geometry with its own mask, plus a sweeping sheen.
+ *  laurel    two SVG olive branches masked onto the ::after layer, added
+ *            beside a plain ring rather than clipping the avatar — a wreath
+ *            sits around a circle, it does not reshape it.
+ *
+ * ── the two extra spec fields the elemental/shape set introduces ───────────
+ *
+ *  spec.drift   seconds, like spec.spin/spec.pulse. Drives a background-
+ *               position sweep (--cf-drift) instead of a rotation or an
+ *               opacity cycle — venom's bubbles, blood's drip, frost's and
+ *               ornate's sheen.
+ *  spec.shape   see above. Read directly off the spec by InjectCosmetics, not
+ *               computed into a custom property, because it selects a CSS
+ *               rule rather than feeding one — same treatment as
+ *               spec.pattern on a banner.
  *
  * ── spec.obtain, the four real ownership sources ────────────────────────────
  *
@@ -57,13 +107,21 @@ namespace Local\Cosmetics;
  *
  * ── where the colours come from ─────────────────────────────────────────────
  *
- * Every hex below is COPIED from looksmax-brand/less/brand.less, which is
- * generated and contrast-measured by looksmax-brand/tools/palette.py. Nothing
- * here is invented. The brand token each value corresponds to is named in the
+ * Every hex below is COPIED from looksmax-brand/less/brand.less where the hue
+ * exists there, and the brand token each value corresponds to is named in the
  * comment on its line. They are literals rather than var() references because
  * these strings are written into inline custom properties by the decorator and
  * a var() inside a gradient stop that is itself inside a var() does not
  * resolve reliably across the mask/border-box compositing this uses.
+ *
+ * The elemental frames (blaze, frost, venom, void, blood, nature) are the one
+ * deliberate exception: fire needs a true orange, blood needs a near-black
+ * red, toxic needs an acid yellow-green, and brand.less — one violet ramp, one
+ * cyan ramp, five semantic colours — has none of them. Those hexes are
+ * INVENTED, and each says so on its line rather than pointing at a brand
+ * token that isn't actually where the colour came from. They are chosen to
+ * read on both the light and the neon-black theme, same as everything else
+ * here; being invented does not exempt them from that.
  */
 final class Defs
 {
@@ -168,6 +226,139 @@ final class Defs
                     'spin' => 7, 'spin2' => 11,
                     'glow' => ['color' => '#e8c07d', 'size' => 14, 'alpha' => 0.4],
                     'obtain' => ['type' => 'never'],
+                ],
+            ],
+
+            // ------------------------------------------------------ elemental
+            // "ice and fire and lightning type shit" — ten themed frames, none
+            // of them a recoloured ring: eight run a bespoke render (see the
+            // docblock above and less/forum.less's "elemental renderers"
+            // section) and four of the ten also carry a non-circular
+            // spec.shape. Priced through real tiers and the real badges this
+            // file already reads, not through a new store SKU — that catalogue
+            // row lives in looksmax-ranks' Catalog::FRAMES /
+            // looksmax-store/src/Seed.php, a different lane this task does not
+            // touch, and a 'sku' obtain rule with no matching store_items row
+            // is exactly the "obtain rule that isn't real" the docblock above
+            // warns against.
+            [
+                'kind' => 'frame', 'slug' => 'blaze', 'sku' => null, 'sort' => 300,
+                'spec' => [
+                    'render' => 'blaze',
+                    'colors' => ['#ff6a00', '#ffb346', '#f75d59'],   // INVENTED (fire orange) core, --brand-warn, --brand-danger
+                    'width' => 3, 'inset' => 4,
+                    'spin' => 5,
+                    'glow' => ['color' => '#ff8a3d', 'size' => 12, 'alpha' => 0.5],   // INVENTED, between warn and danger
+                    'obtain' => ['type' => 'tier', 'tier' => 'vip'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'frost', 'sku' => null, 'sort' => 310,
+                'spec' => [
+                    'render' => 'frost',
+                    // INVENTED (ice-white core, brand has no near-white cyan), --brand-cyan-400, --brand-cyan-700
+                    'colors' => ['#eafcff', '#69dff6', '#1f96a9'],
+                    'width' => 3, 'inset' => 4,
+                    'drift' => 4.5,
+                    'glow' => ['color' => '#69dff6', 'size' => 11, 'alpha' => 0.45],   // --brand-cyan-400
+                    'obtain' => ['type' => 'tier', 'tier' => 'vip'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'storm', 'sku' => null, 'sort' => 320,
+                'spec' => [
+                    'render' => 'storm',
+                    // --brand-rank-ascended (base ring), --brand-cyan-300 (bolts, --cf-c2)
+                    'colors' => ['#ffffff', '#85ebff'],
+                    'width' => 2, 'inset' => 4,
+                    'pulse' => 2.4,   // the bolts' snap interval, not an easing pulse
+                    'glow' => ['color' => '#85ebff', 'size' => 13, 'alpha' => 0.55],
+                    'obtain' => ['type' => 'tier', 'tier' => 'elite'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'venom', 'sku' => null, 'sort' => 330,
+                'spec' => [
+                    'render' => 'venom',
+                    'colors' => ['#c8ff5e', '#6dd88e'],   // INVENTED (acid yellow-green, deliberately off the violet/cyan family), --brand-ok
+                    'width' => 2, 'inset' => 3,
+                    'drift' => 5.5,
+                    'glow' => ['color' => '#c8ff5e', 'size' => 9, 'alpha' => 0.4],   // INVENTED, matches colors[0]
+                    'obtain' => ['type' => 'tier', 'tier' => 'elite'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'royal', 'sku' => null, 'sort' => 340,
+                'spec' => [
+                    'render' => 'gradient', 'shape' => 'ornate',
+                    'angle' => 135,
+                    // --brand-rank-ascended, --brand-rank-gold, --brand-rank-bronze
+                    'colors' => ['#ffffff', '#e8c07d', '#c98b5e'],
+                    'width' => 2, 'inset' => 5,
+                    'drift' => 5,   // the sheen sweeping across the corner-flourish mask
+                    'glow' => ['color' => '#e8c07d', 'size' => 12, 'alpha' => 0.4],
+                    'obtain' => ['type' => 'tier', 'tier' => 'founder'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'void', 'sku' => null, 'sort' => 350,
+                'spec' => [
+                    'render' => 'void', 'shape' => 'hex',
+                    // --brand-bg, --brand-violet-900, --brand-violet-800
+                    'colors' => ['#0e0c17', '#270e56', '#4a3289'],
+                    'width' => 3, 'inset' => 5,
+                    'spin' => 16, 'pulse' => 4,
+                    'glow' => ['color' => '#6e54bd', 'size' => 14, 'alpha' => 0.5],   // --brand-violet-700, visible against the dark ring itself
+                    'obtain' => ['type' => 'never'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'nature', 'sku' => null, 'sort' => 360,
+                'spec' => [
+                    'render' => 'ring', 'shape' => 'laurel',
+                    // INVENTED (forest green, bracketing the one green brand.less has), --brand-ok
+                    'colors' => ['#1f963a', '#6dd88e'],
+                    'width' => 2, 'inset' => 4,
+                    // No spin/pulse/drift: a wreath does not need to move to
+                    // read as a wreath, and it is the cheapest frame in the set
+                    // for it — zero animated layers, never enters ANIMATED{}.
+                    'glow' => ['color' => '#6dd88e', 'size' => 8, 'alpha' => 0.3],
+                    'obtain' => ['type' => 'tier', 'tier' => 'plus'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'blood', 'sku' => null, 'sort' => 370,
+                'spec' => [
+                    'render' => 'blood', 'shape' => 'notched',
+                    'colors' => ['#8a0303', '#f75d59'],   // INVENTED (near-black red brand has no token for), --brand-danger
+                    'width' => 2, 'inset' => 4,
+                    'drift' => 3.2,
+                    'glow' => ['color' => '#8a0303', 'size' => 10, 'alpha' => 0.45],   // INVENTED, matches colors[0]
+                    'obtain' => ['type' => 'never'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'cosmic', 'sku' => null, 'sort' => 380,
+                'spec' => [
+                    'render' => 'cosmic',
+                    // --brand-violet-900, --brand-violet-500, --brand-rank-luminary (--cf-c2 star accent)
+                    'colors' => ['#270e56', '#9b7dfb', '#f0a5d0'],
+                    'width' => 2, 'inset' => 4,
+                    'spin' => 20, 'pulse' => 2.2,
+                    'glow' => ['color' => '#9b7dfb', 'size' => 12, 'alpha' => 0.5],
+                    'obtain' => ['type' => 'badge', 'badge' => 'liked-10k'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'glitch', 'sku' => null, 'sort' => 390,
+                'spec' => [
+                    'render' => 'glitch',
+                    // --brand-cyan-500 (clean channel), --brand-tier-founder (--cf-c2, the offset ghost channel)
+                    'colors' => ['#4ecee5', '#f7768e'],
+                    'width' => 2, 'inset' => 3,
+                    'pulse' => 2.6,   // the jump-cut interval, not an easing pulse
+                    'glow' => ['color' => '#4ecee5', 'size' => 9, 'alpha' => 0.45],
+                    'obtain' => ['type' => 'tier', 'tier' => 'plus'],
                 ],
             ],
 

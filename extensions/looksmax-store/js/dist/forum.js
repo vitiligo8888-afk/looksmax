@@ -992,7 +992,20 @@
         var body;
 
         if (S.error) {
-          body = m('div.StoreError', [icon('ph:warning-fill'), m('span', S.error)]);
+          // A dead end used to say only "reload the page" -- true, but it cost
+          // a full-page reload (losing scroll position and any open dialog)
+          // for what is usually a single dropped request. Retrying the same
+          // fetch this view already made costs one click instead.
+          var retryFor = which === 'orders' ? ['orders', 'orders']
+            : which === 'admin' ? ['admin', 'admin']
+            : ['catalogue', 'data'];
+          body = m('div.StoreError', [
+            icon('ph:warning-fill'),
+            m('span', S.error),
+            m('button.Button.Button--link.StoreError-retry', {
+              onclick: function () { S.error = null; get(retryFor[0], retryFor[1]); },
+            }, t('forum.action.retry', {}, 'Retry')),
+          ]);
         } else if (which === 'orders') {
           body = ordersView();
         } else if (which === 'inventory') {

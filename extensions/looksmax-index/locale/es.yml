@@ -63,6 +63,10 @@ local-looksmax-index:
         threads: discusiones
         posts: publicaciones
         members: miembros
+        # StatsBlock renders a fourth cell (the newest member) and this key was
+        # missing from both locales, so the front page printed the raw key
+        # "LOCAL-LOOKSMAX-INDEX.FORUM.INDEX.STATS.NEWEST" above the username.
+        newest: nuevo miembro
 
       news:
         heading: Novedades

@@ -260,6 +260,12 @@ class Definitions
             '--cf-w' => (int) ($spec['width'] ?? 2) . 'px',
             '--cf-inset' => '-' . (int) ($spec['inset'] ?? 3) . 'px',
             '--cf-c1' => $colors[0],
+            // The elemental renderers (blaze/frost/storm/venom/royal/void/blood/
+            // cosmic/glitch) need a second literal colour for a ghost channel, a
+            // star accent or a sheen highlight that isn't just "the gradient" —
+            // falls back to c1 so a one-colour spec never leaves the property
+            // empty for a renderer that expects it.
+            '--cf-c2' => $colors[1] ?? $colors[0],
             '--cf-glow' => $this->rgba($glowColor, $glowAlpha),
             '--cf-glow-size' => (int) ($glow['size'] ?? 8) . 'px',
         ];
@@ -285,6 +291,13 @@ class Definitions
         }
         if (isset($spec['pulse'])) {
             $props['--cf-pulse'] = ((float) $spec['pulse']) . 's';
+        }
+        // A second timing knob, for the renderers whose motion is a
+        // background-position drift (venom's ooze, blood's drip, royal's and
+        // frost's sheen sweep) rather than a rotation or an opacity pulse.
+        // Same reasoning as --cf-spin: a literal seconds string, never a calc().
+        if (isset($spec['drift'])) {
+            $props['--cf-drift'] = ((float) $spec['drift']) . 's';
         }
         if (isset($spec['inset2'])) {
             $props['--cf-inset2'] = '-' . (int) $spec['inset2'] . 'px';

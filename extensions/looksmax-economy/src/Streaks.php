@@ -2,6 +2,7 @@
 
 namespace Local\Economy;
 
+use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Database\ConnectionInterface;
 
 /**
@@ -29,21 +30,42 @@ use Illuminate\Database\ConnectionInterface;
  */
 class Streaks
 {
-    /** A post has to be at least this long to hold a streak. */
+    /**
+     * A post has to be at least this long to hold a streak. Default; the
+     * live number is `economy.streak.minLength` (Config::KEYS) and is read
+     * through minLength() below, never through this constant directly —
+     * TrackStreak and RevokeStreak both call minLength() so a settings
+     * change and the farming-bug fix agree on the exact same threshold.
+     */
     public const MIN_LENGTH = 80;
 
     public function __construct(
         protected ConnectionInterface $db,
-        protected Ledger $ledger
+        protected Ledger $ledger,
+        protected SettingsRepositoryInterface $settings
     ) {
+    }
+
+    public function minLength(): int
+    {
+        return (int) Config::get($this->settings, 'streak.minLength');
     }
 
     /**
      * Record activity for today and pay whatever it earned.
      *
+     * $postId, when given, is written to economy_streak_days as the ANCHOR
+     * for the day — the one post RevokeStreak will look for if it is later
+     * deleted. Only the post that actually causes pay() to run (the first
+     * qualifying post of a new day) becomes an anchor; a second qualifying
+     * post the same day hits the `$row->last_day === $today` branch below
+     * and returns before recordAnchor() is reached, which is correct: that
+     * post did not earn anything, so there is nothing to revoke if it is
+     * deleted.
+     *
      * @return array{current:int,best:int,paid:int,frozen:bool}
      */
-    public function touch(int $userId, ?string $today = null): array
+    public function touch(int $userId, ?string $today = null, ?int $postId = null): array
     {
         $today ??= gmdate('Y-m-d');
 
@@ -55,7 +77,10 @@ class Streaks
                 'last_day' => $today, 'freezes_used' => 0, 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
-            return ['current' => 1, 'best' => 1, 'paid' => $this->pay($userId, 1, $today), 'frozen' => false];
+            $paid = $this->pay($userId, 1, $today);
+            $this->recordAnchor($userId, $today, $postId);
+
+            return ['current' => 1, 'best' => 1, 'paid' => $paid, 'frozen' => false];
         }
 
         if ($row->last_day === $today) {
@@ -86,31 +111,104 @@ class Streaks
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-        return ['current' => $current, 'best' => $best, 'paid' => $this->pay($userId, $current, $today), 'frozen' => $frozen];
+        $paid = $this->pay($userId, $current, $today);
+        $this->recordAnchor($userId, $today, $postId);
+
+        return ['current' => $current, 'best' => $best, 'paid' => $paid, 'frozen' => $frozen];
     }
 
+    /**
+     * Record which post anchors a streak day, for RevokeStreak to find later.
+     * Unique on (user_id, day), and touch() only ever calls this once per
+     * user per day (see the doc comment on touch()), so the insert failing
+     * means only a genuine retry of the same request — safe to swallow.
+     */
+    private function recordAnchor(int $userId, string $day, ?int $postId): void
+    {
+        if ($postId === null) {
+            return;
+        }
+
+        try {
+            $this->db->table('economy_streak_days')->insert([
+                'user_id' => $userId,
+                'day' => $day,
+                'post_id' => $postId,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            // already anchored for this day — idempotent, not an error
+        }
+    }
+
+    /**
+     * @return array{current:int,best:int,lastDay:?string,freezesUsed:int,heldToday:bool,nextMilestone:?int,toNextMilestone:?int}
+     */
     public function of(int $userId): array
     {
         $row = $this->db->table('economy_streaks')->where('user_id', $userId)->first();
+        $current = (int) ($row->current ?? 0);
+        $today = gmdate('Y-m-d');
+
+        $milestones = Config::streakMilestones($this->settings);
+        $nextMilestone = null;
+        foreach ($milestones as $n) {
+            if ($n > $current) {
+                $nextMilestone = $n;
+                break;
+            }
+        }
 
         return [
-            'current' => (int) ($row->current ?? 0),
+            'current' => $current,
             'best' => (int) ($row->best ?? 0),
             'lastDay' => $row->last_day ?? null,
             'freezesUsed' => (int) ($row->freezes_used ?? 0),
+            // Whether today already counts — the widget's "you're done for
+            // today" state, vs. "post something to keep it going".
+            'heldToday' => ($row->last_day ?? null) === $today,
+            'nextMilestone' => $nextMilestone,
+            'toNextMilestone' => $nextMilestone !== null ? $nextMilestone - $current : null,
+            // True exactly on the days `current` sits ON a milestone value —
+            // the forum widget compares this against what it last celebrated
+            // (kept client-side) so a page reload does not re-fire the toast,
+            // without this endpoint needing to remember "have I shown this
+            // yet" itself.
+            'atMilestone' => in_array($current, $milestones, true),
         ];
     }
 
     /**
      * The day and week awards, referenced by date so a replay cannot pay twice
      * — the ledger's unique (user, reason, ref) does the rest.
+     *
+     * Also where a milestone celebration bonus is paid the first time a
+     * streak reaches one of `economy.streak.milestones` (default 7/30/100/365
+     * days) — invented for this pass because a streak that only ever pays a
+     * flat 5 or 40 gives an account no reason to notice day 100 versus day 93.
+     * Paid via credit(), not award(): see Ledger::refreshRank()'s comment on
+     * the identical countsForRank:false choice for the rank-up bonus, and the
+     * same bound applies here — a fixed number of milestones (four by
+     * default), each payable once per account, ever, via the `milestone:<n>`
+     * ref.
      */
     private function pay(int $userId, int $current, string $day): int
     {
         $paid = $this->ledger->award($userId, 'streak.day', 'day:' . $day);
 
-        if ($current > 0 && $current % 7 === 0) {
+        $weekEvery = max(1, (int) Config::get($this->settings, 'streak.weekEvery'));
+        if ($current > 0 && $current % $weekEvery === 0) {
             $paid += $this->ledger->award($userId, 'streak.week', 'week:' . $day);
+        }
+
+        foreach (Config::streakMilestones($this->settings) as $n) {
+            if ($current === $n) {
+                $bonus = (int) Config::get($this->settings, 'award.streakMilestone');
+                if ($bonus > 0) {
+                    $this->ledger->credit($userId, $bonus, 'streak.milestone', 'milestone:' . $n, false);
+                }
+                break; // $current cannot equal two different milestones at once
+            }
         }
 
         return $paid;

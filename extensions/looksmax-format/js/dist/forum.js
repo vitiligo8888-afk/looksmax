@@ -330,17 +330,60 @@
    * Done here rather than server-side because flarum/emoji performs the swap in
    * the browser, from the compiled bundle: no template override can reach it.
    */
+  function swapEmojiImg(img) {
+    var ch = img.getAttribute('alt');
+    if (!ch) return;
+    var span = document.createElement('span');
+    span.className = 'lmxEmoji';
+    span.textContent = ch;
+    if (img.parentNode) img.parentNode.replaceChild(span, img);
+  }
+
   function restoreEmoji(root) {
     (root || document)
       .querySelectorAll('img.emoji, img[class*="emoji"]')
-      .forEach(function (img) {
-        var ch = img.getAttribute('alt');
-        if (!ch) return;
-        var span = document.createElement('span');
-        span.className = 'lmxEmoji';
-        span.textContent = ch;
-        if (img.parentNode) img.parentNode.replaceChild(span, img);
-      });
+      .forEach(swapEmojiImg);
+  }
+
+  /**
+   * Catch the twemoji <img> AT INSERTION, before the fetch is dispatched.
+   *
+   * restoreEmoji() above runs on enhance(), which is after flarum/emoji has
+   * already put the element in the document — by then the browser has queued
+   * the request, CSP refuses it, and every emoji logs a console error and a
+   * failed request. The reader never saw a broken image (we swap it in time),
+   * but "renders fine while throwing" is exactly the state a console-error gate
+   * exists to catch, and it buried real errors in the noise.
+   *
+   * A MutationObserver callback runs as a microtask immediately after the
+   * mutation, which beats the network dispatch in practice. Clearing `src`
+   * first is the part that actually prevents the request; the swap then happens
+   * as before. This is best-effort by nature — if a fetch has already started
+   * we simply lose that race and land back on the old behaviour, which was
+   * already visually correct.
+   */
+  function watchEmoji() {
+    if (typeof MutationObserver !== 'function') return;
+
+    new MutationObserver(function (records) {
+      for (var i = 0; i < records.length; i++) {
+        var added = records[i].addedNodes;
+        for (var j = 0; j < added.length; j++) {
+          var n = added[j];
+          if (!n || n.nodeType !== 1) continue;
+          if (n.tagName === 'IMG' && /emoji/.test(n.className || '')) {
+            n.removeAttribute('src');
+            swapEmojiImg(n);
+          } else if (n.querySelectorAll) {
+            var imgs = n.querySelectorAll('img.emoji, img[class*="emoji"]');
+            for (var k = 0; k < imgs.length; k++) {
+              imgs[k].removeAttribute('src');
+              swapEmojiImg(imgs[k]);
+            }
+          }
+        }
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true });
   }
 
   function enhance() {
@@ -370,6 +413,15 @@
     enhance();
     observer.observe(document.body, { childList: true, subtree: true });
   }
+
+  /*
+   * Started IMMEDIATELY, not from start(). This script is injected in <head>,
+   * so documentElement exists but <body> does not yet — and the whole value of
+   * this observer is being live before flarum/emoji inserts its first <img>.
+   * The main observer above cannot do this job: it is rAF-debounced, which by
+   * definition runs after the frame in which the request was already sent.
+   */
+  watchEmoji();
 
   if (document.readyState !== 'loading') start();
   else document.addEventListener('DOMContentLoaded', start);

@@ -218,24 +218,59 @@
 }
 
 // `.colored` is core's marker for "this tag has a colour"; --tag-bg carries it.
+// The contrast-class variants are listed EXPLICITLY, not left to the base
+// selector, because core ships its own `.TagLabel.text-contrast--dark` /
+// `--light` rules for fill and ink. Those are (0,2,0) and beat a bare
+// `.TagLabel.colored`, and on this theme they resolved to --ink for BOTH the
+// background and the text: measured on the live discussion page, a chip with
+// `--tag-bg: #7aa2f7` rendered as rgb(240,239,244) text on rgb(240,239,244)
+// fill — 2.2:1, i.e. an invisible chip. Chaining the class here makes ours
+// (0,3,0) and wins without reaching for !important.
 .TagLabel.colored,
-.TagLabel--colored {
+.TagLabel.colored.text-contrast--dark,
+.TagLabel.colored.text-contrast--light,
+.TagLabel--colored,
+.TagLabel--colored.text-contrast--dark,
+.TagLabel--colored.text-contrast--light {
   background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 18%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 38%, transparent);
-  // The tag hue, lifted toward white until it is readable on a dark surface.
+  // The tag hue, lifted toward the scheme's TEXT colour until it is readable.
   // Doing this in one place is what makes an arbitrary imported palette safe.
-  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 72%, #fff);
+  //
+  // --ink, not #fff. Lifting toward white is correct on the black scheme and
+  // exactly wrong on the light one, where it washes an already-pale imported
+  // hue into the page. --ink is light on dark schemes and near-black on the
+  // light scheme, so one rule stays legible in all three.
+  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 72%, var(--ink));
 }
 
 // core sets these on the chip and on its children; both have to be neutralised
-// or the inner spans re-inherit the verdict colour
+// or the inner spans re-inherit the verdict colour.
+//
+// The children take the MIXED colour outright rather than `color: inherit`.
+// Inherit was the tidier expression of the same intent and it did not hold:
+// core's rule for `.TagLabel-name` is more specific than the chip's, so the
+// child kept painting the raw `--tag-bg` (measured: #7aa2f7 at 2.2:1 on the
+// chip fill, an unreadable label) while the parent was already correct.
+// Restating the mix here is what actually wins.
 .TagLabel.text-contrast--light,
 .TagLabel.text-contrast--dark,
+.TagLabel.colored .TagLabel-text,
+.TagLabel.colored .TagLabel-name,
+.TagLabel--colored .TagLabel-text,
+.TagLabel--colored .TagLabel-name,
 .TagLabel.text-contrast--light .TagLabel-text,
 .TagLabel.text-contrast--dark .TagLabel-text,
 .TagLabel.text-contrast--light .TagLabel-name,
 .TagLabel.text-contrast--dark .TagLabel-name {
-  color: inherit;
+  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 72%, var(--ink));
+}
+
+// An uncoloured chip has no hue to mix, so its children follow the chip's own
+// muted ink instead of resolving --tag-bg to the accent fallback.
+.TagLabel:not(.colored):not(.TagLabel--colored) {
+  .TagLabel-text,
+  .TagLabel-name { color: var(--ink-dim); }
 }
 
 .TagLabel-icon,
@@ -256,6 +291,47 @@ a.TagLabel:hover,
 a.TagLabel:focus-visible {
   background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 28%, transparent);
   text-decoration: none;
+}
+
+// ------------------------------------------------- list-row tag overflow
+//
+// A discussion with more than one tag shows a SECOND `.TagLabel` in the list
+// row. Core's own rule for it (forum.css, from flarum/tags):
+//
+//   .item-tags{position:absolute;right:80px;max-width:150px;overflow:hidden;
+//     -webkit-mask-image:linear-gradient(to right,#000 140px,transparent 150px);}
+//   .item-tags:hover{max-width:400px;-webkit-mask-image:none}
+//
+// — a fixed 150px window with a fade, widening on `:hover`. Two gaps in that,
+// both real user-impact rather than polish:
+//
+//   1. `.TagLabel` inside is a real, focusable link, so Tab can land on a tag
+//      that is still masked down to a sliver — content revealed only on
+//      :hover with no keyboard equivalent is a WCAG 1.4.13 miss, not just
+//      cosmetic. :focus-within mirrors the :hover core already wired.
+//   2. Below 768px core drops this mechanism entirely (no absolute
+//      positioning, no mask) and the tag list falls back into the
+//      single-line, ellipsised `.DiscussionListItem-info`. `text-overflow:
+//      ellipsis` only elides a TEXT node, so a second tag chip there gets
+//      clipped mid-glyph instead — hard, illegible, no fade. Measured on
+//      /t/p-blackpill at 390px: a second tag rendered as an unreadable
+//      2-3px sliver of colour with no way to ever read it, because a touch
+//      screen has no hover to fall back on either.
+@media (min-width: 768px) {
+  .IndexPage .DiscussionListItem-info > .item-tags:focus-within,
+  .UserPage .DiscussionListItem-info > .item-tags:focus-within {
+    max-width: 400px;
+    -webkit-mask-image: none;
+  }
+}
+
+@media (max-width: 767.98px) {
+  // Show only the row's own first tag. The rest stay reachable on the
+  // thread itself; a hard-clipped fragment of one is worse than not showing
+  // it at all.
+  .DiscussionListItem-info > .item-tags .TagLabel:not(:first-child) {
+    display: none;
+  }
 }
 
 // ---------------------------------------------------------------- featured

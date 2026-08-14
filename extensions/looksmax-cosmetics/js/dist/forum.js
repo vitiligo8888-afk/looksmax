@@ -267,7 +267,14 @@
 
   // --------------------------------------------------------------- frames
 
-  var ANIMATED = { conic: 1, dashed: 1, dual: 1 };
+  // Renderers with a continuous animation gated behind the IntersectionObserver
+  // below (see watch()) so an off-screen avatar never costs a compositor frame.
+  // 'nature' and 'laurel'-shaped frames are deliberately absent: they render a
+  // static leaf mask with no keyframe, so watch() would just be wasted work.
+  var ANIMATED = {
+    conic: 1, dashed: 1, dual: 1,
+    blaze: 1, frost: 1, storm: 1, venom: 1, royal: 1, void: 1, blood: 1, cosmic: 1, glitch: 1,
+  };
 
   function applyFrame(av, slug) {
     var d = (DEFS.frame || {})[slug];
@@ -302,6 +309,8 @@
     wrap.setAttribute('data-cf', slug);
     wrap.setAttribute('data-cf-render', d.r || 'ring');
     wrap.setAttribute('data-rarity', d.q || 'common');
+    if (d.s && d.s !== 'circle') wrap.setAttribute('data-cf-shape', d.s);
+    else wrap.removeAttribute('data-cf-shape');
 
     var css = d.c || {};
     for (var k in css) wrap.style.setProperty(k, css[k]);
@@ -319,6 +328,7 @@
     if (!wrap || !wrap.classList || !wrap.hasAttribute('data-cf')) return;
     wrap.removeAttribute('data-cf');
     wrap.removeAttribute('data-cf-render');
+    wrap.removeAttribute('data-cf-shape');
     wrap.removeAttribute('data-rarity');
     wrap.classList.remove('is-pulse', 'is-live');
     wrap.removeAttribute('style');
@@ -575,6 +585,7 @@
         if (d) {
           swatchWrap.setAttribute('data-cf', slug);
           swatchWrap.setAttribute('data-cf-render', d.r || 'ring');
+          if (d.s && d.s !== 'circle') swatchWrap.setAttribute('data-cf-shape', d.s);
           for (var k in (d.c || {})) swatchWrap.style.setProperty(k, d.c[k]);
           if (d.c && d.c['--cf-pulse']) swatchWrap.classList.add('is-pulse');
           swatchWrap.classList.add('is-live');
@@ -695,6 +706,7 @@
       if (d) {
         wrapper.setAttribute('data-cf', fslug);
         wrapper.setAttribute('data-cf-render', d.r || 'ring');
+        if (d.s && d.s !== 'circle') wrapper.setAttribute('data-cf-shape', d.s);
         for (var k2 in (d.c || {})) wrapper.style.setProperty(k2, d.c[k2]);
         if (d.c && d.c['--cf-pulse']) wrapper.classList.add('is-pulse');
         wrapper.classList.add('is-live');

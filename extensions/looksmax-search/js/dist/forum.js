@@ -1942,8 +1942,17 @@
     if (!sidebar || $('#lmx-related')) return;
 
     var title = ($('.DiscussionHero-title') || {}).textContent || document.title;
-    var box = el('div', { id: 'lmx-related', class: 'lmx-related' }, [
-      el('h3', {}, [icon('sparkle'), el('span', {}, [tr('forum.discovery.related', {}, 'Related threads')])]),
+    // <details>/<summary>, NOT a div+h3. On desktop this sits in the real
+    // sidebar column and open-by-default is correct. On mobile `.DiscussionPage-nav`
+    // is NOT a sidebar -- core stacks it in normal flow ABOVE the post stream
+    // (see forum.css `@media (max-width:767.98px)`), so an open-by-default card
+    // here pushed the thread's own first post below the fold behind five links
+    // to OTHER threads. <details> costs nothing extra (no JS toggle to wire,
+    // no extra state to track) and is keyboard/AT operable for free.
+    var boxAttrs = { id: 'lmx-related', class: 'lmx-related' };
+    if (!isMobile()) boxAttrs.open = '';
+    var box = el('details', boxAttrs, [
+      el('summary', {}, [icon('sparkle'), el('span', {}, [tr('forum.discovery.related', {}, 'Related threads')])]),
       el('div', { class: 'lmx-related-body' }, [
         el('div', { class: 'lmx-sk lmx-sk--line' }), el('div', { class: 'lmx-sk lmx-sk--line lmx-sk--short' }),
       ]),

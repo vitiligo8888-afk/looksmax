@@ -155,6 +155,7 @@ local-looksmax-store:
       retire: Retire
       restore: Restore
       show_fewer: Show fewer
+      retry: Retry
 
     loading:
       catalogue: Loading the catalogue…

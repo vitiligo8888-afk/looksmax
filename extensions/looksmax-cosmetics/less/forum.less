@@ -61,6 +61,62 @@
   50%      { background-position: 100% 0%; }
 }
 
+// ------------------------------------------------- the elemental keyframes
+// Five more, all still transform/opacity/background-position only. Reused
+// across renderers rather than one-per-theme: frost's sheen and royal's sheen
+// both run cf-drift, storm's snap and glitch's jump-cut both run on hard
+// steps() so the timing FEELS different even where the keyframe is shared.
+
+// background-position only. venom's bubbles, blood's drip, frost's and
+// ornate's sheen — direction and repeat come from how each renderer sizes and
+// tiles its own background, not from this keyframe.
+@keyframes cf-drift {
+  from { background-position: 0% 0%; }
+  to   { background-position: 100% 100%; }
+}
+
+// blaze's flame licks: irregular on purpose, so it reads as flicker and not
+// as a metronome.
+@keyframes cf-flicker {
+  0%, 100% { opacity: 0.55; }
+  20%      { opacity: 0.85; }
+  40%      { opacity: 0.4; }
+  60%      { opacity: 0.92; }
+  80%      { opacity: 0.5; }
+}
+
+// storm's bolts and glitch's ghost channel run this WITH steps(1) so the
+// browser holds each value instead of easing between them — a fade would
+// look like a pulse; a snap looks like electricity.
+@keyframes cf-snap {
+  0%, 18%   { opacity: 1; }
+  20%, 24%  { opacity: 0.15; }
+  26%, 60%  { opacity: 0.9; }
+  62%, 66%  { opacity: 0.2; }
+  68%, 100% { opacity: 1; }
+}
+
+// cosmic's star-dot layer. Same shape as cf-pulse but off-rhythm from it, so
+// a cosmic frame's two layers (rotating nebula + twinkling stars) don't
+// breathe in lockstep.
+@keyframes cf-twinkle {
+  0%   { opacity: 0.35; }
+  30%  { opacity: 0.9; }
+  55%  { opacity: 0.45; }
+  80%  { opacity: 1; }
+  100% { opacity: 0.35; }
+}
+
+// glitch's ghost ring. transform + opacity only, run with steps(1) — a
+// sideways jump-cut, not a slide.
+@keyframes cf-glitch {
+  0%, 80%   { transform: translateX(0); opacity: 0.5; }
+  83%       { transform: translateX(-2px); opacity: 0.85; }
+  86%       { transform: translateX(2px); opacity: 0.7; }
+  89%       { transform: translateX(-1px); opacity: 0.9; }
+  92%, 100% { transform: translateX(0); opacity: 0.5; }
+}
+
 // ============================================================ the frame
 //
 // Drawn on a wrapper AROUND the avatar, never as a border on it. Three reasons,

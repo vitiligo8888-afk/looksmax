@@ -49,6 +49,11 @@ class InjectCosmetics
                     // The pattern selects a CSS rule rather than feeding one, so
                     // it travels as an attribute value and not as a property.
                     'p' => (string) ($def['spec']['pattern'] ?? 'none'),
+                    // Same idea for a frame's silhouette: 'circle' (the default,
+                    // no attribute needed) or one of the four non-circular
+                    // shapes. It selects a CSS rule, so it is an attribute, not
+                    // a custom property.
+                    's' => (string) ($def['spec']['shape'] ?? 'circle'),
                     'c' => $def['css'],
                 ];
             }

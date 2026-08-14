@@ -1275,19 +1275,52 @@ a.lmx-tag:focus-visible { box-shadow: var(--ring); outline: none; }
 
 // ================================================================= discovery
 
+// `<details>`, not a div: collapsed by default on mobile (see mountDiscovery
+// in js/dist/forum.js) so five links to OTHER threads cannot sit above the
+// thread's own first post. summary gets the native disclosure behaviour —
+// keyboard-operable and announced by a screen reader with no JS of ours.
 .lmx-related { margin-top: var(--gap-lg); }
-.lmx-related h3 {
+.lmx-related summary {
   align-items: center;
   color: var(--ink-faint);
+  cursor: pointer;
   display: flex;
   font-size: var(--fs-xs);
   font-weight: 700;
   gap: 6px;
   letter-spacing: 0.08em;
+  list-style: none;
   margin: 0 0 var(--gap-sm);
+  // 44px minimum touch target on mobile without inflating the desktop row.
+  min-height: 28px;
+  padding: 8px 2px;
   text-transform: uppercase;
 
-  .lmx-ico { height: 13px; width: 13px; flex-basis: 13px; }
+  &::-webkit-details-marker { display: none; }
+  &::marker { content: ''; }
+
+  &:hover { color: var(--ink-dim); }
+  &:focus-visible { border-radius: var(--r-xs); box-shadow: var(--ring); outline: none; }
+
+  .lmx-ico { flex-basis: 13px; height: 13px; width: 13px; }
+
+  // A plain rotating chevron so a collapsed row still signals "expandable"
+  // rather than looking like a dead label.
+  &::after {
+    border-bottom: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    content: '';
+    height: 6px;
+    margin-left: auto;
+    transform: rotate(45deg);
+    transition: transform var(--t-fast) var(--ease);
+    width: 6px;
+  }
+}
+.lmx-related[open] summary::after { transform: rotate(-135deg); }
+
+@media (max-width: 767.98px) {
+  .lmx-related summary { min-height: 44px; }
 }
 .lmx-related-body { display: flex; flex-direction: column; gap: 2px; }
 .lmx-rel {
@@ -1299,6 +1332,7 @@ a.lmx-tag:focus-visible { box-shadow: var(--ring); outline: none; }
   text-decoration: none;
 }
 .lmx-rel:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+.lmx-rel:focus-visible { background: var(--surface-2); box-shadow: var(--ring); color: var(--ink); outline: none; }
 .lmx-rel-title {
   display: -webkit-box;
   -webkit-line-clamp: 2;

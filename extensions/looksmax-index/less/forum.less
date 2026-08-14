@@ -1440,7 +1440,17 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--cat, var(--accent)) 16%, transparent);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cat, var(--accent)) 34%, transparent);
-  color: var(--cat, var(--accent));
+  // The raw tag colour is NOT legible as text. These values come from the
+  // imported board's `tags.color` column and were picked for that board's
+  // lighter surfaces: measured here, "Discussion" (#414868) rendered at 2.16:1
+  // on the true-black page, well under the 4.5:1 body-text requirement.
+  //
+  // Mixing 72% of the tag hue with --ink keeps the tag identifiable while
+  // pinning the result near whichever end of the ramp the ACTIVE scheme uses
+  // for text — so it lifts toward light on the black scheme and darkens toward
+  // near-black on the light one. A hardcoded #fff here would fix the dark
+  // scheme and break the light one, which is the bug .TagLabel had.
+  color: color-mix(in srgb, var(--cat, var(--accent)) 72%, var(--ink));
   font-size: var(--fs-xs);
   font-weight: 700;
   letter-spacing: 0.01em;

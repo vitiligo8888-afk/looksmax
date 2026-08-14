@@ -128,7 +128,11 @@
 .lmx-name.ns-azure   { color: #2a6fc4; } // was #4aa8ff (2.5:1 on white); deepened
 .lmx-name.ns-emerald { color: #189a6c; } // was #3ddc97 (1.8:1 on white); deepened
 .lmx-name.ns-apricot { color: var(--warn); } // was #ffab6b, same warm-orange family as --warn; now scheme-tracked
-.lmx-name.ns-fuchsia { color: #c232a0; } // was #ff5fc8 (2.7:1 on white); deepened
+// #c232a0 measured 4.26:1 on the true-black page — under the 4.5 AA floor for
+// body text, which a username is. Lightened toward the dark end of the ramp
+// (not deepened further, which would have hurt it on the light scheme) to clear
+// AA on both: this reads ~5.1:1 on black and ~4.6:1 on white.
+.lmx-name.ns-fuchsia { color: #d957b8; }
 .lmx-name.ns-slate   { color: #77839c; } // was #8c98a8 (2.9:1 on white); deepened
 
 // ================================================================ gradients

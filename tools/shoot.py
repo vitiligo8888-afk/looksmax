@@ -13,7 +13,7 @@ Env:
   BASE   default http://localhost:8888
   SCHEME dark|light|neon  (sets localStorage lmx-scheme before load)
 """
-import os, sys, json, pathlib
+import os, re, sys, json, pathlib
 
 from playwright.sync_api import sync_playwright
 
@@ -45,7 +45,12 @@ def shoot(label, paths):
                     page.evaluate("s => localStorage.setItem('lmx-scheme', s)", SCHEME)
                 page.goto(url, wait_until="networkidle", timeout=45000)
                 page.wait_for_timeout(1200)  # let entry animations settle
-                slug = path.strip("/").replace("/", "_") or "home"
+                # Windows rejects ? " < > | : * in filenames -- a path with a
+                # query string (e.g. /search?q=x) used to crash the writer
+                # with OSError 22 partway through a run, after already
+                # spending the page load. Sanitize instead of trusting the
+                # path to be filename-safe.
+                slug = re.sub(r"[^A-Za-z0-9_-]+", "_", path.strip("/")) or "home"
                 fn = OUT / f"{label}_{slug}_{vp_name}.png"
                 page.screenshot(path=str(fn), full_page=(vp_name == "desktop"))
                 results.append({"url": url, "vp": vp_name, "file": str(fn),

@@ -2,6 +2,7 @@
 
 namespace Local\Economy;
 
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Database\ConnectionInterface;
 
@@ -26,7 +27,14 @@ use Illuminate\Database\ConnectionInterface;
  */
 class Ledger
 {
-    /** Base award per reason. Receiving beats emitting, by design. */
+    /**
+     * Base award per reason — the DEFAULTS, now. The numbers themselves live
+     * in Config::KEYS under `economy.award.*` and are editable from the admin
+     * panel without a deploy; this constant is what a fresh install (or a
+     * setting nobody has touched) falls back to, and it is the thing
+     * Config::KEYS's comments cite when explaining each default's provenance.
+     * See AWARD_KEYS below for the reason -> setting-key mapping.
+     */
     public const AWARDS = [
         'discussion.started'  => 5,
         'post.created'        => 2,
@@ -53,6 +61,23 @@ class Ledger
         'badge.earned'        => 1,
     ];
 
+    /** Ledger reason -> Config::KEYS suffix under `award.*`. */
+    private const AWARD_KEYS = [
+        'discussion.started'  => 'discussionStarted',
+        'post.created'        => 'postCreated',
+        'reaction.received'   => 'reactionReceived',
+        'reaction.given'      => 'reactionGiven',
+        'best_answer.awarded' => 'bestAnswerAwarded',
+        'guide.published'     => 'guidePublished',
+        'post.read_through'   => 'postReadThrough',
+        'thread.held'         => 'threadHeld',
+        'guide.sourced'       => 'guideSourced',
+        'streak.day'          => 'streakDay',
+        'streak.week'         => 'streakWeek',
+        'import.legacy'       => 'importLegacy',
+        'badge.earned'        => 'badgeEarned',
+    ];
+
     /**
      * Fallback ladder.
      *
@@ -74,7 +99,10 @@ class Ledger
         ['slug' => 'ascended', 'name' => 'Ascended', 'min' => 250000],
     ];
 
-    /** Awards of the same reason beyond this many in 24h are worth nothing. */
+    /**
+     * Awards of the same reason beyond this many in 24h are worth nothing.
+     * Defaults; see DAILY_CAP_KEYS and Config::KEYS's `cap.*` entries.
+     */
     private const DAILY_CAP = [
         'post.created' => 40,
         'reaction.given' => 60,
@@ -83,11 +111,22 @@ class Ledger
         'thread.held' => 60,
     ];
 
+    /** Ledger reason -> Config::KEYS suffix under `cap.*`. */
+    private const DAILY_CAP_KEYS = [
+        'post.created' => 'postCreated',
+        'reaction.given' => 'reactionGiven',
+        'reaction.received' => 'reactionReceived',
+        'post.read_through' => 'postReadThrough',
+        'thread.held' => 'threadHeld',
+    ];
+
     /** Reasons that are seeded in bulk and must not be rate limited. */
     private const UNCAPPED = ['import.legacy', 'badge.earned', 'streak.day', 'streak.week'];
 
-    public function __construct(protected ConnectionInterface $db)
-    {
+    public function __construct(
+        protected ConnectionInterface $db,
+        protected SettingsRepositoryInterface $settings
+    ) {
     }
 
     /**
@@ -100,7 +139,8 @@ class Ledger
      */
     public function award(int $userId, string $reason, ?string $ref = null, ?int $actorId = null, float $multiplier = 1.0): int
     {
-        $base = self::AWARDS[$reason] ?? 0;
+        $key = self::AWARD_KEYS[$reason] ?? null;
+        $base = $key !== null ? (int) Config::get($this->settings, 'award.' . $key) : 0;
         if ($base === 0 || $userId <= 0) {
             return 0;
         }
@@ -290,16 +330,111 @@ class Ledger
     }
 
     /**
+     * How close an account is to the NEXT rank, for the progress bar this
+     * extension previously had no way to draw — every other surface (the
+     * store's tier cards, the identity layer's own richer `identity`
+     * attribute) already shows a member what they own; nothing showed them
+     * what they were working toward, which is the more motivating number for
+     * the 95% of accounts who own nothing yet. Only used as the FALLBACK on
+     * UserSerializer, same rule as points/lifetimePoints/rankSlug above: if
+     * looksmax-ranks is installed its own `identity` attribute already
+     * carries next-rank data (Standing.php `nextRank`) and this is not
+     * duplicated.
+     *
+     * @return array{rankSlug:string,nextRankSlug:?string,pointsToNextRank:?int,rankProgressPct:int}
+     */
+    public function progress(int $lifetimePoints): array
+    {
+        $ranks = $this->ranks();
+        $current = $this->rankFor($lifetimePoints);
+
+        $idx = null;
+        foreach ($ranks as $i => $r) {
+            if ($r['slug'] === $current['slug']) {
+                $idx = $i;
+                break;
+            }
+        }
+
+        $next = $idx !== null && isset($ranks[$idx + 1]) ? $ranks[$idx + 1] : null;
+
+        if ($next === null) {
+            // Top of the ladder. 100%, not 0/0 — a progress bar that reads
+            // "0 of 0 points to go" at the top rank looks broken; full and
+            // still is the honest picture.
+            return [
+                'rankSlug' => $current['slug'],
+                'nextRankSlug' => null,
+                'pointsToNextRank' => null,
+                'rankProgressPct' => 100,
+            ];
+        }
+
+        $span = max(1, $next['min'] - $current['min']);
+        $into = max(0, $lifetimePoints - $current['min']);
+        $pct = (int) min(100, max(0, round($into / $span * 100)));
+
+        return [
+            'rankSlug' => $current['slug'],
+            'nextRankSlug' => $next['slug'],
+            'pointsToNextRank' => max(0, $next['min'] - $lifetimePoints),
+            'rankProgressPct' => $pct,
+        ];
+    }
+
+    /**
      * Rank follows lifetime_points, never the spendable balance.
      *
      * This was a real defect in the first cut: it read `points`, so the moment
      * a store existed, buying anything would silently demote the buyer.
+     *
+     * Also where a rank-up is celebrated. The bonus is paid with credit(),
+     * NOT award(): countsForRank is explicitly false, because a bonus for
+     * reaching a rank must not itself count toward lifetime_points — that
+     * would risk the bonus pushing the account across the NEXT threshold too,
+     * which would pay another bonus, which could push it across a third. The
+     * ref is `rank:<slug>`, so it can only ever be paid once per rank per
+     * account, ever — worth noting for the shape of what this can be worth:
+     * with ten rungs on the ladder (Ledger::RANKS) and a default of 20 per
+     * rung, the absolute ceiling this adds to any single account, under any
+     * sequence of events, is 200 points. That bound is deliberate: it is why
+     * this does not also try to claw the bonus back if a later post deletion
+     * drops the account back below the rank it celebrated — writing that
+     * clawback correctly would mean revoke() learning to distinguish a
+     * countsForRank:false credit from a normal award (today it does not, and
+     * teaching it wrong would corrupt lifetime_points for every OTHER
+     * countsForRank:false credit already in production — store.credits,
+     * store.refund, admin.adjust). A bounded, well-understood 200-point
+     * worst case is a better trade than a lifetime_points bug in the ledger
+     * every real balance on this install depends on.
      */
     public function refreshRank(int $userId): void
     {
-        $lifetime = (int) $this->db->table('users')->where('id', $userId)->value('lifetime_points');
-        $this->db->table('users')->where('id', $userId)
-            ->update(['rank_slug' => $this->rankFor($lifetime)['slug']]);
+        $row = $this->db->table('users')->where('id', $userId)->first(['lifetime_points', 'rank_slug']);
+        $lifetime = (int) ($row->lifetime_points ?? 0);
+        $before = (string) ($row->rank_slug ?? '');
+        $after = $this->rankFor($lifetime)['slug'];
+
+        if ($after !== $before) {
+            $this->db->table('users')->where('id', $userId)->update(['rank_slug' => $after]);
+        }
+
+        if ($after !== $before && $this->isHigherRank($after, $before)) {
+            $bonus = (int) Config::get($this->settings, 'award.rankUp');
+            if ($bonus > 0) {
+                $this->credit($userId, $bonus, 'rank.milestone', 'rank:' . $after, false);
+            }
+        }
+    }
+
+    /** True if $after sits strictly above $before on the ladder. An unrecognised slug (including '', a brand new account) is treated as the bottom rung, not as "higher than everything" — see refreshRank(). */
+    private function isHigherRank(string $after, string $before): bool
+    {
+        $order = array_column($this->ranks(), 'slug');
+        $a = array_search($after, $order, true);
+        $b = array_search($before, $order, true);
+
+        return ($a === false ? 0 : $a) > ($b === false ? 0 : $b);
     }
 
     /**
@@ -354,12 +489,12 @@ class Ledger
             return false;
         }
 
-        $cap = self::DAILY_CAP[$reason] ?? null;
-        if ($cap === null) {
+        $key = self::DAILY_CAP_KEYS[$reason] ?? null;
+        if ($key === null) {
             return false;
         }
 
-        $cap = (int) round($cap * $boost);
+        $cap = (int) round((int) Config::get($this->settings, 'cap.' . $key) * $boost);
 
         $count = $this->db->table('economy_transactions')
             ->where('user_id', $userId)

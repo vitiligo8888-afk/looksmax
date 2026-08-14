@@ -638,9 +638,25 @@
   border-radius: var(--r-md);
   color: var(--danger);
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   padding: var(--pad);
+
+  > span { flex: 1 1 auto; min-width: 160px; }
 }
+
+.StoreError-retry {
+  background: transparent;
+  border: 1px solid var(--danger-a45);
+  border-radius: var(--r-sm);
+  color: var(--danger);
+  flex: 0 0 auto;
+  font-weight: 600;
+  min-height: 32px;
+  padding: 6px 12px;
+}
+.StoreError-retry:hover { background: var(--danger-a14); }
+.StoreError-retry:focus-visible { box-shadow: var(--ring-danger); outline: none; }
 
 // ------------------------------------------------------------- inventory
 
