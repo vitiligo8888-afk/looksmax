@@ -8,6 +8,7 @@ with sync_playwright() as p:
     errs=[]; failed=[]; responses=[]
     pg.on("console", lambda m: errs.append(m.type+": "+m.text[:300]) if m.type in ("error","warning") else None)
     pg.on("requestfailed", lambda r: failed.append(f"{r.method} {r.url[:120]} :: {r.failure}"))
+    pg.on("pageerror", lambda e: errs.append("PAGEERROR: " + str(e)[:400]))
     pg.on("response", lambda r: responses.append((r.status, r.request.method, r.url[:130])) if r.status>=400 else None)
     try:
         pg.goto(url, wait_until="domcontentloaded", timeout=45000)

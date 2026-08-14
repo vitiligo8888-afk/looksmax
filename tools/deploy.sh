@@ -107,6 +107,29 @@ docker exec flarum-app php flarum migrate 2>&1 | grep -viE 'nothing to migrate|^
 docker exec flarum-app php flarum cache:clear >/dev/null 2>&1
 sleep 2
 
+# BUST THE CDN, or the deploy is invisible.
+#
+# Flarum serves /assets/forum.css?v=<rev> with Cache-Control max-age=2592000 —
+# thirty days — and Cloudflare honours it. That is correct ONLY if <rev> changes
+# when the content does, and measured here it does NOT: a CSS edit recompiled
+# the file while rev-manifest.json kept the same hash, so the URL was identical
+# and Cloudflare kept serving a stale stylesheet (cf-cache-status HIT, Age 1758)
+# with the old rules in it. The fix had shipped to the origin and no reader
+# could see it.
+#
+# Rewriting the manifest hash changes the query string, which is a new URL to
+# the CDN and therefore a guaranteed miss. Cheap, and it makes "I deployed CSS
+# and nothing changed" impossible.
+NEWREV=\$(date +%s%N | md5sum | cut -c1-8)
+docker exec -e NEWREV="\$NEWREV" flarum-app php -r '
+\$f = "/flarum/app/public/assets/rev-manifest.json";
+if (!is_file(\$f)) { exit; }
+\$m = json_decode(file_get_contents(\$f), true) ?: [];
+if (isset(\$m["forum.css"])) { \$m["forum.css"] = getenv("NEWREV"); }
+file_put_contents(\$f, json_encode(\$m));
+echo "    css rev -> " . getenv("NEWREV") . PHP_EOL;
+' 2>/dev/null
+
 echo "==> probing"
 probe_all
 BAD=\$(cat /tmp/probe-bad-$TS)

@@ -87,7 +87,16 @@ a[href$="/u/chris"].LmxAuthor-name::before {
   height: 0.92em;
   margin-right: 0.28em;
   vertical-align: -0.09em;
-  background: url("../assets/emoji/1f451.svg") center / contain no-repeat;
+  // ABSOLUTE published path, not a relative one.
+  //
+  // A url() in LESS resolves against the COMPILED stylesheet, which Flarum
+  // writes to /assets/forum.css — so "../assets/emoji/1f451.svg" resolved to
+  // /assets/emoji/1f451.svg and 404ed on every page that rendered a crown.
+  // (This file is reached via @import from forum.less:401, so it does ship
+  // even though extend.php never lists it directly.) Flarum publishes an
+  // extension's assets/ to /assets/extensions/<id>/, which is where the file
+  // actually is — verified 200.
+  background: url("/assets/extensions/local-looksmax-reactions/emoji/1f451.svg") center / contain no-repeat;
   -webkit-text-fill-color: initial;
   filter: drop-shadow(0 0 3px rgba(230, 177, 105, 0.7));
 }
