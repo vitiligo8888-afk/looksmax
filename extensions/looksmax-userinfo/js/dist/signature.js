@@ -82,10 +82,30 @@
   }
 
   function decorate(post) {
-    if (post.querySelector(':scope > .LmxSig')) return;
-
+    // IDEMPOTENCE GUARD, on the post element itself.
+    //
+    // This used to test `post.querySelector(':scope > .LmxSig')` — a DIRECT
+    // child of the post. The signature is inserted with
+    // `body.insertAdjacentElement('afterend', ...)`, which lands it as a
+    // SIBLING OF .Post-body, one level deeper than that selector can see. So
+    // the guard never matched, and since this runs from a MutationObserver,
+    // every mutation appended another signature: the node count grew without
+    // bound until the tab died.
+    //
+    // It only reproduced on pages showing an author who actually HAS a
+    // signature (everyone else returns early below), which is why it looked
+    // like "new discussions hang" — the only account with one had authored
+    // them, so every other thread looked healthy.
     var body = post.querySelector('.Post-body');
     if (!body) return;
+
+    // Test the node we ACTUALLY insert, in the place we actually insert it.
+    // Marking the post up-front would be simpler but wrong: on the first pass
+    // the user payload may not be in the store yet, signatureFor() returns
+    // null, and a post flagged "done" would never get its signature when the
+    // data arrives a tick later.
+    var next = body.nextElementSibling;
+    if (next && next.classList && next.classList.contains('LmxSig')) return;
 
     // The author link in the post header carries the slug.
     var link = post.querySelector('.PostUser a[href*="/u/"], .Post-header a[href*="/u/"]');
@@ -213,7 +233,20 @@
 
   function start() {
     tick();
-    new MutationObserver(tick).observe(document.body, { childList: true, subtree: true });
+
+    // rAF-debounced. tick() sweeps every post on the page, and the enhancers
+    // in this forum mutate the DOM themselves, so an undebounced observer runs
+    // a full sweep for each of their mutations. One pass per frame is enough
+    // and keeps a long thread responsive.
+    var scheduled = false;
+    new MutationObserver(function () {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(function () {
+        scheduled = false;
+        tick();
+      });
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   if (document.readyState === 'loading') {
