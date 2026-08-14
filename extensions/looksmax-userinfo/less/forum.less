@@ -171,7 +171,11 @@
   max-width: 100%;
   font-weight: 700;
   font-size: var(--fs-lg);
-  color: var(--ink);
+  // Falls back to --ink when the author has no catalogue colour. When they do,
+  // nameNode() hands it over as --lmx-name-color and it is mixed toward --ink so
+  // the active scheme picks the direction -- the pale rank hues were built for
+  // the black page and measured as low as 1.62:1 on the light one.
+  color: color-mix(in srgb, var(--lmx-name-color, var(--ink)) 60%, var(--ink));
   text-decoration: none;
   overflow-wrap: anywhere;
   transition: filter var(--t-fast) var(--ease);

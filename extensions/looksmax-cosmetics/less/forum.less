@@ -24,11 +24,24 @@
 //    (looksmax-store/less/forum.less:238-242) so that "epic" is the same colour
 //    in the shop and in the wardrobe.
 //
-// 4. Every mask-image below is an inline SVG data: URI, never an external
-//    image URL — the forum's CSP is `img-src 'self' data: blob:`, so anything
-//    hotlinked would render as a broken box. Every literal '#' inside one is
-//    written '%23': a raw '#' inside url("data:...") starts a fragment, not a
-//    fill colour, and silently breaks the shape it's on.
+// 4. UPDATE 2026-08-14: this file no longer has a single url() or mask-image
+//    in it. The elemental set (blaze/frost/venom/void/blood/cosmic/glitch/
+//    storm) and the ornate/laurel shapes originally shipped with inline SVG
+//    data: URIs as mask-image — legal under this forum's `img-src 'self'
+//    data: blob:` CSP, so not a CSP problem — but production showed them all
+//    painting nothing (a plain neutral ring) while every renderer using ONLY
+//    the xor mask technique below rendered correctly. That is the tell: the
+//    failure tracked the url()/data-URI mechanism itself, not any one
+//    renderer's artwork, and there was no way to test-compile against the
+//    actual wikimedia/less.php port to find out WHERE in that mechanism it
+//    broke. So every non-circular silhouette in this file is now built from
+//    two techniques already proven correct in production before this file
+//    ever had a url() in it: the xor mask (`linear-gradient(#000 0 0)
+//    padding-box, linear-gradient(#000 0 0); mask-composite: exclude` — no
+//    url(), ember and glacier have shipped it for a while) for the ring
+//    itself, and clip-path: polygon(...) or literal radial-gradient()
+//    ellipses for the shape on top. Nothing below references an external
+//    image URL either way, so the CSP point above is moot but still true.
 //
 // ── the class-name interlock with looksmax-ranks ───────────────────────────
 //
@@ -234,11 +247,15 @@
 // ============================================================ elemental renderers
 //
 // Eight themed engines, none of them a recoloured ring: each draws its own
-// silhouette (an inline SVG mask, data:, %23 in place of every '#' because a
-// literal '#' inside url("...") is a fragment, not a colour) and moves it a
-// different way. Still the same rules as the five renderers above: no
-// fade()/darken() on a var(), no calc(), transform/opacity/background-position
-// only, at most two animated layers, paused until .is-live.
+// silhouette and moves it a different way. Originally that silhouette was an
+// inline SVG mask-image; see the "UPDATE 2026-08-14" note at the top of this
+// file for why every one of them is now built from the xor mask technique
+// (proven in production by ember/glacier/circuit below) plus clip-path or
+// literal radial-gradient() positions instead — no url(), no mask-image,
+// anywhere in this section. Still the same rules as the five renderers
+// above: no fade()/darken() on a var(), no calc(),
+// transform/opacity/background-position only, at most two animated layers,
+// paused until .is-live.
 //
 // `.is-pulse::before` (declared above, for the pulse renderers this file
 // shipped with first) would otherwise win the cascade on every renderer below
@@ -279,21 +296,30 @@
 }
 
 // ---------------------------------------------------------------- blaze (fire)
-// An SVG flame-lick annulus — jagged outer edge, round inner edge, one
-// compound path with fill-rule evenodd so the "hole" needs no second mask
-// layer. ::before rolls it slowly; ::after is the SAME mask, flickering
-// opacity, so the flame's edge itself seems to gutter rather than just
-// dimming a static ring.
+// FIXED 2026-08-14: this used to be a single SVG data: URI as mask-image —
+// the only url() in this whole file. Production showed it painting nothing
+// (a plain neutral ring), while every renderer below that uses ONLY the
+// proven xor mask (linear-gradient(#000 0 0) padding-box/border-box,
+// mask-composite: exclude — the same mechanism ember and glacier already
+// ship with) rendered correctly. That is the tell: the failure tracks the
+// url()/data-URI mechanism itself, not this renderer's colours or geometry,
+// so every silhouette below is now built from the SAME proven mask PLUS
+// clip-path — a plain numeric polygon() has no url(), no nested quoting, and
+// no nonstandard mask-size/intrinsic-size resolution for wikimedia/less.php
+// or the browser to get wrong. clip-path only needs to describe the OUTER
+// jagged edge now; the annulus "hole" still comes from the xor mask, so the
+// hand-picked points below are the outer flame-lick ring from the original
+// SVG, unchanged, just re-expressed as percentages instead of path data.
 .LmxCosFrame[data-cf-render='blaze']::before,
 .LmxCosFrame[data-cf-render='blaze']::after {
   display: block;
+  border: var(--cf-w, 3px) solid transparent;
   background: var(--cf-linear) border-box;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M50 4L62.2 20.4L78.3 21.7L77.7 38.5L94 50L78.6 61.9L76.9 76.9L61.1 76.8L50 95L37.4 80.5L21 79L22.3 61.5L3 50L20.4 37.8L22.4 22.4L38.9 23.2ZM76 50A26 26 0 1 0 24 50A26 26 0 1 0 76 50Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M50 4L62.2 20.4L78.3 21.7L77.7 38.5L94 50L78.6 61.9L76.9 76.9L61.1 76.8L50 95L37.4 80.5L21 79L22.3 61.5L3 50L20.4 37.8L22.4 22.4L38.9 23.2ZM76 50A26 26 0 1 0 24 50A26 26 0 1 0 76 50Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  clip-path: polygon(50% 4%, 62.2% 20.4%, 78.3% 21.7%, 77.7% 38.5%, 94% 50%, 78.6% 61.9%, 76.9% 76.9%, 61.1% 76.8%, 50% 95%, 37.4% 80.5%, 21% 79%, 22.3% 61.5%, 3% 50%, 20.4% 37.8%, 22.4% 22.4%, 38.9% 23.2%);
 }
 .LmxCosFrame[data-cf-render='blaze']::before {
   animation: cf-spin var(--cf-spin, 5s) linear infinite;
@@ -306,18 +332,17 @@
 }
 
 // ---------------------------------------------------------------- frost (ice)
-// A second SVG annulus, this one straight-edged facets rather than flame
-// licks, and static — ice does not roil. The motion is a diagonal sheen
-// masked to the SAME facets, so the shimmer looks like light catching a
-// crystal edge rather than a generic gradient sweep.
+// Same fix as blaze, same reasoning: proven xor mask for the annulus, the ice
+// facets are now the outer edge's clip-path (fewer, sharper points than
+// blaze's — angular rather than licking).
 .LmxCosFrame[data-cf-render='frost']::before,
 .LmxCosFrame[data-cf-render='frost']::after {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M94 50L80.3 67.5L71 86.4L50 85L28 88.1L19.7 67.5L8 50L19.7 32.5L28 11.9L50 15L71 13.6L80.3 32.5ZM80 50A30 30 0 1 0 20 50A30 30 0 1 0 80 50Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M94 50L80.3 67.5L71 86.4L50 85L28 88.1L19.7 67.5L8 50L19.7 32.5L28 11.9L50 15L71 13.6L80.3 32.5ZM80 50A30 30 0 1 0 20 50A30 30 0 1 0 80 50Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  border: var(--cf-w, 3px) solid transparent;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  clip-path: polygon(94% 50%, 80.3% 67.5%, 71% 86.4%, 50% 85%, 28% 88.1%, 19.7% 67.5%, 8% 50%, 19.7% 32.5%, 28% 11.9%, 50% 15%, 71% 13.6%, 80.3% 32.5%);
 }
 .LmxCosFrame[data-cf-render='frost']::before {
   display: block;
@@ -326,6 +351,7 @@
 .LmxCosFrame[data-cf-render='frost']::after {
   display: block;
   background-image: repeating-linear-gradient(115deg, transparent 0 12%, var(--white-a10) 12% 14%, transparent 14% 100%);
+  background-origin: border-box;
   background-size: 220% 220%;
   animation: cf-drift var(--cf-drift, 4.5s) linear infinite;
   animation-play-state: paused;
@@ -333,24 +359,32 @@
 
 // ------------------------------------------------------------ storm (lightning)
 // ::before is the plain 'ring' rule below (storm is in that selector group).
-// ::after is two SVG bolt glyphs, positioned once by hand rather than
-// centred, because a lightning strike is not symmetric. Both layers snap on
-// the SAME steps() timing, driven by spec.pulse, so the whole frame appears
-// to lose and regain power together rather than the bolts flickering over an
-// unrelated steady ring.
+// ::after used to be two SVG bolt glyphs; same fix as blaze/frost, but a
+// literal zigzag bolt is not one convex outer edge the way flame/ice are, so
+// instead of a clip-path this is now a jagged repeating-conic-gradient —
+// irregular sharp-edged wedges, hand-written stops (no each()/range()) —
+// masked by the same proven xor technique. Reads as an electric crackle
+// running the ring rather than two static bolt icons, which is arguably MORE
+// electric, not less. Both layers still snap on the SAME steps() timing.
 .LmxCosFrame[data-cf-render='storm'].is-pulse::before {
   animation: cf-snap var(--cf-pulse, 2.4s) steps(1) infinite;
   animation-play-state: paused;
 }
 .LmxCosFrame[data-cf-render='storm']::after {
   display: block;
-  background: var(--cf-c2, #fff);
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg transform='translate(72,32) rotate(20) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3Cg transform='translate(28,68) rotate(200) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg transform='translate(72,32) rotate(20) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3Cg transform='translate(28,68) rotate(200) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3C/svg%3E");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  border: var(--cf-w, 2px) solid transparent;
+  background-image: repeating-conic-gradient(
+    from 0deg,
+    var(--cf-c2, #fff) 0deg 4deg, transparent 4deg 9deg,
+    var(--cf-c2, #fff) 9deg 11deg, transparent 11deg 23deg,
+    var(--cf-c2, #fff) 23deg 25deg, transparent 25deg 33deg,
+    var(--cf-c2, #fff) 33deg 40deg, transparent 40deg 51deg
+  );
+  background-origin: border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   animation: cf-snap var(--cf-pulse, 2.4s) steps(1) infinite;
   animation-play-state: paused;
 }
@@ -480,9 +514,10 @@
 // fight — so void keeps rotating inside its hex crop and blood keeps
 // dripping inside its notch.
 //
-// ornate and laurel are SVG masks that REPLACE the renderer's own ring
-// geometry outright (a corner-flourish or a wreath is not expressible as a
-// clip-path polygon). Both selectors below match at the same (0,2,1)
+// ornate is also clip-path (added, not replacing, the renderer's own mask);
+// laurel is ten literal radial-gradient() ellipses, no mask needed at all.
+// Nothing in this section uses url()/mask-image any more — see the note on
+// blaze above for why. All four selectors below match at the same (0,2,1)
 // specificity as every [data-cf-render] rule above, so — same rule as the
 // is-pulse overrides — being BELOW them in the file is what makes them win.
 
@@ -500,44 +535,62 @@
   clip-path: polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%);
 }
 
-// A second SVG annulus again — base radius near-circular, four diagonal
-// points pulled out into small flourishes — filled with the frame's own
-// gradient and, on ::after, the same diagonal sheen frost/royal already use.
+// FIXED 2026-08-14, same root cause and same fix as blaze/frost/storm above
+// (see the note on blaze): no url(), no SVG, no mask-image at all for either
+// of these two any more.
+//
+// ornate: royal's ::before is already a complete rendered ring — 'gradient'
+// is its render, so the shared rule near the top of this file already gave
+// it border + --cf-linear background + the proven xor mask. This rule does
+// not need to redeclare any of that; it only ADDS a clip-path, restricting
+// that already-correct ring's outer edge from a circle to the corner-
+// flourish silhouette (the same points the old SVG traced). ::after has
+// nothing from 'gradient' to build on (gradient never touches ::after), so
+// it gets the full treatment: the proven xor mask for its own ring, the
+// diagonal sheen as background, and the SAME clip-path.
 .LmxCosFrame[data-cf-shape='ornate']::before,
 .LmxCosFrame[data-cf-shape='ornate']::after {
-  display: block;
-  border: none;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M88 50L92.5 67.6L76.9 76.9L62.6 80.5L50 88L32.4 92.5L23.1 76.9L19.5 62.6L12 50L7.5 32.4L23.1 23.1L37.4 19.5L50 12L67.6 7.5L76.9 23.1L80.5 37.4ZM79 50A29 29 0 1 0 21 50A29 29 0 1 0 79 50Z' fill='%23000'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M88 50L92.5 67.6L76.9 76.9L62.6 80.5L50 88L32.4 92.5L23.1 76.9L19.5 62.6L12 50L7.5 32.4L23.1 23.1L37.4 19.5L50 12L67.6 7.5L76.9 23.1L80.5 37.4ZM79 50A29 29 0 1 0 21 50A29 29 0 1 0 79 50Z' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-}
-.LmxCosFrame[data-cf-shape='ornate']::before {
-  background: var(--cf-linear) border-box;
+  clip-path: polygon(88% 50%, 92.5% 67.6%, 76.9% 76.9%, 62.6% 80.5%, 50% 88%, 32.4% 92.5%, 23.1% 76.9%, 19.5% 62.6%, 12% 50%, 7.5% 32.4%, 23.1% 23.1%, 37.4% 19.5%, 50% 12%, 67.6% 7.5%, 76.9% 23.1%, 80.5% 37.4%);
 }
 .LmxCosFrame[data-cf-shape='ornate']::after {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
   background-image: repeating-linear-gradient(115deg, transparent 0 10%, var(--white-a10) 10% 13%, transparent 13% 100%);
+  background-origin: border-box;
   background-size: 220% 220%;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   animation: cf-drift var(--cf-drift, 5s) linear infinite;
   animation-play-state: paused;
 }
 
-// Two SVG olive branches on ::after, added beside whatever ::before the
-// renderer already drew (nature's plain green ring) rather than replacing it
-// — a wreath sits around a circle, it does not reshape one. Static: no
-// animation, so it never enters ANIMATED{} in js/dist/forum.js and never
-// costs the IntersectionObserver a subscription.
+// laurel: a wreath is ten discrete leaf blobs, not one closed outline, so it
+// was never going to be a clip-path candidate the way ornate is. Same fix in
+// spirit though — no SVG, no mask-image: it's ten literal radial-gradient()
+// ellipses, hand-positioned at the same points the old SVG's leaves sat at,
+// alternating --cf-c1/--cf-c2 the same way venom's bubbles and cosmic's
+// stars already do. No mask needed at all: these are small opaque shapes
+// well inside the box, not a ring that needs an annulus cut out of it.
+// Still added beside whatever ::before the renderer already drew (nature's
+// plain green ring) rather than replacing it — a wreath sits around a
+// circle, it does not reshape one. Still static: no animation, so it still
+// never enters ANIMATED{} in js/dist/forum.js.
 .LmxCosFrame[data-cf-shape='laurel']::after {
   display: block;
   border: none;
-  background: var(--cf-linear) border-box;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92 44.1 83.5 L 29.7 80.3 L 17.1 71 L 9 56.3 L 7.5 38.6' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cpath d='M50 92 55.9 83.5 L 70.3 80.3 L 82.9 71 L 91 56.3 L 92.5 38.6' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cellipse cx='44.1' cy='83.5' rx='6.5' ry='2.8' transform='rotate(190 44.1 83.5)' fill='%23000'/%3E%3Cellipse cx='29.7' cy='80.3' rx='6.5' ry='2.8' transform='rotate(213.8 29.7 80.3)' fill='%23000'/%3E%3Cellipse cx='17.1' cy='71' rx='6.5' ry='2.8' transform='rotate(237.5 17.1 71)' fill='%23000'/%3E%3Cellipse cx='9' cy='56.3' rx='6.5' ry='2.8' transform='rotate(261.2 9 56.3)' fill='%23000'/%3E%3Cellipse cx='7.5' cy='38.6' rx='6.5' ry='2.8' transform='rotate(285 7.5 38.6)' fill='%23000'/%3E%3Cellipse cx='55.9' cy='83.5' rx='6.5' ry='2.8' transform='rotate(-10 55.9 83.5)' fill='%23000'/%3E%3Cellipse cx='70.3' cy='80.3' rx='6.5' ry='2.8' transform='rotate(-33.8 70.3 80.3)' fill='%23000'/%3E%3Cellipse cx='82.9' cy='71' rx='6.5' ry='2.8' transform='rotate(-57.5 82.9 71)' fill='%23000'/%3E%3Cellipse cx='91' cy='56.3' rx='6.5' ry='2.8' transform='rotate(-81.2 91 56.3)' fill='%23000'/%3E%3Cellipse cx='92.5' cy='38.6' rx='6.5' ry='2.8' transform='rotate(-105 92.5 38.6)' fill='%23000'/%3E%3C/svg%3E");
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  background-image:
+    radial-gradient(ellipse 7% 3% at 44.1% 83.5%, var(--cf-c1), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 29.7% 80.3%, var(--cf-c1), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 17.1% 71%, var(--cf-c2), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 9% 56.3%, var(--cf-c2), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 7.5% 38.6%, var(--cf-c1), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 55.9% 83.5%, var(--cf-c1), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 70.3% 80.3%, var(--cf-c1), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 82.9% 71%, var(--cf-c2), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 91% 56.3%, var(--cf-c2), transparent 70%),
+    radial-gradient(ellipse 7% 3% at 92.5% 38.6%, var(--cf-c1), transparent 70%);
 }
 
 // ============================================================ banner

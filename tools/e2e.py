@@ -44,9 +44,17 @@ PAGES = [
     ("home", "/"),
     ("all", "/all"),
     ("tag", "/t/mejores-guias"),
+    ("tag2", "/t/peptides"),
+    ("tags", "/tags"),
     ("discussion", "/d/30660-lip-lift-results-2-weeks-post-op-pictures-included"),
+    # A long, heavily-formatted guide. The forum's whole point is guides, and
+    # they exercise the formatter (spoilers, tables, quotes, code) far harder
+    # than a short ratings thread does.
+    ("guide", "/d/292-socialmaxxing-extremely-high-effort"),
     ("profile", "/u/admin"),
+    ("profile2", "/u/Chris"),
     ("store", "/store"),
+    ("search", "/search?q=mewing"),
 ]
 
 VIEWPORTS = {"desktop": (1440, 900), "mobile": (390, 844)}

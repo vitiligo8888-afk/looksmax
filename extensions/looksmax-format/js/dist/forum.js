@@ -386,9 +386,79 @@
     }).observe(document.documentElement, { childList: true, subtree: true });
   }
 
+  /*
+   * Rescue author-chosen text colours that are illegible on THIS theme.
+   *
+   * The corpus was written on a board with light surfaces, and authors picked
+   * colours to suit it — `<span style="color:#666666">` is everywhere in the
+   * long guides. On this forum's true-black page that measures 3.36:1, under
+   * the 4.5:1 needed for body text, and it is the actual prose of the guide,
+   * not decoration.
+   *
+   * Rewriting the stored content is the wrong fix: it is 1.9M posts of other
+   * people's writing, and the "right" colour depends on which scheme the
+   * reader has chosen, which the database cannot know.
+   *
+   * So: measure each inline colour against the surface it sits on, and only
+   * where it fails, replace it with a color-mix() of the SAME hue toward
+   * --ink. Two properties of that are the point — the author's colour is still
+   * recognisable, and because color-mix resolves against a custom property,
+   * the browser re-resolves it when the reader switches scheme, with no second
+   * JS pass. Colours that already pass are left completely alone.
+   */
+  function rescueColors(root) {
+    var scope = root || document;
+    var nodes = scope.querySelectorAll('.Post-body [style*="color"]:not([data-lmx-fg])');
+    if (!nodes.length) return;
+
+    var lum = function (r, g, b) {
+      var a = [r, g, b].map(function (v) {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+    };
+    var parse = function (s) {
+      var m = /rgba?\(([^)]+)\)/.exec(s || '');
+      if (!m) return null;
+      var p = m[1].split(',').map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+
+    // The post surface, resolved once. Every rescued span sits on it.
+    var probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;visibility:hidden;background:var(--surface-1)';
+    document.body.appendChild(probe);
+    var bg = parse(getComputedStyle(probe).backgroundColor) || { r: 14, g: 14, b: 14, a: 1 };
+    probe.remove();
+    var Lbg = lum(bg.r, bg.g, bg.b);
+
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      el.setAttribute('data-lmx-fg', '1');            // idempotent: never twice
+      var inline = el.style && el.style.color;
+      if (!inline) continue;
+      var fg = parse(getComputedStyle(el).color);
+      if (!fg || fg.a < 0.9) continue;
+
+      var Lfg = lum(fg.r, fg.g, fg.b);
+      var ratio = (Math.max(Lfg, Lbg) + 0.05) / (Math.min(Lfg, Lbg) + 0.05);
+      if (ratio >= 4.5) continue;                     // already legible, leave it
+
+      // 60% keeps the hue clearly present while pulling far enough toward the
+      // scheme's text colour to clear AA for the greys that dominate the
+      // corpus. A stronger mix would flatten distinct author colours together.
+      el.style.setProperty(
+        'color',
+        'color-mix(in srgb, ' + inline + ' 60%, var(--ink))'
+      );
+    }
+  }
+
   function enhance() {
     restoreEmoji();
     foldQuotes();
+    rescueColors();
     document.querySelectorAll('.Post-body pre').forEach(addCopy);
   }
 

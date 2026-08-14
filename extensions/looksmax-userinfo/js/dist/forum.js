@@ -372,7 +372,11 @@
         // Mithril routes internal links only when the router link component is
         // used; a bare href reloads the SPA. onclick keeps it a route change.
         onclick: route(href),
-        style: color ? { color: color } : undefined,
+        // The custom property, never `color`. An inline colour outranks every
+        // stylesheet, so painting the catalogue hue here made the light scheme
+        // unreadable (silver #c3ccd8 measured 1.62:1 on a white surface).
+        // less/forum.less mixes --lmx-name-color toward --ink per scheme.
+        style: color ? { '--lmx-name-color': color } : undefined,
         'data-legacy-style': info && info.legacyStyleClass ? info.legacyStyleClass : undefined,
       },
       user.displayName()

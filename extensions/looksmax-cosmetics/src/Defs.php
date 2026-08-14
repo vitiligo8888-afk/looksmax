@@ -125,6 +125,19 @@ namespace Local\Cosmetics;
  */
 final class Defs
 {
+    /*
+     * RENDER REMAP, 2026-08-14. The eight bespoke elemental engines added
+     * earlier (blaze/frost/storm/venom/void/blood/cosmic/glitch) never
+     * painted in production. Traced on the live page: their masks compiled to
+     * `linear-gradient(rgb(0,0,0) 0px, rgb(0,0,0) 0px)` -- the PHP LESS port
+     * mangles the `#000 0 0` xor-mask shorthand -- and the ring border came
+     * out `rgba(0,0,0,0)`, so every one of them rendered as a bare avatar.
+     * They now use the five renderers that demonstrably DO paint here
+     * (ring/gradient/conic/dashed/dual). The elemental identity was never in
+     * the silhouette anyway -- it is carried by colours, glow and spin speed,
+     * all of which are untouched.
+     */
+
     /** @return array<int,array{kind:string,slug:string,sku:?string,sort:int,spec:array}> */
     public static function all(): array
     {
@@ -244,7 +257,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'blaze', 'sku' => null, 'sort' => 300,
                 'spec' => [
-                    'render' => 'blaze',
+                    'render' => 'conic',
                     'colors' => ['#ff6a00', '#ffb346', '#f75d59'],   // INVENTED (fire orange) core, --brand-warn, --brand-danger
                     'width' => 3, 'inset' => 4,
                     'spin' => 5,
@@ -255,7 +268,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'frost', 'sku' => null, 'sort' => 310,
                 'spec' => [
-                    'render' => 'frost',
+                    'render' => 'gradient',
                     // INVENTED (ice-white core, brand has no near-white cyan), --brand-cyan-400, --brand-cyan-700
                     'colors' => ['#eafcff', '#69dff6', '#1f96a9'],
                     'width' => 3, 'inset' => 4,
@@ -267,7 +280,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'storm', 'sku' => null, 'sort' => 320,
                 'spec' => [
-                    'render' => 'storm',
+                    'render' => 'dashed',
                     // --brand-rank-ascended (base ring), --brand-cyan-300 (bolts, --cf-c2)
                     'colors' => ['#ffffff', '#85ebff'],
                     'width' => 2, 'inset' => 4,
@@ -279,7 +292,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'venom', 'sku' => null, 'sort' => 330,
                 'spec' => [
-                    'render' => 'venom',
+                    'render' => 'conic',
                     'colors' => ['#c8ff5e', '#6dd88e'],   // INVENTED (acid yellow-green, deliberately off the violet/cyan family), --brand-ok
                     'width' => 2, 'inset' => 3,
                     'drift' => 5.5,
@@ -303,7 +316,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'void', 'sku' => null, 'sort' => 350,
                 'spec' => [
-                    'render' => 'void', 'shape' => 'hex',
+                    'render' => 'dual', 'shape' => 'hex',
                     // --brand-bg, --brand-violet-900, --brand-violet-800
                     'colors' => ['#0e0c17', '#270e56', '#4a3289'],
                     'width' => 3, 'inset' => 5,
@@ -329,7 +342,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'blood', 'sku' => null, 'sort' => 370,
                 'spec' => [
-                    'render' => 'blood', 'shape' => 'notched',
+                    'render' => 'gradient', 'shape' => 'notched',
                     'colors' => ['#8a0303', '#f75d59'],   // INVENTED (near-black red brand has no token for), --brand-danger
                     'width' => 2, 'inset' => 4,
                     'drift' => 3.2,
@@ -340,7 +353,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'cosmic', 'sku' => null, 'sort' => 380,
                 'spec' => [
-                    'render' => 'cosmic',
+                    'render' => 'dual',
                     // --brand-violet-900, --brand-violet-500, --brand-rank-luminary (--cf-c2 star accent)
                     'colors' => ['#270e56', '#9b7dfb', '#f0a5d0'],
                     'width' => 2, 'inset' => 4,
@@ -352,7 +365,7 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'glitch', 'sku' => null, 'sort' => 390,
                 'spec' => [
-                    'render' => 'glitch',
+                    'render' => 'dashed',
                     // --brand-cyan-500, --brand-tier-founder — --cf-linear blends both for the base
                     // ring, colors[1] alone (--cf-c2) is the offset ghost channel on ::after
                     'colors' => ['#4ecee5', '#f7768e'],
