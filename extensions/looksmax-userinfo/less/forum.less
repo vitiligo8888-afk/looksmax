@@ -291,6 +291,13 @@
 // =================================================================== rank
 
 .LmxRank {
+  // The hue arrives as --lmx-rank-color from js/dist/forum.js (it used to be
+  // an inline `color`, which no stylesheet could adapt). Mixed toward --ink so
+  // the SCHEME picks the direction: the pale catalogue hues lift on the black
+  // page and darken on the light one, staying identifiable in both. 55%, not
+  // 70% — the rank palette runs pale, and 70% still measured under AA on white.
+  // border stays currentColor, so the outline tracks the resolved text colour.
+  color: color-mix(in srgb, var(--lmx-rank-color, var(--ink-dim)) 55%, var(--ink));
   display: inline-flex;
   align-items: center;
   gap: 4px;

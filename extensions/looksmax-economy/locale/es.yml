@@ -35,6 +35,7 @@ local-looksmax-economy:
       streak:
         day: Racha diaria
         week: Racha semanal
+        milestone: Bono por hito de racha
       import:
         legacy: Saldo importado
       badge:
@@ -46,5 +47,51 @@ local-looksmax-economy:
         credits: Créditos añadidos
       tier:
         purchase: Compra de membresía
+      rank:
+        milestone: Bono por subir de rango
 
     reason_unknown: Ajuste
+
+  admin:
+    settings:
+      award_discussion_started: "Premio: iniciar un hilo (puntos)"
+      award_post_created: "Premio: una respuesta (puntos base, antes de ponderar el esfuerzo)"
+      award_reaction_received: "Premio: recibir una reacción (puntos)"
+      award_reaction_given: "Premio: dar una reacción (puntos)"
+      award_best_answer: "Premio: mejor respuesta marcada (puntos)"
+      award_guide_published: "Premio: publicar en una etiqueta de guía (puntos)"
+      award_read_through: "Premio: un lector llega al final de tu hilo (puntos)"
+      award_thread_held: "Premio: un lector se queda 3+ minutos (puntos)"
+      award_guide_sourced: "Premio: una fuente citada en una guía (puntos)"
+      award_streak_day: "Premio: racha diaria (puntos)"
+      award_streak_week: "Premio: bono de racha semanal (puntos)"
+      award_import_legacy: "Premio: saldo heredado importado, por unidad (puntos)"
+      award_badge_earned: "Premio: se gana una insignia (puntos)"
+      award_rank_up: "Premio: alcanzar un rango nuevo, bono único (puntos, no cuenta para el rango)"
+      award_streak_milestone: "Premio: alcanzar un hito de racha, bono único (puntos, no cuenta para el rango)"
+      cap_post_created: "Límite diario: respuestas que pagan (cantidad por 24h)"
+      cap_reaction_given: "Límite diario: reacciones dadas que pagan (cantidad por 24h)"
+      cap_reaction_received: "Límite diario: reacciones recibidas que pagan (cantidad por 24h)"
+      cap_read_through: "Límite diario: premios por lectura completa (cantidad por 24h)"
+      cap_thread_held: "Límite diario: premios por atención sostenida (cantidad por 24h)"
+      streak_min_length: "Racha: longitud mínima de publicación para contar (caracteres)"
+      streak_week_every: "Racha: pagar el bono semanal cada N días"
+      streak_milestones: "Racha: longitudes que pagan un bono único (días, separados por comas)"
+      reaction_pair_cap: "Reacciones: máximo de veces que una cuenta puede pagarle a otra por día"
+      reaction_max_age: "Reacciones: publicaciones más viejas que esto no ganan nada al recibir un like (días)"
+      post_min_multiplier: "Ponderación de esfuerzo: multiplicador mínimo"
+      post_max_multiplier: "Ponderación de esfuerzo: multiplicador máximo"
+      post_multiplier_divisor: "Ponderación de esfuerzo: caracteres por 1.0x"
+
+  forum:
+    widget:
+      toggle_title: Tu progreso de puntos
+      day_streak_one: día de racha
+      day_streak_other: días de racha
+      to_milestone: "{count, plural, one {Falta # día para una racha de # días} other {Faltan # días para una racha de # días}}"
+      points_to_rank: "{count, plural, one {Falta # punto para {rank}} other {Faltan # puntos para {rank}}}"
+      top_rank: Rango máximo alcanzado
+      goal_posts: Publicaciones hoy
+      goal_reactions: Reacciones recibidas hoy
+      celebrate_streak: "¡Racha de {count} días! Sigue así."
+      celebrate_rank: "¡Alcanzaste {rank}!"

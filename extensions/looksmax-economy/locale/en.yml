@@ -40,6 +40,11 @@ local-looksmax-economy:
       streak:
         day: Daily streak
         week: Weekly streak
+        # New — paid by Ledger::credit(countsForRank:false), see Streaks::pay().
+        # A duplicate `streak:` mapping key here would silently clobber day/week
+        # above (YAML keeps only the last of a repeated key), so this lives
+        # inside the SAME block rather than a second `streak:` entry.
+        milestone: Streak milestone bonus
       import:
         legacy: Imported balance
       badge:
@@ -51,7 +56,61 @@ local-looksmax-economy:
         credits: Credits added
       tier:
         purchase: Membership purchase
+      # New — paid by Ledger::credit(countsForRank:false), see
+      # Ledger::refreshRank() for why it does not go through award().
+      rank:
+        milestone: Rank-up bonus
 
     # Shown when a ledger row carries a reason this pack does not name yet —
     # better than printing the code, and it keeps the raw-key sentinel quiet.
     reason_unknown: Adjustment
+
+  # ── admin: every number the ledger pays or refuses ─────────────────────────
+  # Read by js/dist/admin.js's registerSetting() calls. Labels are short on
+  # purpose — the admin settings list is one field per row with no room for a
+  # sentence, and the reasoning behind each default lives in Config.php's
+  # comments, one setting-screen click away for anyone who opens the file.
+  admin:
+    settings:
+      award_discussion_started: "Award: starting a discussion (points)"
+      award_post_created: "Award: a reply (base points, before effort weighting)"
+      award_reaction_received: "Award: receiving a reaction (points)"
+      award_reaction_given: "Award: giving a reaction (points)"
+      award_best_answer: "Award: best answer marked (points)"
+      award_guide_published: "Award: posting into a guide tag (points)"
+      award_read_through: "Award: a reader reaches the end of your thread (points)"
+      award_thread_held: "Award: a reader stays 3+ minutes (points)"
+      award_guide_sourced: "Award: a cited source in a guide (points)"
+      award_streak_day: "Award: daily streak (points)"
+      award_streak_week: "Award: weekly streak bonus (points)"
+      award_import_legacy: "Award: legacy imported balance, per unit (points)"
+      award_badge_earned: "Award: a badge is earned (points)"
+      award_rank_up: "Award: reaching a new rank, one-time bonus (points, does not count toward rank)"
+      award_streak_milestone: "Award: reaching a streak milestone, one-time bonus (points, does not count toward rank)"
+      cap_post_created: "Daily cap: replies that pay (count per 24h)"
+      cap_reaction_given: "Daily cap: reactions given that pay (count per 24h)"
+      cap_reaction_received: "Daily cap: reactions received that pay (count per 24h)"
+      cap_read_through: "Daily cap: read-through awards (count per 24h)"
+      cap_thread_held: "Daily cap: held-attention awards (count per 24h)"
+      streak_min_length: "Streak: minimum post length to count (characters)"
+      streak_week_every: "Streak: pay the weekly bonus every N days"
+      streak_milestones: "Streak: milestone lengths that pay a one-time bonus (comma-separated days)"
+      reaction_pair_cap: "Reactions: max times one account can pay another per day"
+      reaction_max_age: "Reactions: posts older than this earn nothing when liked (days)"
+      post_min_multiplier: "Post effort weighting: minimum multiplier"
+      post_max_multiplier: "Post effort weighting: maximum multiplier"
+      post_multiplier_divisor: "Post effort weighting: characters per 1.0x"
+
+  # ── the streak/progress widget (js/dist/forum.js) ───────────────────────────
+  forum:
+    widget:
+      toggle_title: Your earning progress
+      day_streak_one: day streak
+      day_streak_other: day streak
+      to_milestone: "{count, plural, one {# day to a # day streak} other {# days to a # day streak}}"
+      points_to_rank: "{count, plural, one {# point to {rank}} other {# points to {rank}}}"
+      top_rank: Top rank reached
+      goal_posts: Posts today
+      goal_reactions: Reactions received today
+      celebrate_streak: "{count} day streak! Keep it going."
+      celebrate_rank: "You reached {rank}!"

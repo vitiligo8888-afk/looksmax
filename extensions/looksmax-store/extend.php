@@ -6,6 +6,7 @@ use Flarum\Extend;
 use Local\Store\Api\StoreActionController;
 use Local\Store\Api\StoreController;
 use Local\Store\Console;
+use Local\Store\InjectAdminScript;
 use Local\Store\Listeners;
 
 /**
@@ -47,7 +48,10 @@ return [
         ->content(Listeners\InjectStore::class),
 
     (new Extend\Frontend('admin'))
-        ->content(Listeners\InjectAdminLink::class),
+        ->content(Listeners\InjectAdminLink::class)
+        // The boost stacking ceiling — see src/Config.php for why it is the
+        // one setting this extension owns outside the catalogue table.
+        ->content(InjectAdminScript::class),
 
     // Read and write on separate routes with a parameterised view/action, the
     // same shape the identity extension uses. New routes have no conflict

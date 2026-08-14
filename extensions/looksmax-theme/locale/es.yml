@@ -1,0 +1,15 @@
+# Looksmax Theme — español.
+#
+# Este archivo cubre las cadenas del propio tema: hoy, solo el botón de
+# "volver arriba" que inyecta js/dist/forum.js. El resto de ese archivo
+# (los controles de Tema/Densidad/Fondo en /settings) corre en <head>, antes
+# de que exista `app`, así que sus textos son literales a propósito y no
+# pasan por aquí — ver el comentario al inicio de js/dist/forum.js.
+#
+# Registro: tú, nunca usted, nunca vos, sin vosotros. Español neutro de
+# América Latina, igual que el resto de las extensiones locales.
+
+local-looksmax-theme:
+  forum:
+    totop:
+      label: Volver arriba

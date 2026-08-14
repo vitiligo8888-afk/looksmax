@@ -204,3 +204,101 @@
     start();
   }
 })();
+
+/*
+ * Scroll-to-top.
+ *
+ * A SEPARATE IIFE, not folded into the appearance-controls one above: same
+ * reasoning as InjectSignature being its own <script> rather than tacked onto
+ * an existing bundle -- a throw in either feature must not take the other
+ * down with it, and the two share nothing but the file they are shipped in.
+ *
+ * Every long list on this forum (a discussion, a tag, search results) had no
+ * way back to the top except dragging the scrollbar. The button mounts once
+ * on `document.body`, which the SPA never tears down between routes (unlike
+ * `.SettingsPage .container` above, which is why THAT feature needs a
+ * MutationObserver and this one does not).
+ */
+(function () {
+  'use strict';
+
+  try {
+    if (document.getElementById('lmx-totop')) return;
+
+    // Same fallback chain looksmax-search's forum.js uses: the shared
+    // formatter/translator singleton first, core's translator second, a
+    // literal Spanish string last -- so the label is still correct even if
+    // this script runs before either is ready.
+    function tr(key, fallback) {
+      try {
+        if (window.lmxI18n && typeof window.lmxI18n.t === 'function') {
+          var s = window.lmxI18n.t(key, {}, fallback);
+          if (typeof s === 'string' && s) return s;
+        }
+      } catch (e) { /* fall through */ }
+      try {
+        var app = window.flarum && window.flarum.core && window.flarum.core.app;
+        if (app && app.translator) {
+          var s2 = app.translator.trans(key, {});
+          if (typeof s2 === 'string' && s2 && s2 !== key) return s2;
+        }
+      } catch (e) { /* fall through */ }
+      return fallback;
+    }
+
+    function prefersReducedMotion() {
+      try {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (e) { return false; }
+    }
+
+    function mount() {
+      if (!document.body || document.getElementById('lmx-totop')) return;
+
+      var btn = document.createElement('button');
+      btn.id = 'lmx-totop';
+      btn.type = 'button';
+      btn.className = 'LmxToTop';
+      btn.setAttribute('aria-label', tr('local-looksmax-theme.forum.totop.label', 'Volver arriba'));
+      document.body.appendChild(btn);
+
+      var THRESHOLD = 480;
+      var visible = false;
+      var ticking = false;
+
+      function sync() {
+        ticking = false;
+        var shouldShow = (window.scrollY || document.documentElement.scrollTop || 0) > THRESHOLD;
+        if (shouldShow === visible) return;
+        visible = shouldShow;
+        btn.classList.toggle('is-visible', visible);
+        // A hidden button must not sit in the tab order between the last
+        // piece of content and the footer/header controls that follow it.
+        if (visible) btn.removeAttribute('tabindex');
+        else btn.setAttribute('tabindex', '-1');
+      }
+
+      window.addEventListener('scroll', function () {
+        if (ticking) return;
+        ticking = true;
+        (window.requestAnimationFrame || window.setTimeout)(sync);
+      }, { passive: true });
+
+      btn.addEventListener('click', function () {
+        try {
+          window.scrollTo({ top: 0, left: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+        } catch (e) {
+          window.scrollTo(0, 0); // older engines: no options object support
+        }
+      });
+
+      sync();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mount);
+    } else {
+      mount();
+    }
+  } catch (e) { /* never throw into the SPA */ }
+})();

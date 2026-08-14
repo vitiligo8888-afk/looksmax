@@ -386,7 +386,17 @@
     return m(
       'span.LmxRank',
       {
-        style: { color: r.color, borderColor: r.color },
+        // A CUSTOM PROPERTY, not `color`/`borderColor` directly.
+        //
+        // An inline `color` is the highest-priority declaration there is, so
+        // the stylesheet cannot adapt it — and the rank palette (Catalog.php)
+        // is a set of pale hues chosen for a near-black page. On the light
+        // scheme that shipped as unreadable text: measured 1.63:1 for the
+        // Luminary chip against the 4.5 floor. Handing CSS the raw hue instead
+        // lets less/forum.less mix it toward --ink per scheme, which keeps the
+        // rank identifiable in both without the client needing to know which
+        // scheme is active.
+        style: { '--lmx-rank-color': r.color },
         'data-source': r.source,
         title:
           r.source === 'ranks'

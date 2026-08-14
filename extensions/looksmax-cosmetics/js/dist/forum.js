@@ -318,7 +318,12 @@
     if (css['--cf-pulse']) wrap.classList.add('is-pulse');
     else wrap.classList.remove('is-pulse');
 
-    if (ANIMATED[d.r] || css['--cf-pulse']) watch(wrap);
+    // --cf-drift covers 'royal': its render is the plain 'gradient' (not in
+    // ANIMATED) and its only motion is the ornate shape's sheen, which is
+    // spec.drift, not spec.pulse. Without this check royal's shimmer would
+    // carry a working animation-name in CSS that never leaves paused, because
+    // nothing would ever toggle .is-live on it.
+    if (ANIMATED[d.r] || css['--cf-pulse'] || css['--cf-drift']) watch(wrap);
 
     return true;
   }

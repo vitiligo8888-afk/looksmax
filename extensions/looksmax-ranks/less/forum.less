@@ -62,7 +62,7 @@
 }
 
 .lmx-chip--rank {
-  color: var(--lmx-rank-color, var(--ink-dim, #aab5c6));
+  color: color-mix(in srgb, var(--lmx-rank-color, var(--ink-dim)) 55%, var(--ink));
   // the ladder position, drawn as a filled dot rather than a number: a number
   // invites comparison arithmetic in a place where the name is the subject
   border-color: fade(#ffffff, 14%);
@@ -281,7 +281,7 @@
   gap: 5px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--lmx-rank-color, var(--ink-dim, #aab5c6));
+  color: color-mix(in srgb, var(--lmx-rank-color, var(--ink-dim)) 55%, var(--ink));
   margin-top: 2px;
 }
 

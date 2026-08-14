@@ -307,18 +307,48 @@ class Ledger
             ->map(fn ($r) => (array) $r)->all();
     }
 
-    public function ranks(): array
+    /**
+     * The ladder, resolved once per worker process rather than once per call.
+     *
+     * `class_exists()` itself is cheap, but this method is now called from
+     * UserSerializer's attribute callback — a callback that runs once per
+     * user on any page that lists more than one (member list, leaderboard,
+     * chat, mentions), and unlike the `identity` short-circuit above, WHICH
+     * rank of two competing extenders runs first on a given user is decided
+     * by extension load order, not by this file, so the fallback branch
+     * cannot be assumed dead code just because looksmax-ranks is installed.
+     * A ladder that is 10 fixed arrays never changes within a request — or
+     * within a worker's lifetime, since neither RANKS constant is mutable —
+     * so resolving it once and reusing the same reference is strictly safer
+     * than repeating the class_exists() + property lookup per row for no
+     * behavioural difference.
+     */
+    private static ?array $ladderCache = null;
+
+    public static function ladder(): array
     {
-        if (class_exists(\Local\Ranks\Catalog::class)) {
-            return \Local\Ranks\Catalog::RANKS;
+        if (self::$ladderCache === null) {
+            self::$ladderCache = class_exists(\Local\Ranks\Catalog::class)
+                ? \Local\Ranks\Catalog::RANKS
+                : self::RANKS;
         }
 
-        return self::RANKS;
+        return self::$ladderCache;
+    }
+
+    public function ranks(): array
+    {
+        return self::ladder();
     }
 
     public function rankFor(int $points): array
     {
-        $ranks = $this->ranks();
+        return self::rankForPoints($points);
+    }
+
+    public static function rankForPoints(int $points): array
+    {
+        $ranks = self::ladder();
         $rank = $ranks[0];
         foreach ($ranks as $r) {
             if ($points >= $r['min']) {
@@ -339,14 +369,22 @@ class Ledger
      * UserSerializer, same rule as points/lifetimePoints/rankSlug above: if
      * looksmax-ranks is installed its own `identity` attribute already
      * carries next-rank data (Standing.php `nextRank`) and this is not
-     * duplicated.
+     * duplicated (when it runs first — see ladder()'s comment on why that is
+     * not guaranteed).
+     *
+     * STATIC, and deliberately touches neither $this->db nor $this->settings:
+     * every input is a plain int and every output is derived from ladder(),
+     * which is pure and memoized. This is what makes it safe to call directly
+     * from UserSerializer's attribute callback — see extend.php — without
+     * resolving a full Ledger instance (and its ConnectionInterface /
+     * SettingsRepositoryInterface dependencies) once per user on the page.
      *
      * @return array{rankSlug:string,nextRankSlug:?string,pointsToNextRank:?int,rankProgressPct:int}
      */
-    public function progress(int $lifetimePoints): array
+    public static function progressFor(int $lifetimePoints): array
     {
-        $ranks = $this->ranks();
-        $current = $this->rankFor($lifetimePoints);
+        $ranks = self::ladder();
+        $current = self::rankForPoints($lifetimePoints);
 
         $idx = null;
         foreach ($ranks as $i => $r) {
@@ -380,6 +418,12 @@ class Ledger
             'pointsToNextRank' => max(0, $next['min'] - $lifetimePoints),
             'rankProgressPct' => $pct,
         ];
+    }
+
+    /** Instance wrapper kept for existing call sites (e.g. SummaryController); delegates to the static, container-free progressFor(). */
+    public function progress(int $lifetimePoints): array
+    {
+        return self::progressFor($lifetimePoints);
     }
 
     /**
@@ -430,7 +474,7 @@ class Ledger
     /** True if $after sits strictly above $before on the ladder. An unrecognised slug (including '', a brand new account) is treated as the bottom rung, not as "higher than everything" — see refreshRank(). */
     private function isHigherRank(string $after, string $before): bool
     {
-        $order = array_column($this->ranks(), 'slug');
+        $order = array_column(self::ladder(), 'slug');
         $a = array_search($after, $order, true);
         $b = array_search($before, $order, true);
 

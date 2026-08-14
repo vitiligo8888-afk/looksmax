@@ -4,7 +4,9 @@ namespace Local\Economy\Listeners;
 
 use Flarum\Likes\Event\PostWasLiked;
 use Flarum\Likes\Event\PostWasUnliked;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Database\ConnectionInterface;
+use Local\Economy\Config;
 use Local\Economy\Ledger;
 
 /**
@@ -40,15 +42,22 @@ use Local\Economy\Ledger;
  */
 class AwardReaction
 {
-    /** How many times one account can pay the same author in 24 hours. */
+    /**
+     * How many times one account can pay the same author in 24 hours.
+     * Default; the live number is `economy.reaction.pairDailyCap`.
+     */
     private const PAIR_DAILY_CAP = 6;
 
-    /** Reactions on posts older than this pay nothing. */
+    /**
+     * Reactions on posts older than this pay nothing. Default; the live
+     * number is `economy.reaction.maxPostAgeDays`.
+     */
     private const MAX_POST_AGE_DAYS = 90;
 
     public function __construct(
         protected Ledger $ledger,
-        protected ConnectionInterface $db
+        protected ConnectionInterface $db,
+        protected SettingsRepositoryInterface $settings
     ) {
     }
 
@@ -123,8 +132,9 @@ class AwardReaction
         }
 
         $ts = $created instanceof \DateTimeInterface ? $created->getTimestamp() : strtotime((string) $created);
+        $maxAgeDays = (int) Config::get($this->settings, 'reaction.maxPostAgeDays');
 
-        return $ts > 0 && $ts < time() - self::MAX_POST_AGE_DAYS * 86400;
+        return $ts > 0 && $ts < time() - $maxAgeDays * 86400;
     }
 
     private function pairCapped(int $authorId, int $likerId): bool
@@ -136,6 +146,6 @@ class AwardReaction
             ->where('created_at', '>', date('Y-m-d H:i:s', time() - 86400))
             ->count();
 
-        return $count >= self::PAIR_DAILY_CAP;
+        return $count >= (int) Config::get($this->settings, 'reaction.pairDailyCap');
     }
 }

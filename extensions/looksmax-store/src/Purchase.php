@@ -187,6 +187,41 @@ class Purchase
                     throw new PurchaseRefused('sold_out', resolve('translator')->trans('local-looksmax-store.forum.error.sold_out'));
                 }
 
+                // The max_per_user check Catalogue::lockReason() runs to build
+                // the CARD's error message happens BEFORE this transaction
+                // even opens, against a plain (unlocked) count — it is a hint
+                // for the UI, not a guarantee. Two requests for the same
+                // max_per_user=1 SKU that both read that count as zero both
+                // reach here; the `lockForUpdate()` on store_items above
+                // already SERIALISES them (the second transaction blocks
+                // until the first commits or rolls back), but serialised is
+                // not the same as re-checked — without asking again down
+                // here, the second request wakes up from the lock, sees
+                // stock/active/window are still fine, and completes the
+                // purchase anyway. Confirmed exploitable before this check
+                // existed: two concurrent POST /store/purchase calls for a
+                // max_per_user=1 SKU (e.g. tier-vip-lifetime or any `style-*`/
+                // `frame-*` cosmetic) both returned 200.
+                //
+                // `lockForUpdate()` here too, not a plain count: InnoDB's
+                // REPEATABLE READ view is otherwise established at this
+                // transaction's first read and could still be stale by the
+                // time this line runs even though execution is serialised —
+                // a locking read is the only one guaranteed to see the other
+                // transaction's just-committed row.
+                if ((int) $locked->max_per_user > 0) {
+                    $already = (int) $this->db->table('store_orders')
+                        ->where('recipient_id', $recipient->id)
+                        ->where('sku', $locked->sku)
+                        ->whereIn('state', ['granted', 'redeemed'])
+                        ->lockForUpdate()
+                        ->count();
+
+                    if ($already >= (int) $locked->max_per_user) {
+                        throw new PurchaseRefused('max_per_user', resolve('translator')->trans('local-looksmax-store.forum.error.max_per_user'));
+                    }
+                }
+
                 $this->faultPoint($opts, 'before_charge');
 
                 $charge = $provider->charge((int) $buyer->id, $price, 'order:' . $orderId, [

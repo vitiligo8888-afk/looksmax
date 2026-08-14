@@ -102,12 +102,28 @@ AUDIT = r"""
   // walk would sail past it to the page and report dark-ink-on-black at 1.02:1
   // -- which is exactly backwards: the ink is dark BECAUSE the button is light.
   // Unknown backdrop is not the same as a failure, so those are skipped.
-  const bgOf = (el) => { let n = el; while (n && n !== document.documentElement) {
+  // Walks THROUGH documentElement, not up to it. body is transparent on this
+  // forum and the page fill lives on <html>, so stopping at documentElement and
+  // assuming black reported the entire light scheme as 1.1:1 -- 12 false
+  // failures that looked exactly like a real regression. Falling back to the
+  // resolved --bg token (not a hardcoded black) keeps the last resort honest.
+  const bgOf = (el) => { let n = el; while (n) {
       const s = getComputedStyle(n);
       if (s.backgroundImage && s.backgroundImage !== 'none') return null;
       const c = parse(s.backgroundColor); if (c && c.a === 1) return c.rgb;
+      if (n === document.documentElement) break;
       n = n.parentElement; }
-    return [0, 0, 0]; };
+    const tok = parse(getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
+                      || 'rgb(0,0,0)');
+    if (tok) return tok.rgb;
+    // --bg is usually a hex, which parse() cannot read; resolve it via canvas-free
+    // fallback by letting the browser compute it on a throwaway element.
+    const probe = document.createElement('div');
+    probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    document.body.appendChild(probe);
+    const rgb = parse(getComputedStyle(probe).color);
+    probe.remove();
+    return rgb ? rgb.rgb : [0, 0, 0]; };
 
   const seen = new Set();
   for (const el of document.querySelectorAll('p, li, span, a, h1, h2, h3, td, button')) {

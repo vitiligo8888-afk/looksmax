@@ -2,6 +2,7 @@
 
 namespace Local\Store;
 
+use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Database\ConnectionInterface;
 
 /**
@@ -20,8 +21,10 @@ use Illuminate\Database\ConnectionInterface;
  */
 class Entitlements
 {
-    public function __construct(protected ConnectionInterface $db)
-    {
+    public function __construct(
+        protected ConnectionInterface $db,
+        protected SettingsRepositoryInterface $settings
+    ) {
     }
 
     public function grant(
@@ -75,8 +78,27 @@ class Entitlements
      * Earn multiplier and daily-cap multiplier from active boosts.
      *
      * Boosts multiply rather than max(), which is a deliberate choice: two
-     * stacked 2x boosts are 4x and cost twice as much, and the ceiling that
-     * stops that being a problem is the daily cap, not the multiplier.
+     * stacked 2x boosts are 4x and cost twice as much. That comment used to
+     * end there, and the claim that "the ceiling that stops that being a
+     * problem is the daily cap, not the multiplier" was wrong: the daily cap
+     * bounds how many AWARDS count per day, not how big each one is, and
+     * `active($userId, 'boost')` has no limit on how many boost rows can be
+     * simultaneously active — buying N of `boost-2x-24h` multiplies `earn` by
+     * 2^N with nothing to stop it. Ledger::tierModifiers() feeds this
+     * straight into `$delta = (int) round($base * $multiplier * $earn)`,
+     * written into an `int(11)` `points` column whose signed range tops out
+     * at 2,147,483,647 — and this install already carries a founder balance
+     * of 999,999,999, so an uncapped multiplier is not a theoretical
+     * overflow, it is one large `best_answer.awarded` (40 base) away from one
+     * on an account that has stacked a double-digit N.
+     *
+     * The fix is a hard ceiling, not max_per_user on the boost SKUs: see
+     * Config.php's header for why max_per_user is the wrong tool for a
+     * repeatable, time-limited item. Reading it through Local\Store\Config
+     * rather than a local constant is what makes it possible for an operator
+     * to tighten the ceiling the same hour a stacking pattern is spotted,
+     * exactly like every other number Catalogue.php already argues should be
+     * a setting rather than a deploy.
      */
     public function boosts(int $userId): array
     {
@@ -88,7 +110,13 @@ class Entitlements
             $cap *= (float) ($row->payload['capBoost'] ?? 1.0);
         }
 
-        return ['earn' => $earn, 'capBoost' => $cap];
+        $maxEarn = (float) Config::get($this->settings, 'boost.maxEarnMultiplier');
+        $maxCap = (float) Config::get($this->settings, 'boost.maxCapBoost');
+
+        return [
+            'earn' => min($earn, max(1.0, $maxEarn)),
+            'capBoost' => min($cap, max(1.0, $maxCap)),
+        ];
     }
 
     /**

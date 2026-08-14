@@ -1,0 +1,7 @@
+# Looksmax Theme — English translation. Spanish (es.yml) is the source; see
+# the note there. Flarum registers this into the messages+intl-icu domain.
+
+local-looksmax-theme:
+  forum:
+    totop:
+      label: Back to top

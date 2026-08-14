@@ -249,6 +249,7 @@ local-looksmax-store:
       refund_window_closed: La ventana de reembolso de este artículo ya cerró.
       already_used: Eso ya se usó, así que no se puede reembolsar.
       already_owned: Eso ya lo tienes.
+      max_per_user: Ya tienes el máximo de estos.
       own_everything_box: Ya tienes todo lo que esta caja puede dar.
       own_everything_bundle: Ya tienes todo lo que trae este paquete.
       injected_fault: "La compra se revirtió a propósito ({detail}). No se te cobró nada."
@@ -417,3 +418,6 @@ local-looksmax-store:
     nav:
       store: Tienda
       store_title: Catálogo, pedidos, saldos y el registro de auditoría
+    settings:
+      boost_max_earn: "Impulsos: multiplicador máximo combinado de ganancia por impulsos acumulados"
+      boost_max_cap: "Impulsos: multiplicador máximo combinado del límite diario por impulsos acumulados"

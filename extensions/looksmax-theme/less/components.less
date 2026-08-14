@@ -741,3 +741,67 @@ input[aria-invalid='true'] {
   margin-bottom: 0;
   margin-top: var(--gap);
 }
+
+// ============================================================ scroll to top
+// Injected by js/dist/forum.js. Every page on this forum is a long list or a
+// long thread and had no way back to the top except the browser's own
+// scrollbar drag — measured on /t/p-blackpill: 20 rows load per page before
+// "Cargar mas", which is already several screens on mobile.
+.LmxToTop {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  box-shadow: var(--e-3);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: flex;
+  height: 44px;
+  width: 44px;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  right: var(--gap-lg);
+  bottom: var(--gap-lg);
+  transform: translateY(8px);
+  transition: opacity var(--t-base) var(--ease), transform var(--t-base) var(--ease), background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  z-index: var(--z-sticky);
+
+  &::before {
+    border-right: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    content: '';
+    height: 9px;
+    margin-top: 3px;
+    transform: rotate(-45deg);
+    width: 9px;
+  }
+
+  &.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--ink);
+  }
+
+  &:focus-visible {
+    box-shadow: var(--e-3), var(--ring);
+    outline: none;
+  }
+}
+
+// The safe-area inset keeps it clear of a phone's home-indicator gesture bar.
+@media (max-width: 767.98px) {
+  // ESCAPED with ~"..." on purpose. The PHP port of LESS does not know the CSS
+  // env() function and tries to resolve it as a LESS function inside calc(),
+  // which aborts the compile — and a LESS compile error takes the whole
+  // stylesheet with it, so forum.css is never written and EVERY page 500s.
+  // Measured: this exact line took the live forum down. An escaped string is
+  // passed through untouched and reaches the browser as written.
+  .LmxToTop { bottom: ~"calc(var(--gap-lg) + env(safe-area-inset-bottom, 0px))"; }
+}

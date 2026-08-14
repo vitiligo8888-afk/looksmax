@@ -40,10 +40,27 @@ return [
     // extension is disabled, and defers to it when it is not — two extenders
     // writing the same key is a load-order coin flip, and the ladder must not
     // depend on which one lands second. The same fallback rule now also
-    // covers the next-rank progress fields (see Ledger::progress()):
+    // covers the next-rank progress fields (see Ledger::progressFor()):
     // looksmax-ranks' own `identity` attribute already carries a richer
     // `nextRank` object (Standing.php), so this is only ever the answer when
-    // that extension is absent.
+    // that extension is absent OR simply has not run yet on this user (the
+    // `isset($attributes['identity'])` check below depends on extension load
+    // order, which this file does not control — see the next paragraph for
+    // why that matters).
+    //
+    // PERFORMANCE NOTE, learned the expensive way: this callback runs once
+    // per user on any page that serializes more than one through
+    // UserSerializer (member list, leaderboard, chat, mentions) — and because
+    // the `identity` short-circuit above cannot be relied on to always fire
+    // first, the branch below is NOT dead code just because looksmax-ranks is
+    // installed. An earlier version of this file called `resolve(Ledger::class)`
+    // and an instance method here, which meant constructing a Ledger (and
+    // resolving its ConnectionInterface + SettingsRepositoryInterface
+    // dependencies through the container) once per row on every such page.
+    // `Ledger::progressFor()` is a static, pure function over a ladder that is
+    // memoized once per worker (`Ledger::ladder()`) specifically so this
+    // callback never touches the container, the database, or an object
+    // construction at all — see Ledger.php's comments on ladder()/progressFor().
     (new Extend\ApiSerializer(UserSerializer::class))
         ->attributes(function (UserSerializer $serializer, User $user, array $attributes) {
             if (isset($attributes['identity'])) {
@@ -57,9 +74,7 @@ return [
             $attributes['rankSlug'] = $user->rank_slug ?? 'greycel';
 
             try {
-                /** @var Ledger $ledger */
-                $ledger = resolve(Ledger::class);
-                $progress = $ledger->progress($lifetime);
+                $progress = Ledger::progressFor($lifetime);
                 $attributes['nextRankSlug'] = $progress['nextRankSlug'];
                 $attributes['pointsToNextRank'] = $progress['pointsToNextRank'];
                 $attributes['rankProgressPct'] = $progress['rankProgressPct'];

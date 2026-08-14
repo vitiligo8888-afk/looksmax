@@ -133,6 +133,69 @@
 //
 // Every contrast pair in BRAND.md §5 is re-measured against these surfaces and
 // is required to pass on both.
+// ---------------------------------------------------------------- light
+// The brand palette is a SEPARATE token layer from looksmax-theme's, and until
+// now it had no light variant at all — so when a reader chose the light scheme,
+// every surface painted from --brand-* stayed dark while the text switched to
+// the light scheme's near-black ink. Measured across the e2e sweep: header,
+// hero and footer copy landed at 1.1:1 (--ink #100d1c on --brand-bg #0e0c17),
+// i.e. invisible, on all six page types at both widths.
+//
+// Mirrors looksmax-theme's `:root[data-scheme='light']` selector exactly, so
+// ONE user choice moves both layers. The surface ramp inverts (void is now the
+// lightest recess, hover the deepest tint) and the ink ramp flips with it;
+// brand HUES are untouched, because the brand is the hue, not the lightness.
+//
+// The `:not([data-brand-surface="oled"])` guard keeps the OLED variant below
+// authoritative when someone has explicitly asked for it.
+:root[data-scheme='light']:not(.brand-oled):not([data-brand-surface="oled"]) {
+  --brand-void       : #ffffff;
+  --brand-header     : #f4f2f9;
+  --brand-bg         : #eeecf4;
+  --brand-surface    : #ffffff;
+  --brand-raised     : #f4f2f9;
+  --brand-hover      : #e7e3f1;
+  --brand-line       : #d8d3e4;
+  --brand-line-strong: #7b7590;
+
+  // Flipped with the surfaces. --brand-ink-invert is what sits ON a filled
+  // brand plate, so it inverts in the opposite direction and stays light.
+  --brand-ink       : #100d1c;
+  --brand-ink-dim   : #4a4560;
+  --brand-ink-faint : #625c78;
+  --brand-ink-invert: #ffffff;
+
+  --brand-scrim: rgba(26, 20, 48, 0.55);
+
+  // Rank and tier hues, DEEPENED for a light page.
+  //
+  // The values above the light block are pale by design — they were picked to
+  // glow on a near-black surface, and every one of them is used as TEXT (rank
+  // names, tier chips, the nav's gold). On white they collapse: measured in the
+  // e2e sweep, gold #e8c07d came back at 1.46:1 and luminary #f0a5d0 at 1.91:1
+  // against the 4.5 floor for body text.
+  //
+  // Each replacement keeps the HUE and drops the lightness until it clears AA
+  // on #ffffff, so a Gold rank still reads as gold and Diamond still reads as
+  // cyan — the identity survives, only the luminance moves.
+  --brand-rank-greycel : #5a6472;
+  --brand-rank-iron    : #5b7189;
+  --brand-rank-bronze  : #8a5a2b;
+  --brand-rank-silver  : #5f6b7a;
+  --brand-rank-gold    : #8a5a06;
+  --brand-rank-platinum: #17697f;
+  --brand-rank-diamond : #1f8a7d;
+  --brand-rank-master  : #6b46c1;
+  --brand-rank-luminary: #b6488f;
+  --brand-rank-ascended: #100d1c;
+
+  --brand-tier-standard: #5a6472;
+  --brand-tier-plus    : #2a6fc4;
+  --brand-tier-vip     : #8a5a06;
+  --brand-tier-elite   : #6b46c1;
+  --brand-tier-founder : #b3243f;
+}
+
 .brand-oled, [data-brand-surface="oled"] {
   --brand-void: #000000;
   --brand-header: #000000;

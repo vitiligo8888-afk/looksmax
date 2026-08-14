@@ -92,7 +92,7 @@
 // The default: painted by the rank the ledger says you hold. The colour comes
 // from a CSS variable the decorator sets from the catalogue, so the ladder can
 // be re-coloured in Catalog.php without touching this file.
-.lmx-name.ns-rank { color: var(--lmx-rank-color, inherit); }
+.lmx-name.ns-rank { color: color-mix(in srgb, var(--lmx-rank-color, var(--ink)) 70%, var(--ink)); }
 
 // The bare rank colouring, applied to every styled name that has no cosmetic.
 //
@@ -132,7 +132,15 @@
 // body text, which a username is. Lightened toward the dark end of the ramp
 // (not deepened further, which would have hurt it on the light scheme) to clear
 // AA on both: this reads ~5.1:1 on black and ~4.6:1 on white.
-.lmx-name.ns-fuchsia { color: #d957b8; }
+// ADAPTIVE, not a fixed literal. A single hex cannot clear 4.5:1 against BOTH
+// #000 and #ffffff — the band where that is true is vanishingly narrow, and
+// chasing it is what produced the earlier flip-flop here (#ff5fc8 failed on
+// white, #c232a0 failed on black at 4.26, #d957b8 then failed on white at
+// 2.99). Mixing the hue with --ink lets the SCHEME decide the direction:
+// toward white on the black scheme, toward near-black on the light one. The
+// fuchsia identity is preserved either way, which is the point of a name
+// colour. Same technique the tag chips use.
+.lmx-name.ns-fuchsia { color: color-mix(in srgb, #c232a0 70%, var(--ink)); }
 .lmx-name.ns-slate   { color: #77839c; } // was #8c98a8 (2.9:1 on white); deepened
 
 // ================================================================ gradients

@@ -258,6 +258,11 @@ local-looksmax-store:
       refund_window_closed: The refund window for this item has closed.
       already_used: That has already been used, so it cannot be refunded.
       already_owned: You already own that.
+      # Thrown by the re-check Purchase.php now runs INSIDE the locked
+      # transaction, not just by the pre-purchase card hint (lock.max_reached
+      # below) — see Purchase::buy()'s comment on the concurrent-purchase race
+      # this closes.
+      max_per_user: You already have the maximum of these.
       own_everything_box: You already own everything this box can contain.
       own_everything_bundle: You already own everything in this bundle.
       injected_fault: "The purchase was rolled back on purpose ({detail}). Nothing was charged."
@@ -432,8 +437,12 @@ local-looksmax-store:
 
   # ── admin panel ──────────────────────────────────────────────────────────
   # The store's management screen lives on the forum, at /store/admin. The
-  # admin panel gets a doorway to it and nothing else.
+  # admin panel gets a doorway to it (nav) and the one setting that is not a
+  # catalogue row (settings) — see src/Config.php.
   admin:
     nav:
       store: Store
       store_title: Catalogue, orders, balances and the audit trail
+    settings:
+      boost_max_earn: "Boosts: maximum combined earn multiplier from stacked boosts"
+      boost_max_cap: "Boosts: maximum combined daily-cap multiplier from stacked boosts"

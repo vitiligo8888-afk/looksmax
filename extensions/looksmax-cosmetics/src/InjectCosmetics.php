@@ -21,8 +21,12 @@ use Psr\Http\Message\ServerRequestInterface;
  *     document that way and the page still returned 200.
  *
  * The specs are inlined rather than fetched because they are the same for every
- * visitor, they are ~4KB for nineteen cosmetics, and a frame that pops in a
- * second after the avatar is a worse artefact than no frame. The per-user part
+ * visitor, they stay a few KB even now that there are 29, and a frame that
+ * pops in a second after the avatar is a worse artefact than no frame. This
+ * payload is small because the elemental frames' SVG artwork lives in
+ * less/forum.less, not here — every 'r' this sends is a short renderer NAME
+ * (e.g. 'blaze'), never the mask itself, so ten new themed frames added maybe
+ * 400 bytes to this script, not ten inline data: URIs. The per-user part
  * (which slug each account wears) rides on the user payload the SPA already
  * has, so the common case makes NO network request at all.
  */

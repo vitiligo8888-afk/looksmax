@@ -353,7 +353,8 @@ final class Defs
                 'kind' => 'frame', 'slug' => 'glitch', 'sku' => null, 'sort' => 390,
                 'spec' => [
                     'render' => 'glitch',
-                    // --brand-cyan-500 (clean channel), --brand-tier-founder (--cf-c2, the offset ghost channel)
+                    // --brand-cyan-500, --brand-tier-founder — --cf-linear blends both for the base
+                    // ring, colors[1] alone (--cf-c2) is the offset ghost channel on ::after
                     'colors' => ['#4ecee5', '#f7768e'],
                     'width' => 2, 'inset' => 3,
                     'pulse' => 2.6,   // the jump-cut interval, not an easing pulse

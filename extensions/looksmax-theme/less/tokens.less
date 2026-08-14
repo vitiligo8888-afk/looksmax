@@ -382,6 +382,30 @@
   --following-color: var(--accent);
   --ignoring-bg: var(--surface-3);
   --lock-color: var(--ink-faint);
+
+  // Core's own primary, re-pointed so it follows the scheme.
+  //
+  // extend.php feeds Flarum `config-primary-color: #e8c07d` as a COMPILE-TIME
+  // LESS variable, and core paints the side-nav items and several link states
+  // from it. A compile-time value cannot know about data-scheme, so the nav sat
+  // at the dark-scheme gold on the light page: measured 1.46:1 for "Etiquetas"
+  // and "Discusiones", the worst contrast anywhere in the sweep.
+  //
+  // --gold (not --accent) because gold IS what that config value means here,
+  // and --gold already carries a per-scheme value (#e8c07d dark / #8a5a06
+  // light) that tokens.less measures. This makes core's nav track the scheme
+  // without touching the extender, which other code still reads.
+  --primary-color: var(--gold);
+}
+
+// Core writes the side-nav's resting colour from its own primary. It is a
+// (0,2,0) selector, so this has to match its shape to win.
+.App-nav .Button,
+.sideNav .Button,
+.item-nav .Button {
+  color: var(--ink-dim);
+
+  &:hover { color: var(--ink); }
 }
 
 // ---------------------------------------------------------------- schemes

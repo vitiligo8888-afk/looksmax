@@ -16,11 +16,19 @@
 //    looksmax-theme/less/tokens.less by NAME. The house colour is violet and it
 //    changed today; anything hardcoded would already be out of system. The only
 //    literal colours are the cosmetics' own palettes, and those come from
-//    looksmax-brand/less/brand.less through src/Defs.php, not from here.
+//    looksmax-brand/less/brand.less (or, for the elemental set, an invented hex
+//    brand.less has no token for — see the note in src/Defs.php) through
+//    src/Defs.php, not from here.
 //
 // 3. Rarity colours come from the ramp the store already uses
 //    (looksmax-store/less/forum.less:238-242) so that "epic" is the same colour
 //    in the shop and in the wardrobe.
+//
+// 4. Every mask-image below is an inline SVG data: URI, never an external
+//    image URL — the forum's CSP is `img-src 'self' data: blob:`, so anything
+//    hotlinked would render as a broken box. Every literal '#' inside one is
+//    written '%23': a raw '#' inside url("data:...") starts a fragment, not a
+//    fill colour, and silently breaks the shape it's on.
 //
 // ── the class-name interlock with looksmax-ranks ───────────────────────────
 //
@@ -221,6 +229,315 @@
 .LmxCosFrame[data-cf]:not(.is-live)::before,
 .LmxCosFrame[data-cf]:not(.is-live)::after {
   will-change: auto;
+}
+
+// ============================================================ elemental renderers
+//
+// Eight themed engines, none of them a recoloured ring: each draws its own
+// silhouette (an inline SVG mask, data:, %23 in place of every '#' because a
+// literal '#' inside url("...") is a fragment, not a colour) and moves it a
+// different way. Still the same rules as the five renderers above: no
+// fade()/darken() on a var(), no calc(), transform/opacity/background-position
+// only, at most two animated layers, paused until .is-live.
+//
+// `.is-pulse::before` (declared above, for the pulse renderers this file
+// shipped with first) would otherwise win the cascade on every renderer below
+// that ALSO uses spec.pulse for a reason other than "fade the base ring" —
+// void and cosmic pulse their ::after, not their ::before; storm and glitch
+// want their ::before to snap, not ease. Each of those four re-declares
+// `[data-cf-render='X'].is-pulse::before` at the same (0,3,1) specificity as
+// the generic rule, so source order (this section is BELOW it) decides, not
+// the accident of which property a spec happens to set.
+
+// venom/void/blood/cosmic/glitch's ::before all reuse the plain xor-mask
+// annulus already declared for gradient/dual above — one shared rule instead
+// of five copies of the same four declarations. Declared FIRST, ahead of
+// every per-theme section below, so glitch's own background override (it
+// needs a scanline layer the other four don't) and the is-pulse animation
+// overrides (void, cosmic, glitch — see the note above) both win on source
+// order for the one property each of them actually changes.
+.LmxCosFrame[data-cf-render='venom']::before,
+.LmxCosFrame[data-cf-render='void']::before,
+.LmxCosFrame[data-cf-render='blood']::before,
+.LmxCosFrame[data-cf-render='cosmic']::before,
+.LmxCosFrame[data-cf-render='glitch']::before {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background: var(--cf-linear) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+// storm's and nature's ::before are the plain flat ring — no mask, just a
+// border — same as 'ring' above.
+.LmxCosFrame[data-cf-render='storm']::before,
+.LmxCosFrame[data-cf-render='nature']::before {
+  display: block;
+  border: var(--cf-w, 2px) solid var(--cf-c1, currentColor);
+}
+
+// ---------------------------------------------------------------- blaze (fire)
+// An SVG flame-lick annulus — jagged outer edge, round inner edge, one
+// compound path with fill-rule evenodd so the "hole" needs no second mask
+// layer. ::before rolls it slowly; ::after is the SAME mask, flickering
+// opacity, so the flame's edge itself seems to gutter rather than just
+// dimming a static ring.
+.LmxCosFrame[data-cf-render='blaze']::before,
+.LmxCosFrame[data-cf-render='blaze']::after {
+  display: block;
+  background: var(--cf-linear) border-box;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M50 4L62.2 20.4L78.3 21.7L77.7 38.5L94 50L78.6 61.9L76.9 76.9L61.1 76.8L50 95L37.4 80.5L21 79L22.3 61.5L3 50L20.4 37.8L22.4 22.4L38.9 23.2ZM76 50A26 26 0 1 0 24 50A26 26 0 1 0 76 50Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M50 4L62.2 20.4L78.3 21.7L77.7 38.5L94 50L78.6 61.9L76.9 76.9L61.1 76.8L50 95L37.4 80.5L21 79L22.3 61.5L3 50L20.4 37.8L22.4 22.4L38.9 23.2ZM76 50A26 26 0 1 0 24 50A26 26 0 1 0 76 50Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.LmxCosFrame[data-cf-render='blaze']::before {
+  animation: cf-spin var(--cf-spin, 5s) linear infinite;
+  animation-play-state: paused;
+}
+.LmxCosFrame[data-cf-render='blaze']::after {
+  opacity: 0.7;
+  animation: cf-flicker 1.6s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+// ---------------------------------------------------------------- frost (ice)
+// A second SVG annulus, this one straight-edged facets rather than flame
+// licks, and static — ice does not roil. The motion is a diagonal sheen
+// masked to the SAME facets, so the shimmer looks like light catching a
+// crystal edge rather than a generic gradient sweep.
+.LmxCosFrame[data-cf-render='frost']::before,
+.LmxCosFrame[data-cf-render='frost']::after {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M94 50L80.3 67.5L71 86.4L50 85L28 88.1L19.7 67.5L8 50L19.7 32.5L28 11.9L50 15L71 13.6L80.3 32.5ZM80 50A30 30 0 1 0 20 50A30 30 0 1 0 80 50Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M94 50L80.3 67.5L71 86.4L50 85L28 88.1L19.7 67.5L8 50L19.7 32.5L28 11.9L50 15L71 13.6L80.3 32.5ZM80 50A30 30 0 1 0 20 50A30 30 0 1 0 80 50Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.LmxCosFrame[data-cf-render='frost']::before {
+  display: block;
+  background: var(--cf-linear) border-box;
+}
+.LmxCosFrame[data-cf-render='frost']::after {
+  display: block;
+  background-image: repeating-linear-gradient(115deg, transparent 0 12%, var(--white-a10) 12% 14%, transparent 14% 100%);
+  background-size: 220% 220%;
+  animation: cf-drift var(--cf-drift, 4.5s) linear infinite;
+  animation-play-state: paused;
+}
+
+// ------------------------------------------------------------ storm (lightning)
+// ::before is the plain 'ring' rule below (storm is in that selector group).
+// ::after is two SVG bolt glyphs, positioned once by hand rather than
+// centred, because a lightning strike is not symmetric. Both layers snap on
+// the SAME steps() timing, driven by spec.pulse, so the whole frame appears
+// to lose and regain power together rather than the bolts flickering over an
+// unrelated steady ring.
+.LmxCosFrame[data-cf-render='storm'].is-pulse::before {
+  animation: cf-snap var(--cf-pulse, 2.4s) steps(1) infinite;
+  animation-play-state: paused;
+}
+.LmxCosFrame[data-cf-render='storm']::after {
+  display: block;
+  background: var(--cf-c2, #fff);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg transform='translate(72,32) rotate(20) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3Cg transform='translate(28,68) rotate(200) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg transform='translate(72,32) rotate(20) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3Cg transform='translate(28,68) rotate(200) scale(0.55) translate(-12,-30)'%3E%3Cpath d='M12 0L2 34L11 34L6 60L22 24L13 24L20 0Z' fill='%23000'/%3E%3C/g%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: cf-snap var(--cf-pulse, 2.4s) steps(1) infinite;
+  animation-play-state: paused;
+}
+
+// ------------------------------------------------------------- venom (toxic)
+// ::before is the ordinary xor-mask gradient annulus (venom is in that
+// selector group below). ::after layers six radial-gradient "bubbles" — hand
+// positioned, not a loop, because this LESS port has no each()/range() —
+// inside the same xor mask, drifting diagonally.
+.LmxCosFrame[data-cf-render='venom']::after {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--cf-c2) 0 3px, transparent 4px),
+    radial-gradient(circle at 60% 15%, var(--cf-c1) 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 55%, var(--cf-c2) 0 3px, transparent 4px),
+    radial-gradient(circle at 35% 75%, var(--cf-c1) 0 2px, transparent 3px),
+    radial-gradient(circle at 90% 85%, var(--cf-c2) 0 2px, transparent 3px),
+    radial-gradient(circle at 10% 90%, var(--cf-c1) 0 3px, transparent 4px);
+  background-origin: border-box;
+  background-size: 160% 160%;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-drift var(--cf-drift, 5.5s) linear infinite;
+  animation-play-state: paused;
+}
+
+// -------------------------------------------------------------- void (shadow)
+// ::before is the xor-mask gradient annulus (void is in that selector group)
+// but, unlike gradient/dual, it ROTATES — a void that holds still is just a
+// dark ring. ::after is a soft radial vignette, unmasked, pulsing behind it.
+.LmxCosFrame[data-cf-render='void'].is-pulse::before {
+  animation: cf-spin var(--cf-spin, 16s) linear infinite;
+  animation-play-state: paused;
+}
+.LmxCosFrame[data-cf-render='void']::after {
+  display: block;
+  background: radial-gradient(circle at 50% 50%, var(--black-a60) 0%, transparent 70%);
+  animation: cf-pulse var(--cf-pulse, 4s) ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+// -------------------------------------------------------------------- blood
+// ::before is the xor-mask gradient annulus (blood is in that selector
+// group). ::after is a repeating vertical gradient — teardrops, loosely —
+// stretched tall and slid downward for a drip-flow rather than a shimmer.
+.LmxCosFrame[data-cf-render='blood']::after {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background-image: repeating-linear-gradient(180deg, var(--cf-c1) 0 8%, transparent 8% 30%);
+  background-origin: border-box;
+  background-size: 100% 220%;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-drift var(--cf-drift, 3.2s) linear infinite;
+  animation-play-state: paused;
+}
+
+// --------------------------------------------------------- cosmic (starfield)
+// ::before is the xor-mask gradient annulus (cosmic is in that selector
+// group), rotating slowly as a nebula sweep. ::after is a second, STATIC
+// xor-masked layer of radial-gradient "stars" — hand positioned, same reason
+// as venom's bubbles — that only twinkles in opacity, never spins, so the
+// stars don't smear.
+.LmxCosFrame[data-cf-render='cosmic'].is-pulse::before {
+  animation: cf-spin var(--cf-spin, 20s) linear infinite;
+  animation-play-state: paused;
+}
+.LmxCosFrame[data-cf-render='cosmic']::after {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background-image:
+    radial-gradient(circle at 15% 20%, #fff 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 10%, var(--cf-c2) 0 2px, transparent 3px),
+    radial-gradient(circle at 85% 60%, #fff 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 40% 85%, var(--cf-c2) 0 2px, transparent 3px),
+    radial-gradient(circle at 10% 70%, #fff 0 1.5px, transparent 2.5px);
+  background-origin: border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-twinkle var(--cf-pulse, 2.2s) ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+// ----------------------------------------------------------------- glitch (cyber)
+// ::before is the xor-mask gradient annulus (glitch is in that selector
+// group) PLUS a scanline overlay. ::after is colors[1] (--cf-c2) as a second,
+// independent ring that jump-cuts sideways — the RGB-split look — on the same
+// steps() timing as the base layer's flicker, so the two feel like one signal
+// failing rather than two unrelated animations.
+.LmxCosFrame[data-cf-render='glitch']::before {
+  background:
+    repeating-linear-gradient(0deg, var(--white-a06) 0 1px, transparent 1px 3px) border-box,
+    var(--cf-linear) border-box;
+}
+.LmxCosFrame[data-cf-render='glitch'].is-pulse::before {
+  animation: cf-snap var(--cf-pulse, 2.6s) steps(1) infinite;
+  animation-play-state: paused;
+}
+.LmxCosFrame[data-cf-render='glitch']::after {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background: var(--cf-c2) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-glitch var(--cf-pulse, 2.6s) steps(1) infinite;
+  animation-play-state: paused;
+}
+
+// ============================================================ frame shapes
+//
+// Orthogonal to render: any renderer's colours can wear any shape, selected
+// by data-cf-shape (default 'circle' — no attribute, no rule, no cost).
+//
+// hex and notched are pure clip-path: they crop the WRAPPER, so the avatar
+// inside is cropped to the same silhouette as the ring, not just the
+// decoration around it. They stack on top of whatever the renderer already
+// drew — a clip-path and a mask on the same element compose, they don't
+// fight — so void keeps rotating inside its hex crop and blood keeps
+// dripping inside its notch.
+//
+// ornate and laurel are SVG masks that REPLACE the renderer's own ring
+// geometry outright (a corner-flourish or a wreath is not expressible as a
+// clip-path polygon). Both selectors below match at the same (0,2,1)
+// specificity as every [data-cf-render] rule above, so — same rule as the
+// is-pulse overrides — being BELOW them in the file is what makes them win.
+
+.LmxCosFrame[data-cf-shape='hex'],
+.LmxCosFrame[data-cf-shape='hex']::before,
+.LmxCosFrame[data-cf-shape='hex']::after {
+  border-radius: 0;
+  clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0% 50%);
+}
+
+.LmxCosFrame[data-cf-shape='notched'],
+.LmxCosFrame[data-cf-shape='notched']::before,
+.LmxCosFrame[data-cf-shape='notched']::after {
+  border-radius: 0;
+  clip-path: polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%);
+}
+
+// A second SVG annulus again — base radius near-circular, four diagonal
+// points pulled out into small flourishes — filled with the frame's own
+// gradient and, on ::after, the same diagonal sheen frost/royal already use.
+.LmxCosFrame[data-cf-shape='ornate']::before,
+.LmxCosFrame[data-cf-shape='ornate']::after {
+  display: block;
+  border: none;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M88 50L92.5 67.6L76.9 76.9L62.6 80.5L50 88L32.4 92.5L23.1 76.9L19.5 62.6L12 50L7.5 32.4L23.1 23.1L37.4 19.5L50 12L67.6 7.5L76.9 23.1L80.5 37.4ZM79 50A29 29 0 1 0 21 50A29 29 0 1 0 79 50Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M88 50L92.5 67.6L76.9 76.9L62.6 80.5L50 88L32.4 92.5L23.1 76.9L19.5 62.6L12 50L7.5 32.4L23.1 23.1L37.4 19.5L50 12L67.6 7.5L76.9 23.1L80.5 37.4ZM79 50A29 29 0 1 0 21 50A29 29 0 1 0 79 50Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.LmxCosFrame[data-cf-shape='ornate']::before {
+  background: var(--cf-linear) border-box;
+}
+.LmxCosFrame[data-cf-shape='ornate']::after {
+  background-image: repeating-linear-gradient(115deg, transparent 0 10%, var(--white-a10) 10% 13%, transparent 13% 100%);
+  background-size: 220% 220%;
+  animation: cf-drift var(--cf-drift, 5s) linear infinite;
+  animation-play-state: paused;
+}
+
+// Two SVG olive branches on ::after, added beside whatever ::before the
+// renderer already drew (nature's plain green ring) rather than replacing it
+// — a wreath sits around a circle, it does not reshape one. Static: no
+// animation, so it never enters ANIMATED{} in js/dist/forum.js and never
+// costs the IntersectionObserver a subscription.
+.LmxCosFrame[data-cf-shape='laurel']::after {
+  display: block;
+  border: none;
+  background: var(--cf-linear) border-box;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 92 44.1 83.5 L 29.7 80.3 L 17.1 71 L 9 56.3 L 7.5 38.6' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cpath d='M50 92 55.9 83.5 L 70.3 80.3 L 82.9 71 L 91 56.3 L 92.5 38.6' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cellipse cx='44.1' cy='83.5' rx='6.5' ry='2.8' transform='rotate(190 44.1 83.5)' fill='%23000'/%3E%3Cellipse cx='29.7' cy='80.3' rx='6.5' ry='2.8' transform='rotate(213.8 29.7 80.3)' fill='%23000'/%3E%3Cellipse cx='17.1' cy='71' rx='6.5' ry='2.8' transform='rotate(237.5 17.1 71)' fill='%23000'/%3E%3Cellipse cx='9' cy='56.3' rx='6.5' ry='2.8' transform='rotate(261.2 9 56.3)' fill='%23000'/%3E%3Cellipse cx='7.5' cy='38.6' rx='6.5' ry='2.8' transform='rotate(285 7.5 38.6)' fill='%23000'/%3E%3Cellipse cx='55.9' cy='83.5' rx='6.5' ry='2.8' transform='rotate(-10 55.9 83.5)' fill='%23000'/%3E%3Cellipse cx='70.3' cy='80.3' rx='6.5' ry='2.8' transform='rotate(-33.8 70.3 80.3)' fill='%23000'/%3E%3Cellipse cx='82.9' cy='71' rx='6.5' ry='2.8' transform='rotate(-57.5 82.9 71)' fill='%23000'/%3E%3Cellipse cx='91' cy='56.3' rx='6.5' ry='2.8' transform='rotate(-81.2 91 56.3)' fill='%23000'/%3E%3Cellipse cx='92.5' cy='38.6' rx='6.5' ry='2.8' transform='rotate(-105 92.5 38.6)' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 // ============================================================ banner
@@ -617,10 +934,14 @@
 }
 
 // ============================================================ motion off
-// Everything above degrades to a static ring. Nothing here is load bearing:
-// with motion off the frames still read as bronze, silver, gold and so on,
-// because the colour carries the identity and the movement only carries the
-// rarity.
+// Everything above degrades to a static ring or a static SVG silhouette:
+// nothing here is load bearing. With motion off, blaze is still a flame-lick
+// annulus, void is still a hex-clipped dark ring, storm is still two bolts —
+// the SHAPE and the colour carry the theme, the animation only carries the
+// "this one moves" part of the rarity. This selector is unconditional on
+// [data-cf], not on a render or shape value, so every renderer and shape
+// added above (the elemental set, ornate, laurel) is covered automatically —
+// nothing about adding a new one requires touching this block.
 @media (prefers-reduced-motion: reduce) {
   .LmxCosFrame[data-cf]::before,
   .LmxCosFrame[data-cf]::after,

@@ -40,6 +40,10 @@ return [
     (new Extend\Frontend('admin'))
         ->css(__DIR__ . '/less/admin.less'),
 
+    // Only the scroll-to-top button's aria-label lives here today. See
+    // locale/es.yml for why the appearance-panel strings do not.
+    (new Extend\Locales(__DIR__ . '/locale')),
+
     (new Extend\Theme())
         ->addCustomLessVariable('config-primary-color', fn () => '#e8c07d')
         // Follows the surface ramp to true black (tokens.less, 2026-08-14).

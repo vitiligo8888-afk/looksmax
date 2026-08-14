@@ -101,7 +101,6 @@
       body;
 
     var toggle = root.querySelector('.lmx-econ-toggle');
-    var panel = root.querySelector('.lmx-econ-panel');
     toggle.addEventListener('click', function () {
       var open = root.classList.toggle('is-open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
