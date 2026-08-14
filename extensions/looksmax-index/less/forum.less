@@ -909,19 +909,39 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 
 .LmxTile-hit { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 
+// BARE LINE ART, no tile. The operator's reference is a classic forum index:
+// a thin monochrome glyph sitting directly on the row, with nothing behind it.
+// This used to be a filled, tinted, rounded square with a 1px inner ring and a
+// saturated per-section glyph — six coloured chips that competed with the
+// section names for attention on a page that is otherwise fully dark.
+//
+// The glyph weight itself is the OUTLINE Phosphor set, changed in Sections.php
+// (a fill cannot be turned into line art from CSS). Monochrome --ink-dim
+// rather than the section hue, because in the reference the icon is a quiet
+// wayfinding mark and the NAME is what carries the section's identity. The hue
+// is not lost: --tile still drives the tile's left edge and its hover state.
 .LmxTile-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex: none;
-  border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--tile) 20%, transparent);
-  color: var(--tile);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tile) 35%, transparent);
+  background: none;
+  box-shadow: none;
+  color: var(--ink-dim);
+  transition: color var(--t-fast) var(--ease);
 
-  iconify-icon { font-size: 21px; }
+  // Bigger than the old 21px: with no tile behind it the glyph has to hold the
+  // left column on its own.
+  iconify-icon { font-size: 34px; }
+}
+
+// On hover the section's own colour comes back, so the hue still does work --
+// it just does it on demand instead of shouting on every row at rest.
+.LmxTile:hover .LmxTile-icon,
+.LmxTile:focus-within .LmxTile-icon {
+  color: var(--tile, var(--accent));
 }
 
 .LmxTile-name {

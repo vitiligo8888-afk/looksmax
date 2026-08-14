@@ -61,6 +61,16 @@ class Sections
      * slug     the tag slug — ASCII only, accents live in the display string
      * hue      OKLCH hue; the hex is derived, never hand-picked
      * icon     iconify name, bundled in looksmax-icons/js/dist/icons.json
+     *
+     * ICONS ARE THE OUTLINE (regular) PHOSPHOR SET, not the -fill variants.
+     * The operator supplied a reference showing bare line-art glyphs with no
+     * coloured tile behind them. A filled glyph cannot be made to read as line
+     * art in CSS, so the weight has to change here, at the source.
+     *
+     * All six outline names were ADDED to looksmax-icons/js/dist/icons.json
+     * (191 -> 197 entries) because only their -fill twins were bundled.
+     * Nothing is fetched at runtime — the CSP forbids it, and an unbundled
+     * name renders as an empty square — so the path data is vendored there.
      */
     /**
      * THE ARRAY ORDER IS THE RENDER ORDER on the front page.
@@ -76,12 +86,12 @@ class Sections
      * values set the same day, so the front page and /tags agree.
      */
     public const SECTIONS = [
-        'mejores_guias' => ['slug' => 'mejores-guias', 'hue' => 290, 'icon' => 'ph:book-open-text-fill'],
-        'looksmaxing' => ['slug' => 'looksmaxing', 'hue' => 80, 'icon' => 'ph:sparkle-fill'],
-        'softmaxing' => ['slug' => 'softmaxing', 'hue' => 150, 'icon' => 'ph:drop-fill'],
-        'peptides' => ['slug' => 'peptides', 'hue' => 195, 'icon' => 'ph:syringe-fill'],
-        'anabolicos' => ['slug' => 'anabolicos', 'hue' => 25, 'icon' => 'ph:barbell-fill'],
-        'peligrosomaxing' => ['slug' => 'peligrosomaxing', 'hue' => 355, 'icon' => 'ph:warning-fill'],
+        'mejores_guias' => ['slug' => 'mejores-guias', 'hue' => 290, 'icon' => 'ph:book-open-text'],
+        'looksmaxing' => ['slug' => 'looksmaxing', 'hue' => 80, 'icon' => 'ph:sparkle'],
+        'softmaxing' => ['slug' => 'softmaxing', 'hue' => 150, 'icon' => 'ph:drop'],
+        'peptides' => ['slug' => 'peptides', 'hue' => 195, 'icon' => 'ph:syringe'],
+        'anabolicos' => ['slug' => 'anabolicos', 'hue' => 25, 'icon' => 'ph:barbell'],
+        'peligrosomaxing' => ['slug' => 'peligrosomaxing', 'hue' => 355, 'icon' => 'ph:warning'],
     ];
 
     /** i18n namespace. The extension id is `local-looksmax-index`. */
