@@ -172,7 +172,10 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 
 // One name for "this row's colour", so every rule below reads the same thing
 // whether the server wrote --tag or not.
-.LmxForum { --row: var(--tag, var(--accent, #eaf0ff)); }
+// Same move as --tile on the section cards: the browse list's hover rail and
+// wash take the accent rather than each forum's own hue, so the whole index
+// speaks in one colour instead of forty-seven.
+.LmxForum { --row: var(--accent, #eaf0ff); }
 
 .LmxForum-name {
   color: var(--ink, #f0eff4);
@@ -901,7 +904,20 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   // before the fix: three tiles carrying --tag #ff8b83 / #59dc7f / #ffcafc all
   // reported `color: rgb(230, 177, 105)`. That is operator defect "per category
   // colors" — not missing, connected to nothing.
-  --tile: var(--tag, var(--accent));
+  // HEAVENLY WHITE, not the per-section hue.
+  //
+  // --tag still arrives from the server (SectionsBlock writes style="--tag:
+  // #hex" from Sections::color()), and everything downstream reads --tile, so
+  // pointing --tile at the accent turns the arrow, the hover border and the
+  // hover icon white in one move instead of six.
+  //
+  // Operator: "change all the colors that are colorful to the heavenly white
+  // that makes them stand out more". They are right that it stands out more —
+  // #eaf0ff is 18.6:1 on this page, while the section hues ran 6.5-9:1, so the
+  // white marks are the highest-contrast thing on the card rather than six
+  // competing mid-tones. The section identity is carried by the icon and the
+  // name, which is where the reference put it too.
+  --tile: var(--accent);
   position: relative;
   display: flex;
   flex-direction: column;
