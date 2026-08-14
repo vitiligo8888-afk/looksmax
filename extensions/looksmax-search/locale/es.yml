@@ -1,0 +1,233 @@
+# Looksmax Search — español (México / América Latina neutra).
+#
+# Tuteo en todo el archivo. Nada de "usted", nada de "vosotros", nada de léxico
+# peninsular. Se sigue la terminología que ya usa el resto de la instalación:
+# "discusión" (no "hilo" ni "tema"), "publicación" (no "post"), igual que el
+# paquete flarum-lang/spanish y que looksmax-reactions.
+#
+# Los operadores de la consulta (tag: by: after: prefix: lang: is: sort:) NO se
+# traducen: QueryParser solo entiende los ingleses. Solo cambia el texto que
+# rodea al operador y los valores de ejemplo.
+
+local-looksmax-search:
+  forum:
+    header:
+      placeholder: Busca — presiona /
+
+    palette:
+      placeholder: "Busca discusiones, publicaciones, personas…   prueba  tag:looksmaxing  by:nombre  after:2023"
+      aria_label: Buscar
+      recent: Recientes
+      no_matches: "Sin resultados para “{query}”"
+      see_all: "Ver todos los resultados de “{query}”"
+      # Igual de directo que el inglés: qué pasó y por qué no hay nada abajo.
+      unavailable: el motor de búsqueda no respondió — preferimos no mostrar nada a mostrar algo incorrecto
+      failed: "la búsqueda falló: {error}"
+
+    # El desplegable del encabezado y su versión de pantalla completa en móvil
+    # son un solo componente, así que comparten este bloque.
+    surface:
+      close: Cerrar la búsqueda
+      forget: Quitar del historial
+      # La leyenda del teclado va después de cada <kbd>, así que cada fragmento
+      # empieza en minúscula y se lee junto con la tecla: "↑ ↓ para moverte".
+      hint_move: para moverte
+      hint_open: para abrir
+      hint_close: para cerrar
+      count: "{count, plural, one {{n} sugerencia} other {{n} sugerencias}}"
+
+    groups:
+      discussions: Discusiones
+      posts: Publicaciones
+      users: Personas
+      tags: Foros
+
+    types:
+      label: Tipo de resultado
+      all: Todo
+      discussions: Discusiones
+      posts: Publicaciones
+      users: Personas
+      tags: Foros
+
+    sort:
+      label: Ordenar los resultados
+      relevance: Relevancia
+      # Los cuatro "Más …" concuerdan con el sustantivo implícito
+      # (respuestas, vistas, reacciones), todos femeninos plurales, así que no
+      # hay que adivinar género en ningún caso.
+      new: Más recientes
+      old: Más antiguas
+      top: Más reacciones
+      replies: Más respuestas
+      views: Más vistas
+      active: Actividad reciente
+
+    results:
+      query_label: Consulta de búsqueda
+      submit: Buscar
+      count: "{count, plural, one {{n} resultado} other {{n} resultados}}"
+      none: Sin resultados
+      timing: "motor {engine} ms · total {total} ms"
+      # Se ve junto a los resultados cuando Meilisearch no respondió y contestó
+      # MySQL. Es una advertencia de calidad, no un error, y se deja en minúscula
+      # igual que en inglés.
+      degraded: "degradado: respaldo desde la base de datos"
+      prev: ← Anteriores
+      next: Siguientes →
+      failed: "La búsqueda falló: {error}"
+      placeholder: Busca en el foro…
+      pager: Páginas de resultados
+      # En-dash sin espacios, que es como se escribe un rango en español.
+      page_of: "{from}–{to} de {total}"
+
+    filters:
+      panel_label: Afinar los resultados
+      remove: Quitar este filtro
+      # El nombre accesible del mismo botón. Con `remove` a secas, un lector de
+      # pantalla anuncia lo mismo para todos los chips de la fila y no hay forma
+      # de saber cuál se está quitando.
+      remove_named: "Quitar el filtro: {filter}"
+      # Etiquetas de los chips. El valor a la derecha viene de la consulta tal
+      # como se escribió; el operador que se vuelve a escribir en la caja sigue
+      # siendo el inglés.
+      tag: "foro: {value}"
+      prefix: "prefijo: {value}"
+      author: "autor: {value}"
+      lang: "idioma: {value}"
+      flag: "estado: {value}"
+      # "desde/hasta" y no "después/antes": es como se lee un rango de fechas.
+      after: "desde: {value}"
+      before: "hasta: {value}"
+      phrase: "frase: “{value}”"
+      negative: "sin: {value}"
+      sort: "orden: {value}"
+      type: "tipo: {value}"
+      clear_all: Limpiar todo
+      toggle: Filtros
+      date: Fecha
+      date_from: Desde
+      date_to: Hasta
+      author_ph: nombre de usuario
+      # Concuerdan con el sustantivo: día y mes masculinos, semana femenino.
+      last_day: último día
+      last_week: última semana
+      last_month: último mes
+      last_year: último año
+      # Controles avanzados. Cada uno corresponde a un operador que QueryParser
+      # ya entiende, así que el control y el token escrito a mano son lo mismo.
+      advanced: Avanzado
+      any: cualquiera
+      min_replies: Respuestas mínimas
+      min_reactions: Reacciones mínimas
+      min_views: Vistas mínimas
+      min_length: Extensión mínima (palabras)
+
+    # Los indicadores `is:` que acepta QueryParser, como botones de activación.
+    # El VALOR sigue en inglés porque el analizador solo entiende el inglés;
+    # únicamente cambia de idioma la etiqueta.
+    flags:
+      unanswered: Sin responder
+      answered: Respondidas
+      guide: Guías
+      sticky: Fijadas
+      locked: Cerradas
+      op: Solo la primera publicación
+
+    # El acceso a la búsqueda avanzada, desde el desplegable del encabezado.
+    advanced:
+      title: Búsqueda avanzada
+      sub: "filtra por foro, autor, fecha, respuestas…"
+
+    saved:
+      save: Guardar esta búsqueda
+      done: Guardada
+      none: Todavía no guardaste ninguna.
+      delete: "Borrar la búsqueda guardada: {name}"
+      new_count: "{count, plural, one {{n} nueva} other {{n} nuevas}}"
+
+    facets:
+      tag_names: Foro
+      prefixes: Prefijo
+      author: Autor
+      lang: Idioma
+      group_names: Grupo
+
+    empty:
+      heading: "No encontramos nada para “{query}”"
+      try: "Prueba {label}"
+      count: "{count, plural, one {{n} resultado} other {{n} resultados}}"
+      related_forums: "Foros relacionados: "
+      sub: Prueba con menos palabras o quita un filtro.
+      all_types: Buscar en todo
+      # Solo se ofrece después de que el motor confirmó que la palabra recortada
+      # sí devuelve resultados, así que nunca es una suposición.
+      try_stem: "Prueba con “{word}”"
+      # La otra recuperación que el servidor no hace: la consulta SIN la palabra
+      # que la está bloqueando. Solo se ofrece si el motor confirma resultados.
+      try_without: "Prueba sin “{word}”"
+      everything: todo
+
+    recovery:
+      # Se insertan en `empty.try`: "Prueba sin filtros". Minúscula a propósito.
+      without_filters: sin filtros
+      without_phrase: sin la frase exacta
+      without_word: "sin “{word}”"
+
+    hit:
+      replies: "{count, plural, one {{n} respuesta} other {{n} respuestas}}"
+      views: "{count, plural, one {{n} vista} other {{n} vistas}}"
+      posts: "{count, plural, one {{n} publicación} other {{n} publicaciones}}"
+      threads: "{count, plural, one {{n} discusión} other {{n} discusiones}}"
+      # Participios sueltos bajo el título de un resultado. Concuerdan con
+      # "discusión", femenino, en los dos casos.
+      pinned: fijada
+      locked: cerrada
+      # "coincide" en presente: describe el resultado que se está viendo, no
+      # algo que pasó. {author} es un nombre de usuario, sin género conocido.
+      matched_in_reply: "coincide en una respuesta de {author}:"
+      related_meta: "{count, plural, one {{n} respuesta} other {{n} respuestas}} · {when}"
+
+    # Qué ES cada resultado. Antes una discusión y una respuesta se veían
+    # exactamente igual; esta es la palabra que va encima del título.
+    kind:
+      discussion: Discusión
+      post: Respuesta
+      user: Persona
+      tag: Foro
+
+    # El estado inicial: /search sin consulta, y el desplegable antes de que se
+    # escriba nada. Antes mostraba «No encontramos nada para “”» en una página
+    # vacía.
+    landing:
+      heading: ¿Qué estás buscando?
+      sub: Busca en todas las discusiones, publicaciones y personas del foro.
+      saved: Búsquedas guardadas
+      popular_tags: Foros con más movimiento
+      search_tag: "Buscar en {tag}"
+      hello: Busca discusiones, publicaciones y personas.
+      operators: "Prueba  tag:looksmaxing · by:nombre · after:2023"
+      operators_h: Operadores de búsqueda
+      # Cada una describe el ejemplo que tiene al lado, así que es una
+      # descripción y no una oración: va en minúscula y sin punto final.
+      op_tag: solo dentro de un foro
+      op_by: solo de una persona
+      op_after: desde esa fecha en adelante
+      op_phrase: esa frase exacta
+      op_neg: excluye esa palabra
+      op_sort: cambia el orden
+
+    # El estado de error. Se muestran el código y el cuerpo de la respuesta
+    # porque un "falló la búsqueda" a secas no le sirve ni a quien lee ni a
+    # quien opera el foro.
+    error:
+      heading: La búsqueda falló
+      status: "HTTP {status}"
+      retry: Reintentar
+
+    discovery:
+      related: Discusiones relacionadas
+
+    page:
+      title: Buscar
+      title_with_query: "Buscar: {query}"

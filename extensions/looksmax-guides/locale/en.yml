@@ -1,0 +1,100 @@
+local-looksmax-guides:
+  forum:
+
+    # Evidence tiers. Terms of art — these are the labels a reader uses to
+    # weigh a claim, so they must stay distinguishable from each other in both
+    # languages. `community_report` is the longer form src/Guide/Tiers.php uses
+    # for the same tier the JS calls `community`; both are kept rather than
+    # silently unified, because they appear in different places.
+    tier:
+      anecdote: Anecdote
+      community: Community
+      community_report: Community report
+      mechanism: Mechanism
+      observational: Observational
+      trial: Trial
+      guideline: Guideline
+      marketing: Marketing
+
+    badge:
+      guide: Guide
+      guide_stale: "Guide · stale"
+
+    freshness:
+      # {when} comes from lmxI18n.rel() — "3 months ago".
+      reviewed: "Reviewed {when}"
+      recently: recently
+      due: Review due
+      stale: "Not reviewed since {when}"
+      long_time: a long time
+      never: Never reviewed
+
+    banner:
+      due_title: "Review due."
+      stale_title: "Out of date."
+      # The leading space separates the bold lead-in from the sentence; it is
+      # punctuation between two sibling nodes, not layout.
+      due_body: " This guide was last checked {when} and is due for review. Treat specifics with care."
+      stale_body: " This guide has not been reviewed since {when}. It is no longer recommended in rankings until someone checks it."
+      some_time_ago: some time ago
+      since_written: it was written
+
+    header:
+      read_time: "{minutes} min read"
+      # {n} selects the plural arm; {count} is the same number formatted for
+      # the locale (lmxI18n.num) where the figure can get large.
+      sections: "{n, plural, one {{count} section} other {{count} sections}}"
+      version: "v{version}"
+      words: "{n, plural, one {{count} word} other {{count} words}}"
+      sourced: "{n, plural, one {{sourced} of {total} claim carries a source} other {{sourced} of {total} claims carry a source}}"
+
+    evidence:
+      seg_title: "{label}: {count} of {total}"
+
+    list:
+      badge_title: "{minutes} min read · {n, plural, one {{claims} claim} other {{claims} claims}}, {sourced} sourced"
+
+    toc:
+      title: Contents
+      aria: Guide contents
+
+    anchor_label: Link to this section
+
+    # ── Server-rendered, NOT yet wired ───────────────────────────────────────
+    # Everything below is baked into the s9e/TextFormatter XSLT by
+    # src/Formatter/Configure.php, which is compiled once and cached, so it
+    # cannot be swapped per request the way a trans() call can. The keys are
+    # written and translated here so the mechanism described in the `deferred`
+    # block of locale/i18n-map.json has somewhere to read from.
+    block:
+      tldr: "TL;DR"
+
+    callout:
+      note: Note
+      tip: Tip
+      warn: Warning
+      danger: Danger
+      key: Key takeaway
+      risk: Risk
+
+    spec:
+      difficulty: Difficulty
+      cost: Cost
+      time: Results in
+      risk: Risk
+      reversibility: Reversibility
+      pro: Needs a professional
+      pro_yes: "Yes"
+
+    stack:
+      item: Item
+      dose: Dose
+      frequency: Frequency
+      duration: Duration
+
+    ba:
+      before: Before
+      after: After
+
+    claim:
+      source_attached: "{label} — source attached"

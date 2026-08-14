@@ -1,0 +1,438 @@
+# Looksmax Store — English source strings.
+#
+# Every key here also exists in es.yml. Flarum registers these into the
+# `messages+intl-icu` domain, so ICU MessageFormat is available on every key:
+# `{count, plural, …}` and `{name}` both work, in PHP and in the browser.
+#
+# Two rules this file follows and the code that reads it must keep following:
+#
+#  1. A count NEVER gets concatenated to a word. Even where English does not
+#     need the one/other arms to differ ("3 added" / "1 added"), both arms are
+#     written out, because Spanish does need them and a missing arm is a
+#     missing sentence rather than an obvious defect.
+#
+#  2. A number is never FORMATTED here. `12,431` vs `12.431` is
+#     `window.lmxI18n.num()`'s job in JS and ICU's `#` in a plural arm. No key
+#     in this file contains a thousands separator.
+
+local-looksmax-store:
+
+  forum:
+
+    # ── the page itself ────────────────────────────────────────────────────
+    head:
+      title: Store
+      sub: Credits are earned by posting things people read. Spend them here.
+
+    # Document titles (app.setTitle), which are separate from the tab labels
+    # because a browser tab says where you are and a tab strip says where you
+    # can go.
+    title:
+      catalogue: Store
+      inventory: What you own
+      orders: Your orders
+      admin: Store admin
+
+    nav:
+      catalogue: Catalogue
+      inventory: What you own
+      orders: Orders
+      manage: Manage
+
+    # ── balance bar ────────────────────────────────────────────────────────
+    bar:
+      guest: Sign in to see your balance and buy anything here.
+      # Rendered in its own <span> next to the figure, so this is the UNIT
+      # only. It still needs the plural arms: the number decides the word.
+      credits_unit: "{count, plural, one {credit} other {credits}}"
+      membership: Membership
+      discount: Your discount
+      discount_sub: applied to the prices below
+      earn_rate: Earning rate
+      boost_active: boost active
+      base_rate: base rate for your tier
+      lifetime: Lifetime earned
+      lifetime_sub: spending never reduces this
+
+    # Fallback only. Real tier names come from looksmax-ranks' Catalog and are
+    # that extension's to translate; this is what shows when it is absent.
+    tier:
+      standard: Standard
+
+    category:
+      membership: Memberships
+      colours: Username colours
+      frames: Avatar frames
+      boosts: Boosts
+      utility: Thread perks
+      mystery: Boxes
+      bundles: Bundles
+      credits: Credit packs
+
+    rarity:
+      common: common
+      uncommon: uncommon
+      rare: rare
+      epic: epic
+      legendary: legendary
+
+    # `kind` is the grant handler's name. It is shown to members as the "what
+    # sort of thing is this" line under an inventory row.
+    kind:
+      style: Username colour
+      frame: Avatar frame
+      tier: Membership
+      boost: Boost
+      streakfreeze: Streak freeze
+      highlight: Thread highlight
+      sticky: Thread pin
+      bump: Thread bump
+      rename: Username change
+      credits: Credits
+      mystery: Box
+      bundle: Bundle
+
+    # Order states. `failed` is an adjective, not a verb, because it is also
+    # substituted into error.order_state ("That order is failed.").
+    state:
+      granted: delivered
+      refused: refused
+      failed: failed
+      refunded: refunded
+      expired: ended
+      pending: in flight
+
+    time:
+      ended: ended
+      days_left: "{count, plural, one {# day left} other {# days left}}"
+      hours_left: "{count, plural, one {# hour left} other {# hours left}}"
+      minutes_left: "{count, plural, one {# minute left} other {# minutes left}}"
+
+    price:
+      card_not_live: card not live
+
+    chip:
+      days: "{count, plural, one {# day} other {# days}}"
+      uses: "{count, plural, one {# use} other {# uses}}"
+      stock: "{left} of {total} left"
+      holders: "{count, plural, one {# member has this} other {# members have this}}"
+
+    preview:
+      username_sample: Username
+
+    card:
+      owned: owned
+      working: working…
+      short: "{count, plural, one {# credit short} other {# credits short}}"
+
+    buy:
+      buy: Buy
+      renew: Renew
+      upgrade: Upgrade
+      credits: Buy credits
+
+    dialog:
+      price: Price
+      list_price: List price
+      discount: Your membership discount
+      you_pay: You pay
+      balance_after: Balance after
+      lasts: Lasts
+      credits_amount: "{count, plural, one {# credit} other {# credits}}"
+      gift_label: Buy it for someone else
+      gift_placeholder: their username, or leave empty
+      card_label: Card number
+      card_mock: Card payment is not connected yet. This path is wired end to end against a mock provider so the real one can drop in; nothing is charged and no card details are stored or sent anywhere. 4000 0000 0000 0002 is treated as a declined card.
+      send: Send it
+      confirm: Confirm
+
+    action:
+      cancel: Cancel
+      save: Save
+      apply: Apply
+      edit: Edit
+      refund: Refund
+      retire: Retire
+      restore: Restore
+      show_fewer: Show fewer
+
+    loading:
+      catalogue: Loading the catalogue…
+      generic: Loading…
+      orders: Loading your orders…
+
+    empty:
+      category: Nothing in this section yet.
+
+    inventory:
+      ready: Ready to use
+      ready_empty: Nothing waiting to be used. Pins, highlights, bumps and name changes appear here after you buy them.
+      running: Running now
+      running_empty: No boosts or memberships running.
+      permanent: Kept forever
+      permanent_empty: Colours and frames you buy stay here permanently, even if a membership lapses.
+      uses_left: "{count, plural, one {# use left} other {# uses left}}"
+      ends: "{countdown}, ends {when}"
+      from: "from {name}"
+      new_username_placeholder: new username
+      rename_button: Change my name
+      no_threads: Start a thread first, then come back.
+      bump: Bump it
+      pin: Pin it
+      highlight: Highlight it
+
+    orders:
+      title: Your orders
+      empty: You have not bought anything yet.
+      gift_to: "gift to {name}"
+      gifts_title: Gifts you were given
+      show_all: "{count, plural, one {Show the # order} other {Show all # orders}}"
+
+    ledger:
+      title: Credit movements
+      empty: No store movements on your ledger yet.
+      show_all: "{count, plural, one {Show the # movement} other {Show all # movements}}"
+      # The ledger `reason` column holds slugs like `store.purchase`, which the
+      # orders table used to print raw. The nesting here matches the slug, so
+      # the lookup is `forum.ledger.reason.` + the column value.
+      reason:
+        store:
+          purchase: Store purchase
+          refund: Store refund
+          credits: Credits bought
+          clawback: Credits taken back
+        tier:
+          purchase: Membership purchase
+        admin:
+          adjust: Staff adjustment
+
+    table:
+      when: When
+      item: Item
+      paid: Paid
+      state: State
+      from: From
+      reason: Reason
+      reference: Reference
+      amount: Amount
+      sku: SKU
+      name: Name
+      kind: Kind
+      price: Price
+      stock: Stock
+      buyer: Buyer
+      action: Action
+      subject: Subject
+      before: Before
+      after: After
+      note: Note
+
+    alert:
+      box_won: "The box gave you {name} ({rarity}, normally {worth})."
+      gift_sent: "{item} sent to {username}."
+      # Deliberately not "{item} is yours" — see the note in es.yml.
+      bought: "{item} is yours."
+      refunded: "{count, plural, one {Refunded # credit.} other {Refunded # credits.}}"
+      renamed: "You are now {username}."
+      bumped: Thread bumped.
+      redeemed: "Done. It ends {when}."
+
+    error:
+      no_answer: The store did not answer. Reload the page.
+      purchase_failed: That did not go through. Nothing was charged.
+      refund_failed: That order could not be refunded.
+      redeem_failed: That could not be redeemed.
+      no_such_item: There is no such item.
+      not_giftable: That one cannot be given as a gift.
+      no_such_user: No account by that name.
+      no_account_named: "No account called {name}."
+      duplicate_submitted: That purchase was already submitted.
+      duplicate_processing: That purchase is already being processed.
+      not_on_sale: That is not on sale right now.
+      closed: That one has closed.
+      sold_out: Sold out.
+      order_state: "That order is {state}."
+      not_your_order: That is not your order.
+      no_refund_window: This item cannot be refunded. Ask staff if something went wrong.
+      refund_window_closed: The refund window for this item has closed.
+      already_used: That has already been used, so it cannot be refunded.
+      already_owned: You already own that.
+      own_everything_box: You already own everything this box can contain.
+      own_everything_bundle: You already own everything in this bundle.
+      injected_fault: "The purchase was rolled back on purpose ({detail}). Nothing was charged."
+      generic_rollback: Something went wrong and nothing was charged.
+      sign_in: Sign in first.
+      unknown_action: unknown action
+      unknown_operation: unknown operation
+      unknown_view: unknown view
+      generic: Something went wrong. Nothing was charged.
+      no_such_order: No such order.
+      nothing_to_redeem: Nothing to redeem of that kind.
+      not_allowed: not allowed
+      already_refunded: That order was already refunded.
+      card_declined: That card was declined.
+      card_invalid: That card number is not valid.
+      nothing_to_charge: Nothing to charge.
+      not_mock_charge: That charge was not made by the mock provider.
+
+    pay:
+      credits_label: Credits
+      card_label: Card (not live)
+      short: "{count, plural, one {You are # credit short.} other {You are # credits short.}}"
+
+    # Why a card cannot be bought, in one sentence. See i18n-map.json: three of
+    # these are also re-derived into an error CODE by Purchase.php, which is
+    # why lock.min_tier is still hardcoded in Catalogue.php for now.
+    lock:
+      guest: Sign in to buy anything.
+      inactive: Not on sale right now.
+      opens: "Opens {when}."
+      closed: This one has closed.
+      sold_out: Sold out.
+      owned: You already own this.
+      owned_gift: They already own this.
+      max_reached: You have the maximum of these.
+      tier_downgrade: "You are on {current} already, which is above {target}."
+      min_tier: "{tier} or above can use this."
+      rank_required: "Reach {rank} first ({count, plural, one {# more lifetime point} other {# more lifetime points}})."
+      requires: "Needs {item} first."
+
+    redeem:
+      no_highlight: You have no highlight left to use.
+      no_pin: You have no pin left to use.
+      no_bump: You have no bump left to use.
+      no_rename: You have no username change left to use.
+      already_pinned: That thread is already pinned.
+      bumped_this_week: That thread was already bumped this week.
+      name_rules: Names are 3 to 30 characters, letters, numbers, dashes and underscores.
+      same_name: That is already your name.
+      name_taken: That name is taken.
+      no_such_thread: No such thread.
+      not_your_thread: That is not your thread.
+      thread_deleted: That thread is deleted.
+
+    admin:
+      stat:
+        items: Items
+        orders: Orders
+        delivered: Delivered
+        refused: Refused
+        failed: Failed
+        refunded: Refunded
+        spent: Credits spent
+        circulating: Credits circulating
+        entitlements: Live entitlements
+      adjust_title: Adjust a balance
+      username_placeholder: username
+      amount_placeholder: amount, e.g. 500 or -500
+      reason_placeholder: reason (recorded)
+      adjusted: "{username}: {before} to {after}"
+      failed: That did not work.
+      tab:
+        catalogue: Catalogue
+        orders: Recent orders
+        audit: Audit trail
+      catalogue_section: Catalogue
+      orders_section: Recent orders
+      audit_section: Audit trail
+      synced: "Catalogue synced: {added, plural, one {# added} other {# added}}, {updated, plural, one {# refreshed} other {# refreshed}}."
+      sync_button: Sync shipped catalogue
+      new_item: New item
+      filter_placeholder: filter by SKU, name or kind
+      on_sale: on sale
+      # Quoted key: YAML 1.1 reads a bare `off` as the boolean false.
+      "off": "off"
+      saved: "Saved {sku}."
+      save_failed: That did not save.
+      sku_rules: SKUs are lower case letters, numbers and dashes.
+      retired_note: It has been sold before, so it was retired rather than deleted.
+      nothing_to_adjust: Nothing to adjust.
+      reason_required: Say why. The adjustment is recorded with the reason.
+      no_such_item: No such item.
+      field:
+        sku: SKU
+        name: Name
+        kind: Kind
+        category: Category
+        price: Price
+        rarity: Rarity
+        icon: Icon
+        color: Colour
+        max_per_user: Max per user
+        stock_total: Stock total
+        duration_days: Duration (days)
+        uses: Charges
+        refund_minutes: Refund window (minutes)
+        min_tier: Minimum tier
+        min_rank: Minimum rank
+        available_until: Closes at (Y-m-d H:i:s)
+        sort: Sort
+        blurb: Blurb
+        payload: Payload (JSON)
+        active: On sale
+        giftable: Giftable
+        discountable: Membership discount applies
+
+    # ── shipped catalogue copy ─────────────────────────────────────────────
+    #
+    # NOT WIRED UP YET. These keys exist so the fix described in
+    # i18n-map.json's `deferred` section is a migration plus six lines, not a
+    # translation job. Today src/Seed.php writes this prose straight into
+    # `store_items.name` / `.blurb`, and a translation key cannot live in a
+    # column an admin edits through a plain text input.
+    #
+    # Keyed by SKU, so `forum.item.<sku>.name`.
+    item:
+      boost-2x-24h:
+        name: Double earnings, 24 hours
+        blurb: Everything you earn counts double for a day. Stacks with your membership multiplier.
+      boost-2x-7d:
+        name: Double earnings, 7 days
+        blurb: The same thing for a week. Cheaper per day than buying seven of the above.
+      cap-raise-24h:
+        name: Raised daily ceiling, 24 hours
+        blurb: Doubles the anti-farming daily caps for a day. For the days you actually are writing that much.
+      streak-freeze:
+        name: Streak freeze
+        blurb: Covers one missed day so a daily streak survives it. Spent automatically, oldest first.
+      thread-highlight-3d:
+        name: Highlight a thread, 3 days
+        blurb: Your thread gets a marked edge in the discussion list for three days. One thread, your choice, redeemed when you want it.
+      thread-sticky-24h:
+        name: Pin a thread, 24 hours
+        blurb: Pins one of your threads to the top of its tag for a day, then unpins it. A moderator can end it early.
+      thread-bump:
+        name: Bump a thread
+        blurb: Moves one of your threads back to the top of the recent list without posting "bump".
+      username-change:
+        name: Username change
+        blurb: One change of the name on your account. Your old name is recorded on the order.
+      box-colour:
+        name: Colour box
+        # The odds are the payload's odds. They are written out here as words
+        # because the card prints this line verbatim; if the payload changes,
+        # both arms of this key change with it.
+        blurb: One username style you do not already own. 55% solid, 38% gradient, 7% animated. Cheapest animated style is worth 12,000.
+      box-frame:
+        name: Frame box
+        blurb: One avatar frame you do not already own. 40% common, 30% uncommon, 24% rare, 6% epic.
+      tier-vip-lifetime:
+        name: VIP for life
+        blurb: VIP that never expires and never needs renewing. Twenty five of these exist.
+      bundle-vip-start:
+        name: VIP starter
+        blurb: A month of VIP, the Oceanic gradient and a day of doubled earnings. Sold together for less than the three separately.
+      credits-10k:
+        name: 10,000 credits
+        blurb: Card payment is not live yet. This is a test purchase path and it does not charge anything.
+      credits-50k:
+        name: 50,000 credits
+        blurb: Card payment is not live yet. This is a test purchase path and it does not charge anything.
+
+  # ── admin panel ──────────────────────────────────────────────────────────
+  # The store's management screen lives on the forum, at /store/admin. The
+  # admin panel gets a doorway to it and nothing else.
+  admin:
+    nav:
+      store: Store
+      store_title: Catalogue, orders, balances and the audit trail

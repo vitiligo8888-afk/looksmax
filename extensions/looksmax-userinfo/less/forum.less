@@ -1,0 +1,1607 @@
+// The user identity surface: the author rail, THE hover card, and DMs.
+//
+// Every colour, radius, duration, elevation, z-index and spacing value here
+// resolves to a custom property declared by local/looksmax-theme
+// (less/tokens.less). Nothing is hardcoded except the per-user rank colours,
+// which arrive as inline styles from the server because they are DATA.
+//
+// ── Four rules that are not style preferences ────────────────────────────────
+//
+// 1. NO each() AND NO range(). Flarum compiles LESS through wikimedia/less.php,
+//    which implements neither. Using one does not raise an error — it throws
+//    inside the compiler, forum.css is never written, and the forum serves with
+//    no stylesheet at all while forum.js still builds perfectly. It is
+//    completely silent from the outside.
+// 2. NO @container. wikimedia/less.php cannot parse the at-rule and dies the
+//    same silent death. This has already taken the forum down once, from
+//    line 400 of this file.
+// 3. NO colour function on a custom property. fade(var(--x), 40%),
+//    darken(var(--surface-1), 2%) and mix() all evaluate at COMPILE time and
+//    abort on a var(). Same for `+` inside calc(): `calc(var(--a) + var(--b))`
+//    is "Operation on an invalid type". Escape those with ~"...".
+// 4. The side rail is a FLOAT, not a grid item. This is measured, not taste —
+//    see the block comment on .Post.has-lmx-author below.
+//
+// ── Names ────────────────────────────────────────────────────────────────────
+// This file used to define `.LmxCard` with `width: 300px`. `.LmxCard` is the
+// SHARED sidebar-card class on this install: looksmax-index's blocks
+// (src/Blocks/AbstractBlock.php:52), looksmax-chat (js/chat.js:819),
+// looksmax-ranks' leaderboard (js/dist/forum.js:448) and looksmax-theme
+// (less/components.less:557) all use it. A 300px width declared here pinned
+// every one of them. The hover card is `.LmxHoverCard` now and touches nothing
+// it does not own.
+
+// ============================================================ local tokens
+
+// The two dimensions the admin panel can move (src/Config.php). They are
+// declared here with defaults so the stylesheet is correct even on the first
+// paint, before forum.js has read the configuration off the forum payload.
+:root {
+  --lmx-card-w: 340px;
+  --lmx-card-avatar: 64px;
+  --lmx-author-w: 200px;
+}
+
+// ============================================================ the post rail
+
+// XenForo, vBulletin and IPB all put the author beside the post rather than
+// above it, and this board's readers spent years on the first of those. The
+// panel is not decoration: reading a claim about a compound or a surgery next
+// to "joined 2018, 12k posts, 30k reactions" is a different act from reading it
+// next to a 32px circle.
+//
+// ── Why a float and not CSS grid ─────────────────────────────────────────────
+//
+// The first implementation made the post wrapper a two-column grid and gave the
+// rail `grid-row: 1 / span 50`, on the reasoning that a post has an unknown
+// number of rows so the rail should span more than it can ever need.
+//
+// That is exactly wrong, and it is wrong in a way that no DOM assertion sees.
+// When a grid item spans several intrinsically-sized tracks, the track sizing
+// algorithm DISTRIBUTES the item's intrinsic contribution across every spanned
+// track. The rail's ~390px was therefore not placed beside the body: it was
+// smeared across 50 auto rows, and the first row alone grew tall enough to push
+// the body down. Measured on /d/329 at 1440px: 392.8px of empty space between
+// the top of the rail and the top of the post body. Reducing the span only
+// changes the number — with span 1 the single shared row is still sized by the
+// taller of (rail, post header), which is the same defect.
+//
+// A float has none of this. The rail is taken out of flow, the in-flow siblings
+// keep their own block layout and are indented past it by a margin, and neither
+// one can size the other. It also degrades correctly: if the rail is taller
+// than the post, the clearfix below makes the wrapper contain it.
+.Post.has-lmx-author {
+  > div {
+    // establish a block formatting context so the float is contained without a
+    // clearfix pseudo-element fighting Flarum's own ::after rules
+    display: flow-root;
+  }
+
+  > div > .LmxAuthor {
+    float: left;
+    width: var(--lmx-author-w);
+    // The rail's own height. It does NOT stretch to the post: a 40-line post
+    // with a 3-line rail should not draw a 40-line divider.
+    margin-right: var(--gap);
+  }
+
+  // Everything the float sits beside is indented past it. `margin-left` rather
+  // than relying on line-box shortening, because a block that establishes its
+  // own BFC (any `overflow` other than visible — which Flarum sets on code
+  // blocks, tables and the actions bar) would otherwise shrink to avoid the
+  // float and end up narrower than its siblings.
+  //
+  // The `~"..."` is not decoration. less.php evaluates `+` as LESS arithmetic
+  // wherever it appears, including inside calc(), and `var(--a) + var(--b)` is
+  // "Operation on an invalid type" — which throws in the compiler, so forum.css
+  // is NEVER WRITTEN and every page 500s.
+  > div > *:not(.LmxAuthor) {
+    margin-left: ~"calc(var(--lmx-author-w) + var(--gap))";
+    min-width: 0;
+  }
+
+  // The stock avatar+name above the body. With the rail present it is the same
+  // two facts twice, four pixels apart. The rest of the header — timestamp,
+  // permalink, "edited" — stays.
+  .Post-header .item-user,
+  .Post-header .PostUser {
+    display: none;
+  }
+}
+
+// ── The 96px of dead gutter ────────────────────────────────────────────────
+//
+// looksmax-theme reserves a left gutter on every post for core's floated avatar
+// and pulls the avatar into it:
+//
+//   extensions/looksmax-theme/less/discussion.less:459  .Post { padding-left: 96px }
+//   extensions/looksmax-theme/less/discussion.less:462  .PostUser .Avatar { margin-left: -58px }
+//
+// That gutter exists to hold an avatar this rail has already replaced and
+// hidden, so with the rail present it is 96px of nothing, and it is why the
+// post column read as squished: 96 + 200 + 14 = 310px consumed before the first
+// word of the body. `.Post.has-lmx-author` is (0,2,0) against the theme's
+// (0,1,0), so this wins on specificity without !important — but only inside the
+// same media query, because the theme's rule is scoped to >=768px.
+@media (min-width: 768px) {
+  .Post.has-lmx-author,
+  .CommentPost.has-lmx-author {
+    padding-left: var(--pad);
+  }
+}
+
+// ================================================================== panel
+
+.LmxAuthor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  padding: 2px var(--pad-sm) var(--pad-sm) 0;
+  border-right: 1px solid var(--line-soft);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+}
+
+.LmxAuthor-id {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.LmxAuthor-idText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+}
+
+.LmxAuthor-avatarLink {
+  display: block;
+  line-height: 0;
+  border-radius: var(--r-md);
+}
+
+.LmxAuthor-name {
+  display: block;
+  max-width: 100%;
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: var(--ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition: filter var(--t-fast) var(--ease);
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+    filter: brightness(1.18);
+  }
+}
+
+// The user title. Free text from the source board — emoji, unicode script
+// fonts, trailing spam — so it is clamped rather than trusted to be short.
+.LmxAuthor-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--ink-dim);
+  font-size: var(--fs-xs);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+// ================================================================= avatar
+
+// `line-height: 0` on the wrapper kills the descender gap under the <img>, but
+// it is INHERITED. Core renders an avatar with no uploaded image as a <span>
+// containing a single letter, and that letter's line box then collapsed onto
+// the top edge of the square: the glyph rendered half above an 84px avatar,
+// which is what the operator saw. So the wrapper zeroes its own line box and
+// every child re-declares one. Anything added inside .LmxAvatar later must do
+// the same — it is not optional.
+.LmxAvatar {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+
+  .LmxAvatar-img,
+  .Avatar {
+    // flex, NOT block: core's .Avatar centres its initial with
+    // `display:inline-flex; align-items:center; justify-content:center`, and
+    // `display:block` silently threw that centring away.
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--r-md);
+    box-shadow: var(--e-2);
+    // NOT --surface-2. Core paints a generated initial in --ink-on-light, a
+    // dark ink chosen for the light pastel it also generates; putting that ink
+    // on a dark surface measured 1.23:1 on the post rail. --avatar-bg is the
+    // one token that means "the fallback behind an avatar letter".
+    background: var(--avatar-bg);
+    color: var(--ink-on-light);
+    font-size: 26px; // the initial, when there is no image
+    line-height: 1;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  // an <img class="Avatar"> nested by core inside a .Avatar wrapper
+  .Avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+}
+
+.LmxAvatar--lg {
+  width: 76px;
+  height: 76px;
+}
+
+.LmxAvatar--card {
+  width: var(--lmx-card-avatar);
+  height: var(--lmx-card-avatar);
+
+  .LmxAvatar-img,
+  .Avatar {
+    font-size: 22px;
+  }
+}
+
+.LmxAvatar--sm {
+  width: 30px;
+  height: 30px;
+
+  .LmxAvatar-img,
+  .Avatar {
+    font-size: 13px;
+    border-radius: var(--r-sm);
+  }
+}
+
+// Presence. A sibling of the image, never an overlay on it, so a 404 avatar
+// cannot take the indicator down with it.
+.LmxAvatar-presence {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 13px;
+  height: 13px;
+  border-radius: var(--r-pill);
+  background: var(--ink-faint);
+  box-shadow: 0 0 0 2px var(--surface-1);
+}
+
+.LmxAvatar[data-online='1'] .LmxAvatar-presence {
+  background: var(--ok);
+  box-shadow: 0 0 0 2px var(--surface-1), 0 0 8px var(--ok-a14);
+}
+
+// =================================================================== rank
+
+.LmxRank {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  // A tenth of the chip's own colour behind it, which reads as a tint on dark
+  // without needing a second token per rank.
+  background: color-mix(in srgb, currentColor 12%, transparent);
+
+  iconify-icon {
+    font-size: 12px;
+    flex: none;
+  }
+}
+
+// A colour carried over from the source board is a purchase, not a ladder
+// position, so it is drawn flat rather than as a rank chip.
+.LmxRank[data-source='legacy-style'] {
+  text-transform: none;
+  border-style: dashed;
+}
+
+// ================================================================= groups
+
+// The forum's OWN roles. A third axis beside the rank ladder (earned) and the
+// source board's banners (carried over): this is what THIS install granted, and
+// it is the only one of the three that carries real permissions. Solid fill
+// rather than the rank chip's outline, so at a glance "Mod" and "Gold" are not
+// the same kind of thing.
+.LmxGroups {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.LmxGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  color: var(--accent);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.LmxGroup-icon {
+  flex: none;
+  font-size: 10px;
+  opacity: 0.9;
+}
+
+// A suspended account still renders — hiding it would make moderation
+// invisible — but it renders as suspended, in the one colour on the palette
+// that means "stop".
+.LmxSuspended {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--danger);
+  border-radius: var(--r-sm);
+  background: var(--danger-a14);
+  color: var(--danger);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+// ================================================================ banners
+
+.LmxBanners {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.LmxBanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: var(--r-xs);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  iconify-icon {
+    font-size: 11px;
+  }
+}
+
+// A role banner rendered into a core `badges` list, where there is only room
+// for the glyph.
+.LmxBadge {
+  display: inline-flex;
+  align-items: center;
+
+  iconify-icon {
+    font-size: 15px;
+  }
+}
+
+// =============================================================== presence
+
+.LmxPresence {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  line-height: 1.3;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.LmxPresence-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--ink-faint);
+}
+
+.LmxPresence.is-online {
+  color: var(--ok);
+
+  .LmxPresence-dot {
+    background: var(--ok);
+    box-shadow: 0 0 8px var(--ok-a14);
+  }
+}
+
+// ================================================================== stats
+
+.LmxStats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  margin: 0;
+  padding: var(--gap-sm) 0 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+// ── The overlap this shape replaces ─────────────────────────────────────────
+//
+// A stat is a label and a value on one line, and the first version was
+// `display:flex; justify-content:space-between` with `white-space: nowrap` on
+// BOTH halves. In a wide column that is right. In a 176px rail column, or in a
+// `repeat(2, minmax(0,1fr))` grid on a 300px card, the label plus the value are
+// wider than the line — and because nowrap forbids wrapping and neither child
+// can shrink below its content, they simply PAINTED ON TOP OF EACH OTHER. The
+// operator's screenshot has "Jun 2021" and "Messages" occupying the same
+// pixels, twice on one page.
+//
+// nowrap is not the bug on its own; nowrap on a child that is allowed to
+// overflow its parent is. Three rules make it impossible:
+//
+//   1. the label may SHRINK (min-width: 0) and ellipsise, so it always yields
+//      to the value — a truncated "Reaction…" is readable, an overprint is not;
+//   2. the value may not shrink (flex: none), because a truncated number is a
+//      lie;
+//   3. one-line pairs are OPT-IN (.LmxStats--row / .LmxStats--wide), so the
+//      default is the shape that cannot fail at any width.
+//
+// Container queries would express "one line when the COLUMN is wide" exactly —
+// and `@container` is a LESS parse error in wikimedia/less.php (see the header).
+.LmxStat {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  padding: 2px 0;
+
+  dt {
+    align-items: center;
+    color: var(--ink-faint);
+    display: flex;
+    flex: 0 1 auto;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    gap: 5px;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // the label text itself, so the icon is never the thing that gets clipped
+    > span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    iconify-icon {
+      flex: none;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+  }
+
+  dd {
+    color: var(--ink);
+    // A number must never be truncated or wrapped: it would read as a
+    // different number.
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    margin: 0;
+    white-space: nowrap;
+  }
+}
+
+// Opt-in one-line pairs, for contexts with real width. Still shrink-safe: the
+// label yields and ellipsises, the number never does.
+.LmxStats--row .LmxStat,
+.LmxStats--wide .LmxStat {
+  align-items: baseline;
+  flex-direction: row;
+  gap: var(--gap-sm);
+  justify-content: space-between;
+}
+
+// Wider contexts — the hover card, the profile — get a two-column stat grid.
+//
+// `auto-fit` with a 132px floor, NOT `repeat(2, minmax(0,1fr))`. The fixed two
+// columns were the other half of the overlap: on the profile the same markup
+// renders inside a ~190px sidebar card, where two columns are 88px each and
+// nothing fits in one. auto-fit collapses to a single column instead, so the
+// grid can never produce a column narrower than a stat needs.
+.LmxStats--wide {
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  column-gap: var(--gap);
+}
+
+// ============================================================ reaction mix
+
+.LmxMix {
+  display: flex;
+  height: 4px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  background: var(--surface-3);
+  cursor: help;
+}
+
+.LmxMix-seg {
+  display: block;
+  flex-basis: 0;
+  min-width: 2px;
+}
+
+// ================================================================= legacy
+
+// Carried-over standing. Visually quieter than the local stats on purpose: it
+// describes a DIFFERENT FORUM, and a reader must never confuse the two.
+//
+// The label is back. A previous pass reduced this to an archive glyph plus the
+// bare figures, on the grounds that the words were two thirds of a 176px line —
+// which was true, and which produced "38.2K posts · 76.3K reactions" sitting
+// directly under "Messages 8" with nothing to say they were different forums.
+// The rail is 200px now and the card is 340px, so both fit; where they do not,
+// the LABEL truncates and the figures never do.
+.LmxLegacy {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  padding-top: 4px;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  line-height: 1.35;
+  cursor: help;
+
+  iconify-icon {
+    font-size: 11px;
+    flex: none;
+    align-self: center;
+    opacity: 0.75;
+  }
+}
+
+.LmxLegacy-label {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+.LmxLegacy-figures {
+  flex: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+// ========================================================= THE hover card
+
+// One host, at body level. Not tidiness: `.Post`, the header and several theme
+// surfaces create stacking contexts with transform/filter/backdrop-filter, and
+// a card rendered inside one of them cannot rise above its ancestor no matter
+// what z-index it is given. A body-level host with --z-tooltip is the only
+// arrangement that actually wins.
+.LmxCardHost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-tooltip);
+  display: none;
+  pointer-events: none;
+
+  &.is-open {
+    display: block;
+    pointer-events: auto;
+  }
+}
+
+.LmxCardScrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: none;
+  background: var(--scrim);
+  opacity: 0;
+  transition: opacity var(--t-base) var(--ease);
+
+  &.is-open {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.LmxHoverCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  width: var(--lmx-card-w);
+  max-width: ~"calc(100vw - 24px)";
+  padding: var(--pad);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+  box-shadow: var(--e-3);
+  animation: lmxCardIn var(--t-base) var(--ease);
+}
+
+// A wash in the account's own rank colour, painted by an element rather than a
+// background on the card so the colour can be an inline style (it is data) and
+// the opacity ramp can stay in the stylesheet.
+.LmxHoverCard-wash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 74px;
+  opacity: 0.14;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+  mask-image: linear-gradient(180deg, #000, transparent);
+}
+
+.LmxHoverCard-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: var(--z-raised);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--ink-dim);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--ink);
+  }
+}
+
+.LmxHoverCard-head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-sm);
+  min-width: 0;
+}
+
+.LmxHoverCard-avatar {
+  flex: none;
+  display: block;
+  line-height: 0;
+  border-radius: var(--r-md);
+}
+
+.LmxHoverCard-headText {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.LmxHoverCard-nameRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.LmxAuthor-name--card {
+  font-size: var(--fs-xl);
+  line-height: 1.15;
+}
+
+.LmxHoverCard-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 100%;
+}
+
+// Inside the card these two are left-aligned, not centred: the card is a
+// left-aligned block, and the rail is a centred column. Same components, two
+// contexts, one override each.
+.LmxHoverCard .LmxGroups,
+.LmxHoverCard .LmxBanners {
+  justify-content: flex-start;
+}
+
+.LmxHoverCard .LmxStats {
+  padding-top: var(--gap-sm);
+}
+
+// ------------------------------------------------------------- actions
+
+// Never rendered unless the SERVER said the viewer may perform it
+// (src/Presenter.php::abilities). This block only decides how they look.
+.LmxCardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: var(--gap-sm);
+  border-top: 1px solid var(--line-soft);
+}
+
+.LmxCardAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  // A tap target. 36px is the floor at which a thumb hits the button it aimed
+  // at, and the sheet is a touch surface by definition.
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+
+  iconify-icon {
+    flex: none;
+    font-size: 14px;
+  }
+
+  // `.Button:hover` (0,2,0) has beaten `.Button--primary` (0,1,0) on this
+  // install before, so the hover state is declared at the same specificity as
+  // the variants below rather than being left to win by source order.
+  &:hover,
+  &:focus-visible {
+    background: var(--surface-3);
+    border-color: var(--line-strong);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    box-shadow: var(--ring);
+    outline: 0;
+  }
+}
+
+.LmxCardAction.LmxCardAction--primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent);
+    border-color: transparent;
+    color: var(--accent-ink);
+    filter: brightness(1.08);
+  }
+}
+
+.LmxCardAction.LmxCardAction--danger {
+  border-color: var(--danger-a45);
+  color: var(--danger);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--danger-a14);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+}
+
+@keyframes lmxCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lmxSheetIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+// ── The one other implementation on this install ────────────────────────────
+//
+// local/looksmax-ranks attaches a second card (`.LmxHover`,
+// extensions/looksmax-ranks/js/dist/forum.js:307 -> :337) to the same names, at
+// a bare `z-index: 9999` (extensions/looksmax-ranks/less/forum.less:483), so
+// without this it paints OVER this one and a reader sees two cards for one
+// hover. That file belongs to another lane and is not edited here.
+//
+// `.lmx-usercard-owner` is put on <html> by forum.js only after this file's
+// card has actually bound, so if this extension is disabled or fails to boot,
+// theirs comes straight back. The permanent fix is one deleted line in their
+// file — see HOVERCARD-API.md.
+html.lmx-usercard-owner .LmxHover {
+  display: none !important;
+}
+
+// ============================================================== the sheet
+
+// A hover card is wrong on a touch screen: there is no hover, and a popover
+// anchored to a 14px name is a 14px target to dismiss. Below the breakpoint the
+// SAME component renders as a bottom sheet — same markup, same data, same
+// actions — because two components would drift.
+.LmxCardHost.is-sheet {
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  .LmxHoverCard {
+    width: auto;
+    max-width: none;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: var(--pad) var(--pad) ~"calc(var(--pad) + env(safe-area-inset-bottom))";
+    border-width: 1px 0 0;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    box-shadow: var(--e-4);
+    animation: lmxSheetIn var(--t-base) var(--ease);
+    // The grabber. A sheet that does not look draggable does not read as
+    // dismissible, and this one is dismissed by tapping the scrim.
+    padding-top: 22px;
+  }
+
+  .LmxHoverCard::before {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 38px;
+    height: 4px;
+    margin-left: -19px;
+    border-radius: var(--r-pill);
+    background: var(--line-strong);
+    content: '';
+  }
+
+  .LmxHoverCard-close {
+    display: flex;
+  }
+
+  .LmxHoverCard-wash {
+    height: 96px;
+  }
+
+  // On a sheet there is room, so the actions stop competing for one line.
+  .LmxCardAction {
+    flex: 1 1 44%;
+    min-height: 44px;
+  }
+}
+
+// The page must not scroll behind an open sheet.
+html.lmx-card-open,
+html.lmx-card-open body {
+  overflow: hidden;
+}
+
+// =============================================================== messages
+
+.LmxDmHost {
+  position: relative;
+  z-index: var(--z-modal);
+}
+
+.LmxDm-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--scrim);
+}
+
+.LmxDm-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  // Whole value escaped. less.php parses `min(a, b)` as its own math function
+  // and evaluates the arguments at compile time, which is a hard error the
+  // moment one of them is a calc() with a `+`. Passing the string through
+  // untouched is the only form that survives.
+  width: ~"min(560px, calc(100vw - 32px))";
+  height: ~"min(640px, calc(100vh - 96px))";
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+  box-shadow: var(--e-4);
+  animation: lmxCardIn var(--t-base) var(--ease);
+}
+
+.LmxDm-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  flex: none;
+  padding: var(--pad-sm) var(--pad);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+
+  h3 {
+    flex: 1 1 auto;
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+  }
+}
+
+.LmxDm-headIcon {
+  flex: none;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.LmxDm-back,
+.LmxDm-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--ink);
+  }
+}
+
+.LmxDm-error {
+  flex: none;
+  padding: var(--gap-sm) var(--pad);
+  background: var(--danger-a14);
+  color: var(--danger);
+  font-size: var(--fs-sm);
+}
+
+.LmxDm-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  padding: var(--pad-lg);
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  text-align: center;
+}
+
+.LmxDm-threads {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.LmxDm-thread {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  width: 100%;
+  padding: var(--pad-sm) var(--pad);
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  background: transparent;
+  color: var(--ink-dim);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-2);
+  }
+}
+
+.LmxDm-thread.is-unread {
+  background: var(--accent-a06);
+
+  .LmxDm-threadName {
+    color: var(--ink);
+  }
+
+  .LmxDm-threadPreview {
+    color: var(--ink-dim);
+    font-weight: 600;
+  }
+}
+
+.LmxDm-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  background: var(--avatar-bg);
+  color: var(--ink-on-light);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  object-fit: cover;
+}
+
+.LmxDm-threadText {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.LmxDm-threadTop {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-sm);
+  min-width: 0;
+}
+
+.LmxDm-threadName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-dim);
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.LmxDm-threadTime {
+  flex: none;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxDm-threadPreview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+}
+
+.LmxDm-badge {
+  flex: none;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  text-align: center;
+}
+
+.LmxDm-log {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  padding: var(--pad);
+  overflow-y: auto;
+}
+
+.LmxDm-msg {
+  align-self: flex-start;
+  max-width: 82%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.LmxDm-msg.is-own {
+  align-self: flex-end;
+  border-color: transparent;
+  background: var(--accent-a22);
+}
+
+.LmxDm-msgMeta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-sm);
+  margin-bottom: 3px;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxDm-msgWho {
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
+.LmxDm-msgBody {
+  color: var(--ink);
+  font-size: var(--fs-md);
+  line-height: var(--lh);
+  // Real messages contain newlines and long unbroken URLs; neither may escape
+  // the bubble.
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.LmxDm-to {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  flex: none;
+  padding: var(--pad-sm) var(--pad);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+}
+
+.LmxDm-form {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  padding: var(--pad-sm) var(--pad) var(--pad);
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.LmxDm-input {
+  width: 100%;
+  min-height: 72px;
+  max-height: 220px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-0);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  line-height: var(--lh);
+  resize: vertical;
+
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+    outline: 0;
+  }
+}
+
+.LmxDm-formFoot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+}
+
+.LmxDm-count {
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.LmxDm-count.is-low {
+  color: var(--warn);
+}
+
+.LmxDm-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+}
+
+html.lmx-dm-open,
+html.lmx-dm-open body {
+  overflow: hidden;
+}
+
+// ------------------------------------------------------- the header entry
+
+.LmxInbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--header-control-color);
+  cursor: pointer;
+
+  iconify-icon {
+    font-size: 18px;
+  }
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.LmxInbox-count {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: var(--r-pill);
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 16px;
+  text-align: center;
+}
+
+// =============================================================== profile
+
+.LmxProfile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  margin-top: var(--gap);
+}
+
+.LmxProfile-block {
+  padding: var(--pad);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+
+  h4 {
+    margin: 0 0 var(--gap-sm);
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.LmxProfile-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--gap-sm);
+}
+
+.LmxProfile-note {
+  margin-top: 6px;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxTagBars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+// Name and count on one row, the bar on its own row underneath.
+//
+// It used to be a single row of `minmax(0,1fr) 84px 34px`. In the profile
+// sidebar that card is ~190px wide, so the two fixed columns plus the gaps took
+// 134px and left 42px for the tag name: every label rendered as "L…", "Di…",
+// "S…". Same defect as the stat pairs — a fixed track in a container narrow
+// enough that the flexible one collapses.
+.LmxTagBar {
+  display: grid;
+  grid-template-areas: 'name n' 'track track';
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--gap-sm);
+  row-gap: 3px;
+  color: var(--ink-dim);
+  font-size: var(--fs-xs);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+    color: var(--ink);
+  }
+}
+
+.LmxTagBar-name {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.LmxTagBar-track {
+  grid-area: track;
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: var(--r-pill);
+  }
+}
+
+.LmxTagBar-n {
+  grid-area: n;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+}
+
+// Posts per month. The same integer describes two very different accounts
+// depending on whether it arrived over six years or one weekend.
+.LmxSpark {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 36px;
+  cursor: help;
+}
+
+.LmxSpark-bar {
+  flex: 1 1 0;
+  min-width: 2px;
+  border-radius: 1px 1px 0 0;
+  background: var(--accent-a45);
+  transition: background var(--t-fast) var(--ease);
+
+  &:hover {
+    background: var(--accent);
+  }
+}
+
+.LmxRecent {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--line-soft);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  a {
+    display: block;
+    color: var(--ink);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+}
+
+.LmxRecent-meta {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxCardInfo {
+  display: block;
+  width: 100%;
+}
+
+// ============================================================== responsive
+
+// Below the tablet breakpoint the side rail becomes a header strip. A 200px
+// column beside a 390px screen is not a smaller version of this layout, it is
+// a broken one.
+@media (max-width: 767px) {
+  .Post.has-lmx-author > div {
+    display: block;
+  }
+
+  // undo the float layout: on a phone the rail is a full-width strip above the
+  // body, so nothing is floated and nothing is indented
+  .Post.has-lmx-author > div > *:not(.LmxAuthor) {
+    margin-left: 0;
+  }
+
+  .Post.has-lmx-author > div > .LmxAuthor {
+    float: none;
+    width: auto;
+    margin-right: 0;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-areas: 'avatar id' 'stats stats';
+    align-items: center;
+    gap: var(--gap-sm);
+    margin-bottom: var(--gap-sm);
+    padding: 0 0 var(--gap-sm);
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+    min-height: 0;
+  }
+
+  .LmxAuthor-id {
+    display: contents;
+  }
+
+  .LmxAuthor-avatarLink,
+  .LmxAuthor > .LmxAuthor-id > .LmxAvatar {
+    grid-area: avatar;
+  }
+
+  .LmxAvatar--lg {
+    width: 44px;
+    height: 44px;
+
+    .LmxAvatar-img,
+    .Avatar {
+      font-size: 17px;
+    }
+  }
+
+  .LmxAuthor-idText {
+    grid-area: id;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .LmxAuthor-idText .LmxGroups,
+  .LmxBanners {
+    justify-content: flex-start;
+  }
+
+  // Stats go horizontal and drop their border, so the strip stays two lines.
+  .LmxAuthor > .LmxStats {
+    grid-area: stats;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-sm) var(--gap);
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .LmxAuthor > .LmxStats .LmxStat {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 0;
+  }
+
+  // Secondary detail is dropped on a phone rather than shrunk: the reaction
+  // mix, the carried-over line and the presence row are all on the hover card
+  // and the profile, both one tap away.
+  .LmxAuthor > .LmxMix,
+  .LmxAuthor > .LmxLegacy,
+  .LmxAuthor > .LmxPresence {
+    display: none;
+  }
+
+  .LmxStats--wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  // The DM panel is full-bleed on a phone, not a centred dialog with 16px of
+  // wasted margin on each side.
+  .LmxDm-panel {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    transform: none;
+    border: 0;
+    border-radius: 0;
+  }
+}
+
+// A narrow desktop still gets the rail, just a tighter one.
+@media (min-width: 768px) and (max-width: 1023px) {
+  .Post.has-lmx-author {
+    --lmx-author-w: 164px;
+  }
+
+  .LmxAvatar--lg {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .LmxHoverCard,
+  .LmxDm-panel {
+    animation: none;
+  }
+
+  .LmxCardScrim {
+    transition: none;
+  }
+}

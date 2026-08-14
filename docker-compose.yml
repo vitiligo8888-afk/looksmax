@@ -1,0 +1,128 @@
+# Flarum stack for osprey.
+#
+# Ports bind to 127.0.0.1 ONLY. Docker publishes via nat/PREROUTING, which
+# bypasses ufw and the INPUT chain entirely — a 0.0.0.0 bind here would put the
+# forum and its database straight on the public internet (this exact mistake was
+# found live on this box earlier today: a Supabase Postgres on 0.0.0.0:55432).
+# Put it behind the existing caddy edge when it should be reachable.
+services:
+  db:
+    image: mariadb:11
+    container_name: flarum-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASS}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS}
+    # Tuned for THIS box (32 cores, 124GB RAM, NVMe md0) and for the workload
+    # that actually runs on it: a continuous bulk import of a multi-million-row
+    # corpus alongside forum reads.
+    #
+    # What was here before: a 1G buffer pool, fsync on every commit, a 96MB redo
+    # log and io_capacity=200. That is the stock small-VM profile — the pool
+    # could not hold even the posts table, so a steady-state import ran mostly
+    # off disk, and every transaction paid a device flush.
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=${DB_POOL:-24G}
+      --innodb-buffer-pool-instances=8
+      --innodb-log-file-size=2G
+      --innodb-log-buffer-size=256M
+      --innodb-flush-log-at-trx-commit=2
+      --innodb-io-capacity=2000
+      --innodb-io-capacity-max=6000
+      --innodb-read-io-threads=8
+      --innodb-write-io-threads=8
+      --innodb-flush-method=O_DIRECT
+      --max-connections=400
+      --table-open-cache=8000
+      --tmp-table-size=512M
+      --max-heap-table-size=512M
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    container_name: flarum-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      # looksmax-search reads these when no admin setting overrides them
+      # (Meili/Client.php:42). The host must match the meili service's
+      # container_name below, because that is what the extension defaults to.
+      MEILI_HOST: ${MEILI_HOST:-http://flarum-meili:7700}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASS: ${ADMIN_PASS}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      FORUM_TITLE: ${FORUM_TITLE}
+      FLARUM_BASE_URL: ${FLARUM_BASE_URL}
+      FLARUM_DEBUG: ${FLARUM_DEBUG:-false}
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8888}:80"
+    volumes:
+      - app-data:/flarum/app
+      # nginx's access log, on the host, so a fail2ban jail can read it. The
+      # tunnel delivers straight to this container, so this file is the only
+      # place a request is observable from outside Docker.
+      - ${NGINX_LOG_DIR:-./.nginx-logs}:/var/log/nginx
+      # our own extensions live outside the app dir and are symlinked in by
+      # composer, so they survive `composer update` and stay editable
+      - ./extensions:/flarum/extensions
+      # The live scrape database, so the importer reads the corpus instead of a
+      # snapshot. Before this, /data held a 32MB extract copied in by hand while
+      # the real file had grown to 11.8GB, so every import ran against stale
+      # data and the forum could never catch up with the crawler.
+      #
+      # The whole DIRECTORY, not just the .db file: the crawler runs SQLite in
+      # WAL mode, so a reader needs -wal and -shm alongside it or it sees a
+      # truncated database. Read-write for the same reason — WAL readers must be
+      # able to map the shared-memory index. The importer only ever SELECTs.
+      - ${SCRAPE_DIR:-/work/lmx/scraper}:/data/scrape
+
+  # The search extension has always defaulted to `http://flarum-meili:7700`
+  # (looksmax-search/extend.php:131, Meili/Client.php:42) and this file never
+  # defined the service — so search silently fell back to nothing on any host
+  # that did not happen to have a meili container on the same network already.
+  # container_name is load-bearing: it is the hostname the extension resolves.
+  meili:
+    image: getmeili/meilisearch:v1.13
+    container_name: flarum-meili
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-}
+      MEILI_ENV: production
+      # The index is DERIVED state — `php flarum lmx:search:sync` rebuilds it
+      # from MySQL — so it is deliberately excluded from the backup set and a
+      # lost volume costs a reindex, not data.
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili-data:/meili_data
+    # No ports: reached only over the compose network by the app container.
+    # Publishing 7700 would put an unauthenticated-by-default search engine
+    # holding every post on the box's loopback for anything else on it.
+    expose:
+      - "7700"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:7700/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  db-data:
+  app-data:
+  meili-data:

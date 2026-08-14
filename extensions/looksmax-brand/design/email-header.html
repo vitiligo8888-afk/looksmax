@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<!--
+  E-mail header band, 600x104 at 1x and rendered at 2x for retina clients.
+
+  A PNG rather than an inline SVG on purpose: Gmail, Outlook and Yahoo all
+  strip or refuse SVG in mail bodies, so an SVG logo in a transactional e-mail
+  is a broken image icon for most of the audience.
+
+  Dark band with a light logo, because Flarum's own mail templates are white:
+  the band has to be its own surface or the brass disappears into the page.
+-->
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  body { width: 600px; height: 104px; overflow: hidden; background: #0b0e14; position: relative; }
+  .bar { height: 100%; display: flex; align-items: center; padding: 0 32px; }
+  .bar img { height: 30px; display: block; }
+  .edge { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #e8c07d; }
+  .ticks { position: absolute; right: 32px; bottom: 0; display: flex; gap: 10px; align-items: flex-end; }
+  .ticks i { display: block; width: 3px; background: #232c39; }
+</style>
+<div class="bar"><img src="../assets/lockup.svg" alt="Looksmax.lat"></div>
+<div class="ticks">
+  <i style="height:18px"></i><i style="height:10px"></i><i style="height:10px"></i>
+  <i style="height:18px"></i><i style="height:10px"></i><i style="height:10px"></i>
+  <i style="height:18px"></i>
+</div>
+<div class="edge"></div>

@@ -1,0 +1,49 @@
+// The admin panel is part of the product.
+//
+// Flarum's admin ships as a white app with a blue accent. On a forum whose
+// public face is near-black with a brass accent, logging in feels like landing
+// in a different piece of software, and every screenshot an admin takes of a
+// setting is off-brand. This does the minimum that fixes that: the brand
+// typeface on headings, the brand accent on the primary control and the mark
+// in the header. It does not attempt a full dark admin, which would fight
+// core's own stylesheet on every release.
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('extensions/local-looksmax-brand/font/archivo-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('extensions/local-looksmax-brand/font/archivo-800.woff2') format('woff2');
+}
+
+.App-header .Header-title,
+.AdminHeader-description,
+.ExtensionPage-header h1,
+.AdminPage h1,
+.AdminPage h2,
+.Form-group label {
+  font-family: var(--brand-font-display);
+  letter-spacing: var(--brand-tracking-display);
+}
+
+// No mark is added here. The admin header already renders the uploaded logo,
+// so an added pseudo-element produced the lockup twice side by side — visible
+// in design/shots/admin/admin-appearance.png before this was removed. The
+// lockup is constrained instead, because core's admin header gives it no
+// height limit and it renders at its intrinsic size.
+.App-header .Header-logo {
+  height: 34px;
+  max-height: 34px;
+  width: auto;
+}
+
+.AdminHeader {
+  border-bottom: 3px solid var(--brand-brass-500);
+}

@@ -1,0 +1,886 @@
+// Post content styling.
+//
+// Owns only the constructs this extension registers with TextFormatter
+// (.lmx* plus the two mention variants). It deliberately does not restyle
+// .Post or anything else the theme owns.
+//
+// Every value resolves through the theme's design tokens with a literal
+// fallback, so the stylesheet is correct on its own if looksmax-theme is
+// disabled and inherits the theme when it is not.
+//
+// NOTE: the PHP LESS port used by Flarum does not implement each() or range().
+// They fail *silently* — forum.css is simply never written while forum.js still
+// builds — so neither appears here, and neither may be added.
+
+@lmx-line: var(--line, #29323f);
+@lmx-line-soft: var(--line-soft, rgba(41, 50, 63, 0.55));
+@lmx-surface-1: var(--surface-1, #11151c);
+@lmx-surface-2: var(--surface-2, #171d26);
+@lmx-surface-3: var(--surface-3, #212a36);
+@lmx-ink: var(--ink, #e8ecf2);
+@lmx-ink-dim: var(--ink-dim, #98a3b3);
+@lmx-ink-faint: var(--ink-faint, #667186);
+@lmx-accent: var(--accent, #e6b169);
+@lmx-accent-2: var(--accent-2, #6ea8fe);
+@lmx-r-sm: var(--r-sm, 6px);
+@lmx-r-md: var(--r-md, 9px);
+@lmx-r-lg: var(--r-lg, 13px);
+@lmx-t: var(--t-base, 170ms);
+@lmx-ease: var(--ease, cubic-bezier(0.16, 1, 0.3, 1));
+
+// ---------------------------------------------------------------- spoilers
+.lmxSpoiler {
+  margin: 12px 0;
+  border: 1px solid @lmx-line;
+  border-radius: @lmx-r-md;
+  background: @lmx-surface-2;
+  overflow: hidden;
+
+  // A spoiler inside a spoiler must read as a different depth or a three-level
+  // stack (which the corpus has) looks like one box.
+  .lmxSpoiler {
+    background: @lmx-surface-3;
+    margin: 10px 0;
+  }
+}
+
+.lmxSpoiler-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--fs-sm, 12.5px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: @lmx-ink-dim;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+  transition: color @lmx-t @lmx-ease, background @lmx-t @lmx-ease;
+  list-style: none;
+
+  &::-webkit-details-marker { display: none; }
+  &::marker { content: ''; }
+
+  &:hover { color: @lmx-ink; background: rgba(255, 255, 255, 0.05); }
+  &:focus-visible { outline: 2px solid @lmx-accent; outline-offset: -2px; }
+}
+
+.lmxSpoiler-chevron {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform @lmx-t @lmx-ease;
+}
+
+.lmxSpoiler[open] > .lmxSpoiler-summary {
+  color: @lmx-ink;
+  border-bottom: 1px solid @lmx-line-soft;
+
+  .lmxSpoiler-chevron { transform: rotate(90deg); }
+}
+
+.lmxSpoiler-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lmxSpoiler-body {
+  padding: 12px;
+
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+}
+
+// ------------------------------------------------------------------ quotes
+.lmxQuote {
+  position: relative;
+  margin: 12px 0;
+  padding: 0;
+  border: 1px solid @lmx-line;
+  border-left: 3px solid @lmx-accent;
+  border-radius: @lmx-r-sm;
+  background: @lmx-surface-2;
+  color: @lmx-ink-dim;
+  font-size: 0.96em;
+
+  .lmxQuote {
+    // nested quotes step down in emphasis instead of repeating the accent
+    border-left-color: @lmx-line;
+    background: @lmx-surface-3;
+  }
+}
+
+.lmxQuote--uncited { border-left-color: @lmx-line; }
+
+.lmxQuote-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-bottom: 1px solid @lmx-line-soft;
+  font-size: var(--fs-sm, 12.5px);
+}
+
+.lmxQuote-avatar {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.lmxQuote-author {
+  font-weight: 700;
+  color: @lmx-ink;
+}
+
+.lmxQuote-said { color: @lmx-ink-faint; }
+
+.lmxQuote-jump {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: @lmx-r-sm;
+  color: @lmx-ink-faint;
+  transition: color @lmx-t @lmx-ease, background @lmx-t @lmx-ease;
+
+  &:hover { color: @lmx-accent; background: rgba(255, 255, 255, 0.06); }
+}
+
+// A pure-CSS "jump to post" arrow: no icon font dependency, so it cannot
+// render as an empty square if an icon name is ever wrong.
+.lmxQuote-jumpIcon {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.lmxQuote-body {
+  padding: 10px 12px;
+
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+}
+
+// ------------------------------------------------------------ unfurl cards
+.lmxUnfurl {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 12px 0;
+  max-width: 560px;
+  border: 1px solid @lmx-line;
+  border-radius: @lmx-r-md;
+  background: @lmx-surface-2;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color @lmx-t @lmx-ease, background @lmx-t @lmx-ease, transform @lmx-t @lmx-ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: @lmx-accent;
+    background: @lmx-surface-3;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+}
+
+.lmxUnfurl-figure {
+  flex: none;
+  width: 104px;
+  background: @lmx-surface-3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    max-height: 132px;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.lmxUnfurl-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.lmxUnfurl-title {
+  font-weight: 650;
+  font-size: var(--fs-md, 14px);
+  line-height: 1.35;
+  color: @lmx-ink;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lmxUnfurl-desc {
+  font-size: var(--fs-sm, 12.5px);
+  line-height: 1.45;
+  color: @lmx-ink-dim;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lmxUnfurl-minor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: var(--fs-xs, 11px);
+  color: @lmx-ink-faint;
+}
+
+.lmxUnfurl-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+// ------------------------------------------------------------------ images
+.lmxImageWrap {
+  display: block;
+  margin: 8px 0;
+
+  &--left { float: left; margin: 4px 14px 8px 0; }
+  &--right { float: right; margin: 4px 0 8px 14px; }
+  &--center { text-align: center; }
+}
+
+.lmxImage {
+  max-width: 100%;
+  // A 4000px attachment must not turn one post into a scroll marathon; the
+  // lightbox in js/dist/forum.js gives the full size back on click.
+  max-height: 620px;
+  width: auto;
+  height: auto;
+  border-radius: @lmx-r-sm;
+  background: @lmx-surface-2;
+  cursor: zoom-in;
+  vertical-align: middle;
+
+  &.is-missing {
+    // 9,378 corpus urls have no local copy and the source expires attachments;
+    // a labelled placeholder beats the browser's broken-image glyph.
+    min-width: 180px;
+    min-height: 64px;
+    cursor: default;
+    border: 1px dashed @lmx-line;
+    position: relative;
+  }
+}
+
+.lmxLightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(0, 0, 0, 0.86);
+  backdrop-filter: blur(3px);
+  cursor: zoom-out;
+}
+
+.lmxLightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: @lmx-r-sm;
+  box-shadow: var(--e-3, 0 20px 44px -22px rgba(0, 0, 0, 0.85));
+}
+
+.lmxLightbox-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover { background: rgba(255, 255, 255, 0.2); }
+}
+
+body.lmxLightbox-open { overflow: hidden; }
+
+// ------------------------------------------------------------------- media
+.lmxMedia {
+  display: block;
+  position: relative;
+  margin: 12px 0;
+  max-width: 560px;
+  border: 1px solid @lmx-line;
+  border-radius: @lmx-r-md;
+  overflow: hidden;
+  background: @lmx-surface-2;
+  cursor: pointer;
+}
+
+.lmxMedia-frame {
+  display: block;
+  position: relative;
+  padding-top: 56.25%;
+  background: #000;
+
+  > img,
+  > iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  > img { object-fit: cover; }
+}
+
+.lmxMedia-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62px;
+  height: 44px;
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: background @lmx-t @lmx-ease, transform @lmx-t @lmx-ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 52%;
+    transform: translate(-50%, -50%);
+    border-left: 15px solid #fff;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+  }
+}
+
+.lmxMedia:hover .lmxMedia-play {
+  background: @lmx-accent;
+  transform: translate(-50%, -50%) scale(1.06);
+
+  &::after { border-left-color: var(--accent-ink, #16191f); }
+}
+
+.lmxMedia.is-live { cursor: default; }
+.lmxMedia.is-live .lmxMedia-play { display: none; }
+
+.lmxMedia-label {
+  display: block;
+  padding: 5px 10px;
+  font-size: var(--fs-xs, 11px);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: @lmx-ink-faint;
+  border-top: 1px solid @lmx-line-soft;
+}
+
+.lmxVideo,
+.lmxAudio {
+  display: block;
+  margin: 12px 0;
+  max-width: 100%;
+  border-radius: @lmx-r-md;
+  background: #000;
+}
+
+.lmxAudio { width: 100%; max-width: 460px; background: transparent; }
+
+// ---------------------------------------------------------------- mentions
+.UserMention--unimported,
+.GroupMention {
+  display: inline;
+  padding: 1px 5px;
+  border-radius: @lmx-r-sm;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.UserMention--unimported {
+  background: rgba(110, 168, 254, 0.12);
+  color: @lmx-accent-2;
+  border-bottom: 1px dotted rgba(110, 168, 254, 0.5);
+  cursor: help;
+}
+
+.GroupMention {
+  background: rgba(230, 177, 105, 0.14);
+  color: @lmx-accent;
+}
+
+// ------------------------------------------------------------------ emotes
+.lmxEmote {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid @lmx-line;
+  border-radius: var(--r-pill, 999px);
+  background: @lmx-surface-3;
+  color: @lmx-ink-dim;
+  font-size: 0.85em;
+  font-weight: 600;
+  line-height: 1.55;
+  vertical-align: baseline;
+  cursor: default;
+}
+
+// ------------------------------------------------------------------ tables
+.lmxTableWrap {
+  margin: 12px 0;
+  // corpus tables are laid out at width:100% with five columns of prose; on a
+  // phone they must scroll, not squeeze
+  overflow-x: auto;
+  border: 1px solid @lmx-line;
+  border-radius: @lmx-r-md;
+}
+
+.lmxTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm, 12.5px);
+
+  th,
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid @lmx-line-soft;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: @lmx-surface-3;
+    color: @lmx-ink;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: 0; }
+  tr:hover td { background: rgba(255, 255, 255, 0.025); }
+
+  .lmxImage { max-height: 44px; border-radius: 50%; }
+}
+
+// -------------------------------------------------------------------- code
+.Post-body {
+  code.inline {
+    padding: 1px 5px;
+    border-radius: @lmx-r-sm;
+    background: @lmx-surface-3;
+    border: 1px solid @lmx-line-soft;
+    font-size: 0.9em;
+  }
+
+  // Imported posts carry hard-wrapped prose; long unbroken urls otherwise
+  // widen the whole column.
+  overflow-wrap: anywhere;
+}
+
+// ------------------------------------------------------- reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .lmxSpoiler-chevron,
+  .lmxUnfurl,
+  .lmxMedia-play,
+  .lmxQuote-jump {
+    transition: none;
+  }
+
+  .lmxUnfurl:hover { transform: none; }
+  .lmxMedia:hover .lmxMedia-play { transform: translate(-50%, -50%); }
+}
+
+// ----------------------------------------------------------------- narrow
+@media (max-width: 767px) {
+  .lmxUnfurl {
+    flex-direction: column;
+    max-width: none;
+  }
+
+  .lmxUnfurl-figure {
+    width: 100%;
+    height: 132px;
+  }
+
+  .lmxImage { max-height: 420px; }
+
+  .lmxImageWrap--left,
+  .lmxImageWrap--right {
+    float: none;
+    margin: 8px 0;
+  }
+}
+
+// ==========================================================================
+// looksmax.org's own BBCode addons, and the reading affordances built on top.
+// See Local\Format\Configure::community() and reports/CORPUS-SURVEY.md §4.2.
+// ==========================================================================
+
+// ------------------------------------------------- inline spoiler [ispoiler]
+// Blurred rather than blacked out: the shape of the text stays visible so it
+// reads as "hidden", not as a rendering fault. `color: transparent` alone
+// leaves it selectable and copyable, which defeats the point, so the text is
+// also unselectable until revealed.
+.lmxISpoiler {
+  display: inline;
+  padding: 0 3px;
+  border-radius: @lmx-r-sm;
+  background: @lmx-surface-3;
+  color: transparent;
+  text-shadow: 0 0 9px rgba(232,236,242, 0.65);
+  cursor: pointer;
+  user-select: none;
+  transition: color @lmx-t @lmx-ease, text-shadow @lmx-t @lmx-ease, background @lmx-t @lmx-ease;
+
+  &:hover { background: rgba(230,177,105, 0.14); }
+
+  // Keyboard users must be able to see what they are about to reveal.
+  &:focus-visible {
+    outline: 2px solid @lmx-accent;
+    outline-offset: 2px;
+  }
+
+  &.is-revealed {
+    background: transparent;
+    color: inherit;
+    text-shadow: none;
+    cursor: auto;
+    user-select: text;
+  }
+}
+
+// ------------------------------------------------------ post labels [serious]
+.lmxLabel {
+  display: inline-block;
+  padding: 1px 7px;
+  margin: 0 3px 0 0;
+  border-radius: 999px;
+  border: 1px solid @lmx-line;
+  background: @lmx-surface-3;
+  color: @lmx-ink-dim;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: baseline;
+  white-space: nowrap;
+
+  // Colour carries the meaning the community already attaches to each label,
+  // matching the prefix tag colours the importer assigns.
+  &--serious    { border-color: fade(#7aa2f7, 55%); color: #a8c3fb; }
+  &--guide      { border-color: fade(#9ece6a, 55%); color: #bfe093; }
+  &--theory     { border-color: fade(#bb9af7, 55%); color: #d3bcfa; }
+  &--discussion { border-color: fade(#8f9bb3, 55%); color: #b3bccd; }
+  &--method     { border-color: fade(#5fd0c5, 55%); color: #95e2da; }
+  &--motivation { border-color: rgba(230,177,105, 0.6); color: @lmx-accent; }
+  &--rage       { border-color: fade(#f7768e, 55%); color: #fba3b3; }
+  &--nsfw       { border-color: fade(#e0484d, 65%); color: #f08a8d; background: fade(#e0484d, 10%); }
+  &--fake       { border-color: fade(#e0484d, 45%); color: #ef9b9d; }
+  &--op         { border-color: rgba(110,168,254, 0.55); color: @lmx-accent-2; }
+  &--gtfih      { border-color: rgba(230,177,105, 0.6); color: @lmx-accent; }
+  &--hiqm       { border-color: fade(#9ece6a, 55%); color: #bfe093; }
+  &--meme       { border-color: fade(#bb9af7, 45%); color: #cbb2f6; }
+}
+
+// --------------------------------------------------------- removed [deleted]
+.lmxDeleted {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  margin: 10px 0;
+  border: 1px dashed @lmx-line;
+  border-radius: @lmx-r-md;
+  background: rgba(23,29,38, 0.6);
+  color: @lmx-ink-faint;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.lmxDeleted-mark {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    45deg,
+    @lmx-ink-faint 0 2px,
+    transparent 2px 4px
+  );
+  opacity: 0.7;
+}
+
+// ---------------------------------------------- was reply-gated [hideposts]
+.lmxHidden {
+  margin: 12px 0;
+  border: 1px solid @lmx-line;
+  border-left: 3px solid @lmx-accent;
+  border-radius: @lmx-r-md;
+  background: @lmx-surface-2;
+  overflow: hidden;
+}
+
+.lmxHidden-note {
+  padding: 5px 12px;
+  background: rgba(230,177,105, 0.1);
+  color: @lmx-accent;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lmxHidden-body { padding: 10px 12px; }
+
+// ---------------------------------------------------------------- [heading]
+.lmxHeading {
+  margin: 20px 0 8px;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: @lmx-ink;
+  scroll-margin-top: 72px; // so a table-of-contents jump clears the sticky header
+}
+
+// [uwsl] is a source-board line-wrap wrapper with no visual meaning of its own.
+.lmxUwsl { display: inline; }
+
+// ------------------------------------------------------- mocking quote [lolquote]
+.lmxQuote--lol {
+  border-left-color: #bb9af7;
+
+  .lmxQuote-said { color: #bb9af7; }
+}
+
+.lmxQuote-lolMark {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border-radius: 50%;
+  background: #bb9af7;
+  opacity: 0.85;
+}
+
+// ============================================================ long-quote fold
+// Threshold and rationale: js/dist/forum.js (measured in px, because rendered
+// height rather than character count is what pushes the reply off screen).
+.lmxQuote[data-lmx-fold] .lmxQuote-body {
+  overflow: hidden;
+  transition: max-height @lmx-t @lmx-ease;
+}
+
+// The fade tells the reader the quote continues. Without it a hard cut reads
+// as a truncated/broken post rather than as a deliberate fold.
+.lmxQuote[data-lmx-fold='collapsed'] .lmxQuote-body {
+  position: relative;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+.lmxQuote-more {
+  display: block;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 6px 10px;
+  border: 0;
+  border-top: 1px solid @lmx-line-soft;
+  border-radius: 0 0 @lmx-r-md @lmx-r-md;
+  background: rgba(33,42,54, 0.7);
+  color: @lmx-ink-dim;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background @lmx-t @lmx-ease, color @lmx-t @lmx-ease;
+
+  &:hover {
+    background: @lmx-surface-3;
+    color: @lmx-ink;
+  }
+
+  &:focus-visible {
+    outline: 2px solid @lmx-accent;
+    outline-offset: -2px;
+  }
+}
+
+// The quote author is a link when the member resolved to a local account.
+a.lmxQuote-author {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    color: @lmx-accent;
+    text-decoration: underline;
+  }
+}
+
+// ============================================================ code copy button
+.lmxCode {
+  position: relative;
+
+  // The button overlaps the block, so keep clear of the first line of code.
+  pre { padding-right: 74px; }
+}
+
+.lmxCode-copy {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  padding: 3px 9px;
+  border: 1px solid @lmx-line;
+  border-radius: @lmx-r-sm;
+  background: @lmx-surface-3;
+  color: @lmx-ink-dim;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity @lmx-t @lmx-ease, color @lmx-t @lmx-ease;
+
+  &:hover { color: @lmx-ink; }
+
+  // Always visible on touch, where there is no hover to discover it with.
+  &:focus-visible { opacity: 1; outline: 2px solid @lmx-accent; }
+}
+
+.lmxCode:hover .lmxCode-copy { opacity: 1; }
+
+@media (hover: none) {
+  .lmxCode-copy { opacity: 1; }
+}
+
+// Long tables must scroll rather than break the post column on a phone.
+.lmxTableWrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Anyone who has asked not to see motion should not get the fold animation.
+@media (prefers-reduced-motion: reduce) {
+  .lmxQuote[data-lmx-fold] .lmxQuote-body,
+  .lmxISpoiler,
+  .lmxCode-copy {
+    transition: none;
+  }
+}
+
+// ==========================================================================
+// Defensive scoping against generic .Post-body rules owned by other lanes.
+//
+// looksmax-theme (less/content.less:354) styles EVERY image in a post body:
+//   .Post-body img { height: auto; width: auto; margin: .9em 0; border: 1px
+//                    solid var(--line); border-radius: …; box-shadow: …; }
+//
+// That is right for a photo somebody posted and wrong for a component part —
+// a 16px favicon, a quote avatar, or the absolutely-positioned thumbnail
+// behind a click-to-play facade. Its specificity is (0,1,1), identical to a
+// bare `.lmxMedia-frame > img`, so which one wins came down to stylesheet
+// order, which is not something to rely on. Measured on the live site: the
+// media facade's thumbnail took `height: auto`, rendered at its natural 720px
+// inside a 315px box, and covered the "YOUTUBE" label underneath it; the
+// unfurl favicon rendered as a bordered 40px tile instead of a 16px icon.
+//
+// Fixed here, in my own file, by raising specificity to (0,2,1) rather than by
+// editing another lane's stylesheet. Recorded in HANDOFF-FORMAT.md so the
+// theme lane can scope its rule to actual content images if it prefers.
+// ==========================================================================
+
+.lmxMedia .lmxMedia-frame > img,
+.lmxMedia .lmxMedia-frame > iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+}
+
+.lmxMedia .lmxMedia-frame > img { object-fit: cover; }
+
+.lmxUnfurl .lmxUnfurl-icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  margin: 0;
+  border: 0;
+  border-radius: 3px;
+  box-shadow: none;
+  object-fit: contain;
+  flex: none;
+}
+
+.lmxUnfurl .lmxUnfurl-figure img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: cover;
+}
+
+.lmxQuote .lmxQuote-avatar {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  object-fit: cover;
+  flex: none;
+}
+
+// looksmax-theme (content.less:276) draws a chevron on every
+// `.Post-body details > summary::before`. Spoilers already ship their own,
+// which is what the render tests assert on and what the [open] animation
+// rotates, so two arrows appeared side by side on every spoiler on the site.
+// Suppress the generic one for this component only — the theme's rule stays
+// correct for any other <details> in a post.
+.lmxSpoiler > .lmxSpoiler-summary::before {
+  content: none;
+  display: none;
+}

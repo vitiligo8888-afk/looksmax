@@ -1,0 +1,57 @@
+##
+# looksmax-economy — English source strings.
+#
+# This extension renders nothing itself: no JS, no controller, no view, no
+# notification, and its only prose is console command help. The audit is right
+# that it has zero hardcoded user-visible strings.
+#
+# What it DOES own is a vocabulary that another extension renders raw. Every
+# row in the ledger carries a `reason` from Ledger::AWARDS (and from the
+# store's spend paths), and looksmax-store/js/dist/forum.js:661 puts that value
+# straight into a table cell under the heading "Reason", so a member reading
+# their own points history is shown `post.read_through`. The label set belongs
+# here, beside the codes it names, so that whichever surface renders the
+# history next uses the same words. See locale/i18n-map.json.
+##
+local-looksmax-economy:
+
+  lib:
+
+    # Keyed by the literal ledger reason, so a lookup is
+    # `local-looksmax-economy.lib.reason.` + row.reason with no mapping table.
+    reason:
+      admin:
+        adjust: Admin adjustment
+      discussion:
+        started: Thread started
+      post:
+        created: Post
+        read_through: Read to the end
+      reaction:
+        received: Reaction received
+        given: Reaction given
+      best_answer:
+        awarded: Best answer
+      guide:
+        published: Guide published
+        sourced: Source cited in a guide
+      thread:
+        held: Held attention
+      streak:
+        day: Daily streak
+        week: Weekly streak
+      import:
+        legacy: Imported balance
+      badge:
+        earned: Badge earned
+      store:
+        purchase: Store purchase
+        refund: Refund
+        clawback: Charge reversed
+        credits: Credits added
+      tier:
+        purchase: Membership purchase
+
+    # Shown when a ledger row carries a reason this pack does not name yet —
+    # better than printing the code, and it keeps the raw-key sentinel quiet.
+    reason_unknown: Adjustment

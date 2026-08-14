@@ -1,0 +1,8 @@
+local-looksmax-import:
+  lib:
+    # "no se importó" en vez de "no se raspó/scrapeó": para quien lee el hilo,
+    # lo que pasó es que el contenido no llegó al foro nuevo, y el detalle
+    # técnico de cómo se obtuvo no le dice nada.
+    no_body: "_(no se importó el contenido de este hilo)_"
+    empty_post: "(vacío)"
+    untitled: Sin título

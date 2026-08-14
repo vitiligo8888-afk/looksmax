@@ -1,0 +1,541 @@
+// Shoutbox.
+//
+// Lives in the index sidebar card stack, so it inherits `.LmxCard` (surface,
+// border, radius, the h3 rules) from looksmax-index and only styles what is its
+// own. Sidebar column is 300px, which is the width every measurement here is
+// against — an avatar column plus a name plus a timestamp does not fit twice.
+//
+// TRAP, paid for once already: Flarum compiles LESS with wikimedia/less.php,
+// which evaluates `+` inside calc() as LESS arithmetic and aborts the whole
+// stylesheet with "Operation on an invalid type". forum.css is then never
+// written and EVERY page returns the compiler stack trace instead of HTML.
+// Any calc() with an operator must be escaped: ~"calc(a + b)". Same for each(),
+// range() and colour functions on anything that is not a literal colour —
+// `darken(var(--x))` took the forum down at 10:52Z today.
+
+@surface-1: #12161c;
+@surface-2: #1a2029;
+@surface-3: #232b36;
+@line: #2a323d;
+@ink: #e6e9ee;
+@ink-dim: #9aa4b2;
+@ink-faint: #6b7583;
+@accent: #e8c07d;
+@accent-2: #7aa2f7;
+@ok: #9ece6a;
+@bad: #f7768e;
+
+@av: 22px;
+@gut: 8px;
+
+.LmxChat {
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    margin-bottom: 8px;
+  }
+}
+
+.LmxChat-title {
+  // the count sits hard right; everything else keeps the card's h3 rhythm
+  margin-right: auto;
+}
+
+// ------------------------------------------------------------------ presence
+
+.LmxChat-live {
+  align-items: center;
+  background: @surface-2;
+  border: 1px solid @line;
+  border-radius: 999px;
+  color: @ink-dim;
+  cursor: default;
+  display: flex;
+  font-size: 10px;
+  font-weight: 700;
+  gap: 5px;
+  letter-spacing: 0.04em;
+  padding: 2px 8px 2px 6px;
+  text-transform: uppercase;
+
+  &:hover { border-color: fade(@ok, 45%); }
+}
+
+.LmxChat-dot {
+  background: @ok;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 fade(@ok, 55%);
+  flex: none;
+  height: 6px;
+  width: 6px;
+  animation: LmxChatPulse 2.4s ease-out infinite;
+
+  &.is-idle {
+    animation: none;
+    background: @ink-faint;
+    box-shadow: none;
+  }
+}
+
+@keyframes LmxChatPulse {
+  0% { box-shadow: 0 0 0 0 fade(@ok, 50%); }
+  70% { box-shadow: 0 0 0 5px fade(@ok, 0%); }
+  100% { box-shadow: 0 0 0 0 fade(@ok, 0%); }
+}
+
+.LmxChat-online {
+  color: @ink;
+  font-variant-numeric: tabular-nums;
+
+  &.is-bumped { animation: LmxChatBump 0.45s ease; }
+}
+
+@keyframes LmxChatBump {
+  0% { color: @ok; transform: translateY(-2px); }
+  100% { color: @ink; transform: none; }
+}
+
+// --------------------------------------------------------------------- alert
+
+.LmxChat-alert {
+  align-items: center;
+  border-radius: 6px;
+  display: flex;
+  font-size: 11.5px;
+  gap: 6px;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+
+  &[hidden] { display: none; }
+
+  i, iconify-icon { flex: none; font-size: 12px; }
+
+  &.is-error {
+    background: fade(@bad, 12%);
+    border: 1px solid fade(@bad, 30%);
+    color: @bad;
+  }
+
+  &.is-warn {
+    background: fade(@accent, 12%);
+    border: 1px solid fade(@accent, 30%);
+    color: @accent;
+  }
+}
+
+.LmxChat-alert-text { flex: 1 1 auto; min-width: 0; }
+
+.LmxChat-retry {
+  background: fade(#fff, 8%);
+  border: 0;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  flex: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 7px;
+  text-transform: uppercase;
+
+  &:hover { background: fade(#fff, 16%); }
+}
+
+// ----------------------------------------------------------------------- log
+
+.LmxChat-logwrap {
+  position: relative;
+}
+
+.LmxChat-log {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  list-style: none;
+  margin: 0;
+  max-height: 268px;
+  min-height: 108px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 2px 0 0;
+  scrollbar-color: @surface-3 transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: @surface-3; border-radius: 3px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+
+  // The top row of a scrolled log is sliced through the middle of its text,
+  // which reads as a rendering fault rather than as scrollback. Fading the
+  // first 14px says "there is more above" instead.
+  mask-image: linear-gradient(180deg, transparent 0, #000 14px);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14px);
+}
+
+// …but not when there is nothing above: a short log would fade its only row.
+.LmxChat-log.is-attop {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.LmxChat-empty {
+  align-items: center;
+  color: @ink-faint;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  inset: 0;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+
+  &[hidden] { display: none; }
+
+  i, iconify-icon { font-size: 20px; opacity: 0.55; }
+  p { color: @ink-dim; font-size: 12.5px; font-weight: 600; margin: 0; }
+  span { font-size: 11px; line-height: 1.4; max-width: 210px; }
+}
+
+// ------------------------------------------------------------------ messages
+
+// A half-full box should hang from the bottom, next to the composer, the way
+// every chat does — not float at the top with a gap under it. `margin-top:auto`
+// on the first row rather than `justify-content: flex-end` on the log: the
+// latter makes the overflowing top unreachable by scroll in several engines.
+.LmxChat-msg:first-child { margin-top: auto; }
+
+.LmxChat-msg {
+  animation: LmxChatIn 0.28s ease both;
+  display: grid;
+  gap: @gut;
+  grid-template-columns: @av minmax(0, 1fr);
+  position: relative;
+
+  // consecutive lines from one person are one block: the avatar column stays,
+  // so text never re-flows, but the furniture stops repeating
+  &.is-cont {
+    margin-top: -5px;
+
+    .LmxChat-avatar { visibility: hidden; }
+    .LmxChat-meta { display: none; }
+  }
+
+  &.is-pending { opacity: 0.55; }
+
+  &.is-removing { opacity: 0.35; }
+
+  &:hover .LmxChat-del { opacity: 1; }
+}
+
+@keyframes LmxChatIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.LmxChat-avatar {
+  display: block;
+  height: @av;
+  width: @av;
+
+  .Avatar {
+    align-items: center;
+    border-radius: 50%;
+    color: #10141a;
+    display: flex;
+    font-size: 11px;
+    font-weight: 800;
+    height: @av;
+    justify-content: center;
+    line-height: 1;
+    object-fit: cover;
+    width: @av;
+  }
+}
+
+.LmxChat-bubble {
+  min-width: 0;
+}
+
+.LmxChat-meta {
+  align-items: baseline;
+  display: flex;
+  gap: 6px;
+  line-height: 1.2;
+  min-width: 0;
+}
+
+.LmxChat-who {
+  color: @accent;
+  flex: 0 1 auto;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+}
+
+.LmxChat-time {
+  color: @ink-faint;
+  flex: none;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.LmxChat-del {
+  background: none;
+  border: 0;
+  color: @ink-faint;
+  cursor: pointer;
+  display: none;
+  flex: none;
+  font-size: 10px;
+  line-height: 1;
+  margin-left: auto;
+  opacity: 0;
+  padding: 1px 3px;
+  transition: opacity 0.12s ease, color 0.12s ease;
+
+  &:hover { color: @bad; }
+  &:focus-visible { opacity: 1; }
+}
+
+.can-delete .LmxChat-del { display: block; }
+
+.LmxChat-text {
+  color: @ink-dim;
+  font-size: 12.5px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  // a line that is only emoji is a reaction, not a sentence
+  &.is-jumbo { font-size: 22px; line-height: 1.15; }
+}
+
+.LmxChat-msg.is-own {
+  .LmxChat-text {
+    border-left: 2px solid fade(@accent, 40%);
+    color: @ink;
+    margin-left: -6px;
+    padding-left: 6px;
+  }
+}
+
+// After .is-own on purpose. Both selectors are two classes deep, so source
+// order decides, and with is-failed written first an unsent message of YOUR OWN
+// kept the ordinary colour — the one case where the state has to be obvious.
+.LmxChat-msg.is-failed .LmxChat-text {
+  border-left-color: fade(@bad, 55%);
+  color: @bad;
+  text-decoration: line-through;
+  text-decoration-color: fade(@bad, 45%);
+}
+
+.LmxChat-link {
+  color: @accent-2;
+  text-decoration: underline;
+  text-decoration-color: fade(@accent-2, 40%);
+  text-underline-offset: 2px;
+
+  &:hover { color: lighten(@accent-2, 8%); }
+}
+
+.LmxChat-mention {
+  background: fade(@accent-2, 14%);
+  border-radius: 3px;
+  color: @accent-2;
+  font-weight: 600;
+  padding: 0 3px;
+
+  &:hover { background: fade(@accent-2, 24%); }
+}
+
+.LmxChat-failnote {
+  align-items: center;
+  color: @bad;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 10.5px;
+  gap: 5px;
+  margin-top: 3px;
+
+  .LmxChat-retry {
+    background: fade(@bad, 16%);
+    &:hover { background: fade(@bad, 26%); }
+  }
+
+  .LmxChat-drop { background: fade(#fff, 8%); color: @ink-faint; }
+}
+
+// ------------------------------------------------------------------ new-mail
+
+.LmxChat-jump {
+  background: @accent;
+  border: 0;
+  border-radius: 999px;
+  bottom: 6px;
+  box-shadow: 0 6px 16px -8px #000;
+  color: #14181f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  gap: 5px;
+  left: 50%;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+  position: absolute;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  z-index: 2;
+
+  &[hidden] { display: none; }
+  &:hover { filter: brightness(1.08); }
+
+  i, iconify-icon { font-size: 9px; }
+}
+
+// -------------------------------------------------------------------- compose
+
+.LmxChat-form {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  position: relative;
+
+  &[hidden] { display: none; }
+}
+
+.LmxChat-input {
+  background: @surface-2;
+  border: 1px solid @line;
+  border-radius: 7px;
+  color: @ink;
+  flex: 1 1 auto;
+  font-size: 12.5px;
+  min-width: 0;
+  padding: 7px 9px;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+
+  &::placeholder { color: @ink-faint; }
+
+  &:focus {
+    border-color: fade(@accent, 55%);
+    box-shadow: 0 0 0 3px fade(@accent, 12%);
+    outline: none;
+  }
+}
+
+// Sits over the right end of the input, so the input reserves the space.
+.LmxChat-form.has-count .LmxChat-input { padding-right: 34px; }
+
+.LmxChat-remain {
+  background: @surface-2;
+  color: @ink-faint;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  padding-left: 3px;
+  pointer-events: none;
+  position: absolute;
+  right: 47px;
+
+  &[hidden] { display: none; }
+  &.is-low { color: @bad; font-weight: 700; }
+}
+
+.LmxChat-send {
+  align-items: center;
+  background: @accent;
+  border: 0;
+  border-radius: 7px;
+  color: #14181f;
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  font-size: 12px;
+  height: 32px;
+  justify-content: center;
+  transition: filter 0.12s ease, transform 0.08s ease, opacity 0.12s ease;
+  width: 34px;
+
+  &:hover { filter: brightness(1.08); }
+  &:active { transform: translateY(1px); }
+
+  &:disabled {
+    background: @surface-3;
+    color: @ink-faint;
+    cursor: default;
+    transform: none;
+  }
+}
+
+// ---------------------------------------------------------------------- guest
+
+.LmxChat-guest {
+  align-items: center;
+  border-top: 1px solid fade(@line, 70%);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding-top: 10px;
+  text-align: center;
+
+  &[hidden] { display: none; }
+
+  span { color: @ink-faint; font-size: 10.5px; }
+}
+
+.LmxChat-login {
+  background: fade(@accent, 14%);
+  border: 1px solid fade(@accent, 35%);
+  border-radius: 6px;
+  color: @accent;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 12px;
+  width: 100%;
+
+  &:hover { background: fade(@accent, 22%); }
+}
+
+// ------------------------------------------------------------------- offline
+
+.LmxChat.is-offline {
+  .LmxChat-log { opacity: 0.6; }
+  .LmxChat-dot { animation: none; background: @bad; }
+}
+
+// -------------------------------------------------------------------- mobile
+// The sidebar stacks under the forum list below 980px, at full width, so the
+// log can be shorter — a full-width 268px box pushes the footer off-screen on a
+// 420px phone and reads as "the page ended".
+
+@media (max-width: 980px) {
+  .LmxChat-log { max-height: 210px; }
+}
+
+@media (max-width: 520px) {
+  .LmxChat-log { max-height: 190px; min-height: 92px; }
+  .LmxChat-here { display: none; }
+  .LmxChat-input { font-size: 16px; }   // < 16px makes iOS zoom on focus
+  .LmxChat-send { height: 34px; width: 38px; }
+}
+
+// Motion is decoration here; the message still arrives without it.
+@media (prefers-reduced-motion: reduce) {
+  .LmxChat-msg { animation: none; }
+  .LmxChat-dot { animation: none; }
+  .LmxChat-online.is-bumped { animation: none; }
+}

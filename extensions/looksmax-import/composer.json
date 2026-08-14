@@ -1,0 +1,15 @@
+{
+  "name": "local/looksmax-import",
+  "description": "Import scraped XenForo content into Flarum: tags, users, discussions, posts",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\Import\\": "src/" } },
+  "extra": {
+    "flarum-extension": {
+      "title": "Looksmax Import",
+      "category": "feature",
+      "icon": { "name": "fas fa-file-import", "backgroundColor": "#12161c", "color": "#9ece6a" }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+local-looksmax-import:
+  lib:
+    # These three are not UI. They are written INTO discussion titles and post
+    # bodies by `php flarum lmx:import` and are then ordinary content that every
+    # reader of that thread sees forever. They are translated in the locale the
+    # importer runs under (the `default_locale` setting), not per reader — see
+    # locale/i18n-map.json `design` for what a per-reader version would take.
+    #
+    # The underscores are markdown: the note renders in italics, so it reads as
+    # an editorial aside rather than as something the author wrote.
+    no_body: "_(body not scraped for this thread)_"
+    # A post whose html was scraped but converted to nothing at all.
+    empty_post: "(empty)"
+    # A thread whose title was missing from the scrape. Becomes the discussion
+    # title, so it is also the link text everywhere that thread is listed.
+    untitled: Untitled

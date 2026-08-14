@@ -1,0 +1,91 @@
+local-looksmax-i18n:
+  forum:
+    # The language control. Core ships a locale dropdown in the header when more
+    # than one pack is installed; these are the strings around ours, which also
+    # appears in the footer, where a visitor who has not spotted the header
+    # control would look for it.
+    switcher:
+      label: Language
+      tooltip: Change the language of the interface
+      current: "Interface language: {language}"
+      # Shown once, under the switcher, the first time the site guesses from the
+      # browser rather than from a choice the visitor made.
+      autodetected: We picked this from your browser. Change it whenever you like.
+
+    # Content language is not interface language. The imported corpus is
+    # English, Spanish, Russian, Turkish, German and French; a Spanish reader
+    # must still be able to open an English thread.
+    content:
+      language_label: "Written in {language}"
+      mixed: This discussion has posts in more than one language.
+      filter_all: All languages
+      filter_mine: My language only
+      translate: Translate this post
+      translating: Translating…
+      show_original: Show the original
+      translation_failed: That could not be translated right now.
+
+    languages:
+      en: English
+      es: Spanish
+      ru: Russian
+      tr: Turkish
+      de: German
+      fr: French
+      unknown: Unknown
+
+    # ── The forum's own copy ────────────────────────────────────────────────
+    #
+    # forum_description and welcome_message are Flarum SETTINGS, not keys —
+    # one value in one column, shown to everybody. On a Spanish-first forum
+    # the setting therefore holds the Spanish, and src/ForumStrings.php swaps
+    # in the translation for the locale actually being served. The setting
+    # stays the fallback, so removing this extension degrades to Spanish
+    # rather than to nothing.
+    welcome:
+      title: Looksmax.lat
+      message: >-
+        Face and body ratings, guides and protocols, with the evidence
+        attached. Read the guides before you post, and rate someone before you
+        ask to be rated.
+
+    meta:
+      description: >-
+        Face and body ratings, and the guides behind them. Read the guides
+        before you post, and expect to be argued with.
+
+    # ── The six front-page sections ─────────────────────────────────────────
+    #
+    # These are the operator's own names and they ship EXACTLY as written. The
+    # Spanish is the source string here, not the translation — this is the one
+    # place in the product where English is derived from Spanish rather than
+    # the other way round, which is what "Spanish-first" means when it stops
+    # being an adjective.
+    #
+    # Three of them are not translated on purpose:
+    #   Softmaxing, Looksmaxing  — the subculture's own coinages. They are the
+    #     same word in every language it is written in, including Spanish.
+    #   Peligrosomaxing          — coined in Spanish, from `peligroso`. There
+    #     is no established English rendering, and inventing one ("Dangermaxx-
+    #     ing") would be exactly the kind of made-up name this operator has
+    #     rejected before. It stays as written until somebody says otherwise.
+    #
+    # `Peptides` is written in English in the operator's list even though the
+    # Spanish word is `Péptidos`. That is deliberate on their part and it is
+    # left alone; only the English side is filled in.
+    sections:
+      peptides: Peptides
+      anabolics: Anabolics
+      softmaxing: Softmaxing
+      looksmaxing: Looksmaxing
+      peligrosomaxing: Peligrosomaxing
+      best_guides: Best Guides
+
+    # The announcements block at the top of the front page.
+    news:
+      heading: News
+      empty: Nothing new right now.
+      see_all: See everything
+      posted: "{when}"
+      dismiss: Dismiss
+      pinned: Pinned

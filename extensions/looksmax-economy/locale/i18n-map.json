@@ -1,0 +1,35 @@
+{
+  "extension": "looksmax-economy",
+  "prefix": "local-looksmax-economy",
+  "notes": [
+    "ZERO replacements, and that is the measured result, not a skipped lane. looksmax-economy ships no JS, no HTTP controller, no view, no notification and no email; its ApiSerializer extender emits three integers and a slug; its LESS has no `content:` rule. Every string in src/ is a ledger reason code, a SQL fragment, a date format or console command help. Nothing in this extension renders text to a member.",
+    "It does own a vocabulary that leaks: locale/en.yml and locale/es.yml name every Ledger::AWARDS reason so the surface that renders a points history has words to use instead of `post.read_through`. That render site is in another lane's file and is listed under deferred with the exact replacement."
+  ],
+  "replacements": [],
+  "deferred": [
+    {
+      "file": "../looksmax-store/js/dist/forum.js",
+      "line": 661,
+      "string": "m('td', l.reason),",
+      "reason": "OUTSIDE MY BOUNDARY — the store lane owns this file. It is the one place a member reads looksmax-economy's raw vocabulary: the 'Credit movements' table on the store page prints the ledger reason code verbatim, so a Spanish reader sees `reaction.received` and `store.purchase` in a Spanish table. The keys now exist; the swap is one line. Suggested replacement, matching that file's own `m()` idiom and its lmxI18n usage: m('td', window.lmxI18n ? window.lmxI18n.t('local-looksmax-economy.lib.reason.' + l.reason, null, l.reason) : l.reason),  — the key is the reason code itself, so no mapping table is needed, and lmxI18n.t()'s third argument keeps the code visible if a reason is ever added without a label. `local-looksmax-economy.lib.reason_unknown` is there if that lane would rather show 'Adjustment' than the code. The label set was enumerated from the code, not guessed: Ledger::AWARDS plus every literal passed to award()/spend()/credit()/revoke() across extensions/, cross-checked against the whereIn list at looksmax-store/src/Api/StoreController.php:247. That check is what caught `admin.adjust` — the actual reason written by the admin balance-adjust path at StoreActionController.php:271."
+    },
+    {
+      "file": "src/Ledger.php",
+      "line": "64-75",
+      "string": "['slug' => 'greycel', 'name' => 'Greycel', 'min' => 0], ...",
+      "reason": "AUDIT CALLED THESE 'identifier' AND THE AUDIT IS RIGHT. This is the fallback ladder used only when looksmax-ranks is absent. Verified by grep across extensions/: every caller of Ledger::ranks() and Ledger::rankFor() reads ['slug'], never ['name'] — refreshRank() at Ledger.php:302 is the only consumer. Not translated, because nobody can read it."
+    },
+    {
+      "file": "src/Console/RecomputeCommand.php",
+      "line": "27, 28, 64",
+      "string": "\"Rebuild user points and ranks from the transaction ledger\", \"report drift without writing\", \"would fix \"",
+      "reason": "Console command description, option help and progress output. Operator-facing, not member-facing; console output should not follow the forum's default locale. Correctly excluded by the audit."
+    },
+    {
+      "file": "src/Streaks.php, src/Ledger.php, src/Listeners/AwardReaction.php",
+      "line": "multiple",
+      "string": "\"Y-m-d H:i:s\"",
+      "reason": "MySQL datetime format for a WHERE clause and an INSERT. Never rendered. Do not touch — replacing one of these with a localised format would corrupt the ledger."
+    }
+  ]
+}

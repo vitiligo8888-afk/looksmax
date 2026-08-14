@@ -1,0 +1,29 @@
+local-looksmax-brand:
+  forum:
+    # The server-rendered pages. These are NOT the SPA: they render with no
+    # extension JS and no forum stylesheet (views/layouts/basic.blade.php), and
+    # they are the first thing a visitor arriving on a stale search result or an
+    # e-mail confirmation link sees. Same plain register as the rest of the
+    # forum — no apology theatre, no "Oops!".
+    error:
+      # Shared by both pages; the only action offered.
+      go_home: Go to the front page
+      not_found:
+        # <title>, i.e. the browser tab and the search-result snippet.
+        title: Page not found
+        heading: That page isn't here.
+        body: The link may be old, or the thread may have been moved or deleted. Try the front page, or search for the title.
+      default:
+        title: Something went wrong
+        heading: Something went wrong.
+        # {email} is a mailto link built in the template, not an address to
+        # translate. Offtopic is the name of a board, so it stays as-is.
+        body: "The forum hit an error handling that request. It has been logged. Try again in a minute; if it keeps happening, post in Offtopic or write to {email}."
+  lib:
+    # Alt text on the share card (og:image:alt) — read out by screen readers on
+    # Twitter/Facebook/Discord previews. {title} is the forum title setting.
+    og_image_alt: "{title} — face and body ratings, and the guides behind them"
+    # og:locale is a Facebook/Open Graph locale code, not prose: language_TERRITORY
+    # with an underscore. It is a translation key precisely so each locale can
+    # name its own territory instead of the code mapping a locale to a country.
+    og_locale: en_US

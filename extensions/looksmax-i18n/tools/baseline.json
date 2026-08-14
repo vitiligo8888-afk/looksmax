@@ -1,0 +1,4232 @@
+{
+  "generated": "2026-08-13T12:23:18.534Z",
+  "coverage": 6.1,
+  "translated": 29,
+  "hardcoded": 448,
+  "perExt": {
+    "looksmax-economy": {
+      "translated": 0,
+      "hardcoded": 0,
+      "coverage": 100,
+      "locales": {},
+      "files": {}
+    },
+    "looksmax-brand": {
+      "translated": 0,
+      "hardcoded": 15,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-brand/src/Head.php": 1,
+        "extensions/looksmax-brand/views/error/not_found.blade.php": 4,
+        "extensions/looksmax-brand/views/error/default.blade.php": 4,
+        "extensions/looksmax-brand/views/layouts/basic.blade.php": 6
+      }
+    },
+    "looksmax-format": {
+      "translated": 1,
+      "hardcoded": 19,
+      "coverage": 5,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-format/src/SecurityHeaders.php": 1,
+        "extensions/looksmax-format/src/Media/Fetcher.php": 6,
+        "extensions/looksmax-format/src/Media/ProxyController.php": 1,
+        "extensions/looksmax-format/src/Configure.php": 5,
+        "extensions/looksmax-format/js/dist/forum.js": 6
+      }
+    },
+    "looksmax-guides": {
+      "translated": 0,
+      "hardcoded": 19,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-guides/src/Guide/Tiers.php": 1,
+        "extensions/looksmax-guides/src/Formatter/Configure.php": 2,
+        "extensions/looksmax-guides/src/Listeners/IndexGuide.php": 1,
+        "extensions/looksmax-guides/src/Api/ListGuidesController.php": 2,
+        "extensions/looksmax-guides/js/dist/forum.js": 13
+      }
+    },
+    "looksmax-theme": {
+      "translated": 0,
+      "hardcoded": 0,
+      "coverage": 100,
+      "locales": {},
+      "files": {}
+    },
+    "looksmax-ranks": {
+      "translated": 0,
+      "hardcoded": 93,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-ranks/src/Badges/Engine.php": 6,
+        "extensions/looksmax-ranks/src/Api/IdentityController.php": 2,
+        "extensions/looksmax-ranks/src/Api/IdentityActionController.php": 14,
+        "extensions/looksmax-ranks/src/Catalog.php": 64,
+        "extensions/looksmax-ranks/src/Standing.php": 6,
+        "extensions/looksmax-ranks/js/dist/forum.js": 1
+      }
+    },
+    "looksmax-reactions": {
+      "translated": 4,
+      "hardcoded": 44,
+      "coverage": 8.3,
+      "locales": {
+        "en": 17
+      },
+      "files": {
+        "extensions/looksmax-reactions/src/Api/AdminController.php": 1,
+        "extensions/looksmax-reactions/src/Api/DiscussionReactionsController.php": 3,
+        "extensions/looksmax-reactions/src/Catalog.php": 1,
+        "extensions/looksmax-reactions/js/dist/admin.js": 9,
+        "extensions/looksmax-reactions/js/dist/forum.js": 30
+      }
+    },
+    "looksmax-import": {
+      "translated": 1,
+      "hardcoded": 5,
+      "coverage": 16.7,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-import/src/HtmlToBbcode.php": 5
+      }
+    },
+    "looksmax-chat": {
+      "translated": 0,
+      "hardcoded": 14,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-chat/src/Api/ChatController.php": 3,
+        "extensions/looksmax-chat/src/Payload.php": 1,
+        "extensions/looksmax-chat/js/chat.js": 10
+      }
+    },
+    "looksmax-store": {
+      "translated": 0,
+      "hardcoded": 162,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-store/src/Payments/PointsProvider.php": 1,
+        "extensions/looksmax-store/src/Payments/MockCardProvider.php": 4,
+        "extensions/looksmax-store/src/Listeners/InjectAdminLink.php": 1,
+        "extensions/looksmax-store/src/Catalogue.php": 9,
+        "extensions/looksmax-store/src/Purchase.php": 19,
+        "extensions/looksmax-store/src/Seed.php": 25,
+        "extensions/looksmax-store/src/Redeem.php": 11,
+        "extensions/looksmax-store/src/Api/StoreController.php": 4,
+        "extensions/looksmax-store/src/Api/StoreActionController.php": 8,
+        "extensions/looksmax-store/src/Grants/CosmeticGrant.php": 1,
+        "extensions/looksmax-store/src/Grants/TierGrant.php": 1,
+        "extensions/looksmax-store/js/dist/forum.js": 78
+      }
+    },
+    "looksmax-icons": {
+      "translated": 0,
+      "hardcoded": 5,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-icons/src/InjectScript.php": 4,
+        "extensions/looksmax-icons/js/dist/forum.js": 1
+      }
+    },
+    "flarum-analytics": {
+      "translated": 13,
+      "hardcoded": 1,
+      "coverage": 92.9,
+      "locales": {},
+      "files": {
+        "extensions/flarum-analytics/src/PostHog/Client.php": 1
+      }
+    },
+    "looksmax-i18n": {
+      "translated": 0,
+      "hardcoded": 1,
+      "coverage": 0,
+      "locales": {
+        "en": 20,
+        "es": 31
+      },
+      "files": {
+        "extensions/looksmax-i18n/js/dist/forum.js": 1
+      }
+    },
+    "looksmax-index": {
+      "translated": 0,
+      "hardcoded": 1,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-index/src/RenderIndex.php": 1
+      }
+    },
+    "looksmax-search": {
+      "translated": 10,
+      "hardcoded": 52,
+      "coverage": 16.1,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-search/src/Search/MeiliFulltextGambit.php": 1,
+        "extensions/looksmax-search/src/Search/Fallback.php": 1,
+        "extensions/looksmax-search/src/Search/Engine.php": 3,
+        "extensions/looksmax-search/src/Listeners/QueueIndexChanges.php": 4,
+        "extensions/looksmax-search/src/Api/SearchController.php": 2,
+        "extensions/looksmax-search/src/Api/FacetController.php": 1,
+        "extensions/looksmax-search/src/Meili/IndexSettings.php": 9,
+        "extensions/looksmax-search/src/Meili/Indexer.php": 1,
+        "extensions/looksmax-search/src/Meili/DocumentBuilder.php": 7,
+        "extensions/looksmax-search/src/Meili/Client.php": 4,
+        "extensions/looksmax-search/js/dist/forum.js": 19
+      }
+    },
+    "looksmax-userinfo": {
+      "translated": 0,
+      "hardcoded": 17,
+      "coverage": 0,
+      "locales": {},
+      "files": {
+        "extensions/looksmax-userinfo/src/RankSource.php": 1,
+        "extensions/looksmax-userinfo/js/dist/forum.js": 16
+      }
+    }
+  },
+  "findings": [
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/src/Head.php",
+      "line": 99,
+      "value": " — face and body ratings, and the guides behind them\">",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/not_found.blade.php",
+      "line": 19,
+      "value": "That page isn't here.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/not_found.blade.php",
+      "line": 21,
+      "value": "The link may be old, or the thread may have been moved or deleted. Try the",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/not_found.blade.php",
+      "line": 22,
+      "value": "front page, or search for the title.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/not_found.blade.php",
+      "line": 25,
+      "value": "Go to the front page",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/default.blade.php",
+      "line": 15,
+      "value": "Something went wrong.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/default.blade.php",
+      "line": 17,
+      "value": "The forum hit an error handling that request. It has been logged. Try again",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/default.blade.php",
+      "line": 18,
+      "value": "in a minute; if it keeps happening, post in Offtopic or write to",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/error/default.blade.php",
+      "line": 22,
+      "value": "Go to the front page",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/layouts/basic.blade.php",
+      "line": 45,
+      "value": "radial-gradient(720px 420px at 18% -20%, rgba(232,192,125,.10), transparent 62%),",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/layouts/basic.blade.php",
+      "line": 46,
+      "value": "radial-gradient(620px 380px at 100% 120%, rgba(122,162,247,.08), transparent 60%),",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/layouts/basic.blade.php",
+      "line": 49,
+      "value": "font: 400 17px/1.55 -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto,",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/layouts/basic.blade.php",
+      "line": 50,
+      "value": "\"Helvetica Neue\", Arial, sans-serif;",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/layouts/basic.blade.php",
+      "line": 86,
+      "value": "border: 1px solid #5f6d82;",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-brand",
+      "file": "extensions/looksmax-brand/views/layouts/basic.blade.php",
+      "line": 95,
+      "value": "border-top: 1px solid #232c39;",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "blade"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/SecurityHeaders.php",
+      "line": 79,
+      "value": "frame-src https://www.youtube-nocookie.com https://www.youtube.com ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/Fetcher.php",
+      "line": 37,
+      "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/Fetcher.php",
+      "line": 38,
+      "value": "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/Fetcher.php",
+      "line": 67,
+      "value": "ext-curl is not available",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/Fetcher.php",
+      "line": 109,
+      "value": "transfer failed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/Fetcher.php",
+      "line": 115,
+      "value": "body over cap",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/Fetcher.php",
+      "line": 118,
+      "value": "content-type not media: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Media/ProxyController.php",
+      "line": 42,
+      "value": "not found",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Configure.php",
+      "line": 175,
+      "value": "Hidden text, activate to reveal",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Configure.php",
+      "line": 204,
+      "value": "High IQ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Configure.php",
+      "line": 291,
+      "value": "Member of the source board, not imported here",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Configure.php",
+      "line": 384,
+      "value": "Go to the quoted post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/src/Configure.php",
+      "line": 526,
+      "value": "Member of the source board, not imported here",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/js/dist/forum.js",
+      "line": 142,
+      "value": "Hidden text, revealed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/js/dist/forum.js",
+      "line": 209,
+      "value": "Show the rest of this quote",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/js/dist/forum.js",
+      "line": 215,
+      "value": "Show the rest of this quote",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/js/dist/forum.js",
+      "line": 223,
+      "value": "Collapse quote",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/js/dist/forum.js",
+      "line": 276,
+      "value": "Press Ctrl+C",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-format",
+      "file": "extensions/looksmax-format/js/dist/forum.js",
+      "line": 284,
+      "value": "Press Ctrl+C",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/src/Guide/Tiers.php",
+      "line": 48,
+      "value": "Community report",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/src/Formatter/Configure.php",
+      "line": 137,
+      "value": "Key takeaway",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/src/Formatter/Configure.php",
+      "line": 197,
+      "value": "Results in",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/src/Listeners/IndexGuide.php",
+      "line": 74,
+      "value": "[guides] indexing failed for post ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/src/Api/ListGuidesController.php",
+      "line": 79,
+      "value": "discussion_tag as dt",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/src/Api/ListGuidesController.php",
+      "line": 97,
+      "value": "d.created_at as started_at",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 155,
+      "value": "Reviewed ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 156,
+      "value": "Review due",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 157,
+      "value": "Not reviewed since ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 158,
+      "value": "Never reviewed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 159,
+      "value": "Never reviewed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 187,
+      "value": " claims carry a source",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 200,
+      "value": "Review due.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 200,
+      "value": "Out of date.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 202,
+      "value": " This guide was last checked ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 203,
+      "value": " and is due for review. Treat specifics with care.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 204,
+      "value": " This guide has not been reviewed since ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 205,
+      "value": ". It is no longer recommended in rankings until someone checks it.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-guides",
+      "file": "extensions/looksmax-guides/js/dist/forum.js",
+      "line": 253,
+      "value": "Link to this section",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Badges/Engine.php",
+      "line": 70,
+      "value": "discussions.user_id AS uid, COUNT(*) c",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Badges/Engine.php",
+      "line": 83,
+      "value": "discussions.user_id AS uid, COUNT(*) c",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Badges/Engine.php",
+      "line": 93,
+      "value": "posts.user_id AS uid, COUNT(*) c",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Badges/Engine.php",
+      "line": 135,
+      "value": "d.user_id AS uid, COUNT(DISTINCT a.session, a.discussion_id) c",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Badges/Engine.php",
+      "line": 146,
+      "value": "d.user_id AS uid, FLOOR(SUM(CAST(JSON_VALUE(a.props, '$.dwell_ms') AS UNSIGNED)) / 1000) c",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Badges/Engine.php",
+      "line": 165,
+      "value": "user_id AS uid, COUNT(*) c",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityController.php",
+      "line": 118,
+      "value": "an invitation",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityController.php",
+      "line": 253,
+      "value": "lifetime_points AS score",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 40,
+      "value": "sign in first",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 54,
+      "value": "unknown action",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 57,
+      "value": "that did not work",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 73,
+      "value": " is not for sale — it is awarded",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 86,
+      "value": "not enough points",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 98,
+      "value": "could not grant the item; you were refunded",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 139,
+      "value": " is granted, not sold",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 144,
+      "value": ", which is above ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 155,
+      "value": "not enough points",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 185,
+      "value": "Looksmax+ or above can set a custom title",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 195,
+      "value": "a title has to contain something visible",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 201,
+      "value": "VIP or above can colour the title",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 237,
+      "value": "you have not earned: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Api/IdentityActionController.php",
+      "line": 257,
+      "value": "VIP or above can set a profile accent",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 36,
+      "value": "Just arrived. Read before you post.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 37,
+      "value": "Posting, and being read.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 38,
+      "value": "A known face in a section.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 39,
+      "value": "Contributes more than it consumes.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 40,
+      "value": "Threads people come back to.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 41,
+      "value": "Reference-grade output.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 42,
+      "value": "Rare. Earned over years.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 43,
+      "value": "Shapes how the board thinks.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 44,
+      "value": "Top of the ladder.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 67,
+      "value": "Everything readable",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 67,
+      "value": "Earn at base rate",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 67,
+      "value": "Rank ladder + 3 showcase slots",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 74,
+      "value": "A custom title under your name",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 74,
+      "value": "+10% on everything you earn",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 81,
+      "value": "Avatar frames",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 81,
+      "value": "Profile banner and accent colour",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 88,
+      "value": "Doubled daily earning ceiling",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 95,
+      "value": "Granted, never sold",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 95,
+      "value": "Legendary name styles",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 95,
+      "value": "Permanent — no renewal",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 117,
+      "value": "Rank colour",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 117,
+      "value": "Whatever your current rank paints you.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 121,
+      "value": "The board classic.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 122,
+      "value": "Cool green, high contrast on dark.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 125,
+      "value": "For people who want less, not more.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 133,
+      "value": "Cyan to magenta, unapologetic.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 134,
+      "value": "Gold Leaf",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 134,
+      "value": "Beaten metal, not yellow.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 135,
+      "value": "Deep water gradient.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 138,
+      "value": "A frost sheen travels the name.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 139,
+      "value": "Toxic green, slowly dripping.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 140,
+      "value": "Barber pole. Loud on purpose.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 142,
+      "value": "The top style on the source board.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 143,
+      "value": "Slow polar drift.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 144,
+      "value": "Full hue rotation. Use sparingly.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 151,
+      "value": "Emits light rather than colour. The top of the source board wore this.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 154,
+      "value": "Awarded. Black with a gold edge.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 155,
+      "value": "Not for sale. Ever.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 163,
+      "value": "A plain warm ring.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 164,
+      "value": "Silver Laurel",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 165,
+      "value": "Two-tone gold, static.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 166,
+      "value": "Cyan halo with bloom.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 167,
+      "value": "A conic sweep of heat, rotating.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 168,
+      "value": "Cold conic sweep, rotating.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 169,
+      "value": "Dashed trace that runs the perimeter.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 170,
+      "value": "Awarded. Double ring, counter-rotating.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 195,
+      "value": "Wrote something people are sent back to.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 196,
+      "value": "Reference Shelf",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 196,
+      "value": "Five published guides.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 197,
+      "value": "Cites Sources",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 200,
+      "value": "Well Received",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 201,
+      "value": "Crowd Favourite",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 204,
+      "value": "At least 3 reactions per post across 200+ posts. Quality, not volume.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 207,
+      "value": "Read To The End",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 208,
+      "value": "An hour of cumulative reading time on your threads.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 211,
+      "value": "A year on the board.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 212,
+      "value": "Three years on the board.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 213,
+      "value": "Five years on the board.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 215,
+      "value": "Revived five threads dead for six months or more.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 223,
+      "value": "Founding Member",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 223,
+      "value": "Here before the migration.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 224,
+      "value": "Arrived carrying serious standing.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 225,
+      "value": "Runs the place.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Catalog.php",
+      "line": 226,
+      "value": "Kept the lights on.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Standing.php",
+      "line": 247,
+      "value": " or above can equip ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Standing.php",
+      "line": 247,
+      "value": "not available on your tier",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Standing.php",
+      "line": 250,
+      "value": "you do not own that style",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Standing.php",
+      "line": 260,
+      "value": "no such frame",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Standing.php",
+      "line": 263,
+      "value": " or above can equip that frame",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/src/Standing.php",
+      "line": 266,
+      "value": "you do not own that frame",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-ranks",
+      "file": "extensions/looksmax-ranks/js/dist/forum.js",
+      "line": 387,
+      "value": "Your balance — spend it in the store",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/src/Api/AdminController.php",
+      "line": 78,
+      "value": "disable it instead; deleting would cascade these rows away",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/src/Api/DiscussionReactionsController.php",
+      "line": 67,
+      "value": "legacy_post_totals as l",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/src/Api/DiscussionReactionsController.php",
+      "line": 72,
+      "value": "legacy_post_reactions as lr",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/src/Api/DiscussionReactionsController.php",
+      "line": 73,
+      "value": "reactions as r2",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/src/Catalog.php",
+      "line": 70,
+      "value": "Love it",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 46,
+      "value": "Loading…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 75,
+      "value": "Reaction catalogue",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 78,
+      "value": "Order here is the order in the picker and in the post strip.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 116,
+      "value": "Allow reacting to your own posts",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 118,
+      "value": "Maximum reactions one user may leave on one post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 120,
+      "value": "Reaction icon size in the post footer (px)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 122,
+      "value": "Reactions allowed per minute (abuse limit)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 124,
+      "value": "Reactions allowed per hour (abuse limit)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/admin.js",
+      "line": 125,
+      "value": "React to posts",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 194,
+      "value": "var(--e-4, 0 24px 64px rgba(0,0,0,.6))",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 270,
+      "value": "nothing matches \"",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 288,
+      "value": "click to remove",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 288,
+      "value": "click to react",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 289,
+      "value": "up to ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 289,
+      "value": " per post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 298,
+      "value": "Loading…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 333,
+      "value": "(count not recorded)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 340,
+      "value": "The old board recorded which reactions a post drew and the total, ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 341,
+      "value": "but not who left them — so these are shown as history rather than as reactors.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 345,
+      "value": "Nobody has reacted to this post yet.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 470,
+      "value": "Too fast — try again in a moment.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 472,
+      "value": "You have already used ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 472,
+      "value": " reactions on this post.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 473,
+      "value": "Could not save that reaction.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 490,
+      "value": " — click to remove",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 511,
+      "value": ", exact count not recorded",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 524,
+      "value": "Total reactions on the old board",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 603,
+      "value": "Loading…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 610,
+      "value": "Most reacted in this thread",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 627,
+      "value": " imported posts",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 646,
+      "value": "No reactions in this thread yet.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 672,
+      "value": "Top posts",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 677,
+      "value": "Reaction leaderboard",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 696,
+      "value": "Loading…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 715,
+      "value": "All-time counts native reactions only — the imported board recorded ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 716,
+      "value": "which reactions a post drew but never who left them.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 804,
+      "value": "Most reacted…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 817,
+      "value": "Reaction leaderboard",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-reactions",
+      "file": "extensions/looksmax-reactions/js/dist/forum.js",
+      "line": 840,
+      "value": " to your post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-import",
+      "file": "extensions/looksmax-import/src/HtmlToBbcode.php",
+      "line": 518,
+      "value": "\n[unfurl url=\"",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-import",
+      "file": "extensions/looksmax-import/src/HtmlToBbcode.php",
+      "line": 627,
+      "value": "[emote name=\"",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-import",
+      "file": "extensions/looksmax-import/src/HtmlToBbcode.php",
+      "line": 790,
+      "value": "\n[embed site=",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-import",
+      "file": "extensions/looksmax-import/src/HtmlToBbcode.php",
+      "line": 928,
+      "value": "[gmention name=\"",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-import",
+      "file": "extensions/looksmax-import/src/HtmlToBbcode.php",
+      "line": 1002,
+      "value": "[umention name=\"",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/src/Api/ChatController.php",
+      "line": 76,
+      "value": "Your account is suspended.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/src/Api/ChatController.php",
+      "line": 84,
+      "value": "Keep it under ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/src/Api/ChatController.php",
+      "line": 98,
+      "value": "Too many messages in a minute.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/src/Payload.php",
+      "line": 69,
+      "value": "u.username as account",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 466,
+      "value": "Nobody here",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 685,
+      "value": "Not sent — check your connection.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 690,
+      "value": "Could not send.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 748,
+      "value": "Could not delete that message.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 765,
+      "value": "People here now",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 784,
+      "value": "Chat messages",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 797,
+      "value": "Say something — everyone on the index sees it.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 814,
+      "value": "Say something…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 815,
+      "value": "Chat message",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-chat",
+      "file": "extensions/looksmax-chat/js/chat.js",
+      "line": 845,
+      "value": "Members can post here.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Payments/PointsProvider.php",
+      "line": 68,
+      "value": "That order was already refunded.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Payments/MockCardProvider.php",
+      "line": 34,
+      "value": "Card (not live)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Payments/MockCardProvider.php",
+      "line": 47,
+      "value": "That card was declined.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Payments/MockCardProvider.php",
+      "line": 50,
+      "value": "That card number is not valid.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Payments/MockCardProvider.php",
+      "line": 62,
+      "value": "That charge was not made by the mock provider.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Listeners/InjectAdminLink.php",
+      "line": 26,
+      "value": "(function () {\n  'use strict';\n  function mount() {\n    var nav = document.querySelector('.App-nav .Dropdown-menu, .AdminNav .Dropdown-menu, nav.AdminNav ul');\n    if (!nav || nav.querySelector('.lmx-store-adminlink')) return;\n    var li = document.createElement('li');\n    li.className = 'lmx-store-adminlink';\n    var a = document.createElement('a');\n    a.className = 'Button Button--link';\n    a.href = '/store/admin';\n    a.target = '_blank';\n    a.rel = 'noopener';\n    a.textContent = 'Store';\n    a.title = 'Catalogue, orders, balances and the audit trail';\n    li.appendChild(a);\n    nav.appendChild(li);\n  }\n  if (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', mount);\n  } else {\n    mount();\n  }\n  new MutationObserver(function () { mount(); })\n    .observe(document.documentElement, { childList: true, subtree: true });\n})();\n",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 205,
+      "value": "Sign in to buy anything.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 208,
+      "value": "Not on sale right now.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 211,
+      "value": "Opens ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 222,
+      "value": "You already own this.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 222,
+      "value": "You have the maximum of these.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 233,
+      "value": " already, which is above ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 240,
+      "value": " or above can use this.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 247,
+      "value": "Reach ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Catalogue.php",
+      "line": 247,
+      "value": " more lifetime points).",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 68,
+      "value": "There is no such item.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 75,
+      "value": "That one cannot be given as a gift.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 78,
+      "value": "No account by that name.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 103,
+      "value": "or above",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 108,
+      "value": "You already own this.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 108,
+      "value": "They already own this.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 128,
+      "value": "That purchase was already submitted.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 158,
+      "value": "That purchase is already being processed.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 170,
+      "value": "That is not on sale right now.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 256,
+      "value": "That is not your order.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 264,
+      "value": "This item cannot be refunded. Ask staff if something went wrong.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 267,
+      "value": "The refund window for this item has closed.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 272,
+      "value": "That has already been used, so it cannot be refunded.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 382,
+      "value": "You already own that.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 384,
+      "value": "already own everything",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 387,
+      "value": "injected fault",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 388,
+      "value": "The purchase was rolled back on purpose (",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 388,
+      "value": "). Nothing was charged.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Purchase.php",
+      "line": 391,
+      "value": "Something went wrong and nothing was charged.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 41,
+      "value": "Double earnings, 24 hours",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 44,
+      "value": "Everything you earn counts double for a day. Stacks with your membership multiplier.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 48,
+      "value": "Double earnings, 7 days",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 51,
+      "value": "The same thing for a week. Cheaper per day than buying seven of the above.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 55,
+      "value": "Raised daily ceiling, 24 hours",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 58,
+      "value": "Doubles the anti-farming daily caps for a day. For the days you actually are writing that much.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 62,
+      "value": "Streak freeze",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 65,
+      "value": "Covers one missed day so a daily streak survives it. Spent automatically, oldest first.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 71,
+      "value": "Highlight a thread, 3 days",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 74,
+      "value": "Your thread gets a marked edge in the discussion list for three days. One thread, your choice, redeemed when you want it.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 78,
+      "value": "Pin a thread, 24 hours",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 81,
+      "value": "Pins one of your threads to the top of its tag for a day, then unpins it. A moderator can end it early.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 85,
+      "value": "Bump a thread",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 88,
+      "value": "Moves one of your threads back to the top of the recent list without posting \"bump\".",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 95,
+      "value": "One change of the name on your account. Your old name is recorded on the order.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 104,
+      "value": "Colour box",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 111,
+      "value": "One username style you do not already own. 55% solid, 38% gradient, 7% animated. Cheapest animated style is worth 12,000.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 114,
+      "value": "Frame box",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 120,
+      "value": "One avatar frame you do not already own. 40% common, 30% uncommon, 24% rare, 6% epic.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 132,
+      "value": "VIP for life",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 135,
+      "value": "VIP that never expires and never needs renewing. Twenty five of these exist.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 141,
+      "value": "VIP starter",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 144,
+      "value": "A month of VIP, the Oceanic gradient and a day of doubled earnings. Sold together for less than the three separately.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 157,
+      "value": "Card payment is not live yet. This is a test purchase path and it does not charge anything.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Seed.php",
+      "line": 164,
+      "value": "Card payment is not live yet. This is a test purchase path and it does not charge anything.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 39,
+      "value": "You have no highlight left to use.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 69,
+      "value": "That thread is already pinned.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 74,
+      "value": "You have no pin left to use.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 114,
+      "value": "That thread was already bumped this week.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 119,
+      "value": "You have no bump left to use.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 146,
+      "value": "Names are 3 to 30 characters, letters, numbers, dashes and underscores.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 149,
+      "value": "That is already your name.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 157,
+      "value": "You have no username change left to use.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 171,
+      "value": "bought username change",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 210,
+      "value": "That is not your thread.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Redeem.php",
+      "line": 213,
+      "value": "That thread is deleted.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreController.php",
+      "line": 49,
+      "value": "unknown view",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreController.php",
+      "line": 151,
+      "value": "Avatar frames",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreController.php",
+      "line": 153,
+      "value": "Thread perks",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreController.php",
+      "line": 156,
+      "value": "Credit packs",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 46,
+      "value": "Sign in first.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 55,
+      "value": "unknown action",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 59,
+      "value": "Something went wrong. Nothing was charged.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 122,
+      "value": "Nothing to redeem of that kind.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 154,
+      "value": "unknown operation",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 162,
+      "value": "SKUs are lower case letters, numbers and dashes.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 237,
+      "value": "It has been sold before, so it was retired rather than deleted.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Api/StoreActionController.php",
+      "line": 256,
+      "value": "Say why. The adjustment is recorded with the reason.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Grants/CosmeticGrant.php",
+      "line": 44,
+      "value": " has no item in its payload",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/src/Grants/TierGrant.php",
+      "line": 65,
+      "value": " already, which is above ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 107,
+      "value": " days left",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 108,
+      "value": " hours left",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 109,
+      "value": " minutes left",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 139,
+      "value": "The store did not answer. Reload the page.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 190,
+      "value": "The box gave you ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 198,
+      "value": "That did not go through. Nothing was charged.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 206,
+      "value": "Refunded ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 209,
+      "value": "That order could not be refunded.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 221,
+      "value": "Thread bumped.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 225,
+      "value": "That could not be redeemed.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 250,
+      "value": "Sign in to see your balance and buy anything here.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 272,
+      "value": "applied to the prices below",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 275,
+      "value": "Earning rate",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 277,
+      "value": "boost active",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 277,
+      "value": "base rate for your tier",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 280,
+      "value": "Lifetime earned",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 282,
+      "value": "spending never reduces this",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 316,
+      "value": "card not live",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 380,
+      "value": " member has this",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 380,
+      "value": " members have this",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 434,
+      "value": "List price",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 436,
+      "value": "Your membership discount",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 439,
+      "value": "You pay",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 441,
+      "value": "Balance after",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 448,
+      "value": "Buy it for someone else",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 450,
+      "value": "their username, or leave empty",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 457,
+      "value": "Card number",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 463,
+      "value": "Card payment is not connected yet. This path is wired end to end against a mock provider so the real one can drop in; nothing is charged and no card details are stored or sent anywhere. 4000 0000 0000 0002 is treated as a declined card.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 486,
+      "value": "Loading the catalogue…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 502,
+      "value": "Nothing in this section yet.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 509,
+      "value": "Loading…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 519,
+      "value": "Ready to use",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 521,
+      "value": " use left",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 521,
+      "value": " uses left",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 524,
+      "value": "Nothing waiting to be used. Pins, highlights, bumps and name changes appear here after you buy them.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 526,
+      "value": "Running now",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 528,
+      "value": "No boosts or memberships running.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 530,
+      "value": "Kept forever",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 537,
+      "value": "Colours and frames you buy stay here permanently, even if a membership lapses.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 542,
+      "value": "Avatar frame",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 543,
+      "value": "Streak freeze",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 544,
+      "value": "Thread pin",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 544,
+      "value": "Thread bump",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 571,
+      "value": "Change my name",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 577,
+      "value": "Start a thread first, then come back.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 588,
+      "value": "Bump it",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 604,
+      "value": "in flight",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 611,
+      "value": "Loading your orders…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 629,
+      "value": "gift to ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 642,
+      "value": "Show fewer",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 643,
+      "value": "You have not bought anything yet.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 645,
+      "value": "Gifts you were given",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 656,
+      "value": "Credit movements",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 670,
+      "value": "Show fewer",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 671,
+      "value": "No store movements on your ledger yet.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 678,
+      "value": "Loading…",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 686,
+      "value": "Credits spent",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 686,
+      "value": "Credits circulating",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 687,
+      "value": "Live entitlements",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 690,
+      "value": "Adjust a balance",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 704,
+      "value": "That did not work.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 711,
+      "value": "Recent orders",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 725,
+      "value": "Catalogue synced: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 729,
+      "value": "Sync shipped catalogue",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 736,
+      "value": "filter by SKU, name or kind",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 776,
+      "value": "Recent orders",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 782,
+      "value": "gift to ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 835,
+      "value": "Stock total",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 837,
+      "value": "Refund window (minutes)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 838,
+      "value": "Minimum rank",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 838,
+      "value": "Closes at (Y-m-d H:i:s)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 847,
+      "value": "Membership discount applies",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 853,
+      "value": "Saved ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 857,
+      "value": "That did not save.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 955,
+      "value": "Credits are earned by posting things people read. Spend them here.",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 971,
+      "value": "no app",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 978,
+      "value": "after boot",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-store",
+      "file": "extensions/looksmax-store/js/dist/forum.js",
+      "line": 978,
+      "value": "before boot",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-icons",
+      "file": "extensions/looksmax-icons/src/InjectScript.php",
+      "line": 85,
+      "value": "var d=",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-icons",
+      "file": "extensions/looksmax-icons/src/InjectScript.php",
+      "line": 86,
+      "value": "var A=(window.customElements&&window.customElements.get(\"iconify-icon\"))||window.IconifyIcon||window.Iconify;",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-icons",
+      "file": "extensions/looksmax-icons/src/InjectScript.php",
+      "line": 87,
+      "value": "if(A&&A.addCollection){for(var k in d){A.addCollection(d[k]);}}",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-icons",
+      "file": "extensions/looksmax-icons/src/InjectScript.php",
+      "line": 88,
+      "value": "else{console.warn(\"icons: no addCollection on the component\");}",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-icons",
+      "file": "extensions/looksmax-icons/js/dist/forum.js",
+      "line": 135,
+      "value": " icon iconify-glyph",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "flarum-analytics",
+      "file": "extensions/flarum-analytics/src/PostHog/Client.php",
+      "line": 44,
+      "value": "posthog not configured",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-i18n",
+      "file": "extensions/looksmax-i18n/js/dist/forum.js",
+      "line": 255,
+      "value": " raw translation keys on screen",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-index",
+      "file": "extensions/looksmax-index/src/RenderIndex.php",
+      "line": 244,
+      "value": "(function () {\n  var TPL = null;\n  function tpl() {\n    if (TPL === null) {\n      var el = document.getElementById('lmx-index-template');\n      TPL = el ? el.textContent : '';\n    }\n    return TPL;\n  }\n  function isIndex() {\n    // front page only. /all is the discussion list and previously got the\n    // index stacked on top of it.\n    var p = location.pathname;\n    return p === '/' || p === '' || p === '/tags';\n  }\n  function mount() {\n    var host = document.querySelector('.IndexPage-results, .TagsPage-content, .IndexPage');\n    if (!host) return;\n    var existing = document.querySelector('.LmxIndex');\n    if (!isIndex()) { if (existing) existing.remove(); return; }\n    if (existing && existing.isConnected) return;\n    var wrap = document.createElement('div');\n    wrap.innerHTML = tpl();\n    var node = wrap.firstElementChild;\n    if (!node) return;\n    host.parentNode.insertBefore(node, host);\n    document.body.classList.add('lmx-index-on');\n  }\n  function tick() { try { mount(); } catch (e) {} }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick);\n  else tick();\n  setInterval(tick, 700);\n  window.addEventListener('popstate', tick);\n})();\n",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Search/MeiliFulltextGambit.php",
+      "line": 185,
+      "value": ") AGAINST (? IN NATURAL LANGUAGE MODE)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Search/Fallback.php",
+      "line": 49,
+      "value": "MATCH(discussions.title) AGAINST (? IN NATURAL LANGUAGE MODE)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Search/Engine.php",
+      "line": 104,
+      "value": "NOT restricted_tag_ids IN [",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Search/Engine.php",
+      "line": 793,
+      "value": "without filters",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Search/Engine.php",
+      "line": 799,
+      "value": "without exact phrase",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Listeners/QueueIndexChanges.php",
+      "line": 126,
+      "value": "search: failed to enqueue post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Listeners/QueueIndexChanges.php",
+      "line": 152,
+      "value": "search: failed to enqueue discussion",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Listeners/QueueIndexChanges.php",
+      "line": 164,
+      "value": "search: failed to enqueue ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Listeners/QueueIndexChanges.php",
+      "line": 198,
+      "value": "search: enqueue failed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Api/SearchController.php",
+      "line": 80,
+      "value": "search: recovery failed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Api/SearchController.php",
+      "line": 142,
+      "value": "search: could not record query",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Api/FacetController.php",
+      "line": 39,
+      "value": "unknown facet",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 54,
+      "value": "psl god",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 59,
+      "value": "nose job",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 60,
+      "value": "nose job",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 74,
+      "value": "limb lengthening",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 75,
+      "value": "limb lengthening",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 76,
+      "value": "bone smashing",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 80,
+      "value": "black pill",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 81,
+      "value": "white pill",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/IndexSettings.php",
+      "line": 82,
+      "value": "blue pill",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/Indexer.php",
+      "line": 301,
+      "value": "indexing tasks failed: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 72,
+      "value": "u.nickname as author_nick",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 244,
+      "value": "u.nickname as author_nick",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 245,
+      "value": "d.title as discussion_title",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 245,
+      "value": "d.slug as discussion_slug",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 246,
+      "value": "d.is_private as d_private",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 246,
+      "value": "d.hidden_at as d_hidden",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/DocumentBuilder.php",
+      "line": 383,
+      "value": "p.name as parent_name",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/Client.php",
+      "line": 86,
+      "value": "payload could not be encoded: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/Client.php",
+      "line": 117,
+      "value": "HTTP %d %s %s — %s (code=%s type=%s)",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/Client.php",
+      "line": 129,
+      "value": "non-JSON response: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/src/Meili/Client.php",
+      "line": 256,
+      "value": "task $uid did not settle in {$timeoutMs}ms",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 251,
+      "value": "matched in reply by ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 289,
+      "value": "Search threads, posts, people…   try  tag:looksmaxing  by:name  after:2023",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 309,
+      "value": "No matches for “",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 313,
+      "value": "Open full search →",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 347,
+      "value": "See all results for “",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 377,
+      "value": "search engine unavailable — showing nothing rather than something wrong",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 378,
+      "value": " ms · round trip ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 382,
+      "value": "search failed: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 434,
+      "value": "Refine results",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 456,
+      "value": "Most replies",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 457,
+      "value": "Most viewed",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 457,
+      "value": "Recently active",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 468,
+      "value": "Search query",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 489,
+      "value": "Remove this filter",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 528,
+      "value": "degraded: database fallback",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 546,
+      "value": "Nothing matched “",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 559,
+      "value": "Related forums: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 612,
+      "value": "Search failed: ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-search",
+      "file": "extensions/looksmax-search/js/dist/forum.js",
+      "line": 690,
+      "value": "Related threads",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/src/RankSource.php",
+      "line": 150,
+      "value": "to the moon!",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "php"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 176,
+      "value": "Never seen",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 258,
+      "value": " posts on this forum",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 260,
+      "value": " discussions started here",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 271,
+      "value": " reactions on their posts here",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 272,
+      "value": " per post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 279,
+      "value": "Posts per day since joining",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 282,
+      "value": "Best post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 282,
+      "value": " reactions on one post",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 346,
+      "value": "Love it",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 362,
+      "value": "Reaction types their posts here attracted, by how many posts drew each:\n",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 522,
+      "value": "View profile",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 837,
+      "value": "Posts per month over the last two years",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 876,
+      "value": " posts in ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 895,
+      "value": " threads started · ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 898,
+      "value": "First post ",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    },
+    {
+      "ext": "looksmax-userinfo",
+      "file": "extensions/looksmax-userinfo/js/dist/forum.js",
+      "line": 906,
+      "value": "Recent threads",
+      "class": "hardcoded",
+      "rule": "user-visible prose",
+      "lang": "js"
+    }
+  ]
+}

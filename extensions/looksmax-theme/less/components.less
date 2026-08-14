@@ -1,0 +1,631 @@
+// Controls and overlays: buttons, inputs, menus, modals, alerts, badges,
+// avatars, tooltips — and the interaction states for all of them.
+//
+// Every value resolves to var(--token). A literal colour or radius in this file
+// is a bug: it means a component has opted out of the system and will not
+// follow a scheme change.
+//
+// States are treated as first-class here rather than as an afterthought:
+// hover, active, focus-visible, disabled and loading are defined for each
+// control family, because a control that only has a rest state is unfinished.
+
+// ============================================================ buttons
+.Button {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  box-shadow: var(--e-1);
+  color: var(--ink);
+  display: inline-flex;
+  font-weight: 600;
+  gap: 7px;
+  justify-content: center;
+  letter-spacing: -0.005em;
+  transition: background var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+
+.Button:hover {
+  background: var(--surface-3);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.Button:active { box-shadow: none; transform: translateY(1px); }
+
+.Button:focus-visible {
+  border-color: var(--accent-a70);
+  box-shadow: var(--ring);
+  outline: none;
+}
+
+.Button:disabled,
+.Button.disabled,
+.Button[aria-disabled='true'] {
+  background: var(--surface-1);
+  border-color: var(--line);
+  box-shadow: none;
+  color: var(--ink-faint);
+  cursor: not-allowed;
+  opacity: 1;             // core drops to 0.5, which puts the label under 3:1
+  transform: none;
+}
+
+.Button-icon { flex: 0 0 auto; }
+
+// ---- variants -------------------------------------------------------------
+//
+// SPECIFICITY CONTRACT, and the bug it exists to prevent:
+//
+//   `.Button:hover` is (0,2,0). `.Button--primary` is (0,1,0). A variant that
+//   states its fill on the bare class therefore LOSES its hover fill to the
+//   base button's hover, and the gold "Start a Discussion" turns grey-on-grey
+//   the moment the pointer touches it — with a gold-ink label on a grey fill,
+//   which is close to unreadable. That shipped, and only a hover screenshot
+//   caught it; a rest-state audit passes.
+//
+//   Every variant below therefore doubles its own class — `.Button.Button--x`
+//   (0,2,0) at rest and `.Button.Button--x:hover` (0,3,0) for states — so it
+//   outranks the base regardless of source order. Adding a variant means
+//   following this pattern; writing `.Button--newthing` alone is the bug.
+//
+//   e2e/visual/sweep.ts now audits contrast in the hover and focus states as
+//   well as at rest, so a regression here fails the build rather than the
+//   operator's eye.
+.Button.Button--primary {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 84%, #fff), var(--accent));
+  border-color: color-mix(in srgb, var(--accent) 62%, #000);
+  color: var(--accent-ink);
+  font-weight: 700;
+  text-shadow: 0 1px 0 var(--white-a10);
+}
+
+.Button.Button--primary:hover {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 72%, #fff), color-mix(in srgb, var(--accent) 90%, #fff));
+  border-color: color-mix(in srgb, var(--accent) 52%, #000);
+  color: var(--accent-ink);
+}
+
+.Button.Button--primary:active {
+  background: color-mix(in srgb, var(--accent) 88%, #000);
+  color: var(--accent-ink);
+}
+
+.Button.Button--primary:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+  color: var(--accent-ink);
+}
+
+.Button.Button--primary:disabled,
+.Button.Button--primary.disabled {
+  background: color-mix(in srgb, var(--accent) 42%, var(--surface-1));
+  border-color: transparent;
+  color: color-mix(in srgb, var(--accent-ink) 82%, #000);
+}
+
+.Button.Button--link,
+.Button.Button--icon {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ink-dim);
+}
+
+.Button.Button--link:hover,
+.Button.Button--icon:hover {
+  background: var(--white-a06);
+  border-color: transparent;
+  color: var(--ink);
+}
+
+.Button.Button--danger {
+  background: var(--danger-a14);
+  border-color: var(--danger-a45);
+  color: var(--danger);
+}
+
+.Button.Button--danger:hover {
+  background: var(--danger-a45);
+  border-color: var(--danger);
+  color: var(--ink);
+}
+
+.Button.Button--danger:focus-visible { border-color: var(--danger); box-shadow: var(--ring-danger); }
+
+.Button.Button--flat {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+// tag-coloured buttons take their fill from the tag; keep the ink readable
+.Button.Button--tagColored { color: var(--ink); }
+
+// loading: the label dims and a spinner takes its place WITHOUT resizing the
+// button, so a busy control never shifts the layout around it
+.Button--loading,
+.Button.loading {
+  cursor: progress;
+  pointer-events: none;
+  position: relative;
+}
+
+.Button--loading .Button-label,
+.Button.loading .Button-label { opacity: 0.35; }
+
+.Button--loading::after,
+.Button.loading::after {
+  animation: btn-spin 620ms linear infinite;
+  border: 2px solid var(--white-a10);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  content: '';
+  height: 14px;
+  left: calc(50% - 7px);
+  position: absolute;
+  top: calc(50% - 7px);
+  width: 14px;
+}
+
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+// grouped buttons read as one object, so only the outer corners round
+.ButtonGroup > .Button {
+  border-radius: 0;
+  margin-left: -1px;
+}
+
+.ButtonGroup > .Button:first-child { border-radius: var(--r-sm) 0 0 var(--r-sm); margin-left: 0; }
+.ButtonGroup > .Button:last-child { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.ButtonGroup > .Button:only-child { border-radius: var(--r-sm); }
+.ButtonGroup > .Button:hover,
+.ButtonGroup > .Button:focus-visible { z-index: var(--z-raised); }
+
+// ============================================================ inputs
+.FormControl,
+.Search-input input,
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='url'],
+input[type='search'],
+select,
+textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-family: inherit;
+  transition: background var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+}
+
+.FormControl::placeholder,
+input::placeholder,
+textarea::placeholder { color: var(--ink-faint); opacity: 1; }
+
+.FormControl:hover,
+input:hover,
+textarea:hover { border-color: var(--line-strong); }
+
+.FormControl:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  background: var(--surface-1);
+  border-color: var(--accent-2-a55);
+  box-shadow: 0 0 0 3px var(--accent-2-a10);
+  outline: none;
+}
+
+.FormControl:disabled,
+input:disabled,
+textarea:disabled {
+  background: var(--surface-1);
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+
+.FormControl.invalid,
+.Form-group.has-error .FormControl,
+input[aria-invalid='true'] {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-a14);
+}
+
+.Form-group > label { color: var(--ink-dim); font-size: var(--fs-sm); font-weight: 600; }
+.helpText { color: var(--ink-faint); font-size: var(--fs-sm); }
+.ValidationError { color: var(--danger); font-size: var(--fs-sm); }
+
+.Checkbox-display {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-xs);
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+
+.Checkbox.on .Checkbox-display,
+.Checkbox--switch.on .Checkbox-display {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.Checkbox input:focus-visible + .Checkbox-display { box-shadow: var(--ring); }
+
+// ============================================================ menus
+.Dropdown-menu {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-3);
+  color: var(--ink-dim);
+  padding: 5px;
+}
+
+.Dropdown-menu > li > a,
+.Dropdown-menu > li > button,
+.Dropdown-menu .Button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-xs);
+  box-shadow: none;
+  color: var(--ink-dim);
+  display: flex;
+  font-weight: 500;
+  gap: 9px;
+  padding: 8px 10px;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  width: 100%;
+}
+
+.Dropdown-menu > li > a:hover,
+.Dropdown-menu > li > button:hover,
+.Dropdown-menu > li.active > a,
+.Dropdown-menu .Button:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.Dropdown-menu > li > a:focus-visible,
+.Dropdown-menu > li > button:focus-visible { background: var(--surface-2); box-shadow: var(--ring); color: var(--ink); }
+
+.Dropdown-menu .Dropdown-separator,
+.Dropdown-menu .divider {
+  background: var(--line);
+  height: 1px;
+  margin: 5px 2px;
+}
+
+.Dropdown-header {
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  padding: 8px 10px 4px;
+  text-transform: uppercase;
+}
+
+// ============================================================ modals
+.Modal-content {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-4);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.Modal-header {
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--line);
+  padding: var(--pad) var(--pad-lg);
+}
+
+.Modal-title { color: var(--ink); font-size: var(--fs-xl); font-weight: 700; margin: 0; }
+.Modal-body { padding: var(--pad-lg); }
+
+.Modal-footer {
+  background: var(--surface-2);
+  border-top: 1px solid var(--line);
+  padding: var(--pad) var(--pad-lg);
+}
+
+.Modal-close .Button {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ink-faint);
+}
+
+.Modal-close .Button:hover { background: var(--white-a06); color: var(--ink); }
+
+.Modal-backdrop { background: var(--scrim); backdrop-filter: blur(3px) saturate(0.75); }
+
+// core's login/signup modals put the form on the raised surface
+.Modal .Form-group input,
+.Modal .Form-group .FormControl { background: var(--surface-2); }
+
+// ============================================================ alerts
+.Alert {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-3);
+  color: var(--ink);
+  display: flex;
+  gap: var(--gap-sm);
+  padding: 12px 14px;
+}
+
+.Alert--error { border-left-color: var(--danger); color: var(--ink); }
+.Alert--success { border-left-color: var(--ok); color: var(--ink); }
+.Alert-body { color: var(--ink); }
+.Alert-controls .Button { background: transparent; border-color: transparent; box-shadow: none; }
+
+// ============================================================ badges
+.Badge {
+  align-items: center;
+  background: var(--surface-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  box-shadow: var(--e-1);
+  color: var(--ink);
+  display: inline-flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  justify-content: center;
+}
+
+.Badge--hidden { background: var(--surface-3); color: var(--ink-faint); }
+.Badge--sticky { background: var(--accent-a28); border-color: var(--accent-a45); color: var(--accent); }
+.Badge--locked { background: var(--surface-3); color: var(--ink-dim); }
+
+// ============================================================ avatars
+// Core paints the generated letter in #fff over a light pastel it generates
+// itself — measured 1.76:1. The letter is forced to dark ink, which measures
+// 10.6:1 against every pastel in core's generator and 12:1 against the
+// fallback surface set in tokens.less.
+// A generated avatar (no uploaded image) is repainted by looksmax-userinfo with
+// a deterministic colour from the same OKLCH ramp as the forum palette; see
+// paintAvatars() there. Everything that is NOT the fill lives here.
+.Avatar {
+  border-radius: 50%;
+  color: var(--ink-on-light);
+  font-weight: 700;
+  // Core sizes the glyph at exactly half the avatar. That is too big to sit
+  // inside a rim at 24px and too small to read as a monogram at 96px.
+  // escaped: less.php evaluates * inside calc() as LESS arithmetic and throws
+  // "Operation on an invalid type" on a var(), which stops forum.css being
+  // written at all. Every calc() with an operator must be ~"escaped".
+  font-size: ~"calc(var(--size) * 0.42)";
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+
+// The rim: a hairline of the avatar's own colour plus a dark edge, so a light
+// generated circle does not float on the dark page as a bare disc.
+.Avatar[data-lmx-av='1'] {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--lmx-av, var(--accent)) 55%, #000),
+    0 0 0 2px var(--bg),
+    0 6px 14px -8px #000;
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--lmx-av-lift, #fff) 60%, transparent);
+}
+
+.PostUser .Avatar,
+.DiscussionListItem .Avatar {
+  box-shadow: 0 0 0 1px var(--line), 0 6px 14px -8px #000;
+}
+
+.PostUser a:hover .Avatar,
+.PostUser .Avatar:hover {
+  box-shadow: 0 0 0 2px var(--accent-a45), 0 8px 18px -8px #000;
+  transform: scale(1.05);
+}
+
+.UserCard,
+.PostUser .UserCard {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-3);
+}
+
+.UserCard-identity,
+.UserCard .username { color: var(--ink); }
+
+// ============================================================ tooltips
+.tooltip-inner {
+  background: var(--surface-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  box-shadow: var(--e-2);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  padding: 6px 9px;
+}
+
+.tooltip.top .tooltip-arrow { border-top-color: var(--line-strong); }
+.tooltip.bottom .tooltip-arrow { border-bottom-color: var(--line-strong); }
+.tooltip.left .tooltip-arrow { border-left-color: var(--line-strong); }
+.tooltip.right .tooltip-arrow { border-right-color: var(--line-strong); }
+
+// ============================================================ loading + empty
+.LoadingIndicator {
+  color: var(--accent);
+}
+
+// A skeleton that matches the real row height, so nothing jumps when the data
+// lands. That — not decoration — is the reason to have one.
+.LoadingIndicator--block { padding: 40px 0; }
+
+@keyframes skeleton-sweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.Skeleton,
+.LoadingIndicator--skeleton .DiscussionListItem {
+  background: var(--surface-1);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+.Skeleton::after,
+.LoadingIndicator--skeleton .DiscussionListItem::after {
+  animation: skeleton-sweep 1.15s linear infinite;
+  background: linear-gradient(90deg, transparent, var(--white-a06), transparent);
+  content: '';
+  inset: 0;
+  position: absolute;
+}
+
+// Empty states get an explicit voice instead of a bare centred sentence.
+.DiscussionList--empty,
+.PostStream--empty,
+.Search-results--empty,
+.EmptyState {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--ink-dim);
+  margin: var(--gap) 0;
+  padding: 44px 24px;
+  text-align: center;
+}
+
+.DiscussionList-empty,
+.Placeholder {
+  color: var(--ink-dim);
+  padding: 44px 24px;
+  text-align: center;
+}
+
+.Placeholder p { color: var(--ink-dim); }
+
+// ============================================================ names
+// Rank colouring hooks. The animated tiers use background-clip on text, which
+// composites on the GPU and never repaints layout; a slow cycle so a page full
+// of names does not shimmer.
+@keyframes name-sheen {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.username { transition: color var(--t-fast) var(--ease); }
+
+.username.rank--regular  { color: var(--accent-2); }
+.username.rank--verified { color: var(--ok); }
+.username.rank--vip      { color: var(--accent); font-weight: 700; }
+.username.rank--legend   { color: var(--purple); font-weight: 700; }
+.username.rank--staff    { color: var(--danger); font-weight: 700; }
+
+.username[class*='rank--anim'] {
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 200% auto;
+  color: transparent;
+  font-weight: 700;
+  animation: name-sheen 7s linear infinite;
+}
+
+.username.rank--anim-gold   { background-image: linear-gradient(90deg, #9b7dfb, #fff0cf, #9b7dfb, #b98337, #9b7dfb); }
+.username.rank--anim-frost  { background-image: linear-gradient(90deg, #4ecee5, #e2f1ff, #4ecee5, #3f7fd6, #4ecee5); }
+.username.rank--anim-toxic  { background-image: linear-gradient(90deg, #7fd18b, #e6ffe9, #7fd18b, #47a05a, #7fd18b); }
+.username.rank--anim-orchid { background-image: linear-gradient(90deg, #9b7dfb, #f7eeff, #9b7dfb, #8256c4, #9b7dfb); }
+
+@media (prefers-reduced-motion: reduce) {
+  .username[class*='rank--anim'] { animation: none; }
+}
+
+// ============================================================ index cards
+// The forum index is another extension's markup; these are the surface rules
+// that keep it inside the theme's system rather than inventing its own.
+.LmxCard,
+.LmxCat {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  box-shadow: var(--e-2);
+  overflow: hidden;
+}
+
+.LmxCat-head,
+.LmxCard > h3,
+.LmxCard-head {
+  background: linear-gradient(180deg, var(--white-a04), transparent);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 11px var(--pad);
+  text-transform: uppercase;
+}
+
+.LmxCat-head { overflow: hidden; position: relative; }
+
+.LmxCat-head::after {
+  background: linear-gradient(100deg, transparent 30%, var(--white-a06) 50%, transparent 70%);
+  content: '';
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-60%);
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.LmxCat:hover .LmxCat-head::after { animation: cat-sheen 1.1s var(--ease); opacity: 1; }
+
+@keyframes cat-sheen {
+  from { transform: translateX(-60%); }
+  to   { transform: translateX(60%); }
+}
+
+.LmxForum { transition: background var(--t-fast) var(--ease); }
+.LmxForum:hover { background: var(--white-a03); }
+
+.LmxForum-icon {
+  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+}
+
+.LmxForum:hover .LmxForum-icon {
+  box-shadow: 0 8px 18px -8px var(--tag, var(--accent));
+  transform: translateY(-2px) scale(1.04);
+}
+
+.LmxForum-name { color: var(--ink); transition: color var(--t-fast) var(--ease); }
+
+// Cross-lane contrast backstop.
+// looksmax-index hardcodes the theme's old #6b7583 for its secondary text,
+// which measures 3.89:1 on --surface-1 — under AA. Its LESS is owned by another
+// lane, so rather than editing their file this raises the value from the theme
+// with one extra level of specificity. Reported upstream; remove once they read
+// --ink-faint.
+.App .LmxForum-stats span,
+.App .LmxForum-last span,
+.App .LmxForum-quiet,
+.App .LmxCard dt,
+.App .LmxCard .LmxList li > span,
+.App .LmxChat-guest,
+.App .LmxAd-label,
+.App .LmxAd-slot,
+.App .LmxForum-desc { color: var(--ink-faint); }
+
+@media (prefers-reduced-motion: reduce) {
+  .LmxCat:hover .LmxCat-head::after { animation: none; opacity: 0; }
+}

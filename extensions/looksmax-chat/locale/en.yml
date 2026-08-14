@@ -1,0 +1,57 @@
+local-looksmax-chat:
+  forum:
+    # The shoutbox in the index sidebar. It is on the most-visited page on the
+    # forum, so the register is deliberately casual and short — these are chat
+    # box labels, not system notices.
+    title: Chat
+
+    presence:
+      # The "3 here" control in the card header, its tooltip, and its label.
+      aria: People here now
+      here: here
+      nobody: Nobody here
+      guests: "{count, plural, one {# guest} other {# guests}}"
+
+    log_aria: Chat messages
+    empty_title: No messages yet.
+    empty_hint: Say something — everyone on the index sees it.
+
+    # The "jump to bottom" pill. Only ever shown with a count, including the
+    # 0 the button is built with before the first payment of unread arrives.
+    unread: "{count, plural, one {# new} other {# new}}"
+
+    placeholder: Say something…
+    input_aria: Chat message
+    send_aria: Send message
+    delete: Delete message
+
+    # Timestamps on an optimistic row, before and after the POST resolves.
+    # Every other timestamp in the log is a real relative time and goes
+    # through window.lmxI18n.rel(), not through a string.
+    sending: sending…
+    failed: failed
+
+    retry: Retry
+    discard: Discard
+
+    login: Log in to chat
+    guest_note: Members can post here.
+
+    offline: Offline — reconnecting
+
+    error:
+      network: Not sent — check your connection.
+      send: Could not send.
+      delete: Could not delete that message.
+
+    # Refusals from POST /api/chat. The client renders `detail` verbatim next
+    # to the failed row and in the alert bar, so these are read by members and
+    # are not developer text.
+    api:
+      guest: Log in to chat.
+      suspended: Your account is suspended.
+      empty: Nothing to send.
+      too_long: Keep it under {max} characters.
+      rate: Slow down.
+      burst: Too many messages in a minute.
+      duplicate: You just said that.

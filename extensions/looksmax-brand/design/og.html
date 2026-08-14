@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="utf-8">
+<!--
+  Share card, 1200x630. Rendered to assets/og.png by tools/build-assets.ts.
+
+  Built as a page rather than drawn as an SVG so the text sets with the real
+  font and real hyphenation, and so the same file can be re-rendered when the
+  description changes. Everything on it is 2x-safe: Twitter and Slack downscale
+  this to about 500px wide, at which point anything under ~28px of type is
+  gone, so nothing here is smaller than 30px.
+-->
+<style>
+  @font-face { font-family: "Archivo"; font-weight: 800; src: url("fonts/archivo-800.ttf"); }
+  @font-face { font-family: "Archivo"; font-weight: 700; src: url("fonts/archivo-700.ttf"); }
+  * { margin: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 630px; overflow: hidden;
+    background: #0e1116;
+    font-family: "Archivo", sans-serif;
+    color: #eef2f7;
+    position: relative;
+  }
+  /* a brass wash off the top-left corner, where the mark sits */
+  .wash {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(900px 520px at 8% -12%, rgba(232,192,125,.20), transparent 62%),
+      radial-gradient(700px 460px at 104% 118%, rgba(122,162,247,.10), transparent 60%);
+  }
+  /* the graduation motif from the mark, as a rule across the foot */
+  .rule { position: absolute; left: 72px; right: 72px; bottom: 104px; height: 1px; background: #2a3444; }
+  .ticks { position: absolute; left: 72px; bottom: 104px; display: flex; gap: 18px; }
+  .ticks i { display: block; width: 4px; background: #e8c07d; }
+  .inner { position: relative; padding: 64px 72px 168px; height: 100%; display: flex; flex-direction: column; }
+  .lockup { height: 62px; align-self: flex-start; }
+  h1 {
+    margin-top: auto; font-size: 62px; line-height: 1.09; font-weight: 800;
+    letter-spacing: -0.03em; max-width: 940px;
+  }
+  p {
+    margin-top: 24px; font-size: 31px; line-height: 1.35; font-weight: 700;
+    color: #aab5c6; max-width: 880px; letter-spacing: -0.01em;
+  }
+  .foot {
+    position: absolute; left: 72px; right: 72px; bottom: 44px;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 26px; font-weight: 700; color: #8b96a8; letter-spacing: .02em;
+  }
+  .foot b { color: #e8c07d; font-weight: 800; }
+</style>
+<div class="wash"></div>
+<div class="inner">
+  <img class="lockup" src="../assets/lockup.svg" alt="">
+  <h1>Face and body ratings, and the guides behind them.</h1>
+  <p>Post a rating request, read the guides first, and expect to be argued with.</p>
+</div>
+<div class="rule"></div>
+<div class="ticks">
+  <i style="height:22px"></i><i style="height:12px"></i><i style="height:12px"></i>
+  <i style="height:22px"></i><i style="height:12px"></i><i style="height:12px"></i>
+  <i style="height:22px"></i>
+</div>
+<div class="foot"><span>looksmax.lat</span><b>Evidence over cope.</b></div>

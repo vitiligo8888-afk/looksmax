@@ -1,0 +1,14 @@
+{
+  "extension": "looksmax-cosmetics",
+  "prefix": "local-looksmax-cosmetics",
+  "generated": "2026-08-13",
+  "sourceLocale": "es",
+  "notes": [
+    "NOTHING TO CODEMOD. Every other local/* extension carries a `replacements` list because it was written in English and retrofitted by extensions/looksmax-i18n/tools/codemod.ts. This one was authored with es.yml as the SOURCE and en.yml as the translation, so there is no hardcoded string to replace and the list below is empty on purpose, not by omission.",
+    "SHAPE: the PHP side never builds a user-facing sentence. Local\\Cosmetics\\Definitions::name()/blurb() resolve `lib.<kind>.<slug>.name|blurb` and fall back to the store's `store_items.name` column, which holds an English literal seeded from looksmax-ranks' Catalog constant. So a missing key degrades to English, never to a raw `local-...` string, and the API answers with structured `unlock` data rather than prose (Api/CosmeticsController.php::unlock) so the client can say it in the reader's language.",
+    "SHAPE: js/dist/forum.js is a standalone IIFE injected by src/InjectCosmetics.php as its own <script>. It holds no `app` binding at parse time, so every string goes through the local t() wrapper, which prefers window.lmxI18n.t (the i18n extension's runtime helper), then app.translator, then the fallback. THE FALLBACKS IN THAT FILE ARE SPANISH — the source language. An English fallback there would silently make English the source for the one tick before lmxI18n is parsed.",
+    "SHARED NAMES: lib.frame.{bronze-laurel,silver-laurel,gold-laurel,neon,ember,glacier,circuit,ascendant} are deliberately IDENTICAL in both languages to looksmax-ranks/locale/{es,en}.yml lib.frame.*. Those eight frames are one object rendered by two extensions; two names for it would read as two products. If ranks retranslates one, retranslate it here in the same commit.",
+    "NUMBERS: forum.lock.buy interpolates {price} already formatted by window.lmxI18n.number(), because Spanish groups thousands with a period and English with a comma. No number is concatenated into a string in this extension."
+  ],
+  "replacements": []
+}

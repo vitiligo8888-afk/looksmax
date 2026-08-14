@@ -1,0 +1,537 @@
+{
+  "extension": "looksmax-ranks",
+  "prefix": "local-looksmax-ranks",
+  "notes": [
+    "SHAPE: src/Catalog.php's constants are NOT turned into translation keys. Two other extensions read those constants directly and looksmax-userinfo/src/RankSource.php:106,121 resolves its lookup by MATCHING ON THE name VALUE (mb_strtolower($r['name']) === $key) - a key in that column breaks it silently, and looksmax-store/src/Seed.php:189-223 seeds name/blurb from those constants into store_items, so keys there would be written into the database. Instead a single private Catalog::localize() derives the key from each row's slug and every lookup method runs its result through it. Net effect: the store, the profile, the hovercard and the DOM decorator all get translated text without any file outside this extension changing, and a missing key falls back to the English literal rather than to a raw `local-...` string.",
+    "Apply the Catalog.php replacements in the order given: cat-01 inserts the helpers that every other replacement calls.",
+    "js/dist/forum.js is a standalone IIFE injected by src/InjectIdentity.php as its own <script>. It holds no `app` binding, so the JS replacements go through window.lmxI18n.t(), which boots `app` lazily, records misses for the i18n gate, and takes the English text as a fallback. js-01 adds the local `t()` wrapper that the rest use and must be applied first."
+  ],
+  "replacements": [
+    {
+      "file": "src/Catalog.php",
+      "line": 246,
+      "id": "cat-01",
+      "key": "(helpers)",
+      "find": "    // ------------------------------------------------------------- lookups",
+      "replace": "    // -------------------------------------------------------- localisation\n\n    /**\n     * Display text for one catalogue row, in the reader's language.\n     *\n     * The keys are DERIVED from the row's slug rather than stored in the row,\n     * so the constants above stay a pure data structure and stay usable as\n     * identifiers. looksmax-userinfo resolves its rank lookup by matching\n     * Catalog::RANKS name values (RankSource.php:106), and looksmax-store\n     * seeds name/blurb out of these constants into store_items (Seed.php:189);\n     * a translation key sitting in those columns would break the first\n     * silently and persist into the database in the second.\n     *\n     * A missing key falls back to the English literal already in the row, so a\n     * half-deployed locale pack degrades to English and never to `local-...`.\n     * Every lookup below runs its result through here, which is why the store,\n     * the profile and the DOM decorator all read translated text without\n     * knowing that this class translates anything.\n     */\n    private static function localize(string $group, ?array $row): ?array\n    {\n        if ($row === null || !isset($row['slug'])) {\n            return $row;\n        }\n\n        $t = resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class);\n        $base = 'local-looksmax-ranks.lib.' . $group . '.' . $row['slug'] . '.';\n\n        foreach (['name', 'blurb'] as $field) {\n            if (!isset($row[$field]) || !is_string($row[$field])) {\n                continue;\n            }\n            $out = $t->trans($base . $field);\n            if ($out !== '' && $out !== $base . $field) {\n                $row[$field] = $out;\n            }\n        }\n\n        if (isset($row['headline']) && is_array($row['headline'])) {\n            foreach ($row['headline'] as $i => $line) {\n                $out = $t->trans($base . 'headline.' . $i);\n                if ($out !== '' && $out !== $base . 'headline.' . $i) {\n                    $row['headline'][$i] = $out;\n                }\n            }\n        }\n\n        return $row;\n    }\n\n    /** A `local-looksmax-ranks.` key, translated. ICU params, named. */\n    public static function trans(string $key, array $params = []): string\n    {\n        return resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)\n            ->trans('local-looksmax-ranks.' . $key, $params);\n    }\n\n    /** Every rank, display-ready, with its ladder index. */\n    public static function ranks(): array\n    {\n        $out = [];\n        foreach (self::RANKS as $i => $r) {\n            $out[] = self::localize('rank', $r) + ['index' => $i];\n        }\n\n        return $out;\n    }\n\n    /** Every membership tier, display-ready. */\n    public static function tiers(): array\n    {\n        return array_map(fn (array $t) => self::localize('tier', $t), self::TIERS);\n    }\n\n    /** Every badge, display-ready. */\n    public static function badges(): array\n    {\n        return array_map(fn (array $b) => self::localize('badge', $b), self::BADGES);\n    }\n\n    // ------------------------------------------------------------- lookups",
+      "note": "Inserts the single translation seam. Nothing else in this spec works without it."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 257,
+      "id": "cat-02",
+      "key": "lib.rank.*",
+      "find": "        return $rank + ['index' => array_search($rank['slug'], array_column(self::RANKS, 'slug'), true)];",
+      "replace": "        return self::localize('rank', $rank) + ['index' => array_search($rank['slug'], array_column(self::RANKS, 'slug'), true)];",
+      "note": "rankFor(). The row already carries 'index' from the loop; the union is unchanged by localize()."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 265,
+      "id": "cat-03",
+      "key": "lib.rank.*",
+      "find": "        return $i === false ? null : (self::RANKS[$i + 1] ?? null);",
+      "replace": "        return $i === false ? null : self::localize('rank', self::RANKS[$i + 1] ?? null);",
+      "note": "nextRank(). localize() returns null unchanged for the top of the ladder."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 271,
+      "id": "cat-04",
+      "key": "lib.rank.*",
+      "find": "            if ($r['slug'] === $slug) {\n                return $r + ['index' => $i];\n            }\n        }\n\n        return self::RANKS[0] + ['index' => 0];",
+      "replace": "            if ($r['slug'] === $slug) {\n                return self::localize('rank', $r) + ['index' => $i];\n            }\n        }\n\n        return self::localize('rank', self::RANKS[0]) + ['index' => 0];",
+      "note": "rank(). Spans both returns so the bare `return $r + ['index' => $i];` stays unambiguous against rankFor()."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 281,
+      "id": "cat-05",
+      "key": "lib.tier.*",
+      "find": "        foreach (self::TIERS as $t) {\n            if ($t['slug'] === $slug) {\n                return $t;\n            }\n        }\n\n        return self::TIERS[0];",
+      "replace": "        foreach (self::TIERS as $t) {\n            if ($t['slug'] === $slug) {\n                return self::localize('tier', $t);\n            }\n        }\n\n        return self::localize('tier', self::TIERS[0]);",
+      "note": "tier(). The whole block is matched because `return $t;` alone also occurs in tierForStyleKind()."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 292,
+      "id": "cat-06",
+      "key": "lib.style.*",
+      "find": "        foreach (self::STYLES as $s) {\n            if ($s['slug'] === $slug) {\n                return $s;\n            }\n        }",
+      "replace": "        foreach (self::STYLES as $s) {\n            if ($s['slug'] === $slug) {\n                return self::localize('style', $s);\n            }\n        }",
+      "note": "style()."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 303,
+      "id": "cat-07",
+      "key": "lib.frame.*",
+      "find": "        foreach (self::FRAMES as $f) {\n            if ($f['slug'] === $slug) {\n                return $f;\n            }\n        }",
+      "replace": "        foreach (self::FRAMES as $f) {\n            if ($f['slug'] === $slug) {\n                return self::localize('frame', $f);\n            }\n        }",
+      "note": "frame()."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 314,
+      "id": "cat-08",
+      "key": "lib.badge.*",
+      "find": "        foreach (self::BADGES as $b) {\n            if ($b['slug'] === $slug) {\n                return $b;\n            }\n        }",
+      "replace": "        foreach (self::BADGES as $b) {\n            if ($b['slug'] === $slug) {\n                return self::localize('badge', $b);\n            }\n        }",
+      "note": "badge()."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 331,
+      "id": "cat-09",
+      "key": "lib.style.*",
+      "find": "            $out[] = $s + ['type' => 'style'];",
+      "replace": "            $out[] = self::localize('style', $s) + ['type' => 'style'];",
+      "note": "shopItems(): the store grid reads name and blurb straight off these rows."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 334,
+      "id": "cat-10",
+      "key": "lib.frame.*",
+      "find": "            $out[] = $f + ['type' => 'frame', 'kind' => 'frame'];",
+      "replace": "            $out[] = self::localize('frame', $f) + ['type' => 'frame', 'kind' => 'frame'];",
+      "note": "shopItems(), frames."
+    },
+    {
+      "file": "src/Catalog.php",
+      "line": 343,
+      "id": "cat-11",
+      "key": "lib.tier.*",
+      "find": "            if (in_array($kind, $t['styles'], true)) {\n                return $t;\n            }",
+      "replace": "            if (in_array($kind, $t['styles'], true)) {\n                return self::localize('tier', $t);\n            }",
+      "note": "tierForStyleKind(). Its name is interpolated into the 'X or above can equip Y styles' refusal."
+    },
+
+    {
+      "file": "src/Standing.php",
+      "line": 187,
+      "id": "std-01",
+      "key": "lib.badge.*",
+      "find": "        foreach (Catalog::BADGES as $b) {",
+      "replace": "        foreach (Catalog::badges() as $b) {",
+      "note": "badges() spreads the whole catalogue row into the trophy-case payload, so the row has to arrive already localised."
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 241,
+      "id": "std-02",
+      "key": "forum.error.no_such_style",
+      "find": "                return 'no such style';",
+      "replace": "                return Catalog::trans('forum.error.no_such_style');",
+      "note": "MISSED BY THE AUDIT. equip() returns an error string that IdentityActionController::equip() puts straight into the JSON body a user reads."
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 247,
+      "id": "std-03",
+      "key": "forum.error.style_needs_tier / style_not_on_tier",
+      "find": "                return $need ? ($need['name'] . ' or above can equip ' . $style['kind'] . ' styles') : 'not available on your tier';",
+      "replace": "                return $need\n                    ? Catalog::trans('forum.error.style_needs_tier', [\n                        'tier' => $need['name'],\n                        'kind' => Catalog::trans('lib.style_kind.' . $style['kind']),\n                    ])\n                    : Catalog::trans('forum.error.style_not_on_tier');",
+      "note": "The interpolated $style['kind'] ('solid'/'gradient'/'animated'/'legendary') was itself untranslated English inside a sentence. lib.style_kind.* carries the Spanish adjective, already agreeing with 'estilos'."
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 250,
+      "id": "std-04",
+      "key": "forum.error.style_not_owned",
+      "find": "                return 'you do not own that style';",
+      "replace": "                return Catalog::trans('forum.error.style_not_owned');"
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 260,
+      "id": "std-05",
+      "key": "forum.error.no_such_frame",
+      "find": "                return 'no such frame';",
+      "replace": "                return Catalog::trans('forum.error.no_such_frame');"
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 263,
+      "id": "std-06",
+      "key": "forum.error.frame_needs_tier",
+      "find": "                return Catalog::tier($frame['tier'])['name'] . ' or above can equip that frame';",
+      "replace": "                return Catalog::trans('forum.error.frame_needs_tier', ['tier' => Catalog::tier($frame['tier'])['name']]);"
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 266,
+      "id": "std-07",
+      "key": "forum.error.frame_not_owned",
+      "find": "                return 'you do not own that frame';",
+      "replace": "                return Catalog::trans('forum.error.frame_not_owned');"
+    },
+    {
+      "file": "src/Standing.php",
+      "line": 273,
+      "id": "std-08",
+      "key": "forum.error.unknown_cosmetic",
+      "find": "        return 'unknown cosmetic type';",
+      "replace": "        return Catalog::trans('forum.error.unknown_cosmetic');",
+      "note": "MISSED BY THE AUDIT."
+    },
+
+    {
+      "file": "src/Api/IdentityController.php",
+      "line": 118,
+      "id": "idc-01",
+      "key": "forum.store.requires_invite",
+      "find": "                'requires' => $allowed ? null : ($need['name'] ?? 'an invitation'),",
+      "replace": "                'requires' => $allowed ? null : ($need['name'] ?? Catalog::trans('forum.store.requires_invite')),"
+    },
+    {
+      "file": "src/Api/IdentityController.php",
+      "line": 135,
+      "id": "idc-02",
+      "key": "lib.tier.*",
+      "find": "        foreach (Catalog::TIERS as $t) {",
+      "replace": "        foreach (Catalog::tiers() as $t) {",
+      "note": "The tier cards read name and the three headline lines straight off the constant."
+    },
+    {
+      "file": "src/Api/IdentityController.php",
+      "line": 167,
+      "id": "idc-03",
+      "key": "lib.rank.*",
+      "find": "        foreach (Catalog::RANKS as $i => $r) {",
+      "replace": "        foreach (Catalog::ranks() as $i => $r) {",
+      "note": "ladder(). Catalog::ranks() already carries 'index'; the union below sets the same value."
+    },
+    {
+      "file": "src/Api/IdentityController.php",
+      "line": 231,
+      "id": "idc-04",
+      "key": "lib.rank.* / lib.tier.*",
+      "find": "            ['names' => $map, 'ranks' => array_column(Catalog::RANKS, null, 'slug'), 'tiers' => array_column(Catalog::TIERS, null, 'slug')],",
+      "replace": "            ['names' => $map, 'ranks' => array_column(Catalog::ranks(), null, 'slug'), 'tiers' => array_column(Catalog::tiers(), null, 'slug')],",
+      "note": "This response IS the rank names and blurbs the DOM decorator paints under every username, and the Cache-Control below it is public/60s. See DEFERRED cache-vary."
+    },
+
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 40,
+      "id": "act-01",
+      "key": "forum.error.guest",
+      "find": "            return new JsonResponse(['error' => 'sign in first'], 401);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.guest')], 401);"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 54,
+      "id": "act-02",
+      "key": "forum.error.unknown_action",
+      "find": "                default => new JsonResponse(['error' => 'unknown action'], 404),",
+      "replace": "                default => new JsonResponse(['error' => Catalog::trans('forum.error.unknown_action')], 404),"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 57,
+      "id": "act-03",
+      "key": "forum.error.failed",
+      "find": "            return new JsonResponse(['error' => 'that did not work', 'detail' => $e->getMessage()], 500);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.failed'), 'detail' => $e->getMessage()], 500);",
+      "note": "`detail` stays untranslated on purpose: it is an exception message for the console, not copy."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 70,
+      "id": "act-04",
+      "key": "forum.error.no_such_item",
+      "find": "            return new JsonResponse(['error' => 'no such item'], 404);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.no_such_item')], 404);",
+      "note": "MISSED BY THE AUDIT."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 73,
+      "id": "act-05",
+      "key": "forum.error.not_for_sale",
+      "find": "            return new JsonResponse(['error' => $item['name'] . ' is not for sale — it is awarded'], 403);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.not_for_sale', ['item' => $item['name']])], 403);"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 76,
+      "id": "act-06",
+      "key": "forum.error.already_owned",
+      "find": "            return new JsonResponse(['error' => 'you already own that'], 409);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.already_owned')], 409);",
+      "note": "MISSED BY THE AUDIT."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 87,
+      "id": "act-07",
+      "key": "forum.error.not_enough_points",
+      "find": "                'error' => 'not enough points',\n                'short' => max(0, $short),",
+      "replace": "                'error' => Catalog::trans('forum.error.not_enough_points'),\n                'short' => max(0, $short),",
+      "note": "Two identical 'not enough points' literals in this file; the following line disambiguates. This is the cosmetic purchase path."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 98,
+      "id": "act-08",
+      "key": "forum.error.grant_failed",
+      "find": "            return new JsonResponse(['error' => 'could not grant the item; you were refunded'], 500);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.grant_failed')], 500);"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 136,
+      "id": "act-09",
+      "key": "forum.error.no_such_tier",
+      "find": "            return new JsonResponse(['error' => 'no such tier'], 404);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.no_such_tier')], 404);",
+      "note": "MISSED BY THE AUDIT."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 139,
+      "id": "act-10",
+      "key": "forum.error.tier_granted_only",
+      "find": "            return new JsonResponse(['error' => $tier['name'] . ' is granted, not sold'], 403);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.tier_granted_only', ['tier' => $tier['name']])], 403);"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 144,
+      "id": "act-11",
+      "key": "forum.error.tier_downgrade",
+      "find": "            return new JsonResponse(['error' => 'you are already on ' . $current['name'] . ', which is above ' . $tier['name']], 409);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.tier_downgrade', ['current' => $current['name'], 'target' => $tier['name']])], 409);",
+      "note": "The audit reported this as two fragments (' is granted, not sold' / ', which is above '). It is one sentence and has to be one key, or the Spanish word order cannot move."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 155,
+      "id": "act-12",
+      "key": "forum.error.not_enough_points",
+      "find": "                'error' => 'not enough points',\n                'short' => max(0, $price - (int) $actor->points),",
+      "replace": "                'error' => Catalog::trans('forum.error.not_enough_points'),\n                'short' => max(0, $price - (int) $actor->points),",
+      "note": "The membership purchase path."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 185,
+      "id": "act-13",
+      "key": "forum.error.title_needs_tier",
+      "find": "            return new JsonResponse(['error' => 'Looksmax+ or above can set a custom title'], 403);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.title_needs_tier')], 403);",
+      "note": "'Looksmax+' stays literal inside the string in both locales: it is the product name, and lib.tier.plus.name is the same in en and es."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 192,
+      "id": "act-14",
+      "key": "forum.error.title_too_long",
+      "find": "            return new JsonResponse(['error' => 'your tier allows ' . $tier['titleLen'] . ' characters'], 422);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.title_too_long', ['count' => (int) $tier['titleLen']])], 422);",
+      "note": "MISSED BY THE AUDIT, and it was a concatenated count. ICU plural now; the count is formatted by the message, not by PHP."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 195,
+      "id": "act-15",
+      "key": "forum.error.title_empty",
+      "find": "            return new JsonResponse(['error' => 'a title has to contain something visible'], 422);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.title_empty')], 422);"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 201,
+      "id": "act-16",
+      "key": "forum.error.title_colour_needs_tier",
+      "find": "            return new JsonResponse(['error' => 'VIP or above can colour the title'], 403);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.title_colour_needs_tier')], 403);"
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 231,
+      "id": "act-17",
+      "key": "forum.error.showcase_too_many",
+      "find": "            return new JsonResponse(['error' => 'your tier has ' . $tier['showcase'] . ' showcase slots'], 422);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.showcase_too_many', ['count' => (int) $tier['showcase']])], 422);",
+      "note": "MISSED BY THE AUDIT, and another concatenated count."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 237,
+      "id": "act-18",
+      "key": "forum.error.showcase_unearned",
+      "find": "            return new JsonResponse(['error' => 'you have not earned: ' . implode(', ', $unknown)], 403);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.showcase_unearned', ['badges' => implode(', ', $unknown)])], 403);",
+      "note": "$unknown holds badge SLUGS, not prose, so the comma join stays a join and is not run through a list formatter. It is only ever reached by a hand-built POST."
+    },
+    {
+      "file": "src/Api/IdentityActionController.php",
+      "line": 257,
+      "id": "act-19",
+      "key": "forum.error.accent_needs_tier",
+      "find": "            return new JsonResponse(['error' => 'VIP or above can set a profile accent'], 403);",
+      "replace": "            return new JsonResponse(['error' => Catalog::trans('forum.error.accent_needs_tier')], 403);"
+    },
+
+    {
+      "file": "js/dist/forum.js",
+      "line": 56,
+      "id": "js-01",
+      "key": "(helpers)",
+      "find": "  function num(n) {\n    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\\.0$/, '') + 'M';\n    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\\.0$/, '') + 'k';\n    return String(n);\n  }",
+      "replace": "  /*\n   * Compact counts, in the reader's locale.\n   *\n   * The hand-rolled k/M suffixes below are English: Spanish compacts 12,431 as\n   * \"12,4 mil\", not \"12.4k\", and the decimal separator flips with it. So this\n   * defers to window.lmxI18n.compact(), which is Intl with the forum's locale,\n   * and keeps the old arithmetic only as the fallback for the tick before the\n   * i18n script has been parsed — this file is injected as its own <script>\n   * and cannot assume it lands second.\n   */\n  function num(n) {\n    if (window.lmxI18n && window.lmxI18n.compact) return window.lmxI18n.compact(n);\n    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\\.0$/, '') + 'M';\n    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\\.0$/, '') + 'k';\n    return String(n);\n  }\n\n  /**\n   * A translation key, with the English text as the fallback.\n   *\n   * There is no `app` in this IIFE to reach a translator through, and there\n   * deliberately never will be — see the header. window.lmxI18n.t() boots one\n   * lazily, records a miss for the i18n gate, and returns the fallback rather\n   * than the raw key. None of the keys used here contain tags, so every result\n   * is a plain string and safe in .title and in textContent.\n   */\n  function t(key, params, fallback) {\n    if (window.lmxI18n && window.lmxI18n.t) {\n      return window.lmxI18n.t('local-looksmax-ranks.' + key, params || {}, fallback);\n    }\n    return fallback;\n  }",
+      "note": "Fixes the extension's own compact() — the string the assignment flagged — and adds the wrapper every JS replacement below calls. Apply first."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 187,
+      "id": "js-02",
+      "key": "forum.hover.rank_title",
+      "find": "      rc.title = rank.name + ' — ' + (rank.blurb || '');",
+      "replace": "      rc.title = t('forum.hover.rank_title', { rank: rank.name, blurb: rank.blurb || '' }, rank.name + ' — ' + (rank.blurb || ''));",
+      "note": "MISSED BY THE AUDIT. rank.name/rank.blurb arrive already localised from /api/identity/names."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 196,
+      "id": "js-03",
+      "key": "forum.hover.tier_title",
+      "find": "      tc.title = tier.name + ' member';",
+      "replace": "      tc.title = t('forum.hover.tier_title', { tier: tier.name }, tier.name + ' member');",
+      "note": "MISSED BY THE AUDIT. Spanish reverses the order — 'Miembro VIP' — which concatenation cannot express."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 204,
+      "id": "js-04",
+      "key": "forum.hover.badges_title",
+      "find": "      bc.title = s.b + ' badge' + (s.b === 1 ? '' : 's');",
+      "replace": "      bc.title = t('forum.hover.badges_title', { count: s.b }, s.b + ' badge' + (s.b === 1 ? '' : 's'));",
+      "note": "MISSED BY THE AUDIT, and a hand-rolled English plural (an 's' glued onto a word). ICU plural now."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 331,
+      "id": "js-05",
+      "key": "forum.hover.rank_unknown",
+      "find": "    row.appendChild(el('span', null, rank.name || 'Greycel'));",
+      "replace": "    row.appendChild(el('span', null, rank.name || t('forum.hover.rank_unknown', null, 'Greycel')));",
+      "note": "MISSED BY THE AUDIT. Keyed even though es and en are both 'Greycel', so the fallback is not a second place to edit the ladder's bottom name."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 357,
+      "id": "js-06",
+      "key": "forum.hover.stat_badges",
+      "find": "    stats.appendChild(mk(String(s.b || 0), 'badges'));",
+      "replace": "    stats.appendChild(mk(num(s.b || 0), t('forum.hover.stat_badges', null, 'badges')));",
+      "note": "MISSED BY THE AUDIT. Also routes the count through num(), so a four-figure badge total is separated the Spanish way."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 358,
+      "id": "js-07",
+      "key": "forum.hover.stat_rank / stat_empty",
+      "find": "    stats.appendChild(mk(rank.name || '—', 'rank'));",
+      "replace": "    stats.appendChild(mk(rank.name || t('forum.hover.stat_empty', null, '—'), t('forum.hover.stat_rank', null, 'rank')));",
+      "note": "MISSED BY THE AUDIT."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 387,
+      "id": "js-08",
+      "key": "forum.points.title",
+      "find": "      chip.setAttribute('title', 'Your balance — spend it in the store');",
+      "replace": "      chip.setAttribute('title', t('forum.points.title', null, 'Your balance — spend it in the store'));"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 424,
+      "id": "js-09",
+      "key": "forum.leaders.heading",
+      "find": "    h.appendChild(el('span', null, 'Standing'));",
+      "replace": "    h.appendChild(el('span', null, t('forum.leaders.heading', null, 'Standing')));",
+      "note": "MISSED BY THE AUDIT. The front-page leaderboard card heading."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 428,
+      "id": "js-10",
+      "key": "forum.leaders.window_week / window_all",
+      "find": "      var b = el('button', w === leaderWindow ? 'is-active' : null, w === 'week' ? '7d' : 'all');",
+      "replace": "      var b = el('button', w === leaderWindow ? 'is-active' : null, w === 'week' ? t('forum.leaders.window_week', null, '7d') : t('forum.leaders.window_all', null, 'all'));",
+      "note": "MISSED BY THE AUDIT. `w` stays 'week'/'all' — that is the query parameter, and only the label moves."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 487,
+      "id": "js-11",
+      "key": "forum.leaders.entry_title",
+      "find": "        li.title = e.username + ' — ' + e.rank;",
+      "replace": "        li.title = t('forum.leaders.entry_title', { username: e.username, rank: e.rank }, e.username + ' — ' + e.rank);",
+      "note": "MISSED BY THE AUDIT. e.rank is localised server-side by idc-* above."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 492,
+      "id": "js-12",
+      "key": "forum.leaders.empty",
+      "find": "        list.appendChild(el('li', 'LmxLeader', 'nothing earned yet'));",
+      "replace": "        list.appendChild(el('li', 'LmxLeader', t('forum.leaders.empty', null, 'nothing earned yet')));",
+      "note": "MISSED BY THE AUDIT."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/Api/IdentityController.php",
+      "line": 233,
+      "string": "['Cache-Control' => 'public, max-age=60']",
+      "reason": "NOT a string to translate — a correctness hazard this spec creates. Once idc-04 lands, /api/identity/names carries LOCALISED rank and tier names and is still served `Cache-Control: public, max-age=60` with no Vary. A shared cache in front of PHP would hand a Spanish reader the English payload for up to a minute. There is no shared cache in this stack today (nginx.conf proxies /api straight through), so it is latent, not live. Fix is one line — add `'Vary' => 'Accept-Language, Cookie'` to that header array, or drop `public` — but it is a caching-policy change, not a translation, so it belongs to whoever owns the HTTP layer."
+    },
+    {
+      "file": "src/Api/IdentityController.php",
+      "line": 253,
+      "string": "'lifetime_points AS score'",
+      "reason": "AUDIT FALSE POSITIVE. A SQL column alias inside a ->get([...]) select list. Never rendered. Do not translate."
+    },
+    {
+      "file": "src/Badges/Engine.php",
+      "line": "70, 83, 93, 135, 146, 165",
+      "string": "\"discussions.user_id AS uid, COUNT(*) c\" and five more like it",
+      "reason": "AUDIT FALSE POSITIVES. All six are selectRaw()/JSON_VALUE SQL fragments. Engine.php contains no user-visible prose at all — every badge label it deals with comes from Catalog::BADGES via slug."
+    },
+    {
+      "file": "src/Console/*.php",
+      "line": "BackfillCommand.php:411, BadgeCommand.php:143, SyncCommand.php:51",
+      "string": "$r['name'] / $b['name'] printed to the terminal",
+      "reason": "Deliberately NOT translated and deliberately NOT broken. These read Catalog::RANKS / Catalog::BADGES directly rather than through the localised lookups, so they keep printing the English literal. An operator's console output should not follow the forum's default locale, and keeping the constants literal is what makes that free."
+    },
+    {
+      "file": "less/forum.less, less/styles.less, less/frames.less",
+      "line": 0,
+      "string": "(none)",
+      "reason": "Checked: the only `content:` rules in all three files are `justify-content` matches (forum.less:125, :315, :431). No text is generated from CSS in this extension, so there is nothing to move into JS."
+    },
+    {
+      "file": "../looksmax-userinfo/src/RankSource.php",
+      "line": "106, 121",
+      "string": "mb_strtolower($r['name']) === $key",
+      "reason": "OUTSIDE MY BOUNDARY, and the reason this spec does not put keys in the Catalog constants. RankSource resolves a user's request by lowercasing Catalog::RANKS/STYLES `name` values and comparing. It reads the constants, not the lookups, so it is unaffected by everything above and keeps matching English. If that lane wants `/rank oro` to work in Spanish it must match on `slug` as well as `name`; that is a two-line change in their file and I have not touched it."
+    },
+    {
+      "file": "../looksmax-store/src/Seed.php",
+      "line": "189, 193, 205, 209, 220, 223",
+      "string": "'name' => $t['name'] . ' membership', 'blurb' => implode('. ', $t['headline']) . '.'",
+      "reason": "OUTSIDE MY BOUNDARY. Seed.php copies Catalog names and blurbs into the store_items TABLE at seed time, so store rows freeze whatever locale the seeder ran in. It reads the constants directly, so after this spec it keeps seeding English — correct, not broken, but it means the store's own item copy is a database concern the store lane owns, not something this locale pack can reach. It also concatenates the three headline lines with '. ', which is an English list join."
+    },
+    {
+      "file": "../looksmax-economy/src/Ledger.php",
+      "line": "64-75",
+      "string": "['slug' => 'greycel', 'name' => 'Greycel', 'min' => 0], ...",
+      "reason": "IN my boundary but correctly left alone. This is the fallback ladder used only when looksmax-ranks is absent, and nothing reads its `name`: Ledger::refreshRank() and every caller take ['slug']. Verified by grep — there is no reader of a name from Ledger::ranks()/rankFor() anywhere in extensions/. Translating it would add 20 keys nobody can ever read."
+    }
+  ]
+}

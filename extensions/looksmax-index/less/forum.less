@@ -1,0 +1,1417 @@
+// Custom forum index.
+//
+// Layout: forum rows carrying icon, name, description, counts and last activity,
+// grouped into category sections, with a sidebar holding the things a community
+// front door needs. Two columns on desktop, stacked on mobile.
+
+// Mirrors the source palette in looksmax-theme/less/tokens.less. Compile-time
+// LESS variables rather than var() references ONLY because fade() is used below
+// and less.php evaluates colour functions at compile time — fade(var(--x), n)
+// aborts compilation, forum.css is never written, and every page serves the
+// compiler's stack trace. Everything outside a fade() reads the live token with
+// the literal as a fallback, so a scheme switch moves the whole index.
+@surface-0: #0a0911;
+@surface-1: #171429;
+@surface-2: #1f1b30;
+@surface-3: #2b2542;
+@line: #443a66;
+@ink: #f0eff4;
+@ink-dim: #b6b4be;
+@ink-faint: #9896a3;
+@accent: #9b7dfb;
+@accent-2: #4ecee5;
+
+// hide Flarum's own tile grid wherever ours is mounted
+body.lmx-index-on .TagsPage-content > .TagTiles,
+body.lmx-index-on .TagsPage-content > ul.TagTiles {
+  display: none;
+}
+
+.LmxIndex {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  margin: 0 auto 40px;
+  max-width: 1180px;
+}
+
+@media (max-width: 980px) {
+  .LmxIndex { grid-template-columns: minmax(0, 1fr); }
+}
+
+// ------------------------------------------------------------------ category
+.LmxCat {
+  background: var(--surface-1, #171429);
+  border: 1px solid var(--line, #443a66);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.LmxCat-head {
+  align-items: baseline;
+  background: linear-gradient(90deg, fade(#fff, 3%), transparent 55%);
+  border-bottom: 1px solid var(--line, #443a66);
+  border-left: 3px solid var(--cat, var(--accent-2, #4ecee5));
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 16px;
+
+  i, iconify-icon {
+    color: var(--cat, var(--accent-2, #4ecee5));
+    font-size: 16px;
+  }
+}
+
+.LmxCat-name {
+  color: var(--ink, #f0eff4);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.LmxCat-desc {
+  color: var(--ink-faint, #9896a3);
+  font-size: 12px;
+}
+
+// -------------------------------------------------------------------- forums
+.LmxForums {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Each row carries its forum's own colour, inherited from the --tag custom
+// property the server writes onto the icon. Hoisting it to the row means the
+// hover wash, the rail and the name hover are all the SAME hue as the icon
+// without the server having to repeat itself, and a row with no colour falls
+// back to the accent rather than to a shared blue.
+.LmxForum {
+  align-items: center;
+  border-bottom: 1px solid fade(#443a66, 60%);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 42px minmax(0, 1fr) 120px 210px;
+  padding: 12px 16px;
+  position: relative;
+  transition: background var(--t-base, 170ms) var(--ease, ease),
+              box-shadow var(--t-base, 170ms) var(--ease, ease);
+
+  &:last-child { border-bottom: 0; }
+
+  // The rail: 2px of the forum's colour, revealed on hover and on focus so
+  // keyboard traversal shows the same thing the mouse does.
+  &::before {
+    background: var(--row, var(--accent, #9b7dfb));
+    border-radius: 0 2px 2px 0;
+    bottom: 6px;
+    content: '';
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    top: 6px;
+    transition: opacity var(--t-base, 170ms) var(--ease, ease);
+    width: 2px;
+  }
+
+  &:hover,
+  &:focus-within {
+    // a wash of the row's own colour, not a grey — 7% is enough to read as
+    // "this one" and low enough that the text contrast underneath is unchanged
+    background:
+      linear-gradient(90deg,
+        color-mix(in srgb, var(--row, var(--accent, #9b7dfb)) 9%, transparent),
+        color-mix(in srgb, var(--row, var(--accent, #9b7dfb)) 2%, transparent) 40%,
+        transparent 70%),
+      var(--surface-2, #1f1b30);
+
+    &::before { opacity: 1; }
+  }
+}
+
+@media (max-width: 860px) {
+  .LmxForum {
+    grid-template-columns: 38px minmax(0, 1fr);
+    .LmxForum-stats, .LmxForum-last { display: none; }
+  }
+}
+
+.LmxForum-icon {
+  align-items: center;
+  // Two layers: a top-left sheen so the tile is a lit object rather than a flat
+  // swatch, over the forum's own colour. The palette holds every hue at one
+  // lightness (see src/Palette.php), which is what lets a single dark ink work
+  // on all 47 of them — measured worst case 6.45:1.
+  background: linear-gradient(145deg, fade(#fff, 22%), fade(#fff, 0%) 62%), var(--tag, var(--accent, #9b7dfb));
+  border-radius: 10px;
+  box-shadow:
+    0 1px 0 fade(#fff, 22%) inset,
+    0 6px 16px -8px var(--tag, var(--accent, #9b7dfb));
+  color: var(--ink-on-light, #10151d);
+  display: flex;
+  height: 38px;
+  justify-content: center;
+  transition: transform var(--t-base, 170ms) var(--ease, ease),
+              box-shadow var(--t-base, 170ms) var(--ease, ease);
+  width: 38px;
+
+  i, iconify-icon { color: var(--ink-on-light, #10151d); font-size: 18px; }
+
+  &:hover,
+  &:focus-visible {
+    box-shadow:
+      0 1px 0 fade(#fff, 28%) inset,
+      0 10px 22px -8px var(--tag, var(--accent, #9b7dfb));
+    transform: translateY(-1px) scale(1.04);
+  }
+}
+
+// One name for "this row's colour", so every rule below reads the same thing
+// whether the server wrote --tag or not.
+.LmxForum { --row: var(--tag, var(--accent, #9b7dfb)); }
+
+.LmxForum-name {
+  color: var(--ink, #f0eff4);
+  display: block;
+  font-size: 14.5px;
+  font-weight: 700;
+
+  &:hover,
+  &:focus-visible {
+    // the forum's own colour, so hovering a row is unambiguous about which one
+    color: var(--row, var(--accent, #9b7dfb));
+    text-decoration: none;
+  }
+}
+
+.LmxForum-desc {
+  color: var(--ink-dim, #b6b4be);
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 2px 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.LmxForum-stats {
+  color: var(--ink-faint, #9896a3);
+  display: flex;
+  flex-direction: column;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  gap: 1px;
+
+  b { color: var(--ink-dim, #b6b4be); font-weight: 700; }
+}
+
+.LmxForum-last {
+  font-size: 11.5px;
+  min-width: 0;
+
+  a {
+    color: var(--ink-dim, #b6b4be);
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover { color: var(--accent, #9b7dfb); }
+  }
+
+  span { color: var(--ink-faint, #9896a3); display: block; }
+}
+
+.LmxForum-quiet { color: var(--ink-faint, #9896a3); font-style: italic; }
+
+// ------------------------------------------------------------------- sidebar
+.LmxIndex-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.LmxCard {
+  background: var(--surface-1, #171429);
+  border: 1px solid var(--line, #443a66);
+  border-radius: 10px;
+  padding: 13px 15px;
+
+  h3 {
+    align-items: center;
+    color: var(--ink, #f0eff4);
+    display: flex;
+    font-size: 12px;
+    font-weight: 800;
+    gap: 8px;
+    letter-spacing: 0.05em;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+
+    i, iconify-icon { color: var(--accent, #9b7dfb); font-size: 14px; }
+  }
+
+  p { color: var(--ink-dim, #b6b4be); font-size: 12.5px; line-height: 1.55; margin: 0; }
+}
+
+.LmxCard--motd {
+  background: linear-gradient(160deg, fade(#9b7dfb, 8%), var(--surface-1, #171429) 60%);
+  border-color: fade(#9b7dfb, 28%);
+}
+
+.LmxList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    border-bottom: 1px solid fade(#443a66, 55%);
+    padding: 6px 0;
+
+    &:last-child { border-bottom: 0; }
+  }
+
+  a {
+    color: var(--ink-dim, #b6b4be);
+    display: block;
+    font-size: 12.5px;
+    line-height: 1.4;
+
+    &:hover { color: var(--accent, #9b7dfb); text-decoration: none; }
+  }
+
+  span {
+    color: var(--ink-faint, #9896a3);
+    display: block;
+    font-size: 11px;
+    margin-top: 1px;
+  }
+}
+
+.LmxCard--stats dl {
+  display: grid;
+  gap: 6px 10px;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+
+  div {
+    background: var(--surface-2, #1f1b30);
+    border: 1px solid var(--line, #443a66);
+    border-radius: 6px;
+    padding: 7px 9px;
+  }
+
+  dt { color: var(--ink-faint, #9896a3); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  dd {
+    color: var(--ink, #f0eff4);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    margin: 2px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// Reserved inventory. Labelled and sized so an unsold slot looks intentional
+// rather than like a broken element, and so layout does not shift when filled.
+.LmxCard--ad {
+  border-style: dashed;
+  border-color: fade(#443a66, 90%);
+  text-align: center;
+}
+
+.LmxAd-label {
+  color: var(--ink-faint, #9896a3);
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.LmxAd-slot {
+  align-items: center;
+  background: repeating-linear-gradient(45deg, var(--surface-2, #1f1b30), var(--surface-2, #1f1b30) 8px, var(--surface-1, #171429) 8px, var(--surface-1, #171429) 16px);
+  border-radius: 6px;
+  color: var(--ink-faint, #9896a3);
+  display: flex;
+  font-size: 11px;
+  height: 250px;
+  justify-content: center;
+}
+
+// ===========================================================================
+// BLOCK SYSTEM
+// ===========================================================================
+//
+// The block markup (hero, news, sections, rails, nav, ad) shipped without any
+// styling: 58 emitted classes had no rule anywhere, so the front page rendered
+// as flat text and bare <ul> bullets. This is that stylesheet.
+//
+// Two constraints that are not preferences:
+//   1. NO colour functions on custom properties. `darken(var(--surface-1), 2%)`
+//      and `fade(var(--x), 40%)` are evaluated at COMPILE time by less.php,
+//      which cannot see a runtime variable — it throws, forum.css is never
+//      written, and the browser gets a stack trace instead of the site. Both
+//      have taken this forum down today. Use `color-mix()`, which is CSS and
+//      passes straight through.
+//   2. Every value resolves to a theme token. A palette change is in flight;
+//      hardcoded hex would survive it and look wrong.
+
+// ------------------------------------------------------------------ layout
+// Three columns on a wide screen. The container was pinned at 1100px, so at
+// 1920 wide 43% of the viewport was empty margin and there was no rail at all.
+.LmxIndex {
+  --lmx-rail: 232px;
+  --lmx-side: 300px;
+
+  // The ORIGINAL .LmxIndex rule higher up in this file is itself a two-column
+  // grid capped at 1180px. Same specificity, so it kept its display,
+  // grid-template-columns and max-width while this rule only added width and
+  // margins — the inner grid was then placed inside its first 812px column and
+  // the whole page collapsed into the left half of the viewport. Measured:
+  // `.LmxIndex display=grid cols=812px 300px`. Layout now belongs to
+  // .LmxIndex-inner, so the outer element is explicitly reset to a plain block.
+  display: block;
+  grid-template-columns: none;
+  max-width: none;
+
+  // Full-bleed breakout. The wrapper is inserted INSIDE the theme's 1100px
+  // container, so simply making the grid wider than its parent overflowed to
+  // the right — the right rail was clipped off-screen and the sticky left rail
+  // painted over the main column's heading. Pulling the wrapper out to the
+  // viewport edges first, then centring the grid inside it, is what actually
+  // reclaims the space. calc() is escaped because less.php evaluates the
+  // arithmetic at compile time and chokes on the mixed % / vw units.
+  width: 100vw;
+  margin-left: ~"calc(50% - 50vw)";
+  margin-right: ~"calc(50% - 50vw)";
+  // The gutter lives on the full-bleed wrapper. Putting it on the inner grid
+  // via `width: min(...)` + `margin: 0 auto` left the content flush against the
+  // viewport edge with the first column clipped — max-width on a width:100%
+  // child centres reliably where a computed width did not.
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.LmxIndex-inner {
+  display: grid;
+  grid-template-columns: var(--lmx-rail) minmax(0, 1fr) var(--lmx-side);
+  grid-template-areas: 'top top top' 'left main side';
+  gap: var(--gap-lg);
+  align-items: start;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.LmxIndex-top  { grid-area: top; }
+.LmxIndex-left { grid-area: left; position: sticky; top: ~"calc(var(--header-h, 52px) + var(--gap))"; }
+.LmxIndex-main { grid-area: main; min-width: 0; }
+.LmxIndex-side { grid-area: side; position: sticky; top: ~"calc(var(--header-h, 52px) + var(--gap))"; }
+
+// The rails are the first thing to go: a 232px column beside a 700px screen is
+// not a smaller version of this layout, it is a broken one.
+@media (max-width: 1400px) {
+  .LmxIndex-inner {
+    grid-template-columns: var(--lmx-rail) minmax(0, 1fr);
+    grid-template-areas: 'top top' 'left main' 'side side';
+  }
+  .LmxIndex-side { position: static; }
+}
+
+@media (max-width: 1000px) {
+  .LmxIndex-inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'top' 'main' 'left' 'side';
+    width: 100%;
+  }
+  .LmxIndex-left { position: static; }
+}
+
+// -------------------------------------------------------------------- hero
+.LmxHero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: var(--pad-lg) 0 var(--gap-lg);
+}
+
+.LmxHero-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+}
+
+.LmxHero-lede {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--ink-dim);
+  font-size: var(--fs-lg);
+  line-height: 1.5;
+}
+
+.LmxHero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.LmxHero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-lg);
+  padding-top: var(--gap-sm);
+}
+
+// The numbers ran straight into their labels — "23,550threads" — because the
+// <b> and <span> were adjacent inline elements with no gap.
+.LmxHero-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+
+  b {
+    color: var(--ink);
+    font-size: var(--fs-xl);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    color: var(--ink-faint);
+    font-size: var(--fs-sm);
+  }
+}
+
+// ----------------------------------------------------------------- buttons
+.LmxBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+
+  &:hover { background: var(--surface-3); border-color: var(--line-strong); text-decoration: none; }
+  &:active { transform: translateY(1px); }
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  iconify-icon { font-size: 16px; flex: none; }
+}
+
+.LmxBtn--primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+
+  &:hover { background: var(--accent); filter: brightness(1.08); }
+}
+
+.LmxBtn--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-dim);
+
+  &:hover { background: var(--surface-2); color: var(--ink); }
+}
+
+.LmxIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--ink-dim);
+  cursor: pointer;
+
+  &:hover { color: var(--ink); border-color: var(--line-strong); }
+  iconify-icon { font-size: 16px; }
+}
+
+.LmxBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.LmxBadge--new {
+  background: color-mix(in srgb, var(--accent-2) 18%, transparent);
+  color: var(--accent-2);
+}
+
+.LmxBadge--pin {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+  padding: 1px 5px;
+}
+
+// -------------------------------------------------------------------- news
+.LmxNews {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  margin-bottom: var(--gap-lg);
+}
+
+.LmxNews-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.LmxNews-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+}
+
+// A grid, not a stack: news read as one flat column of text with nothing to
+// separate one item from the next.
+.LmxNews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--gap);
+}
+
+.LmxNewsItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: var(--pad);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+  transition: border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+
+  &:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+
+  // Whole-card click target, sitting under the text so links inside still work.
+  .LmxNewsItem-hit {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  > *:not(.LmxNewsItem-hit) { position: relative; z-index: 2; pointer-events: none; }
+}
+
+.LmxNewsItem.is-pinned { border-left: 3px solid var(--accent); }
+
+.LmxNewsItem.is-solo {
+  grid-column: 1 / -1;
+  flex-direction: column;
+}
+
+.LmxNewsItem-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 18px;
+}
+
+.LmxNewsItem-date {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.LmxNewsItem-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.LmxNewsItem-excerpt {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
+.LmxNewsItem-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  margin-top: auto;
+  padding-top: 4px;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+
+  span { display: inline-flex; align-items: center; gap: 4px; }
+  iconify-icon { font-size: 13px; }
+}
+
+// ---------------------------------------------------------------- sections
+.LmxSections { margin-bottom: var(--gap-lg); }
+
+.LmxSections-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap);
+}
+
+.LmxSections-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+}
+
+.LmxSections-lede {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+}
+
+.LmxSections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--gap);
+}
+
+// List view is a different job from cards — density for scanning, not
+// browsing — so it is a real alternative rather than cards squashed flat.
+.LmxSections[data-view='list'] .LmxSections-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.LmxSections[data-view='list'] .LmxTile {
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--gap);
+
+  &:last-child { border-bottom: 0; }
+  .LmxTile-recent, .LmxTile-desc { display: none; }
+}
+
+// ------------------------------------------------------------------- tiles
+.LmxTile {
+  // --tag is what the SERVER writes on this element (SectionsBlock renders
+  // style="--tag: #hex" from Sections::color()). This line used to read
+  // `--tile: var(--accent)`, so every one of the six tiles painted its icon,
+  // its hover border and its go-arrow in the house accent and the per-section
+  // colour was computed, serialised, and then thrown away. Measured over CDP
+  // before the fix: three tiles carrying --tag #ff8b83 / #59dc7f / #ffcafc all
+  // reported `color: rgb(230, 177, 105)`. That is operator defect "per category
+  // colors" — not missing, connected to nothing.
+  --tile: var(--tag, var(--accent));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: var(--pad);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+  transition: border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--tile) 55%, transparent);
+    transform: translateY(-2px);
+    box-shadow: var(--e-2);
+  }
+}
+
+.LmxTile-hit { position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+
+.LmxTile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--tile) 20%, transparent);
+  color: var(--tile);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tile) 35%, transparent);
+
+  iconify-icon { font-size: 21px; }
+}
+
+.LmxTile-name {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.LmxTile-desc {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.LmxTile-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxTile-count {
+  color: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.LmxTile-recent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: var(--gap-sm) 0 0;
+  border-top: 1px solid var(--line-soft);
+  list-style: none;
+
+  li { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+
+  a {
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    color: var(--ink-dim);
+    font-size: var(--fs-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+
+    &:hover { color: var(--accent); }
+  }
+
+  // The trailing "9h · author · 32" ran straight into the title.
+  li > span { color: var(--ink-faint); font-size: var(--fs-xs); white-space: nowrap; flex: none; }
+}
+
+.LmxTile-empty { color: var(--ink-faint); font-size: var(--fs-sm); font-style: italic; }
+
+.LmxTile-go {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  margin-top: auto;
+  color: var(--tile);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ------------------------------------------------------------ switch / nav
+.LmxSwitch {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.LmxSwitch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  cursor: pointer;
+
+  &[aria-pressed='true'] { background: var(--surface-0); color: var(--ink); box-shadow: var(--e-1); }
+  &:hover { color: var(--ink); }
+  iconify-icon { font-size: 14px; }
+}
+
+.LmxNav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--pad-sm);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+}
+
+.LmxNav-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+  &.is-active { background: var(--surface-2); color: var(--ink); }
+}
+
+.LmxNav-link--quiet { color: var(--ink-faint); font-weight: 500; }
+
+.LmxNav-icon {
+  display: inline-flex;
+  width: 18px;
+  flex: none;
+  justify-content: center;
+  color: var(--nav, var(--ink-faint));
+  iconify-icon { font-size: 16px; }
+}
+
+.LmxNav-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.LmxNav-count {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.LmxNav-rule { height: 1px; margin: var(--gap-sm) 4px; background: var(--line-soft); }
+
+// ------------------------------------------------------- browse / steps / ad
+.LmxBrowse { margin-bottom: var(--gap); }
+
+.LmxBrowse-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover { color: var(--ink); }
+}
+
+.LmxBrowse-hint { margin-left: var(--gap-sm); color: var(--ink-faint); font-size: var(--fs-xs); }
+.LmxBrowse-body[hidden] { display: none; }
+
+.LmxSteps { display: flex; flex-direction: column; gap: var(--gap-sm); }
+
+// THE GRID BELONGS ON THE ANCHOR, NOT ON THE <li>.
+//
+// The markup is `<li class="LmxStep"><a><span n><span body><icon></a></li>`, so
+// the <li>'s only grid item is the <a>. Declaring a `26px minmax(0,1fr)` grid on
+// the <li> therefore laid the ANCHOR into the 26px track, and every word of the
+// step wrapped onto its own line. Screenshot evidence, left rail at 1440 and at
+// 390: "Find / your / section" stacked vertically in a ~90px column. The grid
+// never applied to the parts it names.
+.LmxStep {
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+}
+
+.LmxStep > a {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 6px 8px;
+  border-radius: var(--r-sm);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease);
+
+  &:hover { background: var(--white-a06); color: var(--ink); text-decoration: none; }
+  &:focus-visible { box-shadow: var(--ring); outline: none; }
+}
+
+.LmxStep-glyph { color: var(--ink-faint); font-size: 15px; }
+
+.LmxSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.LmxStep-n {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+}
+
+.LmxStep-body b { display: block; color: var(--ink); font-weight: 700; }
+
+.LmxAd-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  border: 1px dashed var(--line);
+  border-radius: var(--card-radius);
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// Icons in this tree are <iconify-icon>, which has NO intrinsic size until its
+// geometry loads. Unsized, a flex parent stretches it into the smear the
+// operator kept reporting. An explicit box means an icon that has not resolved
+// yet occupies the right space instead of destroying the layout.
+.LmxIndex iconify-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: none;
+  aspect-ratio: 1;
+  vertical-align: -0.125em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .LmxNewsItem, .LmxTile { transition: none; }
+  .LmxNewsItem:hover, .LmxTile:hover { transform: none; }
+}
+
+// The original .LmxCard was written for the 300px right sidebar and carries
+// that width. Reused in the 232px left rail it overflowed 68px into the main
+// column and painted over the "Where to start" heading — measured as
+// `.LmxIndex-left .LmxCard x=19 w=300 right=319` against `.LmxIndex-main x=273`.
+// A rail card takes the width of its rail.
+.LmxIndex-left .LmxCard,
+.LmxIndex-left .LmxNav {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+// "1,229threads".
+//
+// The previous fix targeted `.LmxTile-count + span` — a span that is a SIBLING
+// of the count. There is no such element: the markup is
+// `<div class="LmxTile-count"><b>1,229</b><span>threads</span></div>`, so the
+// span is a CHILD and the rule matched nothing. It read as fixed for a day.
+// Screenshot evidence at 420px: "1,229threads", "6,588threads",
+// "2,214threads" on the live index.
+.LmxTile-count > b + span,
+.LmxHero-stat > b + span,
+.LmxTile-meta > * + * { margin-left: 5px; }
+
+.LmxTile-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 5px;
+}
+
+// ============================================================ THE FEED
+//
+// The block that opens the main column. Everything here is in service of one
+// number: how many whole rows a reader can see without scrolling. Measured at
+// 1440x900 with the rails beside it — six tabs and eight rows; at 390x844,
+// four rows. e2e/visual/fold.ts asserts it rather than trusting this comment.
+//
+// Rows are separated by a hairline, not carded. Ten cards stacked is ten
+// borders, ten shadows and ten radii competing with the rails on either side;
+// the row IS the card here, and the whole list is the object with the border.
+.LmxFeed {
+  margin-bottom: var(--gap-lg);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  background: var(--surface-1);
+  box-shadow: var(--e-1);
+  overflow: hidden;
+}
+
+.LmxFeed-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 6px 6px 6px 8px;
+  border-bottom: 1px solid var(--line);
+  // The tab strip is the page's primary control. A wash rather than a fill so
+  // it reads as chrome for the list under it instead of a second card.
+  background: linear-gradient(180deg, var(--white-a04), transparent);
+}
+
+.LmxFeed-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  // Six tabs do not fit at 390. They scroll horizontally rather than wrap: a
+  // wrapped tab strip changes the page height when you change tab, which moves
+  // the content you were about to read.
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.LmxFeed-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+
+  iconify-icon { font-size: 15px; flex: none; }
+
+  &:hover { background: var(--white-a06); color: var(--ink); }
+
+  // The selected tab is a filled violet plate with light ink. --accent-deep
+  // rather than --accent because dark ink on the 500 next to a row of ghost
+  // tabs reads as a call to action, and this is a state, not an action.
+  &.is-on {
+    background: var(--accent-deep);
+    border-color: transparent;
+    color: var(--accent-deep-ink);
+    box-shadow: 0 1px 0 var(--white-a10) inset;
+  }
+
+  &:focus-visible { box-shadow: var(--ring); outline: none; }
+}
+
+.LmxFeed-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  padding: 0 8px;
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover { color: var(--accent); text-decoration: none; }
+  iconify-icon { font-size: 13px; }
+}
+
+.LmxFeed-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.LmxFeed-item {
+  position: relative;
+  display: flex;
+  gap: var(--gap-sm);
+  padding: 9px var(--pad);
+  border-bottom: 1px solid var(--line-soft);
+  // Only background and the left rail move on hover. transform on a list row
+  // moves the row under the cursor, which fights the click.
+  transition: background var(--t-fast) var(--ease);
+
+  &:last-child { border-bottom: 0; }
+
+  // The rail: 2px of the row's category colour, revealed on hover and on
+  // keyboard focus, so a pointer and a Tab key show the same thing.
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    background: var(--cat, var(--accent));
+    opacity: 0;
+    transition: opacity var(--t-fast) var(--ease);
+  }
+
+  &:hover {
+    background: var(--white-a04);
+
+    &::before { opacity: 1; }
+  }
+
+  &:focus-within {
+    background: var(--white-a04);
+
+    &::before { opacity: 1; }
+  }
+}
+
+// The whole row is clickable, but the row is NOT a link element: a block-level
+// <a> around a row containing three other links is invalid and unusable with a
+// keyboard. This is an absolutely-positioned overlay behind the real links,
+// aria-hidden and untabbable, so the pointer gets a big target and the
+// accessibility tree still sees exactly the three links that exist.
+.LmxFeed-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.LmxFeed-main {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  flex: 1 1 auto;
+  pointer-events: none;   // let the hit overlay take clicks on empty space
+
+  a, .LmxFeed-stat { pointer-events: auto; }
+}
+
+.LmxFeed-top {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+}
+
+.LmxFeed-pin {
+  flex: none;
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1;
+}
+
+// The category chip carries the tag's own colour as ink on a tint of itself,
+// never as a fill with guessed ink on top. --cat is written by the server from
+// tags.color; the fallback is the accent, so a tag with no colour is still a
+// chip and not an invisible one.
+.LmxFeed-cat {
+  flex: none;
+  max-width: 40%;
+  overflow: hidden;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--cat, var(--accent)) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cat, var(--accent)) 34%, transparent);
+  color: var(--cat, var(--accent));
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover { background: color-mix(in srgb, var(--cat, var(--accent)) 26%, transparent); text-decoration: none; }
+}
+
+.LmxFeed-title {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--fs-md);
+  font-weight: 650;
+  line-height: 1.32;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover { color: var(--accent-hi); text-decoration: none; }
+}
+
+.LmxFeed-excerpt {
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.LmxFeed-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  margin-top: 3px;
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxFeed-who {
+  color: var(--ink-dim);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { color: var(--accent); text-decoration: none; }
+}
+
+.LmxFeed-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+
+  iconify-icon { font-size: 12px; opacity: 0.8; }
+}
+
+.LmxFeed-stat--hot { color: var(--accent); }
+
+// At phone width the excerpt is the first thing to go: one line of body text
+// costs a whole row, and four titles beat three titles with a subtitle.
+@media (max-width: 560px) {
+  .LmxFeed-excerpt { display: none; }
+  .LmxFeed-item { padding: 8px 10px; }
+  .LmxFeed-cat { max-width: 34%; }
+}
+
+
+// ============================================ the guest card, in the RIGHT RAIL
+//
+// HeroBlock used to render a full-width landing band above the content. It is
+// now a rail card (see HeroBlock::defaultSide), so its stylesheet has to stop
+// being a band: 31px display type and a 640px lede do not fit a 316px column,
+// and before this rule the headline overflowed the rail and the stat row ran
+// off the bottom of the page.
+.LmxIndex-side .LmxHero,
+.LmxHero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap-lg);
+  padding: var(--pad);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  // A violet plate, so the one card asking for something looks different from
+  // the eight cards offering something. --accent-deep carries light ink at
+  // 5.0:1; the 500 would need dark ink and would read as a button.
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-deep) 34%, transparent), transparent 70%),
+    var(--surface-1);
+  box-shadow: var(--e-1);
+}
+
+.LmxHero-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.LmxHero-lede {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.LmxHero-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.LmxHero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: var(--gap-sm);
+  border-top: 1px solid var(--line-soft);
+}
+
+.LmxHero-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  b {
+    color: var(--ink);
+    font-size: var(--fs-md);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    // 1,920,848 does not fit a 96px cell. Shrinking the glyphs rather than
+    // wrapping or clipping keeps the three cells the same height, which is what
+    // makes them read as one row.
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    // the stat label sits UNDER the number in a rail this narrow, so the
+    // margin-left that separates them on one line has to be removed here
+    margin-left: 0 !important;
+  }
+}
+
+// Rail lists were rendering with bullet markers outside the card because the
+// reset lived on .LmxNav only and the <ul> in question is .LmxNav--extra's
+// sibling. Reset every list this block owns, once.
+.LmxIndex ul,
+.LmxIndex ol {
+  list-style: none;
+}

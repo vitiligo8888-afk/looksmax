@@ -1,0 +1,445 @@
+// Post content: everything inside .Post-body.
+//
+// Scope note: another lane owns the BBCode -> markup conversion and its own
+// extension's LESS. This file styles the markup that reaches the page; it does
+// not change what that markup is. Where a construct needs different markup to
+// be styleable at all, it is reported rather than worked around here.
+//
+// The constructs below were, before this file existed, either unstyled or
+// styled by a single rule that set a colour and a left border. Quotes were
+// named explicitly by the operator; the rest were found by walking real
+// threads, which is the only way to find them.
+
+.Post-body {
+  color: var(--ink);
+  font-size: var(--fs-md);
+  line-height: 1.62;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.Post-body > *:first-child { margin-top: 0; }
+.Post-body > *:last-child { margin-bottom: 0; }
+
+.Post-body p { margin: 0 0 0.85em; }
+
+.Post-body h1,
+.Post-body h2,
+.Post-body h3,
+.Post-body h4 {
+  color: var(--ink);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+  margin: 1.5em 0 0.5em;
+}
+
+.Post-body h1 { font-size: var(--fs-2xl); }
+.Post-body h2 { font-size: var(--fs-xl); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.Post-body h3 { font-size: var(--fs-lg); }
+.Post-body h4 { font-size: var(--fs-md); color: var(--ink-dim); }
+
+.Post-body strong,
+.Post-body b { color: var(--ink); font-weight: 700; }
+
+.Post-body em,
+.Post-body i { color: var(--ink); }
+
+.Post-body ul,
+.Post-body ol { margin: 0 0 0.9em; padding-left: 1.5em; }
+.Post-body li { margin: 0.25em 0; }
+.Post-body li::marker { color: var(--accent-a70); }
+
+.Post-body hr {
+  background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+  border: 0;
+  height: 1px;
+  margin: 1.6em 0;
+}
+
+// links inside a post: the underline grows rather than appearing, and the
+// colour carries enough contrast to be found by scanning
+.Post-body a:not(.Button):not(.PostMention):not(.UserMention) {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  color: var(--accent-2);
+  text-decoration: none;
+  transition: background-size var(--t-base) var(--ease), color var(--t-fast) var(--ease);
+}
+
+.Post-body a:not(.Button):hover { background-size: 100% 1px; color: var(--accent-2); }
+
+.Post-body a:focus-visible { border-radius: var(--r-xs); box-shadow: var(--ring); }
+
+// ============================================================ quotes
+//
+// A quote must answer three questions at a glance: that it is a quote, who said
+// it, and where it ends. Core answers none of them — the markup that reaches us
+// is a bare <blockquote><div><cite>…</cite><p>…</p></div>, with no class to
+// hook and no visual treatment at all.
+//
+// KNOWN UPSTREAM DEFECT (not fixed here, it is markup): <cite> contains the raw
+// numeric user id, rendering as "59123 wrote" instead of a username. Reported
+// to the content lane; the styling below is written so it improves the moment
+// that string becomes a name.
+.Post-body blockquote {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent-a70);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  color: var(--ink-dim);
+  margin: 1em 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+}
+
+.Post-body blockquote > div { padding: 10px 14px 12px; }
+
+.Post-body blockquote p { margin: 0 0 0.55em; }
+.Post-body blockquote p:last-child { margin-bottom: 0; }
+
+// the attribution line reads as a header strip, not as body text
+.Post-body blockquote cite {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  display: flex;
+  font-size: var(--fs-sm);
+  font-style: normal;
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: -0.005em;
+  margin: -10px -14px 10px;
+  padding: 8px 14px;
+}
+
+// a quotation glyph drawn in CSS so the strip has a mark without an icon
+.Post-body blockquote cite::before {
+  color: var(--accent);
+  content: '\201C';
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 0.6;
+  margin-top: 6px;
+}
+
+// An uncited quote has no strip, so it gets the mark inline instead of an
+// empty header rule sitting above nothing.
+.Post-body blockquote.uncited > div { padding-top: 12px; }
+
+// Nested quotes step down a surface each time and stop stepping at depth three,
+// because a thread that quotes a quote of a quote is common here and the
+// alternative is a stack of ever-darker boxes with no room left for text.
+.Post-body blockquote blockquote {
+  background: var(--surface-1);
+  border-left-color: var(--accent-a28);
+  margin: 0.8em 0;
+}
+
+.Post-body blockquote blockquote blockquote {
+  background: var(--surface-0);
+  border-left-color: var(--line-strong);
+}
+
+.Post-body blockquote blockquote blockquote blockquote {
+  background: var(--surface-0);
+  // beyond three levels the content is noise: keep it readable but stop the
+  // indent from consuming the column
+  border-left-color: var(--line);
+  margin-left: 0;
+}
+
+.Post-body blockquote blockquote blockquote blockquote > div { padding: 8px 10px; }
+
+// ============================================================ code
+.Post-body code {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  color: var(--accent);
+  font-size: 0.9em;
+  padding: 1px 5px;
+  white-space: break-spaces;
+}
+
+.Post-body pre {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  margin: 1em 0;
+  overflow-x: auto;
+  padding: 12px 14px;
+}
+
+.Post-body pre code {
+  background: none;
+  border: 0;
+  color: var(--ink);
+  display: block;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  padding: 0;
+  white-space: pre;
+}
+
+// highlight.js ships a LIGHT theme by default, which flarum/markdown loads
+// unconditionally. On our surface its keyword red measured 4.14:1 and its
+// comment grey worse. Retarget the token classes onto our palette rather than
+// swapping stylesheets, which we do not control.
+.Post-body .hljs,
+.Post-body pre code.hljs { background: transparent; color: var(--ink); }
+
+.Post-body .hljs-comment,
+.Post-body .hljs-quote { color: var(--ink-faint); font-style: italic; }
+
+.Post-body .hljs-keyword,
+.Post-body .hljs-selector-tag,
+.Post-body .hljs-literal,
+.Post-body .hljs-section,
+.Post-body .hljs-doctag,
+.Post-body .hljs-type,
+.Post-body .hljs-name,
+.Post-body .hljs-strong { color: var(--purple); font-weight: 600; }
+
+.Post-body .hljs-string,
+.Post-body .hljs-regexp,
+.Post-body .hljs-addition,
+.Post-body .hljs-attribute,
+.Post-body .hljs-meta .hljs-string { color: var(--ok); }
+
+.Post-body .hljs-number,
+.Post-body .hljs-built_in,
+.Post-body .hljs-class .hljs-title,
+.Post-body .hljs-template-variable,
+.Post-body .hljs-variable { color: var(--accent); }
+
+.Post-body .hljs-title,
+.Post-body .hljs-function .hljs-title,
+.Post-body .hljs-symbol,
+.Post-body .hljs-bullet,
+.Post-body .hljs-link { color: var(--accent-2); }
+
+.Post-body .hljs-deletion { color: var(--danger); }
+.Post-body .hljs-emphasis { font-style: italic; }
+
+// ============================================================ spoilers
+// Core renders a spoiler as background:#444 with transparent text, which on our
+// palette is a light grey slab in the middle of a dark post. Retarget it, and
+// make the affordance explicit — an unlabelled grey block does not tell anyone
+// it can be clicked.
+.Post-body span.spoiler,
+span.spoiler {
+  background: var(--surface-3);
+  border-radius: var(--r-xs);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: transparent;
+  cursor: pointer;
+  transition: background var(--t-base) var(--ease), color var(--t-base) var(--ease);
+}
+
+.Post-body span.spoiler:hover { background: var(--line-strong); }
+
+.Post-body span.spoiler.revealed,
+.Post-body span.spoiler.show {
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+
+// block spoilers, whatever the content lane settles on for a wrapper
+.Post-body .SpoilerBlock,
+.Post-body details {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  margin: 1em 0;
+  overflow: hidden;
+}
+
+.Post-body details > summary {
+  background: var(--white-a03);
+  border-bottom: 1px solid transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  list-style: none;
+  padding: 9px 14px;
+  transition: background var(--t-fast) var(--ease);
+  user-select: none;
+}
+
+.Post-body details > summary::-webkit-details-marker { display: none; }
+
+.Post-body details > summary::before {
+  content: '\25B8';
+  color: var(--accent);
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.Post-body details[open] > summary { border-bottom-color: var(--line); }
+.Post-body details[open] > summary::before { transform: rotate(90deg); }
+.Post-body details > summary:hover { background: var(--white-a06); }
+.Post-body details > summary:focus-visible { box-shadow: var(--ring); outline: none; }
+.Post-body details > *:not(summary) { padding: 0 14px; }
+.Post-body details > *:not(summary):last-child { padding-bottom: 12px; }
+
+// ============================================================ mentions
+.Post-body .PostMention,
+.Post-body .UserMention,
+.PostMention,
+.UserMention {
+  background: var(--accent-2-a10);
+  border-radius: var(--r-xs);
+  color: var(--accent-2);
+  font-weight: 600;
+  padding: 1px 5px;
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease);
+}
+
+.Post-body .PostMention:hover,
+.Post-body .UserMention:hover { background: var(--accent-2-a22); color: var(--accent-2); }
+
+// a mention of a deleted account measured 3.14:1 before this
+.UserMention--deleted,
+.PostMention--deleted {
+  background: var(--white-a04);
+  color: var(--ink-faint);
+  text-decoration: line-through;
+}
+
+// ============================================================ tables
+.Post-body table {
+  border: 1px solid var(--line);
+  border-collapse: separate;
+  border-radius: var(--r-md);
+  border-spacing: 0;
+  display: block;
+  margin: 1em 0;
+  max-width: 100%;
+  overflow-x: auto;
+  width: max-content;
+}
+
+.Post-body th,
+.Post-body td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.Post-body th {
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.Post-body tbody tr:last-child td { border-bottom: 0; }
+.Post-body tbody tr:nth-child(even) { background: var(--white-a03); }
+
+// ============================================================ media
+//
+// The source board's posts are image-heavy and the images arrive at whatever
+// size they were uploaded at, so an unconstrained rule produces a 3000px column
+// of one screenshot. Cap the height, keep the aspect, and make the frame read
+// as a deliberate object.
+.Post-body img {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: 0 12px 28px -20px #000;
+  display: block;
+  height: auto;
+  margin: 0.9em 0;
+  max-height: 620px;
+  max-width: 100%;
+  object-fit: contain;
+  transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  width: auto;
+}
+
+.Post-body img:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 18px 40px -22px #000;
+}
+
+// emoji must not pick up the frame treatment
+.Post-body img.emoji,
+.Post-body img[class*='emoji'] {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: inline-block;
+  height: 1.2em;
+  margin: 0 1px;
+  max-height: none;
+  vertical-align: -0.2em;
+  width: 1.2em;
+}
+
+.Post-body iframe,
+.Post-body video,
+.Post-body .embed-responsive {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  margin: 0.9em 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+// s9e media embeds arrive as an aspect-ratio box; keep them inside the column
+.Post-body [data-s9e-mediaembed] {
+  border-radius: var(--r-md);
+  margin: 0.9em 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+// ============================================================ misc inline
+.Post-body kbd {
+  background: var(--surface-3);
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--r-xs);
+  color: var(--ink);
+  font-size: 0.85em;
+  padding: 1px 5px;
+}
+
+.Post-body mark {
+  background: var(--accent-a28);
+  border-radius: 3px;
+  color: var(--ink);
+  padding: 0 3px;
+}
+
+.Post-body sub,
+.Post-body sup { color: var(--ink-dim); }
+
+.Post-body del { color: var(--ink-faint); }
+
+.Post-body abbr[title] {
+  border-bottom: 1px dotted var(--line-strong);
+  cursor: help;
+  text-decoration: none;
+}
+
+// ============================================================ responsive
+@media (max-width: 767.98px) {
+  .Post-body { font-size: var(--fs-md); }
+  .Post-body img { max-height: 420px; }
+  .Post-body blockquote { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+  .Post-body blockquote > div { padding: 8px 11px 10px; }
+  .Post-body blockquote cite { margin: -8px -11px 8px; padding: 7px 11px; }
+  // stop deep nesting from eating the whole column on a phone
+  .Post-body blockquote blockquote blockquote { border-left-width: 2px; }
+}

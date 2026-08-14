@@ -1,0 +1,148 @@
+local-looksmax-userinfo:
+
+  forum:
+
+    user:
+      # "Deleted" solo; en español un adjetivo suelto no se entiende, así que
+      # se nombra el objeto.
+      deleted: Cuenta eliminada
+
+    presence:
+      online: En línea ahora
+      # {when} viene de lmxI18n.rel() → "hace 3 horas". Sin "el".
+      last_seen: "Visto {when}"
+      # {date} viene de lmxI18n.date() → "4 de marzo de 2019". Con "el".
+      last_seen_on: "Visto por última vez el {date}"
+      seen_short: "Visto {when}"
+      never_seen: Nunca se ha conectado
+
+    rank:
+      title: "Rango: {name}"
+      # El inglés dice "12,431 to Gold"; en español el verbo cambia de sitio,
+      # por eso no es una traducción palabra por palabra.
+      title_next: "Rango: {name} — faltan {points} para {next}"
+      # "source board" = el foro del que se importó esta cuenta.
+      legacy_style: "{name} — color de nombre traído del foro anterior"
+      legacy_rank: "{name} — rango traído del foro anterior"
+
+    banner:
+      title: "{name} — traído del foro anterior"
+
+    # Los grupos de ESTE foro, que es un eje distinto del rango y de los
+    # distintivos traídos: un grupo es lo que este foro concedió.
+    group:
+      title: "{name} — grupo de este foro"
+
+    suspended:
+      label: Suspendido
+      until: "Cuenta suspendida hasta el {date}"
+
+    stat:
+      joined: Se unió
+      messages: Mensajes
+      threads: Temas
+      reactions: Reacciones
+      per_day: Al día
+      # "Mejor publicación" no cabe en la columna del panel lateral.
+      # "Destacada" concuerda con "publicación" y va junto al icono de trofeo
+      # y al tooltip completo.
+      best_post: Destacada
+      messages_title: "{n, plural, one {{count} publicación en este foro} other {{count} publicaciones en este foro}}"
+      threads_title: "{n, plural, one {{count} tema abierto aquí} other {{count} temas abiertos aquí}}"
+      reactions_title: "{n, plural, one {{count} reacción en sus publicaciones aquí} other {{count} reacciones en sus publicaciones aquí}}"
+      reactions_rate: " — {rate} por publicación"
+      per_day_title: Publicaciones por día desde que se unió
+      best_post_title: "{n, plural, one {{count} reacción en una sola publicación} other {{count} reacciones en una sola publicación}}"
+
+    legacy:
+      # La etiqueta vuelve a estar visible. Sin ella, "38,2 mil publicaciones"
+      # aparecía justo debajo de "Mensajes 8" sin nada que dijera que son foros
+      # distintos, y en un teléfono no hay tooltip que lo aclare.
+      label: "Del foro anterior"
+      posts: "{n, plural, one {{count} publicación} other {{count} publicaciones}}"
+      reactions: "{n, plural, one {{count} reacción} other {{count} reacciones}}"
+      title: "Traído del foro anterior: {posts} publicaciones, {reactions} reacciones, {threads} temas{hasJoined, select, yes {, se unió en {joined}} other {}}"
+
+    mix:
+      title: "Tipos de reacción que recibieron sus publicaciones aquí, según cuántas publicaciones recibieron cada uno:"
+      row: "{name} — {n, plural, one {{count} publicación} other {{count} publicaciones}}"
+
+    # La tarjeta de usuario: una sola, en todo el foro.
+    card:
+      view_profile: Ver perfil
+      view_posts: Sus publicaciones
+      message: Mensaje
+      mention: Mencionar
+      report: Reportar
+      suspend: Suspender
+      unsuspend: Levantar suspensión
+      edit: Editar cuenta
+      close: Cerrar
+      mention_copied: Mención copiada al portapapeles
+      report_unavailable: No se puede reportar desde aquí; usa el menú de la publicación
+
+    # Mensajes directos.
+    dm:
+      title: Mensajes
+      back: Volver
+      close: Cerrar
+      loading: Cargando…
+      empty: Todavía no tienes mensajes. Abre la tarjeta de alguien y pulsa «Mensaje».
+      no_messages: Sin mensajes
+      just_you: Solo tú
+      compose_to: "Nuevo mensaje a {name}"
+      to: "Para {name}"
+      body_placeholder: Escribe tu mensaje…
+      reply_placeholder: Responde…
+      send: Enviar
+      sending: Enviando…
+      sent: Mensaje enviado
+      deleted: Mensaje eliminado
+      # Se muestra el código real: un fallo silencioso aquí es exactamente el
+      # "botón muerto" que esta función existe para evitar.
+      error: "No se pudo completar la operación (HTTP {status} {code})"
+
+    # Los bloques de la barra lateral del perfil.
+    #
+    # Este bloque se perdió en una reescritura de este archivo y el resultado
+    # fue que la página de perfil imprimió las CLAVES en crudo
+    # ("local-looksmax-userinfo.forum.profile.top_tags") a la vista de
+    # cualquiera. Flarum no avisa: una clave que falta se renderiza tal cual.
+    # e2e/i18n-gate.ts comprueba ahora que cada clave usada por el JS existe en
+    # los dos idiomas, y falla si no.
+    profile:
+      # Encabezado del bloque con rango, distintivos y cifras.
+      standing: Estatus
+      top_tags: Dónde publica
+      activity: Actividad
+      recent: Temas recientes
+      spark_title: Publicaciones por mes en los últimos dos años
+      spark_bar: "{month}: {n, plural, one {{count} publicación} other {{count} publicaciones}}"
+      tag_title: "{n, plural, one {{count} publicación en {name}} other {{count} publicaciones en {name}}}"
+      reply_share: "{ns, plural, one {{starts} tema abierto} other {{starts} temas abiertos}} · {nr, plural, one {{replies} respuesta} other {{replies} respuestas}}"
+      first_post: "Primera publicación el {date}"
+      recent_meta: "{nr, plural, one {{replies} respuesta} other {{replies} respuestas}} · {nv, plural, one {{views} vista} other {{views} vistas}}"
+
+  admin:
+    settings:
+      heading: Tarjeta de usuario
+      # Una sola configuración para TODOS los sitios donde aparece la tarjeta.
+      note: Estos ajustes valen para todas las tarjetas del foro — publicaciones, menciones, chat, listados, notificaciones y buscador.
+      trigger: Cómo se abre en escritorio (hover o click)
+      open_delay: Retardo al abrir (ms)
+      close_delay: Retardo al cerrar (ms)
+      placement: Posición (auto, bottom, top)
+      follow_scroll: Cerrar la tarjeta al hacer scroll
+      mobile: En móvil (sheet, popover, off)
+      mobile_breakpoint: Ancho máximo considerado móvil (px)
+      width: Ancho de la tarjeta (px)
+      avatar_size: Tamaño del avatar en la tarjeta (px)
+      fields: Campos visibles, separados por comas
+      actions: Acciones visibles, separadas por comas
+      rail_enabled: Mostrar el panel del autor junto a cada publicación
+      rail_width: Ancho de ese panel (px)
+      dm_enabled: Activar los mensajes directos
+      dm_max_length: Longitud máxima de un mensaje
+      dm_max_recipients: Destinatarios máximos por conversación
+    permissions:
+      send: Enviar mensajes directos

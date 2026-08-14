@@ -1,0 +1,50 @@
+##
+# looksmax-economy — español neutro para México.
+#
+# Esta extensión no dibuja nada por su cuenta. Lo que sí le pertenece es el
+# vocabulario de motivos del libro mayor: cada movimiento de puntos lleva un
+# `reason` y looksmax-store lo imprime tal cual en la tabla de movimientos, así
+# que un miembro ve `post.read_through` en su propio historial. Las etiquetas
+# viven aquí, junto a los códigos que nombran.
+#
+# Son etiquetas de una celda de tabla: frases nominales cortas, sin verbo
+# conjugado y sin punto final, para que la columna se lea de un vistazo.
+##
+local-looksmax-economy:
+
+  lib:
+
+    reason:
+      admin:
+        adjust: Ajuste de administración
+      discussion:
+        started: Hilo iniciado
+      post:
+        created: Publicación
+        read_through: Leído hasta el final
+      reaction:
+        received: Reacción recibida
+        given: Reacción dada
+      best_answer:
+        awarded: Mejor respuesta
+      guide:
+        published: Guía publicada
+        sourced: Fuente citada en una guía
+      thread:
+        held: Atención sostenida
+      streak:
+        day: Racha diaria
+        week: Racha semanal
+      import:
+        legacy: Saldo importado
+      badge:
+        earned: Insignia ganada
+      store:
+        purchase: Compra en la tienda
+        refund: Reembolso
+        clawback: Cargo revertido
+        credits: Créditos añadidos
+      tier:
+        purchase: Compra de membresía
+
+    reason_unknown: Ajuste

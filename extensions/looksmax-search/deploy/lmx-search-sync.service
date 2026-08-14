@@ -1,0 +1,29 @@
+# Drains the search outbox continuously.
+#
+# Flarum runs no daemon of its own: `Extend\Console->schedule()` only registers
+# work for `php flarum schedule:run`, which something external has to invoke
+# every minute. Nothing on this box does, so the outbox sat undrained for 33
+# minutes (measured by `search:status`, which is what reported it).
+#
+# Rather than take over the whole forum's scheduler — which would make this lane
+# responsible for every other extension's scheduled jobs — this runs only the
+# search sync, in its own daemon mode. `search:sync` is idempotent and takes a
+# row off the outbox only after the engine has ACCEPTED it, so a restart at any
+# point re-applies rather than loses.
+[Unit]
+Description=Looksmax search index sync
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+# --daemon polls; --interval is the idle sleep, so an empty queue costs one
+# cheap COUNT per 2s rather than a busy loop.
+ExecStart=/usr/bin/docker exec -w /flarum/app flarum-app php flarum search:sync --daemon --interval 2 --batch 500
+# The engine being down must not turn into a restart storm.
+StartLimitIntervalSec=0
+
+[Install]
+WantedBy=multi-user.target

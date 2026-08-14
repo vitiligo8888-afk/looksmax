@@ -1,0 +1,109 @@
+{
+  "extension": "looksmax-brand",
+  "prefix": "local-looksmax-brand",
+  "replacements": [
+    {
+      "file": "views/layouts/basic.blade.php",
+      "line": 24,
+      "key": "(none — locale code)",
+      "find": "<html lang=\"en\">",
+      "replace": "<html lang=\"{{ app('flarum.locales')->getLocale() }}\">",
+      "note": "VERIFIED: $language is NOT in scope here. Core passes it only to views/frontend/app.blade.php (the SPA shell) from Frontend\\Document; the basic layout is rendered by Foundation\\ErrorHandling\\ViewFormatter, which passes only `error` and `message` (core 1.8.5 src/Foundation/ErrorHandling/ViewFormatter.php:54-60). `flarum.locales` is the container alias for Flarum\\Locale\\LocaleManager (src/Locale/LocaleServiceProvider.php:38) and getLocale() proxies the translator, which SetLocale middleware has already set for this request. Equivalent and shorter: {{ $translator->getLocale() }} — $translator is shared into every view (Forum/ForumServiceProvider.php:147, Frontend/FrontendServiceProvider.php:175) and Flarum\\Locale\\Translator extends Symfony's, which has getLocale()."
+    },
+    {
+      "file": "views/error/not_found.blade.php",
+      "line": 12,
+      "key": "forum.error.not_found.title",
+      "find": "@section('title', 'Page not found')",
+      "replace": "@section('title', app('translator')->trans('local-looksmax-brand.forum.error.not_found.title'))",
+      "note": "The <title>: the browser tab, the bookmark, and what a search engine shows for a URL it has not yet dropped. Missed by the audit — @section's second argument is not markup, so a template scanner looking for text nodes does not see it."
+    },
+    {
+      "file": "views/error/not_found.blade.php",
+      "line": 19,
+      "key": "forum.error.not_found.heading",
+      "find": "  <h1>That page isn't here.</h1>",
+      "replace": "  <h1>{{ app('translator')->trans('local-looksmax-brand.forum.error.not_found.heading') }}</h1>"
+    },
+    {
+      "file": "views/error/not_found.blade.php",
+      "line": 20,
+      "key": "forum.error.not_found.body",
+      "find": "  <p>\n    The link may be old, or the thread may have been moved or deleted. Try the\n    front page, or search for the title.\n  </p>",
+      "replace": "  <p>\n    {{ app('translator')->trans('local-looksmax-brand.forum.error.not_found.body') }}\n  </p>",
+      "note": "The sentence is one key, not two lines. The hard wrap in the source is presentation and must not become part of the string."
+    },
+    {
+      "file": "views/error/not_found.blade.php",
+      "line": 25,
+      "key": "forum.error.go_home",
+      "find": "<a class=\"button\" href=\"{{ $url->to('forum')->base() }}\">Go to the front page</a>",
+      "replace": "<a class=\"button\" href=\"{{ $url->to('forum')->base() }}\">{{ app('translator')->trans('local-looksmax-brand.forum.error.go_home') }}</a>",
+      "note": "Same literal exists in default.blade.php; each file is matched separately and it is unique within this one."
+    },
+    {
+      "file": "views/error/default.blade.php",
+      "line": 35,
+      "key": "forum.error.default.title",
+      "find": "@section('title', 'Something went wrong')",
+      "replace": "@section('title', app('translator')->trans('local-looksmax-brand.forum.error.default.title'))",
+      "note": "Also missed by the audit, same reason as the 404's title."
+    },
+    {
+      "file": "views/error/default.blade.php",
+      "line": 42,
+      "key": "forum.error.default.heading",
+      "find": "  <h1>Something went wrong.</h1>",
+      "replace": "  <h1>{{ app('translator')->trans('local-looksmax-brand.forum.error.default.heading') }}</h1>"
+    },
+    {
+      "file": "views/error/default.blade.php",
+      "line": 43,
+      "key": "forum.error.default.body",
+      "find": "  <p>\n    The forum hit an error handling that request. It has been logged. Try again\n    in a minute; if it keeps happening, post in Offtopic or write to\n    <a href=\"mailto:admin@looksmax.lat\">admin@looksmax.lat</a>.\n  </p>",
+      "replace": "  {{-- The address is a link, not a word to translate, so it goes in as an ICU\n       parameter and the sentence stays whole in both languages — splitting a\n       sentence around a tag is how translated text ends up in English word\n       order. Unescaped output because the parameter IS markup; both the string\n       and the parameter are ours and no user input reaches this line. --}}\n  <p>\n    {!! app('translator')->trans('local-looksmax-brand.forum.error.default.body', ['email' => '<a href=\"mailto:admin@looksmax.lat\">admin@looksmax.lat</a>']) !!}\n  </p>",
+      "note": "If the applier prefers to avoid {!! !!} entirely, the alternative is to end the key at '…write to' and leave the anchor in the template — but then Spanish cannot move the address, and 'escríbenos a X' is the only natural word order, so the ICU parameter is the better trade."
+    },
+    {
+      "file": "views/error/default.blade.php",
+      "line": 49,
+      "key": "forum.error.go_home",
+      "find": "<a class=\"button\" href=\"{{ $url->to('forum')->base() }}\">Go to the front page</a>",
+      "replace": "<a class=\"button\" href=\"{{ $url->to('forum')->base() }}\">{{ app('translator')->trans('local-looksmax-brand.forum.error.go_home') }}</a>"
+    },
+    {
+      "file": "src/Head.php",
+      "line": 94,
+      "key": "lib.og_locale",
+      "find": "        $head['brand-og-locale'] = '<meta property=\"og:locale\" content=\"en_US\">';",
+      "replace": "        // og:locale is not prose but it is not a constant either: a Spanish\n        // page announcing en_US makes every share card render in the wrong\n        // language on Facebook. The locale file names its own territory.\n        $head['brand-og-locale'] = '<meta property=\"og:locale\" content=\"'.e(resolve('translator')->trans('local-looksmax-brand.lib.og_locale')).'\">';",
+      "note": "MISSED BY THE AUDIT and a real defect: the forum is Spanish-primary and every share card declares en_US. resolve() is Flarum's own container helper (framework/core/src/helpers.php, autoloaded via composer `files`); 'translator' is the alias registered in Locale/LocaleServiceProvider.php:40. No new import needed."
+    },
+    {
+      "file": "src/Head.php",
+      "line": 99,
+      "key": "lib.og_image_alt",
+      "find": "        $head['brand-og-image-alt'] = '<meta property=\"og:image:alt\" content=\"'.e($title).' — face and body ratings, and the guides behind them\">';",
+      "replace": "        $head['brand-og-image-alt'] = '<meta property=\"og:image:alt\" content=\"'.e(resolve('translator')->trans('local-looksmax-brand.lib.og_image_alt', ['title' => $title])).'\">';",
+      "note": "The forum title moves inside the ICU string as {title} so Spanish can put it where it belongs. e() still wraps the whole result, so the attribute is escaped exactly as before."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "assets/site.webmanifest",
+      "line": 4,
+      "string": "\"description\": \"Face and body ratings, and the guides behind them.\"  (also \"name\" / \"short_name\")",
+      "reason": "A static JSON file served straight off disk, so it has exactly one language. It is user-visible: Chrome and Safari show `name` and `description` in the install prompt and in the app listing after install. Making it per-locale means serving it from a controller (an Extend\\Routes entry returning a JsonResponse built from the translator, with the <link rel=\"manifest\"> in Head.php pointing at that route) — a new route and a new class, outside this lane. `name` and `short_name` are the brand and stay English either way; only `description` actually needs it."
+    },
+    {
+      "file": "src/Head.php",
+      "line": 59,
+      "string": "$document->meta['description'] = $description;   (from the forum_description setting)",
+      "reason": "Not a hardcoded string — it comes from the settings table, which holds one value for the whole forum. So the meta description, og:description and twitter:description are permanently in whichever language the admin typed. Fixing it is a settings-level concern (a per-locale forum_description, or falling back to a translation key when the setting is empty), not a code replacement, and it belongs to whoever owns the admin settings surface."
+    }
+  ],
+  "notes": {
+    "blade_translator": "This lane emits app('translator') as the brief specifies, and it works: app() is defined in Flarum's own framework/core/src/helpers.php. Two facts the applier may want before standardising, though. (1) $translator is ALREADY shared into every view — Forum/ForumServiceProvider.php:147 and Frontend/FrontendServiceProvider.php:175 both call $view->share(['translator' => …]) — and core's own views/error/not_found.blade.php uses {{ $translator->trans(...) }}, so the shorter form is not wrong here, it is the house style of the file being overridden. (2) core marks app() '@deprecated perpetually … should NOT be used in extension code' and offers resolve() as the supported helper. Any of the three resolves the same singleton; if the six lanes are being normalised, $translator is the one core itself uses in exactly these files.",
+    "not_translatable": "basic.blade.php:45-50, 86, 95 (audit findings) are CSS declarations inside the inline <style> block — gradients, a font stack, border colours. basic.blade.php:108 'Looksmax<b>.</b>lat' and Head.php:79 'Looksmax' are the brand mark and stay in every locale. The {{-- … --}} blocks at the top of all three views are Blade comments that never reach the response."
+  }
+}

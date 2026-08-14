@@ -1,0 +1,8 @@
+{
+  "name": "local/looksmax-uploads",
+  "description": "Upload handling: the image formats people actually have.",
+  "type": "flarum-extension",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\Uploads\\": "src/" } },
+  "extra": { "flarum-extension": { "title": "Looksmax Uploads", "category": "feature" } }
+}

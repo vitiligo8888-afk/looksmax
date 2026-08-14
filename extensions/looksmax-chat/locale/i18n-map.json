@@ -1,0 +1,168 @@
+{
+  "extension": "looksmax-chat",
+  "prefix": "local-looksmax-chat",
+  "flarum_id": "local-looksmax-chat",
+  "key_prefix_in_js": "js/chat.js:104 t() prepends 'local-looksmax-chat.forum.', so every JS key lives under forum: in the yml",
+  "locales_extender": "ADDED by this lane: (new Extend\\Locales(__DIR__ . '/locale')) in extend.php. It was missing.",
+  "apply_order": "The `(number formatting helper)` replacement at js/chat.js:104 must be applied before the two num() call sites.",
+  "already_done_by_the_chat_lane": {
+    "note": "js/chat.js was rewritten by the chat lane between this lane's audit and its spec (mtime 2026-08-13 12:35, 989 -> 1029 lines). It now carries its own t(key, params, fallback) helper at js/chat.js:104 which prefixes 'local-looksmax-chat.forum.' and calls window.lmxI18n.t. All 23 static forum keys plus the seven dynamic api.* keys it asks for are exactly the key names in locale/en.yml and locale/es.yml here; verified key-by-key, zero missing and zero extra. No replacement is emitted for any of them.",
+    "keys_already_wired": [
+      "title",
+      "presence.aria",
+      "presence.here",
+      "presence.nobody",
+      "presence.guests",
+      "log_aria",
+      "empty_title",
+      "empty_hint",
+      "unread",
+      "placeholder",
+      "input_aria",
+      "send_aria",
+      "delete",
+      "sending",
+      "failed",
+      "retry",
+      "discard",
+      "login",
+      "guest_note",
+      "offline",
+      "error.network",
+      "error.send",
+      "error.delete",
+      "api.guest",
+      "api.suspended",
+      "api.empty",
+      "api.too_long",
+      "api.rate",
+      "api.burst",
+      "api.duplicate"
+    ],
+    "also_already_localised": [
+      "full() at js/chat.js:163 now composes lmxI18n.rel() + lmxI18n.date(), so the <time> title attribute no longer falls through to the BROWSER locale via toLocaleString().",
+      "paintPresence() at js/chat.js:495 now joins the member list with lmxI18n.list(), so it is \"ana, beto y carla\" rather than an English comma list."
+    ]
+  },
+  "replacements": [
+    {
+      "file": "js/chat.js",
+      "line": 151,
+      "find": "  function rel(iso) {\n    // not `t` — that is the translator, and shadowing it here is a trap\n    var at = Date.parse(iso);\n    if (!at) return '';\n    var d = Math.max(0, now() - at) / 1000;\n    if (d < 45) return 'now';\n    if (d < 3600) return Math.round(d / 60) + 'm';\n    if (d < 86400) return Math.round(d / 3600) + 'h';\n    return Math.round(d / 86400) + 'd';\n  }",
+      "replace": "  function rel(iso) {\n    // not `t` — that is the translator, and shadowing it here is a trap\n    var at = Date.parse(iso);\n    if (!at) return '';\n\n    // \"hace 2 minutos\", not \"2m\". The compact ladder below is four English\n    // tokens rendered on every row of the busiest surface on the forum, which\n    // is exactly the \"3 hours ago beside Spanish text\" defect; Intl does this\n    // properly and lmxI18n.rel() is already the house wrapper for it.\n    //\n    // The instant is skew-corrected BEFORE it is handed over. These are server\n    // timestamps and the client clock can be minutes out — S.skew is\n    // serverTime - Date.now(), which is what now() adds — while lmxI18n.rel()\n    // measures against the raw Date.now(). Shifting the timestamp by the same\n    // skew makes the two agree.\n    var i18n = window.lmxI18n;\n    if (i18n && i18n.rel) return i18n.rel(new Date(at + S.skew));\n\n    var d = Math.max(0, now() - at) / 1000;\n    if (d < 45) return 'now';\n    if (d < 3600) return Math.round(d / 60) + 'm';\n    if (d < 86400) return Math.round(d / 3600) + 'h';\n    return Math.round(d / 86400) + 'd';\n  }",
+      "key": "(relative time — window.lmxI18n.rel)",
+      "note": "The one string-shaped thing left in this file after the chat lane's own i18n pass. Layout was checked, not assumed: .LmxChat-time is `flex: none` (less/forum.less:286) inside a `display:flex` .LmxChat-meta, and .LmxChat-who beside it is `flex: 0 1 auto` with overflow:hidden + text-overflow:ellipsis (less/forum.less:271-279). A wider timestamp therefore shortens the username with an ellipsis and cannot break the row. If it turns out to shorten it too much, the fix belongs in looksmax-i18n rather than here: lmxI18n.rel() builds its formatter with { numeric: 'auto' } at js/dist/forum.js:148, and adding style: 'narrow' there gives \"hace 2 min\" / \"2 min. ago\" everywhere at once."
+    },
+    {
+      "file": "js/chat.js",
+      "line": 104,
+      "find": "  function t(key, params, fallback) {\n    var i18n = window.lmxI18n;\n    if (i18n && i18n.t) {\n      var out = i18n.t('local-looksmax-chat.forum.' + key, params || {}, fallback);\n      if (typeof out === 'string') return out;\n    }\n    return fallback;\n  }",
+      "replace": "  function t(key, params, fallback) {\n    var i18n = window.lmxI18n;\n    if (i18n && i18n.t) {\n      var out = i18n.t('local-looksmax-chat.forum.' + key, params || {}, fallback);\n      if (typeof out === 'string') return out;\n    }\n    return fallback;\n  }\n\n  /** A number in the reader's locale: 1,024 in English, 1.024 in Spanish. */\n  function num(n) {\n    var i18n = window.lmxI18n;\n    return i18n && i18n.num ? i18n.num(n) : String(n);\n  }",
+      "key": "(number formatting helper)",
+      "note": "Guarded the same way t() already is, so it is safe wherever t() is. Apply before the two call sites below."
+    },
+    {
+      "file": "js/chat.js",
+      "line": 484,
+      "find": "    onlineEl.textContent = String(S.online);",
+      "replace": "    onlineEl.textContent = num(S.online);",
+      "key": "(number formatting)",
+      "note": "The presence count. Small today, but it is the one number in the card that a reader compares at a glance."
+    },
+    {
+      "file": "js/chat.js",
+      "line": 520,
+      "find": "    remain.textContent = String(left);",
+      "replace": "    remain.textContent = num(left);",
+      "key": "(number formatting)",
+      "note": "Characters remaining, counts down from 400 — three digits, so grouping never applies, but String() is still the wrong call to leave in place next to translated text."
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 72,
+      "find": "            return [403, ['error' => 'guest', 'detail' => 'Log in to chat.']];",
+      "replace": "            return [403, ['error' => 'guest', 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.guest')]];",
+      "key": "forum.api.guest",
+      "note": "Audit missed it. Every `detail` in this method is member-facing: failSend() at js/chat.js:728 does t('api.' + j.error, {max: S.maxLength}, j.detail) — it prefers the client-side key and falls back to this server string for a refusal it has not heard of. So the server text is the fallback for the client's own key set and must say the same thing in the same language. ChatController is built by the router with two injected dependencies; resolve() is used rather than widening its constructor, which is not this lane's file to change."
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 76,
+      "find": "            return [403, ['error' => 'suspended', 'detail' => 'Your account is suspended.']];",
+      "replace": "            return [403, ['error' => 'suspended', 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.suspended')]];",
+      "key": "forum.api.suspended"
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 81,
+      "find": "            return [422, ['error' => 'empty', 'detail' => 'Nothing to send.']];",
+      "replace": "            return [422, ['error' => 'empty', 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.empty')]];",
+      "key": "forum.api.empty",
+      "note": "Audit missed it."
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 84,
+      "find": "            return [422, ['error' => 'too_long', 'detail' => 'Keep it under ' . Payload::MAX_LEN . ' characters.']];",
+      "replace": "            return [422, ['error' => 'too_long', 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.too_long', ['max' => Payload::MAX_LEN])]];",
+      "key": "forum.api.too_long",
+      "note": "The only one of the seven that interpolates. The client passes {max: S.maxLength} for the same key, so the placeholder name has to be `max` on both sides — it is."
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 95,
+      "find": "            return [429, ['error' => 'rate', 'retryAfter' => Payload::RATE_SECONDS - $gap, 'detail' => 'Slow down.']];",
+      "replace": "            return [429, ['error' => 'rate', 'retryAfter' => Payload::RATE_SECONDS - $gap, 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.rate')]];",
+      "key": "forum.api.rate",
+      "note": "Audit missed it."
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 98,
+      "find": "            return [429, ['error' => 'burst', 'retryAfter' => 20, 'detail' => 'Too many messages in a minute.']];",
+      "replace": "            return [429, ['error' => 'burst', 'retryAfter' => 20, 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.burst')]];",
+      "key": "forum.api.burst"
+    },
+    {
+      "file": "src/Api/ChatController.php",
+      "line": 101,
+      "find": "            return [429, ['error' => 'duplicate', 'retryAfter' => 0, 'detail' => 'You just said that.']];",
+      "replace": "            return [429, ['error' => 'duplicate', 'retryAfter' => 0, 'detail' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-chat.forum.api.duplicate')]];",
+      "key": "forum.api.duplicate",
+      "note": "Audit missed it."
+    }
+  ],
+  "deferred": [],
+  "not_translatable": [
+    {
+      "file": "src/Payload.php",
+      "line": 69,
+      "string": "'u.username as account'",
+      "why": "SQL column alias in a select list. Audit false positive."
+    },
+    {
+      "file": "js/chat.js",
+      "line": 185,
+      "string": "the EMOJI shortcode map (':fire:', ':skull:', …)",
+      "why": "Input shortcodes members type, not output text, and they are the tokens EMOJI_RE matches — translating them would silently stop `:fire:` working. Spanish aliases could be ADDED to the map without removing the English ones; that is a feature request, not an i18n defect."
+    },
+    {
+      "file": "js/chat.js",
+      "line": 176,
+      "string": "AV_COLORS",
+      "why": "Hex colours for the fallback avatar initial. Not text."
+    },
+    {
+      "file": "js/chat.js",
+      "line": 156,
+      "string": "'now' / 'm' / 'h' / 'd' in rel()",
+      "why": "Left in place deliberately by the replacement above, as the fallback ladder for a page where window.lmxI18n never loaded. Unreachable whenever looksmax-i18n is enabled."
+    },
+    {
+      "file": "less/forum.less",
+      "line": 0,
+      "string": "no text `content:` rule anywhere in the file",
+      "why": "Checked: every `content:` occurrence is `justify-content`. Nothing in this extension's LESS needs deferring."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+    "name": "local/looksmax-reactions",
+    "description": "Multi-reaction system: per-user reactions with a custom image catalogue, carrying the imported XenForo reaction history.",
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Local\\Reactions\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Looksmax Reactions",
+            "category": "feature",
+            "icon": {
+                "name": "fas fa-face-grin-stars",
+                "backgroundColor": "#161d28",
+                "color": "#e6b169"
+            }
+        }
+    }
+}

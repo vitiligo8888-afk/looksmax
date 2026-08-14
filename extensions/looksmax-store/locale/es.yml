@@ -1,0 +1,418 @@
+# Looksmax Store — español.
+#
+# Registro: tú, nunca usted, nunca vos, sin vosotros. Español neutro de
+# América Latina, con México como público principal. `clic`, no `click`.
+#
+# Notas de traducción que no son obvias:
+#
+#  * "credits" es `créditos`, la moneda del foro. No se traduce como "puntos":
+#    looksmax-economy ya usa "puntos" para el contador de por vida y confundir
+#    los dos es confundir lo que se gasta con lo que se acumula.
+#  * "tier" / "membership" son la misma cosa aquí: `membresía`.
+#  * "bump" (subir un hilo al principio de la lista) es `empujar`. No existe un
+#    término establecido en español para esto en foros; `empujar` se entiende
+#    por el contexto y es lo que ya usa el resto de la interfaz.
+#  * "boost" es `impulso`. "streak" es `racha`.
+#  * Los plurales llevan las dos ramas escritas porque en español cambia el
+#    verbo, no solo el sustantivo: "queda 1 día" / "quedan 2 días".
+
+local-looksmax-store:
+
+  forum:
+
+    head:
+      title: Tienda
+      sub: Los créditos se ganan publicando cosas que la gente lee. Aquí los gastas.
+
+    title:
+      catalogue: Tienda
+      inventory: Lo que tienes
+      orders: Tus pedidos
+      admin: Administrar la tienda
+
+    nav:
+      catalogue: Catálogo
+      inventory: Lo que tienes
+      orders: Pedidos
+      manage: Administrar
+
+    bar:
+      guest: Inicia sesión para ver tu saldo y comprar aquí.
+      credits_unit: "{count, plural, one {crédito} other {créditos}}"
+      membership: Membresía
+      discount: Tu descuento
+      discount_sub: aplicado a los precios de abajo
+      earn_rate: Ritmo de ganancia
+      boost_active: impulso activo
+      base_rate: ritmo base de tu membresía
+      lifetime: Ganado en total
+      lifetime_sub: gastar nunca reduce esta cifra
+
+    tier:
+      standard: Estándar
+
+    category:
+      membership: Membresías
+      colours: Colores de nombre
+      frames: Marcos de avatar
+      boosts: Impulsos
+      utility: Extras para hilos
+      mystery: Cajas
+      bundles: Paquetes
+      credits: Paquetes de créditos
+
+    # En minúsculas: se imprimen debajo del nombre del artículo, no como
+    # título. Las cinco concuerdan en masculino porque acompañan a "artículo".
+    rarity:
+      common: común
+      uncommon: poco común
+      rare: raro
+      epic: épico
+      legendary: legendario
+
+    kind:
+      style: Color de nombre
+      frame: Marco de avatar
+      tier: Membresía
+      boost: Impulso
+      streakfreeze: Congelador de racha
+      highlight: Resaltado de hilo
+      sticky: Fijado de hilo
+      bump: Empujón de hilo
+      rename: Cambio de nombre
+      credits: Créditos
+      mystery: Caja
+      bundle: Paquete
+    # `failed` es adjetivo, no verbo: también se sustituye en
+    # error.order_state ("Ese pedido está fallido.").
+    state:
+      granted: entregado
+      refused: rechazado
+      failed: fallido
+      refunded: reembolsado
+      expired: terminado
+      pending: en curso
+
+    time:
+      ended: terminó
+      days_left: "{count, plural, one {queda # día} other {quedan # días}}"
+      hours_left: "{count, plural, one {queda # hora} other {quedan # horas}}"
+      minutes_left: "{count, plural, one {queda # minuto} other {quedan # minutos}}"
+
+    price:
+      card_not_live: la tarjeta aún no funciona
+
+    chip:
+      days: "{count, plural, one {# día} other {# días}}"
+      uses: "{count, plural, one {# uso} other {# usos}}"
+      stock: "quedan {left} de {total}"
+      holders: "{count, plural, one {# miembro lo tiene} other {# miembros lo tienen}}"
+
+    preview:
+      username_sample: Usuario
+
+    card:
+      owned: ya lo tienes
+      working: un momento…
+      short: "{count, plural, one {te falta # crédito} other {te faltan # créditos}}"
+
+    buy:
+      buy: Comprar
+      renew: Renovar
+      upgrade: Mejorar
+      credits: Comprar créditos
+
+    dialog:
+      price: Precio
+      list_price: Precio de lista
+      discount: Tu descuento por membresía
+      you_pay: Pagas
+      balance_after: Saldo después
+      lasts: Dura
+      credits_amount: "{count, plural, one {# crédito} other {# créditos}}"
+      gift_label: Regálaselo a alguien
+      gift_placeholder: su nombre de usuario, o déjalo vacío
+      card_label: Número de tarjeta
+      card_mock: El pago con tarjeta todavía no está conectado. Este camino está armado de punta a punta contra un proveedor simulado para que el real entre sin cambiar nada; no se cobra nada y no se guardan ni se envían datos de tarjeta a ningún lado. La tarjeta 4000 0000 0000 0002 se trata como rechazada.
+      send: Enviarlo
+      confirm: Confirmar
+
+    action:
+      cancel: Cancelar
+      save: Guardar
+      apply: Aplicar
+      edit: Editar
+      refund: Reembolsar
+      retire: Retirar
+      restore: Reactivar
+      show_fewer: Ver menos
+
+    loading:
+      catalogue: Cargando el catálogo…
+      generic: Cargando…
+      orders: Cargando tus pedidos…
+
+    empty:
+      category: Todavía no hay nada en esta sección.
+
+    inventory:
+      ready: Listo para usar
+      ready_empty: No tienes nada esperando. Los fijados, resaltados, empujones y cambios de nombre aparecen aquí después de comprarlos.
+      running: Activo ahora
+      running_empty: No tienes impulsos ni membresías activos.
+      permanent: Tuyo para siempre
+      permanent_empty: Los colores y marcos que compras se quedan aquí de forma permanente, aunque una membresía se venza.
+      uses_left: "{count, plural, one {queda # uso} other {quedan # usos}}"
+      ends: "{countdown}, termina el {when}"
+      from: "de {name}"
+      new_username_placeholder: nuevo nombre de usuario
+      rename_button: Cambiar mi nombre
+      no_threads: Primero abre un hilo y luego vuelve.
+      bump: Empujarlo
+      pin: Fijarlo
+      highlight: Resaltarlo
+
+    orders:
+      title: Tus pedidos
+      empty: Todavía no has comprado nada.
+      gift_to: "regalo para {name}"
+      gifts_title: Regalos que te hicieron
+      show_all: "{count, plural, one {Ver el # pedido} other {Ver los # pedidos}}"
+
+    ledger:
+      title: Movimientos de créditos
+      empty: Todavía no tienes movimientos de la tienda en tu historial.
+      show_all: "{count, plural, one {Ver el # movimiento} other {Ver los # movimientos}}"
+      reason:
+        store:
+          purchase: Compra en la tienda
+          refund: Reembolso de la tienda
+          credits: Créditos comprados
+          clawback: Créditos retirados
+        tier:
+          purchase: Compra de membresía
+        admin:
+          adjust: Ajuste del staff
+
+    table:
+      when: Cuándo
+      item: Artículo
+      paid: Pagado
+      state: Estado
+      from: De
+      reason: Motivo
+      reference: Referencia
+      amount: Monto
+      sku: SKU
+      name: Nombre
+      kind: Tipo
+      price: Precio
+      stock: Existencias
+      buyer: Comprador
+      action: Acción
+      subject: Sujeto
+      before: Antes
+      after: Después
+      note: Nota
+
+    alert:
+      box_won: "La caja te dio {name} ({rarity}, normalmente {worth})."
+      gift_sent: "{item} se envió a {username}."
+      # "{item} is yours" no se puede traducir literalmente: "tuyo" concuerda
+      # con el género del artículo y el artículo es una fila de la base de
+      # datos ("Membresía VIP" es femenino, "Marco dorado" masculino). Se
+      # reescribe para que no tenga que concordar con nada.
+      bought: "Ya tienes {item}."
+      refunded: "{count, plural, one {Se te devolvió # crédito.} other {Se te devolvieron # créditos.}}"
+      renamed: "Ahora eres {username}."
+      bumped: El hilo subió.
+      redeemed: "Listo. Termina el {when}."
+
+    error:
+      no_answer: La tienda no respondió. Vuelve a cargar la página.
+      purchase_failed: No se completó. No se te cobró nada.
+      refund_failed: No se pudo reembolsar ese pedido.
+      redeem_failed: No se pudo canjear.
+      no_such_item: No existe ese artículo.
+      not_giftable: Ese no se puede regalar.
+      no_such_user: No hay ninguna cuenta con ese nombre.
+      no_account_named: "No hay ninguna cuenta llamada {name}."
+      duplicate_submitted: Esa compra ya se había enviado.
+      duplicate_processing: Esa compra ya se está procesando.
+      not_on_sale: Eso no está a la venta ahora.
+      closed: Ese ya cerró.
+      sold_out: Agotado.
+      order_state: "Ese pedido está {state}."
+      not_your_order: Ese pedido no es tuyo.
+      no_refund_window: Este artículo no se puede reembolsar. Escríbele al staff si algo salió mal.
+      refund_window_closed: La ventana de reembolso de este artículo ya cerró.
+      already_used: Eso ya se usó, así que no se puede reembolsar.
+      already_owned: Eso ya lo tienes.
+      own_everything_box: Ya tienes todo lo que esta caja puede dar.
+      own_everything_bundle: Ya tienes todo lo que trae este paquete.
+      injected_fault: "La compra se revirtió a propósito ({detail}). No se te cobró nada."
+      generic_rollback: Algo salió mal y no se te cobró nada.
+      sign_in: Inicia sesión primero.
+      unknown_action: acción desconocida
+      unknown_operation: operación desconocida
+      unknown_view: vista desconocida
+      generic: Algo salió mal. No se te cobró nada.
+      no_such_order: No existe ese pedido.
+      nothing_to_redeem: No hay nada de ese tipo para canjear.
+      not_allowed: sin permiso
+      already_refunded: Ese pedido ya se había reembolsado.
+      card_declined: Esa tarjeta fue rechazada.
+      card_invalid: Ese número de tarjeta no es válido.
+      nothing_to_charge: No hay nada que cobrar.
+      not_mock_charge: Ese cargo no lo hizo el proveedor simulado.
+
+    pay:
+      credits_label: Créditos
+      card_label: Tarjeta (no activa)
+      short: "{count, plural, one {Te falta # crédito.} other {Te faltan # créditos.}}"
+
+    lock:
+      guest: Inicia sesión para comprar.
+      inactive: No está a la venta ahora.
+      opens: "Abre el {when}."
+      closed: Este ya cerró.
+      sold_out: Agotado.
+      owned: Esto ya lo tienes.
+      # El sujeto es la otra persona: "They already own this" al regalar.
+      owned_gift: Ya lo tiene.
+      max_reached: Ya tienes el máximo de estos.
+      tier_downgrade: "Ya tienes {current}, que está por encima de {target}."
+      min_tier: "Esto es para {tier} o superior."
+      rank_required: "Primero llega a {rank} ({count, plural, one {te falta # punto de por vida} other {te faltan # puntos de por vida}})."
+      requires: "Primero necesitas {item}."
+
+    redeem:
+      no_highlight: No te queda ningún resaltado para usar.
+      no_pin: No te queda ningún fijado para usar.
+      no_bump: No te queda ningún empujón para usar.
+      no_rename: No te queda ningún cambio de nombre para usar.
+      already_pinned: Ese hilo ya está fijado.
+      bumped_this_week: Ese hilo ya se empujó esta semana.
+      name_rules: "Los nombres llevan de 3 a 30 caracteres: letras, números, guiones y guiones bajos."
+      same_name: Ese ya es tu nombre.
+      name_taken: Ese nombre ya está ocupado.
+      no_such_thread: No existe ese hilo.
+      not_your_thread: Ese hilo no es tuyo.
+      thread_deleted: Ese hilo está borrado.
+
+    admin:
+      stat:
+        items: Artículos
+        orders: Pedidos
+        delivered: Entregados
+        refused: Rechazados
+        failed: Fallidos
+        refunded: Reembolsados
+        spent: Créditos gastados
+        circulating: Créditos en circulación
+        entitlements: Derechos activos
+      adjust_title: Ajustar un saldo
+      username_placeholder: nombre de usuario
+      amount_placeholder: monto, por ejemplo 500 o -500
+      reason_placeholder: motivo (queda registrado)
+      adjusted: "{username}: de {before} a {after}"
+      failed: No funcionó.
+      tab:
+        catalogue: Catálogo
+        orders: Pedidos recientes
+        audit: Registro de auditoría
+      catalogue_section: Catálogo
+      orders_section: Pedidos recientes
+      audit_section: Registro de auditoría
+      synced: "Catálogo sincronizado: {added, plural, one {# agregado} other {# agregados}}, {updated, plural, one {# actualizado} other {# actualizados}}."
+      sync_button: Sincronizar el catálogo original
+      new_item: Artículo nuevo
+      filter_placeholder: filtrar por SKU, nombre o tipo
+      on_sale: a la venta
+      # Clave entrecomillada: en YAML 1.1 un `off` suelto es el booleano false.
+      "off": retirado
+      saved: "Se guardó {sku}."
+      save_failed: No se guardó.
+      sku_rules: Los SKU llevan minúsculas, números y guiones.
+      retired_note: Ya se vendió antes, así que se retiró en lugar de borrarse.
+      nothing_to_adjust: No hay nada que ajustar.
+      reason_required: Di por qué. El ajuste queda registrado con el motivo.
+      no_such_item: No existe ese artículo.
+      field:
+        sku: SKU
+        name: Nombre
+        kind: Tipo
+        category: Categoría
+        price: Precio
+        rarity: Rareza
+        icon: Icono
+        color: Color
+        max_per_user: Máximo por persona
+        stock_total: Existencias totales
+        duration_days: Duración (días)
+        uses: Cargas
+        refund_minutes: Ventana de reembolso (minutos)
+        min_tier: Membresía mínima
+        min_rank: Rango mínimo
+        available_until: Cierra el (Y-m-d H:i:s)
+        sort: Orden
+        blurb: Descripción
+        payload: Payload (JSON)
+        active: A la venta
+        giftable: Se puede regalar
+        discountable: Aplica el descuento por membresía
+
+    # ── copia del catálogo original ────────────────────────────────────────
+    #
+    # TODAVÍA NO ESTÁ CONECTADO. Ver la sección `deferred` de i18n-map.json:
+    # hoy src/Seed.php escribe esta prosa directamente en `store_items.name` y
+    # `.blurb`, y una clave de traducción no puede vivir en una columna que un
+    # administrador edita desde un campo de texto.
+    item:
+      boost-2x-24h:
+        name: Ganancias dobles, 24 horas
+        blurb: Todo lo que ganes cuenta doble por un día. Se suma al multiplicador de tu membresía.
+      boost-2x-7d:
+        name: Ganancias dobles, 7 días
+        blurb: Lo mismo, pero por una semana. Sale más barato por día que comprar siete del anterior.
+      cap-raise-24h:
+        name: Tope diario ampliado, 24 horas
+        blurb: Duplica por un día los topes diarios que frenan el farmeo. Para los días en que de verdad estás escribiendo así.
+      streak-freeze:
+        name: Congelador de racha
+        blurb: Cubre un día perdido para que la racha diaria sobreviva. Se gasta solo, del más viejo al más nuevo.
+      thread-highlight-3d:
+        name: Resaltar un hilo, 3 días
+        blurb: Tu hilo lleva un borde marcado en la lista de discusiones durante tres días. Un hilo, el que tú elijas, canjeado cuando quieras.
+      thread-sticky-24h:
+        name: Fijar un hilo, 24 horas
+        blurb: Fija uno de tus hilos arriba de su etiqueta por un día y después lo suelta. Un moderador puede terminarlo antes.
+      thread-bump:
+        name: Empujar un hilo
+        blurb: Regresa uno de tus hilos al principio de la lista de recientes sin escribir "bump".
+      username-change:
+        name: Cambio de nombre de usuario
+        blurb: Un cambio del nombre de tu cuenta. Tu nombre anterior queda registrado en el pedido.
+      box-colour:
+        name: Caja de colores
+        blurb: Un estilo de nombre que todavía no tengas. 55% sólido, 38% degradado, 7% animado. El estilo animado más barato vale 12.000.
+      box-frame:
+        name: Caja de marcos
+        blurb: Un marco de avatar que todavía no tengas. 40% común, 30% poco común, 24% raro, 6% épico.
+      tier-vip-lifetime:
+        name: VIP de por vida
+        blurb: VIP que nunca vence y nunca hay que renovar. Existen veinticinco.
+      bundle-vip-start:
+        name: Arranque VIP
+        blurb: Un mes de VIP, el degradado Oceanic y un día de ganancias dobles. Juntos cuestan menos que los tres por separado.
+      credits-10k:
+        name: 10.000 créditos
+        blurb: El pago con tarjeta todavía no está activo. Este es un camino de compra de prueba y no cobra nada.
+      credits-50k:
+        name: 50.000 créditos
+        blurb: El pago con tarjeta todavía no está activo. Este es un camino de compra de prueba y no cobra nada.
+
+  admin:
+    nav:
+      store: Tienda
+      store_title: Catálogo, pedidos, saldos y el registro de auditoría

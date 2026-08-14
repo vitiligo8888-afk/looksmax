@@ -1,0 +1,520 @@
+// Cosmetic personalisation.
+//
+// ── the rules this file is written against ─────────────────────────────────
+//
+// 1. Flarum compiles through wikimedia/less.php, where every colour function
+//    is evaluated at COMPILE time. fade(var(--x), 40%), darken(var(--x), 2%)
+//    and `+` inside calc() all abort the build — forum.js still builds,
+//    forum.css is simply NEVER WRITTEN, and every page 500s or renders
+//    unstyled. There is therefore NOT ONE colour function and NOT ONE calc()
+//    in this file. Every colour arithmetic result arrives as a finished rgba()
+//    string in an inline custom property, computed in PHP by
+//    src/Definitions.php::css(). each() and range() are not implemented by that
+//    port and do not appear here either.
+//
+// 2. Every colour, radius, elevation, duration and z-index is a token from
+//    looksmax-theme/less/tokens.less by NAME. The house colour is violet and it
+//    changed today; anything hardcoded would already be out of system. The only
+//    literal colours are the cosmetics' own palettes, and those come from
+//    looksmax-brand/less/brand.less through src/Defs.php, not from here.
+//
+// 3. Rarity colours come from the ramp the store already uses
+//    (looksmax-store/less/forum.less:238-242) so that "epic" is the same colour
+//    in the shop and in the wardrobe.
+//
+// ── the class-name interlock with looksmax-ranks ───────────────────────────
+//
+// looksmax-ranks has its own partial frame renderer. Its decorator refuses to
+// wrap an avatar whose parent already carries `.lmx-frame`
+// (looksmax-ranks/js/dist/forum.js:254), so the wrapper this extension inserts
+// carries that class DELIBERATELY: it is the handshake that stops two
+// extensions drawing two rings on one avatar. Every rule below is therefore
+// selected on `[data-cf]` as well as the class, giving specificity (0,2,1),
+// which beats ranks' base `.lmx-frame::before` (0,1,1) regardless of which
+// stylesheet the bundler emits first. Load order is not a thing to rely on.
+
+// ============================================================ keyframes
+// transform and opacity only. Nothing here reads or writes layout, nothing
+// triggers paint on the avatar itself, and every animated layer is a
+// pseudo-element that the compositor can promote on its own.
+
+@keyframes cf-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes cf-spin-rev {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+
+@keyframes cf-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+// ============================================================ the frame
+//
+// Drawn on a wrapper AROUND the avatar, never as a border on it. Three reasons,
+// all of which were tried the other way round first:
+//   * a border changes the avatar's box and shifts every layout it sits in
+//   * core sets border-radius and overflow on `.Avatar`, so a rotating gradient
+//     placed inside it is clipped to nothing
+//   * if this stylesheet fails to load the avatar still renders. Decoration
+//     must degrade to absence, never to a broken image.
+
+.LmxCosFrame[data-cf] {
+  position: relative;
+  display: inline-block;
+  // A stacking context, so the two negative-z pseudo layers stay behind THIS
+  // avatar and can never slide behind the page or in front of a neighbour.
+  // It contains nothing but the avatar, so it traps no dropdown and no
+  // hovercard — both of those are appended to <body> by their owners.
+  isolation: isolate;
+  vertical-align: middle;
+  line-height: 0;
+  border-radius: var(--r-pill);
+  // The bloom. It lives on the WRAPPER rather than on the ring because the
+  // gradient renderers mask their pseudo-element, and a mask clips the
+  // element's box-shadow with it.
+  box-shadow: 0 0 var(--cf-glow-size, 0) var(--cf-glow, transparent);
+}
+
+.LmxCosFrame[data-cf]::before,
+.LmxCosFrame[data-cf]::after {
+  content: '';
+  position: absolute;
+  inset: var(--cf-inset, -3px);
+  border-radius: var(--r-pill);
+  pointer-events: none;
+  z-index: var(--z-behind);
+  display: none;
+}
+
+// ---------------------------------------------------------- static layer
+.LmxCosFrame[data-cf-render='ring']::before {
+  display: block;
+  border: var(--cf-w, 2px) solid var(--cf-c1, currentColor);
+}
+
+// A gradient RING, not a gradient disc: the gradient paints the border box and
+// an xor mask removes the padding box from it. No calc, so nothing for the LESS
+// port to mis-evaluate.
+.LmxCosFrame[data-cf-render='gradient']::before,
+.LmxCosFrame[data-cf-render='dual']::before {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background: var(--cf-linear) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+// --------------------------------------------------------- moving layer
+// The rotating renderers spin the ELEMENT, not the gradient's `from` angle:
+// `transform` is a compositor property and animating it costs no layout and no
+// paint, where animating a gradient angle repaints the layer every frame.
+.LmxCosFrame[data-cf-render='conic']::after,
+.LmxCosFrame[data-cf-render='dashed']::after,
+.LmxCosFrame[data-cf-render='dual']::after {
+  display: block;
+  border: var(--cf-w, 2px) solid transparent;
+  background: var(--cf-sweep) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cf-spin var(--cf-spin, 6s) linear infinite;
+  // Paused until the decorator's IntersectionObserver says the avatar is on
+  // screen. A paused animation on an off-screen layer costs nothing; fifty
+  // running ones cost a frame budget.
+  animation-play-state: paused;
+}
+
+.LmxCosFrame[data-cf-render='dual']::after {
+  inset: var(--cf-inset2, -5px);
+}
+
+.LmxCosFrame[data-cf-render='dual']::before {
+  animation: cf-spin-rev var(--cf-spin2, 11s) linear infinite;
+  animation-play-state: paused;
+}
+
+.LmxCosFrame[data-cf].is-pulse::before {
+  animation: cf-pulse var(--cf-pulse, 3.4s) ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+// will-change ONLY while actually on screen and actually animating. Left on
+// permanently it is a memory leak with fifty avatars on a page.
+.LmxCosFrame[data-cf].is-live::before,
+.LmxCosFrame[data-cf].is-live::after {
+  animation-play-state: running;
+  will-change: transform, opacity;
+}
+
+.LmxCosFrame[data-cf]:not(.is-live)::before,
+.LmxCosFrame[data-cf]:not(.is-live)::after {
+  will-change: auto;
+}
+
+// ============================================================ banner
+//
+// A generated plate, not an uploaded image: this forum has no moderation
+// surface for a full-width picture behind somebody's name, and a gradient
+// cannot be a shock image or a tracking pixel.
+
+.LmxCosBanner {
+  position: relative;
+  height: 132px;
+  margin: 0 0 -84px 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: var(--cb-fill, var(--surface-2));
+  overflow: hidden;
+  z-index: var(--z-base);
+  pointer-events: none;
+}
+
+// The pattern layer and the legibility fade are separate, so the fade is never
+// tinted by the pattern. The pattern rules are shared with the wardrobe tile so
+// a banner previews as itself and not as a plain gradient.
+.LmxCosBanner::before,
+.LmxCosTile-plate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.32;
+  background-image: none;
+}
+
+.LmxCosBanner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+}
+
+.LmxCosBanner[data-cb-pattern='grid']::before,
+.LmxCosTile-plate[data-cb-pattern='grid']::before {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 22px);
+}
+
+.LmxCosBanner[data-cb-pattern='dots']::before,
+.LmxCosTile-plate[data-cb-pattern='dots']::before {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.4px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+.LmxCosBanner[data-cb-pattern='rays']::before,
+.LmxCosTile-plate[data-cb-pattern='rays']::before {
+  background-image: repeating-conic-gradient(
+    from 0deg at 50% 130%,
+    rgba(255, 255, 255, 0.12) 0deg 3deg,
+    transparent 3deg 9deg
+  );
+}
+
+// On the profile the banner sits behind the hero. 390px gets a shorter plate
+// because a third of a phone screen of decoration is not decoration.
+@media (max-width: 767px) {
+  .LmxCosBanner {
+    height: 96px;
+    margin-bottom: -66px;
+    border-radius: 0;
+  }
+}
+
+// ============================================================ the wardrobe
+// /cosmetics — see what you own, try it on, put it on.
+
+.LmxCosPage {
+  padding: 24px 0 64px;
+}
+
+.LmxCosPage-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.LmxCosPage-title {
+  font-family: var(--brand-font-display, inherit);
+  letter-spacing: var(--brand-tracking-display, 0);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+}
+
+.LmxCosPage-sub {
+  color: var(--ink-dim);
+  margin: 0 0 22px;
+  font-size: 14px;
+}
+
+// ---------------------------------------------------------- the mirror
+// A live preview on the user's OWN avatar, not on a stock circle. A cosmetic
+// previewed on somebody else's picture is not a preview.
+.LmxCosMirror {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.LmxCosMirror-plate {
+  position: absolute;
+  inset: 0;
+  background: var(--cb-fill, transparent);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.LmxCosMirror-avatar,
+.LmxCosMirror-body {
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+.LmxCosMirror-avatar .Avatar {
+  width: 72px;
+  height: 72px;
+  font-size: 28px;
+}
+
+.LmxCosMirror-name {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+.LmxCosMirror-note {
+  color: var(--ink-dim);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.LmxCosMirror-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+// ------------------------------------------------------------- sections
+.LmxCosSection {
+  margin-bottom: 34px;
+}
+
+.LmxCosSection-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  margin: 0 0 12px;
+}
+
+.LmxCosSection-count {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-faint);
+}
+
+.LmxCosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 12px;
+}
+
+// --------------------------------------------------------------- a tile
+// Prefixed LmxCos* on purpose: `.LmxCard` is already declared by two other
+// extensions on this install and a third definition would be a coin toss.
+.LmxCosTile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 12px 14px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--t-fast) ease, background var(--t-fast) ease, transform var(--t-fast) ease;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+}
+
+.LmxCosTile:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+
+.LmxCosTile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.LmxCosTile.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-a08);
+}
+
+.LmxCosTile.is-equipped::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--ok);
+}
+
+.LmxCosTile.is-locked {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.LmxCosTile.is-locked:hover {
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+// The rarity edge, copied in behaviour from the store's cards so an epic reads
+// the same in both places: a top edge, never a wash, so the card fill stays the
+// same surface everywhere and rarity never costs contrast.
+.LmxCosTile-rarity {
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  border-radius: 0 0 var(--r-xs) var(--r-xs);
+  background: var(--cos-rarity, var(--line-strong));
+}
+
+.LmxCosTile[data-rarity='common']    { --cos-rarity: #9aa4b2; }
+.LmxCosTile[data-rarity='uncommon']  { --cos-rarity: #9ece6a; }
+.LmxCosTile[data-rarity='rare']      { --cos-rarity: #7aa2f7; }
+.LmxCosTile[data-rarity='epic']      { --cos-rarity: #bb9af7; }
+.LmxCosTile[data-rarity='legendary'] { --cos-rarity: #e8c07d; }
+
+.LmxCosTile-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.LmxCosTile-meta {
+  font-size: 12px;
+  color: var(--ink-faint);
+  line-height: 1.35;
+}
+
+.LmxCosTile-lock {
+  font-size: 12px;
+  color: var(--warn);
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: center;
+}
+
+.LmxCosTile-swatch {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  display: inline-block;
+}
+
+// Banner tiles preview the plate itself rather than a circle.
+.LmxCosTile-plate {
+  width: 100%;
+  height: 46px;
+  display: block;
+  border-radius: var(--r-sm);
+  background: var(--cb-fill, var(--surface-3));
+  position: relative;
+  overflow: hidden;
+}
+
+.LmxCosTile-none .LmxCosTile-swatch,
+.LmxCosTile-none .LmxCosTile-plate {
+  background: var(--surface-0);
+  border: 1px dashed var(--line-strong);
+}
+
+.LmxCosEmpty {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-lg);
+  color: var(--ink-faint);
+  font-size: 14px;
+  text-align: center;
+}
+
+.LmxCosError {
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  background: var(--danger-a14);
+  color: var(--ink);
+  border: 1px solid var(--danger);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.LmxCosNote {
+  color: var(--ink-faint);
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+  .LmxCosPage { padding: 16px 0 48px; }
+  .LmxCosGrid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; }
+  .LmxCosMirror { flex-wrap: wrap; gap: 12px; }
+  .LmxCosMirror-actions { margin-left: 0; width: 100%; }
+  .LmxCosMirror-actions .Button { flex: 1; }
+}
+
+// ============================================================ motion off
+// Everything above degrades to a static ring. Nothing here is load bearing:
+// with motion off the frames still read as bronze, silver, gold and so on,
+// because the colour carries the identity and the movement only carries the
+// rarity.
+@media (prefers-reduced-motion: reduce) {
+  .LmxCosFrame[data-cf]::before,
+  .LmxCosFrame[data-cf]::after,
+  .LmxCosFrame[data-cf].is-live::before,
+  .LmxCosFrame[data-cf].is-live::after {
+    animation: none !important;
+    will-change: auto !important;
+  }
+
+  .LmxCosTile {
+    transition: none;
+  }
+}

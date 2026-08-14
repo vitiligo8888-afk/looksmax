@@ -1,0 +1,95 @@
+local-looksmax-guides:
+  forum:
+
+    # Términos técnicos de la escala de evidencia. Se mantienen cortos porque
+    # aparecen dentro de una barra apilada y en una leyenda de una línea.
+    tier:
+      anecdote: Anécdota
+      community: Comunidad
+      community_report: Reporte de la comunidad
+      mechanism: Mecanismo
+      observational: Observacional
+      # "Trial" aquí es un ensayo clínico. "Prueba" se confundiría con probar
+      # un producto, que es justo lo que este nivel NO significa.
+      trial: Ensayo
+      guideline: Guía clínica
+      # Una afirmación del propio vendedor sobre su producto.
+      marketing: Publicidad
+
+    badge:
+      guide: Guía
+      guide_stale: "Guía · desactualizada"
+
+    freshness:
+      # "guía" es femenino, por eso "Revisada" y "Desactualizada".
+      reviewed: "Revisada {when}"
+      recently: hace poco
+      due: Toca revisarla
+      stale: "Sin revisar desde {when}"
+      long_time: hace mucho
+      never: Nunca se ha revisado
+
+    banner:
+      due_title: "Toca revisarla."
+      stale_title: "Desactualizada."
+      due_body: " Esta guía se revisó por última vez {when} y ya toca revisarla. Toma los detalles con reservas."
+      stale_body: " Esta guía no se revisa desde {when}. Deja de recomendarse en los rankings hasta que alguien la revise."
+      some_time_ago: hace tiempo
+      # Se usa dentro de "no se revisa desde …", por eso lleva "que".
+      since_written: que se escribió
+
+    header:
+      read_time: "{minutes} min de lectura"
+      sections: "{n, plural, one {{count} sección} other {{count} secciones}}"
+      version: "v{version}"
+      words: "{n, plural, one {{count} palabra} other {{count} palabras}}"
+      # "claim" = afirmación con fuente citable, no "reclamo".
+      sourced: "{n, plural, one {{sourced} de {total} afirmación tiene fuente} other {{sourced} de {total} afirmaciones tienen fuente}}"
+
+    evidence:
+      seg_title: "{label}: {count} de {total}"
+
+    list:
+      badge_title: "{minutes} min de lectura · {n, plural, one {{claims} afirmación} other {{claims} afirmaciones}}, {sourced} con fuente"
+
+    toc:
+      title: Contenido
+      aria: Contenido de la guía
+
+    anchor_label: Enlace a esta sección
+
+    # ── Se renderiza en el servidor; todavía NO está conectado ───────────────
+    # Ver el bloque `deferred` de locale/i18n-map.json.
+    block:
+      tldr: En resumen
+
+    callout:
+      note: Nota
+      tip: Consejo
+      warn: Advertencia
+      danger: Peligro
+      key: Lo esencial
+      risk: Riesgo
+
+    spec:
+      difficulty: Dificultad
+      # "Costo" y no "coste": el público es mexicano.
+      cost: Costo
+      time: Resultados en
+      risk: Riesgo
+      reversibility: Reversibilidad
+      pro: Requiere un profesional
+      pro_yes: Sí
+
+    stack:
+      item: Elemento
+      dose: Dosis
+      frequency: Frecuencia
+      duration: Duración
+
+    ba:
+      before: Antes
+      after: Después
+
+    claim:
+      source_attached: "{label} — con fuente"

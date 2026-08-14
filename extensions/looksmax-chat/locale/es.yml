@@ -1,0 +1,50 @@
+local-looksmax-chat:
+  forum:
+    # Es un chat, no un panel de sistema: el registro es coloquial y corto.
+    # "No hay nadie", no "Actualmente no hay usuarios presentes".
+    title: Chat
+
+    presence:
+      aria: Quién está aquí ahora
+      here: aquí
+      nobody: No hay nadie
+      guests: "{count, plural, one {# invitado} other {# invitados}}"
+
+    log_aria: Mensajes del chat
+    empty_title: Todavía no hay mensajes.
+    # "the index" es la portada del foro, la página de inicio.
+    empty_hint: Di algo — todos los que están en la portada lo ven.
+
+    # "nuevo/nuevos" concuerda con "mensajes", que no aparece en el texto por
+    # falta de espacio en la píldora.
+    unread: "{count, plural, one {# nuevo} other {# nuevos}}"
+
+    placeholder: Di algo…
+    input_aria: Mensaje de chat
+    send_aria: Enviar mensaje
+    delete: Borrar mensaje
+
+    sending: enviando…
+    failed: falló
+
+    retry: Reintentar
+    discard: Descartar
+
+    login: Inicia sesión para chatear
+    guest_note: Aquí pueden escribir los miembros.
+
+    offline: Sin conexión — reconectando
+
+    error:
+      network: No se envió — revisa tu conexión.
+      send: No se pudo enviar.
+      delete: No se pudo borrar ese mensaje.
+
+    api:
+      guest: Inicia sesión para chatear.
+      suspended: Tu cuenta está suspendida.
+      empty: No hay nada que enviar.
+      too_long: Que no pase de {max} caracteres.
+      rate: Más despacio.
+      burst: Demasiados mensajes en un minuto.
+      duplicate: Eso ya lo dijiste.

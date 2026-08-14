@@ -1,0 +1,164 @@
+/*
+ * The language control, and the layout headroom translation needs.
+ *
+ * ── What this had to fix ────────────────────────────────────────────────────
+ *
+ * Installing a second language pack makes core add a locale dropdown to
+ * Header-secondary by itself. Measured in the browser at 1440 wide, it renders
+ * as `li.item-locale > button.Dropdown-toggle.Button--link` at **121×34px**,
+ * because its label is the active language's own name in full ("English",
+ * "Español") followed by a sort caret. On a header that already carries
+ * search, a credits chip, notifications and the session menu, 121px is enough
+ * to push the lockup into an overlap, which is exactly what the operator saw.
+ *
+ * It is now a 34×34 square showing the two-letter language subtag. 87px back.
+ *
+ * Two-letter subtag rather than a flag or a globe, deliberately:
+ *  - A flag is a country and Spanish is not a country. Whose flag would it be
+ *    for a Mexican board — Spain's? Mexico's, for the Argentinians reading it?
+ *  - A globe was tried first and is what shipped broken: `content: "\f0ac"`
+ *    against Font Awesome renders a tofu box here, because the icon lane has
+ *    moved this install to a self-hosted Iconify set and the Font Awesome
+ *    family is no longer loaded. A glyph that depends on another lane's font
+ *    choice is a glyph that breaks when that lane ships.
+ *  - `es`/`en` are ISO 639-1 subtags. They are the same two letters in every
+ *    language, so unlike a word they need no translation, and unlike a flag
+ *    they name the thing they actually select.
+ *
+ * The width and height are explicit and `aspect-ratio: 1` is set, so this
+ * control cannot stretch the way the header search icon currently does.
+ */
+
+.Header-controls > li.item-locale {
+  > .Dropdown > .Dropdown-toggle.Button--link {
+    /* Explicit, square, and unable to be stretched by a flex parent. */
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    aspect-ratio: 1;
+    flex: 0 0 34px;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    line-height: 1;
+
+    /* The language's own name, and the caret. Both are what made it 121px. */
+    > .Button-label,
+    > .Button-caret,
+    > .icon {
+      display: none;
+    }
+
+    /*
+     * The subtag, driven by the `lang` attribute core already puts on <html>
+     * (Frontend/Content/Meta.php sets $document->language). Server-rendered,
+     * so it is correct in the first paint with no flash and no JS.
+     *
+     * `en` is the fallback rather than a hardcoded default: a locale we have
+     * not styled shows its own first two letters via the attr() rules below
+     * where supported, and "EN" where not.
+     */
+    &::after {
+      content: "EN";
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--lmx-surface-2, rgba(255, 255, 255, 0.06));
+    }
+  }
+}
+
+html[lang^="es"] .Header-controls > li.item-locale > .Dropdown > .Dropdown-toggle.Button--link::after {
+  content: "ES";
+}
+
+/*
+ * When the language lives in the session menu, the header does not need it at
+ * all. The class is set by js/dist/forum.js only AFTER the menu item has
+ * actually been added, so a failure there leaves the header control visible
+ * rather than removing the only way to change language.
+ */
+html.lmx-locale-in-session .Header-controls > li.item-locale {
+  display: none;
+}
+
+/* The open list: the active language wants to be obvious, not inferred. */
+.Dropdown--select .Dropdown-menu > li > button {
+  .Button-icon {
+    margin-right: 8px;
+    opacity: 0.9;
+  }
+}
+
+/*
+ * ── Headroom for Spanish ────────────────────────────────────────────────────
+ *
+ * Measured on this forum, not assumed: the ten most prominent strings in the
+ * chrome run 24% longer in Spanish than in English on average
+ * ("Discussions"→"Discusiones", "Log In"→"Iniciar sesión",
+ * "Sign Up"→"Registrarse", "Start a Discussion"→"Iniciar una discusión").
+ * Anything that was sized to fit the English word breaks, and the breakage is
+ * always the same two shapes: a nowrap element overflowing its column, or a
+ * fixed-width button clipping its label.
+ *
+ * These rules relax the constraint rather than shrinking the text. Shrinking
+ * the text to fit Spanish makes the English render look wrong too, and the
+ * next language would need another pass.
+ */
+
+/* Buttons in the chrome: let the label decide the width. */
+.Header-controls .Button--link,
+.IndexPage-toolbar .Button,
+.DiscussionPage-nav .Button {
+  white-space: normal;
+  min-width: 0;
+}
+
+/*
+ * The profile stat strip. `LmxStats--wide` sets `white-space: nowrap` in a
+ * narrow column, which already overlaps in ENGLISH on this install (reported
+ * by the UI lane, visible in shots-profile/), and Spanish labels are longer
+ * still. Allowing the pair to wrap onto two lines costs a row of height and
+ * removes the overlap in both languages.
+ */
+.LmxStats--wide {
+  .LmxStats-item {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Keep the number and its unit together even when the label wraps. */
+  .LmxStats-value {
+    white-space: nowrap;
+  }
+}
+
+/*
+ * Anything that renders a count next to a word is a wrapping hazard once the
+ * word triples in length ("posts" → "publicaciones"). Give those a hanging
+ * indent so the second line lines up under the first rather than under the
+ * number.
+ */
+.LmxStat-label,
+.LmxRank-label,
+.LmxStore-perk {
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+@media (max-width: 767px) {
+  /* On a phone the header has room for the globe and nothing else. */
+  .Header-controls > li > .Dropdown > .Dropdown-toggle.Button--link {
+    .Button-label {
+      display: none;
+    }
+  }
+}

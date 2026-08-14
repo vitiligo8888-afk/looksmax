@@ -1,0 +1,171 @@
+{
+  "angel": {
+    "art_px": [
+      602,
+      852
+    ],
+    "face_px": [
+      476,
+      724
+    ],
+    "face_frac_of_art": 0.791,
+    "skin_area_frac": 0.3741,
+    "policy": "fit-whole"
+  },
+  "angry": {
+    "art_px": [
+      588,
+      722
+    ],
+    "face_px": [
+      440,
+      566
+    ],
+    "face_frac_of_art": 0.748,
+    "skin_area_frac": 0.357,
+    "policy": "face-0.86"
+  },
+  "chrigga": {
+    "art_px": [
+      617,
+      828
+    ],
+    "face_px": [
+      471,
+      804
+    ],
+    "face_frac_of_art": 0.763,
+    "skin_area_frac": 0.4094,
+    "policy": "face-0.86"
+  },
+  "chrishammed": {
+    "art_px": [
+      663,
+      828
+    ],
+    "face_px": [
+      655,
+      682
+    ],
+    "face_frac_of_art": 0.988,
+    "skin_area_frac": 0.4663,
+    "policy": "fit-whole"
+  },
+  "devil": {
+    "art_px": [
+      811,
+      815
+    ],
+    "face_px": [
+      431,
+      576
+    ],
+    "face_frac_of_art": 0.531,
+    "skin_area_frac": 0.2283,
+    "policy": "fit-whole"
+  },
+  "error": {
+    "art_px": [
+      866,
+      604
+    ],
+    "face_px": [
+      391,
+      596
+    ],
+    "face_frac_of_art": 0.452,
+    "skin_area_frac": 0.2432,
+    "policy": "fit-whole"
+  },
+  "happy": {
+    "art_px": [
+      807,
+      816
+    ],
+    "face_px": [
+      434,
+      576
+    ],
+    "face_frac_of_art": 0.538,
+    "skin_area_frac": 0.2253,
+    "policy": "face-0.86"
+  },
+  "nerd": {
+    "art_px": [
+      823,
+      993
+    ],
+    "face_px": [
+      527,
+      758
+    ],
+    "face_frac_of_art": 0.64,
+    "skin_area_frac": 0.248,
+    "policy": "fit-whole"
+  },
+  "neutral": {
+    "art_px": [
+      591,
+      727
+    ],
+    "face_px": [
+      428,
+      576
+    ],
+    "face_frac_of_art": 0.724,
+    "skin_area_frac": 0.3548,
+    "policy": "face-0.86"
+  },
+  "rich": {
+    "art_px": [
+      803,
+      766
+    ],
+    "face_px": [
+      762,
+      745
+    ],
+    "face_frac_of_art": 0.949,
+    "skin_area_frac": 0.4595,
+    "policy": "fit-whole"
+  },
+  "sad": {
+    "art_px": [
+      591,
+      726
+    ],
+    "face_px": [
+      426,
+      576
+    ],
+    "face_frac_of_art": 0.721,
+    "skin_area_frac": 0.3495,
+    "policy": "face-0.86"
+  },
+  "surprised": {
+    "art_px": [
+      810,
+      816
+    ],
+    "face_px": [
+      432,
+      577
+    ],
+    "face_frac_of_art": 0.533,
+    "skin_area_frac": 0.23,
+    "policy": "face-0.86"
+  },
+  "thinking": {
+    "art_px": [
+      575,
+      960
+    ],
+    "face_px": [
+      458,
+      941
+    ],
+    "face_frac_of_art": 0.797,
+    "skin_area_frac": 0.3907,
+    "policy": "fit-whole"
+  }
+}

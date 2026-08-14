@@ -1,0 +1,512 @@
+// App chrome: the header, its navigation, search, the drawer and the footer.
+//
+// The brief on the header was "get rid of all the bs styling for buttons up top
+// and elsewhere, make it very modern and clean". Concretely that means:
+//
+//   * no pills. Stock Flarum renders every header control as a grey rounded
+//     block, so a search field, a nav link and a session menu all read as the
+//     same object. Here they read as three different kinds of thing.
+//   * one accent action. "Sign Up" is the only filled control in the header;
+//     everything else is a ghost that only materialises on hover or focus.
+//   * the header is a translucent glass rail over the page, not an opaque bar.
+//     backdrop-filter creates a stacking context, which is exactly why the
+//     layering in base.less is explicit rather than incidental.
+
+// ============================================================ the rail
+.App-header {
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: saturate(1.6) blur(16px);
+  -webkit-backdrop-filter: saturate(1.6) blur(16px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 var(--white-a04) inset, 0 10px 30px -22px #000;
+  // core sets this from --header-bg; ours is the layer above
+  color: var(--ink);
+}
+
+// A brand hairline under the header, so the chrome is not neutral grey. Sits
+// at the header's own layer, not above it.
+.App-header::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-a45) 22%,
+    var(--accent-2-a30) 55%,
+    var(--purple-a14) 78%,
+    transparent
+  );
+  bottom: -1px;
+  content: '';
+  height: 1px;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+.App-header .container {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  max-width: var(--shell);
+}
+
+// ============================================================ wordmark
+.Header-title {
+  margin: 0;
+  min-width: 0;
+}
+
+.Header-title a,
+.Header-title #home-link {
+  align-items: center;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  gap: 10px;
+  letter-spacing: -0.024em;
+  white-space: nowrap;
+}
+
+.Header-title a:hover { color: var(--ink); text-decoration: none; }
+
+// A css-only brand mark: a rotated square with a conic brand sweep and an inner
+// cut, so there is a logo without shipping an asset or a font.
+.Header-title a::before,
+.Header-title #home-link::before {
+  background: conic-gradient(from 140deg, var(--accent), #c2924b 34%, var(--accent-2) 62%, var(--purple) 82%, var(--accent));
+  border-radius: 7px;
+  box-shadow: 0 3px 14px -4px var(--accent-a45);
+  content: '';
+  flex: 0 0 auto;
+  height: 20px;
+  transform: rotate(45deg);
+  transition: transform var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease);
+  width: 20px;
+}
+
+.Header-title a:hover::before,
+.Header-title #home-link:hover::before {
+  box-shadow: 0 4px 20px -3px var(--accent-a70);
+  transform: rotate(135deg);
+}
+
+// ============================================================ nav row
+.Header-primary,
+.Header-secondary { min-width: 0; }
+
+.Header-primary { flex: 1 1 auto; }
+.Header-secondary { flex: 0 0 auto; margin-left: auto; }
+
+.Header-controls {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Every header control is a ghost by default: transparent, no border, no
+// shadow. This is the "bs styling" removal — the chrome only draws ink where
+// the pointer or the keyboard is.
+.Header-controls > li > .Button,
+.Header-controls > li > .ButtonGroup > .Button,
+.Header-controls .Dropdown-toggle {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  color: var(--ink-dim);
+  font-weight: 600;
+  height: 34px;
+  letter-spacing: -0.005em;
+  padding: 0 12px;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+}
+
+.Header-controls > li > .Button:hover,
+.Header-controls > li > .ButtonGroup > .Button:hover,
+.Header-controls .Dropdown-toggle:hover {
+  background: var(--white-a06);
+  color: var(--ink);
+}
+
+.Header-controls > li > .Button:active,
+.Header-controls .Dropdown-toggle:active { background: var(--white-a10); }
+
+.Header-controls > li > .Button:focus-visible,
+.Header-controls .Dropdown-toggle:focus-visible {
+  background: var(--white-a06);
+  box-shadow: var(--ring);
+  color: var(--ink);
+}
+
+// the one filled control in the chrome, so the primary action is unambiguous
+.Header-controls .item-signUp > .Button {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--accent-ink);
+  font-weight: 700;
+  padding: 0 16px;
+}
+
+.Header-controls .item-signUp > .Button:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+  filter: brightness(1.08);
+}
+
+.Header-controls .item-logIn > .Button {
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.Header-controls .item-logIn > .Button:hover { border-color: var(--line-strong); }
+
+// active section marker: a 2px accent underline rather than a filled pill
+.Header-primary .Header-controls > li > .Button.active,
+.Header-primary .Header-controls > li.active > .Button {
+  color: var(--ink);
+  position: relative;
+}
+
+.Header-primary .Header-controls > li > .Button.active::after,
+.Header-primary .Header-controls > li.active > .Button::after {
+  background: var(--accent);
+  border-radius: var(--r-pill);
+  bottom: -1px;
+  content: '';
+  height: 2px;
+  left: 12px;
+  position: absolute;
+  right: 12px;
+}
+
+// notification / session controls keep their glyph but lose the block
+.Header-controls .Button--icon,
+.Header-controls .Button--link {
+  background: transparent;
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+}
+
+.Header-controls .Button .Avatar {
+  --size: 26px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+// ============================================================ search
+.Header-secondary .item-search { margin-right: var(--gap-sm); }
+
+.Search {
+  position: relative;
+}
+
+.Search-input input,
+.Header-secondary .Search .FormControl {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: var(--fs-sm);
+  height: 34px;
+  padding: 0 12px 0 32px;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+              box-shadow var(--t-fast) var(--ease), width var(--t-base) var(--ease);
+  width: 220px;
+}
+
+.Search-input input::placeholder { color: var(--ink-faint); }
+
+.Search-input input:hover { border-color: var(--line-strong); }
+
+.Search-input input:focus {
+  background: var(--surface-1);
+  border-color: var(--accent-2-a55);
+  box-shadow: 0 0 0 3px var(--accent-2-a10);
+  outline: none;
+  width: 300px;
+}
+
+// magnifier drawn in CSS, so the field reads as a search field before it is
+// focused without depending on the icon extension having replaced a glyph
+.Search {
+  --lmx-magnifier: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 256 256%22%3E%3Cpath fill=%22currentColor%22 d=%22M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68%22/%3E%3C/svg%3E");
+}
+
+.Search-input::before {
+  // ph:magnifying-glass-bold, the SAME icon set the rest of the forum uses,
+  // inlined from the Iconify API rather than fetched from it at runtime.
+  //
+  // It was previously drawn by hand as two independent pseudo-elements — a
+  // 10px bordered circle and a 6px bar rotated 45 degrees, positioned
+  // separately — which never met cleanly at any size and read as a stretched
+  // smudge. Replacing one hand-drawn shape with another would have kept the
+  // real problem: an icon that is not from the icon system. Inlined as a mask
+  // so it takes currentColor, needs no network request, and cannot fail to
+  // resolve the way the runtime <iconify-icon> elements do.
+  background-color: var(--ink-faint);
+  content: '';
+  height: 15px;
+  left: 11px;
+  -webkit-mask: var(--lmx-magnifier) center / contain no-repeat;
+  mask: var(--lmx-magnifier) center / contain no-repeat;
+  pointer-events: none;
+  position: absolute;
+  top: 10px;
+  width: 15px;
+  z-index: 1;
+}
+
+.Search-input:focus-within::before { background-color: var(--ink-dim); }
+
+
+.Search .Search-results {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--e-3);
+  margin-top: 6px;
+  overflow: hidden;
+  padding: 5px;
+}
+
+.Search .Search-results li > a {
+  border-radius: var(--r-xs);
+  color: var(--ink-dim);
+  padding: 8px 10px;
+}
+
+.Search .Search-results li.active > a,
+.Search .Search-results li > a:hover { background: var(--surface-2); color: var(--ink); }
+
+.Search .Search-results .Search-resultsHeader {
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  padding: 8px 10px 4px;
+  text-transform: uppercase;
+}
+
+// ============================================================ back control
+.Navigation.ButtonGroup .Button {
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  color: var(--ink-dim);
+}
+
+.Navigation.ButtonGroup .Button:hover { background: var(--white-a06); color: var(--ink); }
+
+// ============================================================ drawer (mobile)
+.App-drawer {
+  background: var(--surface-1);
+  border-right: 1px solid var(--line);
+  box-shadow: var(--e-4);
+}
+
+.App-drawer .Header-controls > li > .Button,
+.App-drawer .Dropdown-toggle {
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  height: auto;
+  justify-content: flex-start;
+  padding: 10px 14px;
+  width: 100%;
+}
+
+.drawer-backdrop { background: var(--scrim); }
+
+// ============================================================ page nav column
+// The index/discussion side nav is chrome too: same ghost treatment, so the
+// left column and the header speak the same language.
+.IndexPage-nav .item-nav .Button,
+.App-nav .item-nav .Button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  color: var(--ink-dim);
+  font-weight: 600;
+  justify-content: flex-start;
+  text-align: left;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  width: 100%;
+}
+
+.IndexPage-nav .item-nav .Button:hover,
+.App-nav .item-nav .Button:hover { background: var(--white-a06); color: var(--ink); }
+
+.IndexPage-nav .item-nav .Button.active,
+.App-nav .item-nav .Button.active {
+  background: var(--accent-a14);
+  color: var(--accent);
+}
+
+// ============================================================ footer
+.App-footer,
+.Footer {
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  margin-top: 40px;
+  padding: 24px 0 40px;
+}
+
+.App-footer a,
+.Footer a { color: var(--ink-dim); }
+
+.App-footer a:hover,
+.Footer a:hover { color: var(--accent); }
+
+// ============================================================ responsive
+@media (max-width: 991.98px) {
+  .Search-input input { width: 170px; }
+  .Search-input input:focus { width: 210px; }
+}
+
+@media (max-width: 767.98px) {
+  .App-header .container { gap: var(--gap-sm); padding-left: 10px; padding-right: 10px; }
+  .Header-title a,
+  .Header-title #home-link { font-size: 16px; gap: 7px; }
+  .Header-title a::before,
+  .Header-title #home-link::before { height: 17px; width: 17px; }
+  .Header-controls > li > .Button { height: 32px; padding: 0 9px; }
+  .Search-input input { width: 100%; }
+  .Search-input input:focus { width: 100%; }
+}
+
+// ============================================ the logged-in session cluster
+//
+// Operator: "the username/profile part in the top nav is still touching the
+// creds balance thingy, the roles aren't aligned vertically properly".
+//
+// Measured at 1440px logged in, before this block: the session toggle is one
+// 243px control containing avatar + name + two identity chips, sitting directly
+// against a separate credits chip with no gap between the two objects, and the
+// chips inside it are set by three different extensions at three different
+// heights with three different vertical offsets (one uses `vertical-align: 1px`,
+// one is a flex item, one is inline). Nothing lines up because nothing agreed
+// on a baseline.
+//
+// The fix is to stop treating them as text and treat the whole right-hand side
+// as one flex row of centred objects with one gap value, and to normalise the
+// chips to a single height regardless of who renders them.
+.Header-secondary .Header-controls {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.Header-secondary .Header-controls > li {
+  align-items: center;
+  display: flex;
+  margin: 0;
+}
+
+// The balance is its own object, not part of the account button. A little more
+// air on its right than its left says which side it belongs to.
+.Header-secondary .lmx-points,
+.Header-secondary .item-lmxPoints {
+  margin-right: 4px;
+}
+
+// The session toggle: avatar, name and identity chips on one centred row.
+.Header-secondary .Dropdown-toggle.Button--user,
+.Header-secondary .SessionDropdown .Dropdown-toggle {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+  height: 34px;
+  padding: 0 8px;
+}
+
+// Core stacks the username and the avatar with margins that assume inline
+// layout; inside a flex row those margins are just an off-centre nudge.
+.Header-secondary .Dropdown-toggle .Avatar {
+  margin: 0;
+}
+
+// The label is a ROW (name + identity chips), and only the NAME may be
+// clamped. Clamping the label itself clipped the rank and tier chips out of
+// existence — they are appended into the label by the ranks decorator, so
+// `overflow: hidden` on the label hides them, which is exactly what happened
+// on the first attempt at this block.
+.Header-secondary .Dropdown-toggle .Button-label {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  line-height: 1;
+  min-width: 0;
+}
+
+// .username is NOT the name. The ranks decorator appends the identity chips
+// INSIDE it, so its text content is "adminLUMINARYVIP" — clamping it to 14ch
+// rendered "admin…" and hid both chips. (Second time this bit: the first
+// attempt clamped .Button-label, with the same result one level up.) So
+// .username is a row, and only the name element inside it is clamped.
+.Header-secondary .Dropdown-toggle .username {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  line-height: 1;
+  min-width: 0;
+}
+
+.Header-secondary .Dropdown-toggle .username > .lmx-name,
+.Header-secondary .Dropdown-toggle .username > span:first-child:not(.lmx-standing) {
+  flex: 0 1 auto;
+  max-width: 16ch;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Chips never shrink and never get clipped: they are the shortest things here
+// and the first thing the operator looks at.
+.Header-secondary .Dropdown-toggle .lmx-standing,
+.Header-secondary .Dropdown-toggle .LmxRank,
+.Header-secondary .Dropdown-toggle .lmx-chip {
+  flex: none;
+}
+
+// One chip geometry for every identity chip in the header, whichever extension
+// drew it. Without this the rank chip is 16px, the tier chip is 18px and the
+// role banner is 14px, all on different baselines.
+.Header-secondary .lmx-chip,
+.Header-secondary .LmxRank,
+.Header-secondary .LmxBanner,
+.Header-secondary .lmx-badge {
+  align-items: center;
+  display: inline-flex;
+  flex: none;
+  height: 20px;
+  line-height: 1;
+  // core and the ranks decorator both nudge these with vertical-align, which
+  // does nothing useful inside a flex row and does harm inside a flex row
+  vertical-align: baseline;
+}
+
+.Header-secondary .lmx-standing {
+  align-items: center;
+  display: inline-flex;
+  gap: 5px;
+  margin-left: 0;
+}
+
+// Below the tablet breakpoint the name and the chips are the first things to
+// go: the avatar and the balance carry the same information in a third of the
+// width, and a phone header that wraps is worse than one that abbreviates.
+@media (max-width: 767px) {
+  .Header-secondary .Dropdown-toggle .username,
+  .Header-secondary .Dropdown-toggle .Button-label,
+  .Header-secondary .lmx-standing {
+    display: none;
+  }
+
+  .Header-secondary .Header-controls { gap: 2px; }
+}

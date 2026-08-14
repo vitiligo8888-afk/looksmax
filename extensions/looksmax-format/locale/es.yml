@@ -1,0 +1,42 @@
+local-looksmax-format:
+  forum:
+    post:
+      # "Spoiler" se usa tal cual en el español de internet; traducirlo a
+      # "destripe" o "revelación" no lo entendería nadie en este foro.
+      spoiler: Spoiler
+      spoiler_hidden: Texto oculto; actívalo para verlo
+      spoiler_revealed: Texto oculto, ya visible
+      # [hideposts]: en el foro original había que responder para poder leerlo.
+      # Se dice en pasado porque aquí ya no existe ese candado.
+      reply_gated: En el foro original había que responder para ver esto
+      deleted: Contenido eliminado
+      unimported_member: Miembro del foro original; no se importó aquí
+      lightbox_close: Cerrar
+      copy: Copiar
+      copied: Copiado
+      copy_manual: Presiona Ctrl+C
+    quote:
+      # "escribió" no concuerda con el género de quien cita, así que sirve para
+      # cualquier persona sin recurrir a "dijo/dijeron" ni a barras.
+      said: 'escribió:'
+      mock: citado para burlarse
+      jump: Ir a la publicación citada
+      show_rest: Ver el resto de la cita
+      collapse: Contraer la cita
+    label:
+      serious: Serio
+      guide: Guía
+      theory: Teoría
+      discussion: Discusión
+      method: Método
+      motivation: Motivación
+      # "Rage" y "meme" se usan sin traducir en foros en español; "coraje" o
+      # "berrinche" cambiarían el tono del hilo que marca la etiqueta.
+      rage: Rage
+      nsfw: NSFW
+      fake: Falso
+      op: OP
+      gtfih: GTFIH
+      # CI = cociente intelectual, que es como se abrevia en México.
+      high_iq: CI alto
+      meme: Meme

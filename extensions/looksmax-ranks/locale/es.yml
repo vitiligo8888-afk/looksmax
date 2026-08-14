@@ -1,0 +1,355 @@
+##
+# looksmax-ranks — español neutro para México.
+#
+# Decisiones explícitas de traducción (no son accidentes):
+#
+#  * ESCALAFÓN DE RANGOS. Los nombres se traducen (Hierro, Bronce, Plata, Oro,
+#    Platino, Diamante), porque son sustantivos comunes y aparecen debajo de
+#    cada nombre de usuario en cada publicación: dejarlos en inglés haría que
+#    la identidad del foro se leyera a medias. La única excepción es
+#    "Greycel": es jerga acuñada de la comunidad looksmax, no tiene
+#    equivalente y los usuarios ya la usan tal cual.
+#    "Master" -> "Maestro" y "Ascended" -> "Ascendido" quedan en masculino,
+#    igual que los rangos de los juegos que este público ya conoce.
+#
+#  * MEMBRESÍAS. "Looksmax+", "VIP" y "Founder" son nombres de producto y se
+#    quedan igual en los dos idiomas. "Founder" además evita el problema de
+#    concordancia de "Fundador/Fundadora"; la insignia equivalente sí se
+#    traduce, como "Miembro fundador", porque ahí "miembro" es epiceno.
+#    "Standard" -> "Estándar" y "Elite" -> "Élite" sí se traducen: son
+#    adjetivos invariables con forma exacta en español.
+#
+#  * COSMÉTICOS. Los nombres de color se traducen cuando existe la palabra en
+#    español (Carmesí, Esmeralda, Pan de oro). Se dejan igual los que son la
+#    misma palabra (Mistral, Aurora, Kraken) y los acuñados por el foro
+#    original (Zephir), porque son la identidad de un artículo que ya compró
+#    gente que migró. El identificador interno (`slug`) nunca cambia.
+#
+#  * INSIGNIAS. Se traducen. Donde el inglés usa un sustantivo de agente que
+#    en español obligaría a marcar género ("Conversationalist", "Guide
+#    Author", "Contributor"), se reescribe como frase verbal o sustantivo
+#    invariable en lugar de escribir "Autor/a".
+#
+#  * NÚMEROS. Los que van dentro de un texto fijo conservan la coma de
+#    millares, que es la que usa México ("1,000 publicaciones"). Todo número
+#    calculado se formatea con window.lmxI18n, nunca aquí.
+##
+local-looksmax-ranks:
+
+  forum:
+
+    hover:
+      rank_title: "{rank} — {blurb}"
+      tier_title: "Miembro {tier}"
+      badges_title: "{count, plural, one {# insignia} other {# insignias}}"
+      stat_badges: insignias
+      stat_rank: rango
+      rank_unknown: Greycel
+      stat_empty: "—"
+
+    points:
+      title: "Tu saldo: gástalo en la tienda"
+
+    leaders:
+      heading: Clasificación
+      window_week: 7 d
+      window_all: todo
+      entry_title: "{username} — {rank}"
+      empty: todavía nadie ha ganado nada
+
+    store:
+      requires_invite: una invitación
+
+    error:
+      guest: primero inicia sesión
+      unknown_action: acción desconocida
+      failed: eso no funcionó
+      no_such_item: ese artículo no existe
+      not_for_sale: "{item} no está a la venta: se otorga"
+      already_owned: ya lo tienes
+      not_enough_points: no te alcanzan los puntos
+      grant_failed: no se pudo entregar el artículo; se te devolvieron los puntos
+      no_such_tier: esa membresía no existe
+      tier_granted_only: "{tier} se otorga, no se vende"
+      tier_downgrade: ya tienes {current}, que está por encima de {target}
+      title_needs_tier: necesitas Looksmax+ o superior para poner un título personalizado
+      title_too_long: "{count, plural, one {tu membresía permite # carácter} other {tu membresía permite # caracteres}}"
+      title_empty: el título tiene que contener algo visible
+      title_colour_needs_tier: necesitas VIP o superior para darle color al título
+      showcase_too_many: "{count, plural, one {tu membresía tiene # espacio en la vitrina} other {tu membresía tiene # espacios en la vitrina}}"
+      showcase_unearned: "no has ganado: {badges}"
+      accent_needs_tier: necesitas VIP o superior para elegir un color de acento
+      no_such_style: ese estilo no existe
+      style_needs_tier: necesitas {tier} o superior para equipar estilos {kind}
+      style_not_on_tier: no está disponible en tu membresía
+      style_not_owned: no tienes ese estilo
+      no_such_frame: ese marco no existe
+      frame_needs_tier: necesitas {tier} o superior para equipar ese marco
+      frame_not_owned: no tienes ese marco
+      unknown_cosmetic: tipo de cosmético desconocido
+
+  lib:
+
+    # Se interpola en forum.error.style_needs_tier y concuerda con "estilos"
+    # (masculino plural). Nunca se muestra suelto.
+    style_kind:
+      rank: de rango
+      solid: sólidos
+      gradient: con degradado
+      animated: animados
+      legendary: legendarios
+
+    rank:
+      greycel:
+        name: Greycel
+        blurb: Acabas de llegar. Lee antes de publicar.
+      iron:
+        name: Hierro
+        blurb: Publicas, y te leen.
+      bronze:
+        name: Bronce
+        blurb: Una cara conocida en alguna sección.
+      silver:
+        name: Plata
+        blurb: Aporta más de lo que consume.
+      gold:
+        name: Oro
+        blurb: Hilos a los que la gente vuelve.
+      platinum:
+        name: Platino
+        blurb: Material de referencia.
+      diamond:
+        name: Diamante
+        blurb: Poco común. Se gana con los años.
+      master:
+        name: Maestro
+        blurb: Marca cómo piensa el foro.
+      luminary:
+        name: Lumbrera
+        blurb: Lo más alto del escalafón.
+      ascended:
+        name: Ascendido
+        blurb: Se acabó el escalafón.
+
+    tier:
+      standard:
+        name: Estándar
+        headline:
+          '0': Todo se puede leer
+          '1': Ganas a la tasa base
+          '2': Escalafón de rangos y 3 espacios de vitrina
+      plus:
+        name: Looksmax+
+        headline:
+          '0': Un título personalizado debajo de tu nombre
+          '1': Colores sólidos para tu nombre
+          '2': "+10 % en todo lo que ganes"
+      vip:
+        name: VIP
+        headline:
+          '0': Estilos de nombre con degradado
+          '1': Marcos de avatar
+          '2': Portada de perfil y color de acento
+      elite:
+        name: Élite
+        headline:
+          '0': Estilos de nombre animados
+          '1': 20 % de descuento en la tienda
+          '2': El doble de tope diario para ganar
+      founder:
+        name: Founder
+        headline:
+          '0': Se otorga, nunca se vende
+          '1': Estilos de nombre legendarios
+          '2': Permanente, sin renovación
+
+    style:
+      rank-default:
+        name: Color de rango
+        blurb: El color que te da tu rango actual.
+      crimson:
+        name: Carmesí
+        blurb: Rojo arterial, plano.
+      azure:
+        name: Azur
+        blurb: El clásico del foro.
+      emerald:
+        name: Esmeralda
+        blurb: Verde frío, mucho contraste sobre fondo oscuro.
+      apricot:
+        name: Damasco
+        blurb: Recuperado del foro original.
+      fuchsia:
+        name: Fucsia
+        blurb: Recuperado del foro original.
+      slate:
+        name: Pizarra
+        blurb: Para quien quiere menos, no más.
+      zephir:
+        name: Zephir
+        blurb: De cielo pálido a acero. Del foro original.
+      mistral:
+        name: Mistral
+        blurb: Frente frío. Del foro original.
+      solstice:
+        name: Solsticio
+        blurb: Luz larga. Del foro original.
+      equinox:
+        name: Equinoccio
+        blurb: Mitad oscuro, mitad no. Del foro original.
+      sphinx:
+        name: Esfinge
+        blurb: Arena y basalto. Del foro original.
+      vaporwave:
+        name: Vaporwave
+        blurb: De cian a magenta, sin disculpas.
+      goldleaf:
+        name: Pan de oro
+        blurb: Metal batido, no amarillo.
+      oceanic:
+        name: Oceánico
+        blurb: Degradado de aguas profundas.
+      winter:
+        name: Invierno
+        blurb: Un brillo de escarcha recorre el nombre.
+      slime:
+        name: Slime
+        blurb: Verde tóxico que escurre despacio.
+      striped:
+        name: Rayado
+        blurb: Poste de barbería. Llamativo a propósito.
+      kraken:
+        name: Kraken
+        blurb: Verde azulado abisal, en movimiento. Del foro original.
+      fire:
+        name: Fuego
+        blurb: El estilo más alto del foro original.
+      aurora:
+        name: Aurora
+        blurb: Deriva polar lenta.
+      prism:
+        name: Prisma
+        blurb: Rotación completa de tono. Úsalo con medida.
+      luminary:
+        name: Lumbrera
+        blurb: Emite luz más que color. Lo llevaba la cima del foro original.
+      obsidian:
+        name: Obsidiana
+        blurb: Se otorga. Negro con filo dorado.
+      staff:
+        name: Staff
+        blurb: No está a la venta. Nunca.
+
+    frame:
+      bronze-laurel:
+        name: Laurel de bronce
+        blurb: Un aro cálido y sencillo.
+      silver-laurel:
+        name: Laurel de plata
+        blurb: Metal cepillado.
+      gold-laurel:
+        name: Laurel de oro
+        blurb: Oro a dos tonos, estático.
+      neon:
+        name: Neón
+        blurb: Halo cian con resplandor.
+      ember:
+        name: Brasa
+        blurb: Un barrido cónico de calor, girando.
+      glacier:
+        name: Glaciar
+        blurb: Barrido cónico frío, girando.
+      circuit:
+        name: Circuito
+        blurb: Trazo discontinuo que recorre el perímetro.
+      ascendant:
+        name: Ascendente
+        blurb: Se otorga. Anillo doble que gira en sentidos opuestos.
+
+    badge:
+      first-post:
+        name: Primera sangre
+        blurb: Publicaste una vez.
+      posts-100:
+        name: Cien
+        blurb: 100 publicaciones.
+      posts-1k:
+        name: Mil
+        blurb: 1,000 publicaciones.
+      posts-10k:
+        name: Diez mil
+        blurb: 10,000 publicaciones.
+      posts-50k:
+        name: Inamovible
+        blurb: 50,000 publicaciones. Once cuentas del foro original lo lograron.
+      threads-10:
+        # "Conversationalist" en masculino obligaría a "Conversador/a";
+        # la frase verbal no marca género.
+        name: Inicia conversaciones
+        blurb: Abriste 10 hilos.
+      threads-100:
+        name: Marca la agenda
+        blurb: Abriste 100 hilos.
+      guide-author:
+        # "Autor de guías" marcaría género; "autoría" no.
+        name: Autoría de guías
+        blurb: Escribiste algo que la gente recomienda una y otra vez.
+      guide-5:
+        name: Estante de referencia
+        blurb: Cinco guías publicadas.
+      sourced:
+        name: Cita sus fuentes
+        blurb: 10 afirmaciones de tus guías respaldadas por una fuente real.
+      liked-100:
+        name: Buena recepción
+        blurb: 100 reacciones recibidas.
+      liked-1k:
+        name: Éxito de público
+        blurb: 1,000 reacciones recibidas.
+      liked-10k:
+        name: Consenso
+        blurb: 10,000 reacciones recibidas.
+      liked-100k:
+        name: Gravitacional
+        blurb: 100,000 reacciones recibidas.
+      ratio:
+        name: Señal
+        blurb: Al menos 3 reacciones por publicación en más de 200 publicaciones. Calidad, no volumen.
+      read-through:
+        # Concuerda con "el hilo", no con quien la gana.
+        name: Leído hasta el final
+        blurb: 50 lectores llegaron hasta el final de tus hilos.
+      held-attention:
+        name: Atención sostenida
+        blurb: Una hora acumulada de lectura en tus hilos.
+      veteran-1y:
+        name: Un año
+        blurb: Un año en el foro.
+      veteran-3y:
+        name: Tres años
+        blurb: Tres años en el foro.
+      veteran-5y:
+        name: La vieja guardia
+        blurb: Cinco años en el foro.
+      nightowl:
+        name: Búho nocturno
+        blurb: 50 publicaciones entre las 2:00 y las 5:00.
+      necromancer:
+        # "Nigromante" es invariable en género.
+        name: Nigromante
+        blurb: Reviviste cinco hilos muertos desde hacía seis meses o más.
+      founding:
+        name: Miembro fundador
+        blurb: Aquí desde antes de la migración.
+      legacy-elder:
+        # "Elder" -> "Veterano/a" marcaría género; "Trayectoria" no.
+        name: Trayectoria
+        blurb: Llegaste con una trayectoria seria.
+      staff:
+        name: Staff
+        blurb: Lleva las riendas del foro.
+      contributor:
+        # Quien pone dinero para que el foro siga en pie. "Mecenas" es
+        # invariable en género y es la palabra que usa el público mexicano.
+        name: Mecenas
+        blurb: Mantuvo el foro a flote.

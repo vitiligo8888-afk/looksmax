@@ -1,0 +1,192 @@
+# Looksmax Index — español (México / América Latina neutra).
+#
+# Tuteo, nada de "usted" ni de "vosotros". Se usa la misma terminología que el
+# resto de la instalación: "discusión" y "publicación", como en el paquete
+# flarum-lang/spanish, en looksmax-reactions y en looksmax-search.
+#
+# El español es la cadena de ORIGEN de esta portada: los seis nombres de sección
+# los pidió el operador en español y el inglés se deriva de aquí.
+#
+# Los números NO se formatean en las cadenas: los emite Html::num()/n() en PHP.
+# Ninguna cadena lleva separador de miles, ni `#`, ni etiquetas HTML.
+
+local-looksmax-index:
+  # OBSOLETA, y se conserva a propósito: una revisión anterior de i18n-map.json
+  # ya aplicada al árbol llama a esta clave desde RenderIndex::n(). Borrarla
+  # ahora haría que cada cifra se imprimiera como
+  # "local-looksmax-index.lib.number". Se puede borrar cuando n() deje de
+  # mencionarla.
+  lib:
+    number: "{n, number}"
+
+  forum:
+    # ── La portada por bloques (src/Blocks/*) ────────────────────────────────
+    #
+    # Cada bloque pide `forum.index.<id>.heading` desde AbstractBlock::19,
+    # aunque no todos lo muestren; están todos aquí para que ninguno imprima
+    # una clave cruda si el bloque decide dibujar su cabecera.
+    index:
+      # ---------------------------------------------------------------- feed
+      # El bloque que abre la columna principal: seis vistas curadas del mismo
+      # foro. Los nombres son cortos a propósito — son pestañas, no titulares, y
+      # tienen que caber seis en 390px sin partirse.
+      feed:
+        heading: Lo que está pasando
+        hot: Activo
+        new: Nuevo
+        top: Populares
+        reacted: Más reaccionado
+        unanswered: Sin responder
+        guides: Guías
+        all: Ver todo
+        replies: respuestas
+        views: visitas
+        reactions: reacciones
+        empty: Todavía no hay nada por aquí.
+      hero:
+        heading: Bienvenida
+        title: Aquí se habla en serio de cómo te ves
+        lede: Guías, protocolos y gente que responde con pruebas. Lee antes de preguntar y vas a avanzar más rápido.
+        cta_join: Crear cuenta
+        cta_browse: Ver las secciones
+        # Saludo con nombre. El nombre de usuario no tiene género conocido, así
+        # que la frase no concuerda con nada.
+        member_greeting: "Qué gusto verte, {username}"
+        member_lede: "Tienes {count} discusiones con actividad nueva."
+        cta_post: Escribir algo
+        cta_unread: Ver lo nuevo
+
+      # Cifras del foro, bajo el hero y en la tarjeta de estadísticas.
+      stats:
+        heading: El foro en números
+        threads: discusiones
+        posts: publicaciones
+        members: miembros
+
+      news:
+        heading: Novedades
+        more: Ver todo
+        show: Mostrar novedades
+        new_badge: Nuevo
+        by: por
+        empty: Nada nuevo por ahora.
+        dismiss: Ocultar novedades
+
+      sections:
+        heading: Por dónde empezar
+        lede: Seis secciones, armadas a partir de lo que el foro realmente discute.
+        threads: discusiones
+        empty: Todavía no hay nada aquí.
+
+      # Selector de vista del bloque de secciones.
+      view:
+        label: Forma de ver las secciones
+        cards: Tarjetas
+        list: Lista
+
+      browse:
+        heading: "Los {count} foros"
+        hint: El árbol completo, tal como venía del foro anterior.
+
+      nav:
+        heading: Ir a
+        all: Todas las discusiones
+        newest: Lo más reciente
+        best: Mejores guías
+        tags: Todos los foros
+
+      onboarding:
+        heading: Tus primeros pasos
+        step1_title: Encuentra tu sección
+        step1_body: Elige por dónde entrar y guárdala.
+        step2_title: Lee dos guías
+        step2_body: Las mejores están juntas y son gratis.
+        step3_title: Pide tu primera opinión
+        step3_body: Califica a alguien más antes de pedirlo.
+        dismiss: Ocultar estos pasos
+
+      trending:
+        heading: En tendencia
+        replies: respuestas
+
+      activity:
+        heading: Actividad reciente
+        by: por
+
+      ad:
+        heading: Publicidad
+        label: Publicidad
+
+    # ── Las seis secciones de la portada ────────────────────────────────────
+    #
+    # Los nombres van tal cual los pidió el operador. Softmaxing, Looksmaxing y
+    # Peligrosomaxing no se traducen: son términos acuñados en la comunidad y
+    # se usan igual en español. `Peptides` viene en inglés en la lista original
+    # y se respeta.
+    #
+    # Los acentos viven aquí, en el texto. Los slugs de Sections::SECTIONS son
+    # ASCII a propósito (`anabolicos`, `mejores-guias`): un slug es una URL.
+    section:
+      peptides:
+        title: Peptides
+        desc: Péptidos, dosis y protocolos. Qué hace cada uno y qué no.
+      anabolicos:
+        title: Anabólicos
+        desc: Ciclos, compuestos y control de daños. Con análisis, no con anécdotas.
+      softmaxing:
+        title: Softmaxing
+        desc: Piel, pelo, postura, dientes. Lo que cambia sin quirófano.
+      looksmaxing:
+        title: Looksmaxing
+        desc: "Todo junto: cara, cuerpo y todo lo que se mide."
+      peligrosomaxing:
+        title: Peligrosomaxing
+        desc: Lo que puede salir mal. Procedimientos extremos y riesgo real.
+      mejores_guias:
+        title: Mejores Guías
+        desc: Las guías a las que la gente vuelve.
+
+    # ── La portada anterior (src/RenderIndex.php) ───────────────────────────
+    #
+    # Sigue siendo lo que extend.php monta hoy. Se conserva completa mientras
+    # las dos convivan: si se borra, la portada actual imprime claves crudas.
+    row:
+      threads: "{count, plural, one {discusión} other {discusiones}}"
+      posts: "{count, plural, one {publicación} other {publicaciones}}"
+      last_by: "por {name}"
+      quiet: todavía no hay discusiones
+
+    motd:
+      title: Antes de publicar
+      body: Lee las guías primero. Califica a otras personas antes de pedir que te califiquen. Toda afirmación necesita pruebas; decirlo con seguridad no cuenta.
+
+    card:
+      pinned: Fijadas
+      trending: En tendencia
+      recent: Actividad reciente
+      stats: Estadísticas del foro
+
+    list:
+      replies: "{count, plural, one {{n} respuesta} other {{n} respuestas}}"
+      by: "por {name}"
+
+    stats:
+      threads: Discusiones
+      posts: Publicaciones
+      members: Miembros
+      # El valor de al lado es un nombre de usuario, así que "Último miembro"
+      # dice lo que es; "Más reciente" solo se entiende leyendo la fila entera.
+      newest: Último miembro
+
+    ad:
+      label: Publicidad
+
+    # El bloque `forum.news.*` suelto, anterior a la reescritura de NewsBlock.
+    # NewsBlock lee `forum.index.news.*`; nadie lee estas. Se conservan solo
+    # para que quien las escribió las mueva o las borre a conciencia.
+    news:
+      heading: Novedades
+      empty: Nada nuevo por ahora.
+      see_all: Ver todo
+      pinned: Fijado
+      dismiss: Ocultar

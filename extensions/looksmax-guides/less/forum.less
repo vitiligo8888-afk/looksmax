@@ -1,0 +1,644 @@
+// Guide format styling.
+//
+// Palette is duplicated from the theme extension rather than imported: LESS
+// variables do not cross extension bundle boundaries in Flarum, each extension
+// compiles its own file. Keep these in step with looksmax-theme/less/forum.less.
+//
+// NOTE for anyone editing this file: the LESS compiler here is the PHP port,
+// which has no each() and no range(). Using either fails SILENTLY — forum.css
+// simply never gets written while forum.js builds fine. Every repetition in
+// this file is therefore written out longhand on purpose.
+
+@g-surface-0: #0e1116;
+@g-surface-1: #12161c;
+@g-surface-2: #1a2029;
+@g-surface-3: #232b36;
+@g-line: #2a323d;
+@g-ink: #e6e9ee;
+@g-ink-dim: #9aa4b2;
+@g-ink-faint: #6b7583;
+@g-accent: #e8c07d;
+@g-accent-2: #7aa2f7;
+@g-danger: #f7768e;
+@g-ok: #9ece6a;
+@g-warn: #e0af68;
+@g-purple: #bb9af7;
+
+// The document column. Flarum's default post width is fine for a 40-word
+// reply and hostile for a 4,000-word guide; this is the classic 65-75
+// character measure, applied only inside a guide so ordinary threads are
+// untouched.
+.GuidePost .Post-body {
+  max-width: 74ch;
+}
+
+// ---------------------------------------------------------------- TL;DR block
+.GuideBlock--tldr {
+  position: relative;
+  margin: 18px 0 24px;
+  padding: 14px 16px 14px 18px;
+  background: linear-gradient(90deg, fade(@g-accent, 8%) 0%, @g-surface-2 40%);
+  border-left: 3px solid @g-accent;
+  border-radius: 0 6px 6px 0;
+
+  .GuideBlock-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: @g-accent;
+    margin-bottom: 6px;
+  }
+
+  .GuideBlock-body {
+    color: @g-ink;
+    font-size: 15.5px;
+    line-height: 1.6;
+
+    > p:last-child { margin-bottom: 0; }
+  }
+}
+
+// ------------------------------------------------------------------- claims
+// The chip sits inline at the end of the sentence rather than as a block:
+// a block breaks reading flow, and an author who finds the markup annoying to
+// read stops using it, which loses the whole signal.
+.GuideClaim {
+  display: inline;
+
+  .GuideClaim-chip {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 0 5px;
+    border-radius: 3px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    line-height: 15px;
+    vertical-align: 1px;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  a.GuideClaim-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  }
+
+  // A chip with no source reads as a promise with nothing behind it, so it is
+  // drawn hollow. T3 and above are rejected at save time without a source, so
+  // a bare chip can only ever be T0/T1/T2 or a marketing claim.
+  .GuideClaim-chip--bare {
+    opacity: 0.75;
+    background: transparent !important;
+    border-style: dashed !important;
+  }
+}
+
+.GuideClaim[data-tier="0"] .GuideClaim-chip { background: @g-surface-3; color: @g-ink-faint; border-color: @g-line; }
+.GuideClaim[data-tier="1"] .GuideClaim-chip { background: @g-surface-3; color: @g-ink-dim;  border-color: @g-line; }
+.GuideClaim[data-tier="2"] .GuideClaim-chip { background: fade(@g-accent-2, 18%); color: @g-accent-2; border-color: fade(@g-accent-2, 40%); }
+.GuideClaim[data-tier="3"] .GuideClaim-chip { background: fade(@g-accent, 18%);   color: @g-accent;   border-color: fade(@g-accent, 40%); }
+.GuideClaim[data-tier="4"] .GuideClaim-chip { background: fade(@g-ok, 20%);       color: @g-ok;       border-color: fade(@g-ok, 45%); }
+.GuideClaim[data-tier="5"] .GuideClaim-chip { background: @g-ok; color: @g-surface-0; border-color: @g-ok; }
+.GuideClaim[data-tier="9"] .GuideClaim-chip { background: fade(@g-danger, 16%);   color: @g-danger;   border-color: fade(@g-danger, 45%); }
+
+// Reader preference: dim everything below a chosen tier. Applied as a class on
+// the post so the whole document re-reads at once.
+.GuidePost--minTier3 .GuideClaim[data-tier="0"],
+.GuidePost--minTier3 .GuideClaim[data-tier="1"],
+.GuidePost--minTier3 .GuideClaim[data-tier="2"],
+.GuidePost--minTier3 .GuideClaim[data-tier="9"] {
+  opacity: 0.45;
+}
+
+// ----------------------------------------------------------------- callouts
+.GuideCallout {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid @g-line;
+  background: @g-surface-2;
+
+  .GuideCallout-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    color: @g-ink-dim;
+  }
+
+  .GuideCallout-body {
+    color: @g-ink;
+    font-size: 14.5px;
+    line-height: 1.6;
+
+    > p:last-child { margin-bottom: 0; }
+  }
+}
+
+.GuideCallout--note   { border-left: 3px solid @g-ink-faint; }
+.GuideCallout--tip    { border-left: 3px solid @g-ok;      .GuideCallout-label { color: @g-ok; } }
+.GuideCallout--key    { border-left: 3px solid @g-accent;  .GuideCallout-label { color: @g-accent; }
+                        background: linear-gradient(90deg, fade(@g-accent, 7%), @g-surface-2 45%); }
+.GuideCallout--warn   { border-left: 3px solid @g-warn;    .GuideCallout-label { color: @g-warn; } }
+.GuideCallout--danger { border-left: 3px solid @g-danger;  .GuideCallout-label { color: @g-danger; }
+                        background: linear-gradient(90deg, fade(@g-danger, 8%), @g-surface-2 45%); }
+
+.GuideCallout--risk {
+  border-left: 3px solid @g-warn;
+  .GuideCallout-label { color: @g-warn; }
+
+  &[data-level="high"],
+  &[data-level="medical"] {
+    border-left-color: @g-danger;
+    background: linear-gradient(90deg, fade(@g-danger, 10%), @g-surface-2 45%);
+    .GuideCallout-label { color: @g-danger; }
+  }
+
+  &[data-level="low"],
+  &[data-level="none"] {
+    border-left-color: @g-ink-faint;
+    .GuideCallout-label { color: @g-ink-dim; }
+  }
+}
+
+// --------------------------------------------------------------- spec sheet
+.GuideSpec {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  margin: 18px 0 22px;
+  background: @g-line;
+  border: 1px solid @g-line;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.GuideSpec-item {
+  background: @g-surface-2;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.GuideSpec-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: @g-ink-faint;
+}
+
+.GuideSpec-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: @g-ink;
+  font-variant-numeric: tabular-nums;
+}
+
+.GuideSpec-item[data-field="risk"] .GuideSpec-value { color: @g-warn; }
+.GuideSpec-item[data-field="difficulty"] .GuideSpec-value::after { content: " / 5"; color: @g-ink-faint; font-weight: 400; }
+
+// ------------------------------------------------------------------- steps
+.GuideSteps {
+  counter-reset: guidestep;
+  margin: 16px 0;
+}
+
+.GuideStep {
+  counter-increment: guidestep;
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-left: 2px solid @g-line;
+  margin-left: 4px;
+  position: relative;
+
+  &::before {
+    content: counter(guidestep);
+    position: absolute;
+    left: -13px;
+    top: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: @g-surface-3;
+    color: @g-ink-dim;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid @g-line;
+  }
+
+  &.is-done {
+    &::before { background: @g-ok; color: @g-surface-0; border-color: @g-ok; }
+    .GuideStep-title, .GuideStep-body { opacity: 0.5; }
+    .GuideStep-title { text-decoration: line-through; }
+  }
+}
+
+.GuideStep-check {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  margin-left: 14px;
+  border: 1.5px solid @g-line;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+
+  &:hover { border-color: @g-ok; }
+
+  .GuideStep.is-done & {
+    background: @g-ok;
+    border-color: @g-ok;
+  }
+}
+
+.GuideStep-main { flex: 1 1 auto; min-width: 0; }
+.GuideStep-title { font-weight: 650; color: @g-ink; margin-bottom: 2px; }
+.GuideStep-body { color: @g-ink-dim; font-size: 14px; line-height: 1.55; > p:last-child { margin-bottom: 0; } }
+
+// ------------------------------------------------------------------- stack
+// The regimen table. On this board a protocol is almost always
+// (thing, dose, frequency, duration) and the source board renders it as prose,
+// which is why every such thread has forty replies asking what the dose was.
+.GuideStack {
+  margin: 18px 0;
+  border: 1px solid @g-line;
+  border-radius: 8px;
+  overflow: hidden;
+  background: @g-surface-1;
+}
+
+.GuideStack-title {
+  padding: 9px 12px;
+  background: @g-surface-2;
+  border-bottom: 1px solid @g-line;
+  font-weight: 700;
+  font-size: 13px;
+  color: @g-ink;
+}
+
+.GuideStack-head,
+.GuideStack-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  align-items: baseline;
+}
+
+.GuideStack-head {
+  background: @g-surface-2;
+  border-bottom: 1px solid @g-line;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: @g-ink-faint;
+}
+
+.GuideStack-row {
+  border-bottom: 1px solid fade(@g-line, 60%);
+  &:last-child { border-bottom: none; }
+  &:hover { background: @g-surface-2; }
+}
+
+.GuideStack-name { font-weight: 600; color: @g-ink; }
+.GuideStack-dose,
+.GuideStack-freq,
+.GuideStack-dur { color: @g-ink-dim; font-variant-numeric: tabular-nums; }
+.GuideStack-note {
+  grid-column: 1 / -1;
+  color: @g-ink-faint;
+  font-size: 12px;
+  font-style: italic;
+  padding-top: 2px;
+}
+
+// -------------------------------------------------------------------- terms
+.GuideTerm {
+  border-bottom: 1px dotted @g-accent-2;
+  cursor: help;
+  color: @g-ink;
+
+  &:hover, &:focus { background: fade(@g-accent-2, 12%); outline: none; }
+}
+
+// ------------------------------------------------------------- before/after
+.GuideBA {
+  margin: 18px 0;
+
+  .GuideBA-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: @g-line;
+    border: 1px solid @g-line;
+    border-radius: 8px;
+    overflow: hidden;
+
+    img { width: 100%; height: auto; display: block; }
+  }
+
+  .GuideBA-label {
+    margin-top: 6px;
+    font-size: 12px;
+    color: @g-ink-faint;
+    text-align: center;
+  }
+}
+
+// ============================================================ page furniture
+// Everything below is injected by the JS layer into DOM the server rendered.
+// None of it overrides a core component.
+
+.GuideHeader {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  background: @g-surface-1;
+  border: 1px solid @g-line;
+  border-radius: 10px;
+}
+
+.GuideHeader-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.GuideHeader-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: fade(@g-ok, 18%);
+  color: @g-ok;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.GuideHeader-meta {
+  color: @g-ink-faint;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+// The evidence profile bar. Deliberately a bar and not a number: a number on
+// this board is a target, and the target would be "put T4 on everything". The
+// bar is only convincing if the claims are actually there.
+.GuideEvidence {
+  margin-top: 4px;
+}
+
+.GuideEvidence-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: @g-surface-3;
+}
+
+.GuideEvidence-seg { height: 100%; transition: flex-grow 0.3s ease; }
+.GuideEvidence-seg[data-tier="0"] { background: @g-ink-faint; }
+.GuideEvidence-seg[data-tier="1"] { background: @g-ink-dim; }
+.GuideEvidence-seg[data-tier="2"] { background: @g-accent-2; }
+.GuideEvidence-seg[data-tier="3"] { background: @g-accent; }
+.GuideEvidence-seg[data-tier="4"] { background: @g-ok; }
+.GuideEvidence-seg[data-tier="5"] { background: lighten(@g-ok, 12%); }
+.GuideEvidence-seg[data-tier="9"] { background: @g-danger; }
+
+.GuideEvidence-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 7px;
+  font-size: 10.5px;
+  color: @g-ink-faint;
+}
+
+.GuideEvidence-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  i {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+}
+
+// Freshness. A banner alone is advisory and gets ignored, which is why the
+// ranking multiplier in GuideMeta::rankMultiplier() does the actual work; this
+// is the visible half of the same decision.
+.GuideFresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.GuideFresh--fresh { color: @g-ok; }
+.GuideFresh--due   { color: @g-warn; }
+.GuideFresh--stale { color: @g-danger; }
+.GuideFresh--unknown { color: @g-ink-faint; }
+
+.GuideFresh-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.GuideStaleBanner {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid fade(@g-danger, 40%);
+  background: fade(@g-danger, 10%);
+  color: @g-ink;
+  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &.GuideStaleBanner--due {
+    border-color: fade(@g-warn, 40%);
+    background: fade(@g-warn, 9%);
+  }
+
+  strong { color: @g-danger; }
+  &.GuideStaleBanner--due strong { color: @g-warn; }
+}
+
+// ---------------------------------------------------------------------- ToC
+.GuideToc {
+  position: sticky;
+  top: 70px;
+  max-height: ~"calc(100vh - 110px)";
+  overflow-y: auto;
+  padding: 12px 0;
+  border-left: 1px solid @g-line;
+  font-size: 12.5px;
+  scrollbar-width: thin;
+}
+
+.GuideToc-title {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: @g-ink-faint;
+  padding: 0 0 8px 14px;
+}
+
+.GuideToc-link {
+  display: block;
+  padding: 4px 8px 4px 14px;
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  color: @g-ink-dim;
+  text-decoration: none;
+  line-height: 1.4;
+  transition: color 0.12s ease, border-color 0.12s ease;
+
+  &:hover { color: @g-ink; text-decoration: none; }
+
+  &.is-current {
+    color: @g-accent;
+    border-left-color: @g-accent;
+    font-weight: 600;
+  }
+
+  &[data-level="3"] { padding-left: 26px; font-size: 12px; }
+  &[data-level="4"] { padding-left: 38px; font-size: 11.5px; }
+}
+
+.GuideProgress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: @g-accent;
+  z-index: 100;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+// Anchored headings inside a guide get a hover permalink. Deep-linking to
+// "the section on risk" is the single most-requested thing a 4,000-word
+// document needs and the source board cannot do it at all.
+.GuidePost .Post-body h1,
+.GuidePost .Post-body h2,
+.GuidePost .Post-body h3,
+.GuidePost .Post-body h4 {
+  scroll-margin-top: 80px;
+  position: relative;
+
+  .GuideAnchor {
+    position: absolute;
+    left: -20px;
+    opacity: 0;
+    color: @g-ink-faint;
+    text-decoration: none;
+    font-weight: 400;
+    transition: opacity 0.12s ease;
+  }
+
+  &:hover .GuideAnchor { opacity: 1; }
+  .GuideAnchor:hover { color: @g-accent; }
+}
+
+// ------------------------------------------------------- discussion list row
+.DiscussionListItem-guideBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: fade(@g-ok, 16%);
+  color: @g-ok;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 15px;
+}
+
+.DiscussionListItem-guideBadge--stale {
+  background: fade(@g-danger, 14%);
+  color: @g-danger;
+}
+
+.DiscussionListItem-guideMini {
+  display: inline-flex;
+  height: 4px;
+  width: 34px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: @g-surface-3;
+  vertical-align: middle;
+  margin-left: 5px;
+
+  i { height: 100%; display: block; }
+}
+
+// ------------------------------------------------------------------- mobile
+@media (max-width: 767px) {
+  .GuidePost .Post-body { max-width: 100%; }
+
+  .GuideToc {
+    position: static;
+    max-height: none;
+    border-left: none;
+    border-bottom: 1px solid @g-line;
+    margin-bottom: 12px;
+  }
+
+  // The four-column regimen table is unreadable at 360px, so each row becomes
+  // a labelled card. The labels come from CSS rather than duplicated markup so
+  // the desktop table head stays the single source of the column names.
+  .GuideStack-head { display: none; }
+
+  .GuideStack-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 10px 12px;
+  }
+
+  .GuideStack-dose::before { content: "Dose: "; color: @g-ink-faint; }
+  .GuideStack-freq::before { content: "Frequency: "; color: @g-ink-faint; }
+  .GuideStack-dur::before  { content: "Duration: "; color: @g-ink-faint; }
+
+  .GuideSpec { grid-template-columns: repeat(2, 1fr); }
+
+  .GuideBA .GuideBA-pair { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .GuideClaim .GuideClaim-chip,
+  .GuideEvidence-seg,
+  .GuideProgress,
+  .GuideToc-link,
+  .GuideStep-check {
+    transition: none;
+  }
+}

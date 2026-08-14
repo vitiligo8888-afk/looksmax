@@ -1,0 +1,259 @@
+// The tag tree: /tags, the tag hero, and the tiles core renders for both.
+//
+// Core lays TagTiles out as fixed-height floats and paints each tile in its own
+// tag colour. Both fight a dark, dense forum index: the fixed 200px height
+// clipped the child-forum chips (a scrollbar appeared INSIDE a tile), and the
+// per-tag fill made the grid read as a bag of unrelated blocks. Here the tag
+// colour is an accent edge and the tile is one of our surfaces.
+//
+// Specificity note, because it cost an afternoon once: core's selectors are
+// `.TagTiles > li` (0,1,1), which outrank a bare `.TagTile` (0,1,0). A width or
+// height override written on `.TagTile` compiles and never applies. Every rule
+// below that has to beat core matches core's shape.
+
+.TagsPage {
+  padding-top: var(--gap-lg);
+}
+
+// .TagsPage-content holds a SINGLE <ul class="TagTiles">, so the grid belongs
+// on the list. Putting it on the wrapper lays out one <ul> into one column.
+.TagsPage-content {
+  display: block;
+  margin: 0 auto;
+  max-width: var(--shell);
+}
+
+.TagTiles {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  list-style: none;
+  margin: 0;          // core applies `margin: -15px -15px 0` for its float layout
+  overflow: visible;
+  padding: 0;
+}
+
+.TagTiles > li.TagTile {
+  box-sizing: border-box;
+  float: none;
+  // height:auto alone collapses the tile to 2px, because core sizes the inner
+  // anchor from the parent's height. Keep a floor, let it grow, stop clipping.
+  height: auto;
+  margin: 0;
+  min-height: 132px;
+  overflow: visible;
+  width: auto;
+}
+
+.TagTile {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--tag-bg, var(--line));
+  border-radius: var(--card-radius);
+  box-shadow: var(--e-1);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  padding: 0;
+  position: relative;
+  transition:
+    background var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    transform var(--t-base) var(--ease);
+
+  &:hover {
+    background: var(--surface-2);
+    border-left-color: var(--accent);
+    box-shadow: var(--e-3);
+    transform: translateY(-2px);
+  }
+
+  &:focus-within {
+    box-shadow: var(--ring);
+  }
+
+  // core paints tiles with the tag colour as a full background and then picks a
+  // text colour from a YIQ verdict about that fill. Ours is not painted in the
+  // tag colour, so both have to be neutralised or the label inverts to near
+  // black on near black.
+  &.colored { background: var(--surface-1); }
+
+  &.text-contrast--dark,
+  &.text-contrast--light {
+    --contrast-color: var(--ink);
+    color: var(--ink);
+  }
+}
+
+.TagTiles > li.TagTile > .TagTile-info,
+.TagTile-info {
+  display: block;
+  flex: 1 1 auto;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+  padding: var(--pad) var(--pad) 12px;
+  // core sets position:absolute here, which takes the content out of flow so it
+  // cannot size the tile: a measured 132px tile against 211px of content, which
+  // is why child chips spilled over the row beneath.
+  position: static;
+  text-decoration: none;
+
+  &:hover { text-decoration: none; }
+}
+
+.TagTile-name {
+  align-items: center;
+  color: var(--ink);
+  display: flex;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  gap: var(--gap-sm);
+  letter-spacing: -0.01em;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.TagTile-description {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--ink-dim);
+  display: -webkit-box;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  margin: 6px 0 0;
+  overflow: hidden;
+
+  &:empty { display: none; }
+}
+
+// child forums listed under their category
+.TagTile-children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-xs) var(--gap-sm);
+  margin-top: var(--pad-sm);
+
+  &:empty { display: none; }
+
+  a,
+  .TagTile.colored & a,
+  .text-contrast--dark & a,
+  .text-contrast--light & a {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-xs);
+    color: var(--ink);
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    opacity: 1;
+    padding: 3px 8px;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--surface-3);
+      border-color: var(--accent-a45);
+      color: var(--accent);
+      text-decoration: none;
+    }
+  }
+}
+
+.TagTile-lastPostedDiscussion {
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  display: block;
+  font-size: var(--fs-xs);
+  overflow: hidden;
+  padding: var(--gap-sm) var(--pad);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:empty { display: none; }
+
+  a { color: var(--ink-dim); }
+  a:hover { color: var(--accent); }
+}
+
+.TagTile iconify-icon,
+.TagTile .icon {
+  // the glyph inherited a near-black colour against a near-black surface
+  color: var(--accent);
+  flex: 0 0 auto;
+  font-size: 19px;
+  opacity: 1;
+}
+
+// ============================================================ tag chips
+//
+// Core paints a chip in the tag's own colour and then picks the label colour
+// from a YIQ verdict about that fill, publishing the verdict as
+// `.text-contrast--light` / `.text-contrast--dark` and a `--contrast-color`
+// custom property. Two things go wrong with that on this forum:
+//
+//   1. where we do NOT paint the chip in the tag colour (the discussion hero,
+//      where chips are ghosted onto the hero surface), core's verdict is about
+//      a fill that is not there. Measured: a "News" label at 1.99:1.
+//   2. the source board's palette includes tag colours that are themselves
+//      mid-tone, where neither of core's two verdicts clears 4.5:1.
+//
+// So the chip is drawn as a tint of its own tag colour with the tag colour as
+// the LABEL, which is legible for any hue at any lightness on a dark surface,
+// and `--contrast-color` is retargeted so core's own rules stop fighting it.
+// The tag stays identifiable by hue, which is the entire point of tag colours.
+.TagLabel {
+  --contrast-color: var(--ink);
+  align-items: center;
+  border-radius: var(--r-xs);
+  display: inline-flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  gap: 4px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+// `.colored` is core's marker for "this tag has a colour"; --tag-bg carries it.
+.TagLabel.colored,
+.TagLabel--colored {
+  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 38%, transparent);
+  // The tag hue, lifted toward white until it is readable on a dark surface.
+  // Doing this in one place is what makes an arbitrary imported palette safe.
+  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 72%, #fff);
+}
+
+// core sets these on the chip and on its children; both have to be neutralised
+// or the inner spans re-inherit the verdict colour
+.TagLabel.text-contrast--light,
+.TagLabel.text-contrast--dark,
+.TagLabel.text-contrast--light .TagLabel-text,
+.TagLabel.text-contrast--dark .TagLabel-text,
+.TagLabel.text-contrast--light .TagLabel-name,
+.TagLabel.text-contrast--dark .TagLabel-name {
+  color: inherit;
+}
+
+.TagLabel-icon,
+.TagLabel iconify-icon {
+  flex: none;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+// An uncoloured tag still needs to read as a chip.
+.TagLabel:not(.colored):not(.TagLabel--colored) {
+  background-color: var(--white-a06);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-dim);
+}
+
+a.TagLabel:hover,
+a.TagLabel:focus-visible {
+  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 28%, transparent);
+  text-decoration: none;
+}

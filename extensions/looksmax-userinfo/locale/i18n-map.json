@@ -1,0 +1,243 @@
+{
+  "extension": "looksmax-userinfo",
+  "prefix": "local-looksmax-userinfo",
+  "replacements": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 62,
+      "find": "  function compact(n) {\n    n = Number(n) || 0;\n    if (n < 1000) return String(n);\n    if (n < 10000) return (Math.floor(n / 100) / 10).toFixed(1).replace(/\\.0$/, '') + 'k';\n    if (n < 1000000) return Math.round(n / 1000) + 'k';\n    return (Math.round(n / 100000) / 10).toFixed(1).replace(/\\.0$/, '') + 'M';\n  }",
+      "replace": "  function compact(n) {\n    n = Number(n) || 0;\n    // Locale-aware. The hand-rolled 'k'/'M' suffixes below were English-only:\n    // Spanish compacts 12431 to \"12,4 mil\", not \"12.4k\".\n    if (window.lmxI18n) return window.lmxI18n.compact(n);\n    if (n < 1000) return String(n);\n    if (n < 10000) return (Math.floor(n / 100) / 10).toFixed(1).replace(/\\.0$/, '') + 'k';\n    if (n < 1000000) return Math.round(n / 1000) + 'k';\n    return (Math.round(n / 100000) / 10).toFixed(1).replace(/\\.0$/, '') + 'M';\n  }",
+      "key": "(formatting) compact",
+      "note": "Routes the compact form through lmxI18n.compact(). The English fallback is kept verbatim so the panel still renders if looksmax-i18n is absent."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 70,
+      "find": "  function exact(n) {\n    return (Number(n) || 0).toLocaleString();\n  }",
+      "replace": "  function exact(n) {\n    n = Number(n) || 0;\n    // toLocaleString() with NO locale argument follows the BROWSER's locale,\n    // not the forum's, so a Spanish page could print \"12,431\" beside Spanish\n    // text on an en-US browser and \"12.431\" on an es-MX one.\n    return window.lmxI18n ? window.lmxI18n.exact(n) : String(n);\n  }",
+      "key": "(formatting) exact",
+      "note": "Fixes a silent browser-locale leak. Note lmxI18n.num(NaN) returns '' — Number(n)||0 upstream keeps this at '0', preserving the file's 'null renders as nothing, never a zero' rule at the call sites, which all guard on the field first."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 81,
+      "find": "  function monthYear(v) {\n    var t = parseDate(v);\n    if (t === null) return null;\n    var d = new Date(t);\n    return d.toLocaleString('en', { month: 'short', year: 'numeric' });\n  }",
+      "replace": "  function monthYear(v) {\n    var t = parseDate(v);\n    if (t === null) return null;\n    // Was pinned to 'en' — \"Mar 2019\" beside Spanish text. es-MX gives \"mar 2019\".\n    if (window.lmxI18n) return window.lmxI18n.monthYear(t);\n    return new Date(t).toLocaleString(undefined, { month: 'short', year: 'numeric' });\n  }",
+      "key": "(formatting) monthYear"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 88,
+      "find": "  function fullDate(v) {\n    var t = parseDate(v);\n    if (t === null) return null;\n    return new Date(t).toLocaleString('en', { day: 'numeric', month: 'long', year: 'numeric' });\n  }",
+      "replace": "  function fullDate(v) {\n    var t = parseDate(v);\n    if (t === null) return null;\n    // Was pinned to 'en'. es-MX gives \"4 de marzo de 2019\".\n    if (window.lmxI18n) return window.lmxI18n.date(t);\n    return new Date(t).toLocaleString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });\n  }",
+      "key": "(formatting) fullDate"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 94,
+      "find": "  function ago(v) {\n    var t = parseDate(v);\n    if (t === null) return null;\n    var s = Math.floor((Date.now() - t) / 1000);\n    if (s < 60) return 'just now';\n    if (s < 3600) return Math.floor(s / 60) + 'm ago';\n    if (s < 86400) return Math.floor(s / 3600) + 'h ago';\n    var d = Math.floor(s / 86400);\n    if (d < 30) return d + 'd ago';\n    if (d < 365) return Math.round(d / 30.44) + 'mo ago';\n    return Math.round(d / 365.25) + 'y ago';\n  }",
+      "replace": "  function ago(v) {\n    var t = parseDate(v);\n    if (t === null) return null;\n    // \"hace 3 horas\", not \"3h ago\". Intl.RelativeTimeFormat picks the unit and\n    // the wording; the hand-rolled ladder below is the no-i18n fallback.\n    if (window.lmxI18n) return window.lmxI18n.rel(t);\n    var s = Math.floor((Date.now() - t) / 1000);\n    if (s < 60) return 'just now';\n    if (s < 3600) return Math.floor(s / 60) + 'm ago';\n    if (s < 86400) return Math.floor(s / 3600) + 'h ago';\n    var d = Math.floor(s / 86400);\n    if (d < 30) return d + 'd ago';\n    if (d < 365) return Math.round(d / 30.44) + 'mo ago';\n    return Math.round(d / 365.25) + 'y ago';\n  }",
+      "key": "(formatting) ago"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 172,
+      "find": "              title: info.online\n                ? 'Online now'\n                : info.lastSeenAt\n                ? 'Last seen ' + ago(info.lastSeenAt)\n                : 'Never seen',",
+      "replace": "              title: info.online\n                ? app.translator.trans('local-looksmax-userinfo.forum.presence.online')\n                : info.lastSeenAt\n                ? app.translator.trans('local-looksmax-userinfo.forum.presence.last_seen', { when: ago(info.lastSeenAt) })\n                : app.translator.trans('local-looksmax-userinfo.forum.presence.never_seen'),",
+      "key": "forum.presence.online / .last_seen / .never_seen"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 184,
+      "find": "    if (!user) return m('span.LmxAuthor-name', 'Deleted');",
+      "replace": "    if (!user) return m('span.LmxAuthor-name', app.translator.trans('local-looksmax-userinfo.forum.user.deleted'));",
+      "key": "forum.user.deleted"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 216,
+      "find": "        title:\n          r.source === 'ranks'\n            ? 'Rank: ' + r.name + (r.nextName ? ' — ' + exact(r.toNext) + ' to ' + r.nextName : '')\n            : r.kind === 'style'\n            ? r.name + ' — a name colour carried over from the source board'\n            : r.name + ' — rank carried over from the source board',",
+      "replace": "        title:\n          r.source === 'ranks'\n            ? (r.nextName\n                ? app.translator.trans('local-looksmax-userinfo.forum.rank.title_next', { name: r.name, points: exact(r.toNext), next: r.nextName })\n                : app.translator.trans('local-looksmax-userinfo.forum.rank.title', { name: r.name }))\n            : r.kind === 'style'\n            ? app.translator.trans('local-looksmax-userinfo.forum.rank.legacy_style', { name: r.name })\n            : app.translator.trans('local-looksmax-userinfo.forum.rank.legacy_rank', { name: r.name }),",
+      "key": "forum.rank.title / .title_next / .legacy_style / .legacy_rank",
+      "note": "The ternary is restructured because the English built the 'to next rank' clause by concatenation, which Spanish cannot reproduce (it needs 'faltan X para Y'). Behaviour is identical: same three branches, same nextName guard."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 254,
+      "find": "    var joined = monthYear(info.joinedAt);\n    if (joined) {\n      rows.push(stat('Joined', joined, fullDate(info.joinedAt), 'ph:calendar-blank-fill'));\n    }\n    rows.push(stat('Messages', compact(info.posts), exact(info.posts) + ' posts on this forum', 'ph:chat-teardrop-text-fill'));\n    rows.push(\n      stat('Threads', compact(info.discussions), exact(info.discussions) + ' discussions started here', 'ph:tree-structure-fill')\n    );",
+      "replace": "    var joined = monthYear(info.joinedAt);\n    if (joined) {\n      rows.push(stat(app.translator.trans('local-looksmax-userinfo.forum.stat.joined'), joined, fullDate(info.joinedAt), 'ph:calendar-blank-fill'));\n    }\n    rows.push(stat(\n      app.translator.trans('local-looksmax-userinfo.forum.stat.messages'),\n      compact(info.posts),\n      app.translator.trans('local-looksmax-userinfo.forum.stat.messages_title', { n: info.posts, count: exact(info.posts) }),\n      'ph:chat-teardrop-text-fill'\n    ));\n    rows.push(stat(\n      app.translator.trans('local-looksmax-userinfo.forum.stat.threads'),\n      compact(info.discussions),\n      app.translator.trans('local-looksmax-userinfo.forum.stat.threads_title', { n: info.discussions, count: exact(info.discussions) }),\n      'ph:tree-structure-fill'\n    ));",
+      "key": "forum.stat.joined / .messages / .messages_title / .threads / .threads_title"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 268,
+      "find": "        stat(\n          'Reactions',\n          compact(info.reactions),\n          exact(info.reactions) + ' reactions on their posts here' +\n            (info.reactionRate ? ' — ' + info.reactionRate + ' per post' : ''),\n          'ph:heart-fill'\n        )",
+      "replace": "        stat(\n          app.translator.trans('local-looksmax-userinfo.forum.stat.reactions'),\n          compact(info.reactions),\n          app.translator.trans('local-looksmax-userinfo.forum.stat.reactions_title', { n: info.reactions, count: exact(info.reactions) }) +\n            (info.reactionRate\n              ? app.translator.trans('local-looksmax-userinfo.forum.stat.reactions_rate', { rate: window.lmxI18n ? window.lmxI18n.num(info.reactionRate) : String(info.reactionRate) })\n              : ''),\n          'ph:heart-fill'\n        )",
+      "key": "forum.stat.reactions / .reactions_title / .reactions_rate",
+      "note": "reactionRate is a float (round($reactions/$posts, 2)) that was printed raw — '1.25' in a Spanish tooltip. Routed through lmxI18n.num(). The two trans() results are concatenated: both are plain strings because neither message contains tags and no parameter is a vnode."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 278,
+      "find": "    if (opts.wide && info.postsPerDay) {\n      rows.push(stat('Per day', String(info.postsPerDay), 'Posts per day since joining', 'ph:pulse-bold'));\n    }\n    if (opts.wide && info.bestPostScore > 0) {\n      rows.push(stat('Best post', compact(info.bestPostScore), exact(info.bestPostScore) + ' reactions on one post', 'ph:trophy-fill'));\n    }",
+      "replace": "    if (opts.wide && info.postsPerDay) {\n      rows.push(stat(\n        app.translator.trans('local-looksmax-userinfo.forum.stat.per_day'),\n        window.lmxI18n ? window.lmxI18n.num(info.postsPerDay) : String(info.postsPerDay),\n        app.translator.trans('local-looksmax-userinfo.forum.stat.per_day_title'),\n        'ph:pulse-bold'\n      ));\n    }\n    if (opts.wide && info.bestPostScore > 0) {\n      rows.push(stat(\n        app.translator.trans('local-looksmax-userinfo.forum.stat.best_post'),\n        compact(info.bestPostScore),\n        app.translator.trans('local-looksmax-userinfo.forum.stat.best_post_title', { n: info.bestPostScore, count: exact(info.bestPostScore) }),\n        'ph:trophy-fill'\n      ));\n    }",
+      "key": "forum.stat.per_day / .per_day_title / .best_post / .best_post_title",
+      "note": "postsPerDay is a 2-decimal float that String() printed as '1.25'. Spanish writes '1,25'."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 317,
+      "find": "    if (l.posts) bits.push(compact(l.posts) + ' posts');\n    if (l.reactions) bits.push(compact(l.reactions) + ' reactions');",
+      "replace": "    if (l.posts) bits.push(app.translator.trans('local-looksmax-userinfo.forum.legacy.posts', { n: l.posts, count: compact(l.posts) }));\n    if (l.reactions) bits.push(app.translator.trans('local-looksmax-userinfo.forum.legacy.reactions', { n: l.reactions, count: compact(l.reactions) }));",
+      "key": "forum.legacy.posts / .reactions",
+      "note": "bits is later joined with ' · ', so both entries must be plain strings — they are."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 324,
+      "find": "        title:\n          'Carried over from the source board: ' +\n          exact(l.posts) + ' posts, ' + exact(l.reactions) + ' reactions, ' +\n          exact(l.threads) + ' threads' + (l.joined ? ', joined ' + l.joined : ''),",
+      "replace": "        title: app.translator.trans('local-looksmax-userinfo.forum.legacy.title', {\n          posts: exact(l.posts),\n          reactions: exact(l.reactions),\n          threads: exact(l.threads),\n          hasJoined: l.joined ? 'yes' : 'no',\n          joined: l.joined || '',\n        }),",
+      "key": "forum.legacy.title",
+      "note": "The optional ', joined X' clause becomes an ICU select rather than a JS ternary, so Spanish can move it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 361,
+      "find": "        title:\n          'Reaction types their posts here attracted, by how many posts drew each:\\n' +\n          keys.map(function (k) { return '  ' + k + ' — ' + exact(info.reactionMix[k]) + ' posts'; }).join('\\n'),",
+      "replace": "        title:\n          app.translator.trans('local-looksmax-userinfo.forum.mix.title') + '\\n' +\n          keys.map(function (k) {\n            return '  ' + app.translator.trans('local-looksmax-userinfo.forum.mix.row', { name: k, n: info.reactionMix[k], count: exact(info.reactionMix[k]) });\n          }).join('\\n'),",
+      "key": "forum.mix.title / .row",
+      "note": "k is the reaction name from the scrape ('+1', 'JFL', 'Love it'). It is data and stays untranslated — see the deferred entry."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 425,
+      "find": "          ? m('div.LmxAuthor-seen', { title: 'Last seen ' + fullDate(info.lastSeenAt) }, 'Seen ' + ago(info.lastSeenAt))",
+      "replace": "          ? m('div.LmxAuthor-seen', { title: app.translator.trans('local-looksmax-userinfo.forum.presence.last_seen_on', { date: fullDate(info.lastSeenAt) }) }, app.translator.trans('local-looksmax-userinfo.forum.presence.seen_short', { when: ago(info.lastSeenAt) }))",
+      "key": "forum.presence.last_seen_on / .seen_short",
+      "note": "Two keys rather than one: the tooltip carries an absolute date and the label a relative one, and Spanish needs 'el' before the first and not before the second."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 522,
+      "find": "          'View profile'",
+      "replace": "          app.translator.trans('local-looksmax-userinfo.forum.card.view_profile')",
+      "key": "forum.card.view_profile"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 837,
+      "find": "      { title: 'Posts per month over the last two years' },",
+      "replace": "      { title: app.translator.trans('local-looksmax-userinfo.forum.profile.spark_title') },",
+      "key": "forum.profile.spark_title"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 841,
+      "find": "          title: p.month + ': ' + exact(p.posts) + ' posts',",
+      "replace": "          title: app.translator.trans('local-looksmax-userinfo.forum.profile.spark_bar', { month: window.lmxI18n ? window.lmxI18n.monthYear(p.month) : p.month, n: p.posts, count: exact(p.posts) }),",
+      "key": "forum.profile.spark_bar",
+      "note": "p.month arrives as the raw SQL bucket '2025-03'. Routed through monthYear() so it reads 'mar 2025' / 'Mar 2025' instead of a machine string."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 856,
+      "find": "        m('h4', 'Standing'),",
+      "replace": "        m('h4', app.translator.trans('local-looksmax-userinfo.forum.profile.standing')),",
+      "key": "forum.profile.standing"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 871,
+      "find": "          m('h4', 'Posts where'),",
+      "replace": "          m('h4', app.translator.trans('local-looksmax-userinfo.forum.profile.top_tags')),",
+      "key": "forum.profile.top_tags"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 876,
+      "find": "              return m('a.LmxTagBar', { href: app.forum.attribute('baseUrl') + '/t/' + t.slug, title: exact(t.posts) + ' posts in ' + t.name }, [",
+      "replace": "              return m('a.LmxTagBar', { href: app.forum.attribute('baseUrl') + '/t/' + t.slug, title: app.translator.trans('local-looksmax-userinfo.forum.profile.tag_title', { n: t.posts, count: exact(t.posts), name: t.name }) }, [",
+      "key": "forum.profile.tag_title"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 890,
+      "find": "          m('h4', 'Activity'),",
+      "replace": "          m('h4', app.translator.trans('local-looksmax-userinfo.forum.profile.activity')),",
+      "key": "forum.profile.activity"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 895,
+      "find": "                exact(s.replyShare.starts) + ' threads started · ' + exact(s.replyShare.replies) + ' replies'",
+      "replace": "                app.translator.trans('local-looksmax-userinfo.forum.profile.reply_share', { ns: s.replyShare.starts, starts: exact(s.replyShare.starts), nr: s.replyShare.replies, replies: exact(s.replyShare.replies) })",
+      "key": "forum.profile.reply_share"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 898,
+      "find": "          s.firstPostAt ? m('div.LmxProfile-note', 'First post ' + (fullDate(s.firstPostAt) || '')) : null,",
+      "replace": "          s.firstPostAt ? m('div.LmxProfile-note', app.translator.trans('local-looksmax-userinfo.forum.profile.first_post', { date: fullDate(s.firstPostAt) || '' })) : null,",
+      "key": "forum.profile.first_post"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 906,
+      "find": "          m('h4', 'Recent threads'),",
+      "replace": "          m('h4', app.translator.trans('local-looksmax-userinfo.forum.profile.recent')),",
+      "key": "forum.profile.recent"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 923,
+      "find": "                m('span.LmxRecent-meta', compact(d.replies) + ' replies · ' + compact(d.views) + ' views'),",
+      "replace": "                m('span.LmxRecent-meta', app.translator.trans('local-looksmax-userinfo.forum.profile.recent_meta', { nr: d.replies, replies: compact(d.replies), nv: d.views, views: compact(d.views) })),",
+      "key": "forum.profile.recent_meta"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 967,
+      "find": "              m('li.LmxBadge', { title: b.name + ' — carried over from the source board' }, [",
+      "replace": "              m('li.LmxBadge', { title: app.translator.trans('local-looksmax-userinfo.forum.banner.title', { name: b.name }) }, [",
+      "key": "forum.banner.title"
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/RankSource.php",
+      "line": 150,
+      "string": "'to the moon!'",
+      "reason": "FALSE POSITIVE in the audit. It is an array key in the banner colour lookup, matched against mb_strtolower($name); it is never printed. The five keys around it ('administrator', 'staff', 'moderator', 'contributor') are the same. No translation needed."
+    },
+    {
+      "file": "src/RankSource.php",
+      "line": 154,
+      "string": "return ['name' => $name, ...]",
+      "reason": "USER-VISIBLE, AUDIT MISSED IT, and it cannot be a string swap. The banner NAME rendered beside every avatar (js/dist/forum.js:236, :967) is passed through verbatim from the source-board scrape, so a Spanish page prints 'administrator', 'moderator', 'to the moon!'. Fixing it means adding a label lookup — e.g. a LABEL_KEY map from the same five lowercase names to 'local-looksmax-userinfo.forum.banner_name.<slug>' and returning a 'labelKey' alongside 'name', which the JS then resolves with a fallback to the raw name for banners the scrape has not seen. That is a new field on the payload plus a JS branch, not a find/replace. Roughly 12 lines across two files."
+    },
+    {
+      "file": "src/Presenter.php",
+      "line": 100,
+      "string": "'joined' => $profile->legacy_joined ? (string) $profile->legacy_joined : null",
+      "reason": "USER-VISIBLE, AUDIT MISSED IT. This string is printed raw in the carried-over tooltip (js/dist/forum.js:327 -> forum.legacy.title {joined}). It comes from the source-board scrape and its format is not known to be a parseable date, so it cannot be handed to lmxI18n.date() blind. What it would take: one query against userinfo_profiles.legacy_joined to establish the stored format; if it parses, format it in Presenter with a locale-independent ISO string and let the JS run monthYear() over it."
+    },
+    {
+      "file": "src/Api/SummaryController.php",
+      "line": 61,
+      "string": "'no such user'",
+      "reason": "NOT user-visible. It is the body of a 404 JSON response and the only consumer is loadSummary()'s .catch (js/dist/forum.js:821), which logs 'HTTP 404' to the console and renders nothing. Translating it would put a Spanish string in a machine payload. Leave it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 346,
+      "string": "'Love it', 'JFL', 'Hmm...', 'So Sad', 'Woah', 'Ugh..', 'WTF', 'Nerd', '+1'",
+      "reason": "FALSE POSITIVE as source strings: MIX_COLOR is a lookup table keyed by the reaction names the scrape recorded, and the keys are never printed. But the same names ARE printed, as data, in the mix tooltip (forum.mix.row {name}) — they arrive on info.reactionMix from Profile::mix(). Translating them belongs with looksmax-reactions, which owns the reaction catalogue; a second name map here would drift from it."
+    },
+    {
+      "file": "src/Console/BackfillCommand.php",
+      "line": 42,
+      "string": "23 [cli] strings",
+      "reason": "Correctly excluded. Operator-facing console output, never rendered to a visitor."
+    }
+  ]
+}

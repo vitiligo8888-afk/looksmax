@@ -1,0 +1,157 @@
+local-looksmax-userinfo:
+
+  forum:
+
+    user:
+      # Shown in place of a name when post.user() is null (deleted account).
+      deleted: Deleted
+
+    presence:
+      online: Online now
+      # {when} is a RELATIVE time from lmxI18n.rel() — "3 hours ago".
+      last_seen: "Last seen {when}"
+      # {date} is an ABSOLUTE date from lmxI18n.date() — "4 March 2019".
+      # A separate key because Spanish needs "el" before an absolute date and
+      # must not have it before "hace 3 horas".
+      last_seen_on: "Last seen on {date}"
+      # The short form printed under the panel, next to the presence dot.
+      seen_short: "Seen {when}"
+      never_seen: Never seen
+
+    rank:
+      title: "Rank: {name}"
+      # {points} is already locale-formatted by lmxI18n.exact().
+      title_next: "Rank: {name} — {points} to {next}"
+      legacy_style: "{name} — a name colour carried over from the source board"
+      legacy_rank: "{name} — rank carried over from the source board"
+
+    banner:
+      title: "{name} — carried over from the source board"
+
+    # THIS forum's groups — a different axis from both the rank ladder and the
+    # source board's banners, and the only one of the three that carries real
+    # permissions.
+    group:
+      title: "{name} — a group on this forum"
+
+    suspended:
+      label: Suspended
+      until: "Account suspended until {date}"
+
+    stat:
+      joined: Joined
+      messages: Messages
+      threads: Threads
+      reactions: Reactions
+      per_day: Per day
+      best_post: Best post
+      # In every *_title below: {n} is the RAW integer and only ever selects the
+      # plural arm; {count} is the same number already formatted for the locale
+      # by lmxI18n.exact(). Never swap them — {n} would print "12431".
+      messages_title: "{n, plural, one {{count} post on this forum} other {{count} posts on this forum}}"
+      threads_title: "{n, plural, one {{count} discussion started here} other {{count} discussions started here}}"
+      reactions_title: "{n, plural, one {{count} reaction on their posts here} other {{count} reactions on their posts here}}"
+      # Appended to reactions_title only when a rate exists. Leading space and
+      # dash are part of the string because they are punctuation, not layout.
+      reactions_rate: " — {rate} per post"
+      per_day_title: Posts per day since joining
+      best_post_title: "{n, plural, one {{count} reaction on one post} other {{count} reactions on one post}}"
+
+    legacy:
+      # The label is visible again. Without it, "38.2K posts" sat directly under
+      # "Messages 8" with nothing to say they describe different forums, and a
+      # phone has no tooltip to explain it.
+      label: "From the old forum"
+      posts: "{n, plural, one {{count} post} other {{count} posts}}"
+      reactions: "{n, plural, one {{count} reaction} other {{count} reactions}}"
+      # {joined} is a raw string from the source-board scrape, not a Date — it
+      # is passed straight through and is not reformatted. {hasJoined} is
+      # 'yes'/'no' so the clause can disappear entirely.
+      title: "Carried over from the source board: {posts} posts, {reactions} reactions, {threads} threads{hasJoined, select, yes {, joined {joined}} other {}}"
+
+    mix:
+      title: "Reaction types their posts here attracted, by how many posts drew each:"
+      # {name} is the reaction's own name as recorded by the scrape ("+1",
+      # "JFL", "Love it"). It is data, not a translatable string — see the
+      # deferred entry in i18n-map.json.
+      row: "{name} — {n, plural, one {{count} post} other {{count} posts}}"
+
+    # The user card: exactly one, everywhere on the forum.
+    card:
+      view_profile: View profile
+      view_posts: Their posts
+      message: Message
+      mention: Mention
+      report: Report
+      suspend: Suspend
+      unsuspend: Lift suspension
+      edit: Edit account
+      close: Close
+      mention_copied: Mention copied to the clipboard
+      report_unavailable: Reporting is not available here — use the post's own menu
+
+    # Direct messages.
+    dm:
+      title: Messages
+      back: Back
+      close: Close
+      loading: Loading…
+      empty: No messages yet. Open someone's card and press Message.
+      no_messages: No messages
+      just_you: Just you
+      compose_to: "New message to {name}"
+      to: "To {name}"
+      body_placeholder: Write your message…
+      reply_placeholder: Reply…
+      send: Send
+      sending: Sending…
+      sent: Message sent
+      deleted: Message deleted
+      # The real code is shown: a silent failure here is exactly the "dead
+      # button" this whole feature exists to avoid.
+      error: "That did not go through (HTTP {status} {code})"
+
+    # The profile sidebar blocks.
+    #
+    # This block was lost in a rewrite of this file, and the result was that the
+    # profile page printed the RAW KEYS
+    # ("local-looksmax-userinfo.forum.profile.top_tags") to every visitor.
+    # Flarum does not warn: a missing key renders as itself. e2e/i18n-gate.ts
+    # now asserts that every key the JS asks for exists in BOTH locales, and
+    # fails if one does not.
+    profile:
+      standing: Standing
+      top_tags: Posts where
+      activity: Activity
+      recent: Recent threads
+      spark_title: Posts per month over the last two years
+      # {month} is formatted by lmxI18n.monthYear() — "Mar 2025".
+      spark_bar: "{month}: {n, plural, one {{count} post} other {{count} posts}}"
+      tag_title: "{n, plural, one {{count} post in {name}} other {{count} posts in {name}}}"
+      reply_share: "{ns, plural, one {{starts} thread started} other {{starts} threads started}} · {nr, plural, one {{replies} reply} other {{replies} replies}}"
+      first_post: "First post {date}"
+      recent_meta: "{nr, plural, one {{replies} reply} other {{replies} replies}} · {nv, plural, one {{views} view} other {{views} views}}"
+
+  admin:
+    settings:
+      heading: User card
+      # ONE configuration for EVERY site the card appears on.
+      note: These settings apply to every card on the forum — posts, mentions, the shoutbox, listings, notifications and search.
+      trigger: How it opens on a pointer device (hover or click)
+      open_delay: Open delay (ms)
+      close_delay: Close delay (ms)
+      placement: Placement (auto, bottom, top)
+      follow_scroll: Close the card on scroll
+      mobile: On touch (sheet, popover, off)
+      mobile_breakpoint: Widest viewport treated as touch (px)
+      width: Card width (px)
+      avatar_size: Avatar size on the card (px)
+      fields: Visible fields, comma separated
+      actions: Visible actions, comma separated
+      rail_enabled: Show the author panel beside every post
+      rail_width: Author panel width (px)
+      dm_enabled: Enable direct messages
+      dm_max_length: Longest a message may be
+      dm_max_recipients: Most recipients in one conversation
+    permissions:
+      send: Send direct messages

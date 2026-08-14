@@ -1,0 +1,75 @@
+{
+  "extension": "flarum-analytics",
+  "prefix": "local-analytics",
+  "prefix_note": "Composer name is `local/flarum-analytics`. Flarum\\Extension\\Extension::nameToId (framework/core/src/Extension/Extension.php:126-132) does str_replace(['flarum-ext-', 'flarum-'], '', $package) on the package half, so the id is `local-analytics`, NOT `local-flarum-analytics`. No keys are written here, but the prefix is recorded because getting it wrong is a silent miss.",
+  "replacements": [],
+  "deferred": [
+    {
+      "file": "src/PostHog/Client.php",
+      "line": 44,
+      "string": "posthog not configured",
+      "reason": "Not user-visible, and the audit's only finding for this extension. It is the `error` member of the array sendBatch() returns; the single caller is Console/FlushCommand.php, which prints it to the terminal. No HTTP response, no view, no notification carries it. Translating it would make the operator's console output depend on the forum's locale."
+    },
+    {
+      "file": "src/PostHog/Client.php",
+      "line": 84,
+      "string": "http $status: <body excerpt>",
+      "reason": "Same slot as above — a diagnostic for the operator, carrying an upstream HTTP status and 200 bytes of PostHog's own (English) response body. It must stay verbatim to be useful."
+    },
+    {
+      "file": "src/Console/FlushCommand.php",
+      "line": "28-30",
+      "string": "Forward pending analytics events to PostHog / events per request / max events per run",
+      "reason": "Console command description and option help."
+    },
+    {
+      "file": "src/Console/RecomputeRankCommand.php",
+      "line": "37-38",
+      "string": "Recompute discussion hotness from the analytics event stream / days of events to weigh",
+      "reason": "Console command description and option help."
+    },
+    {
+      "file": "src/Api/IngestController.php",
+      "line": "19-21",
+      "string": "discussion.dwell, composer.opened, composer.submitted, composer.abandoned, search.performed, tag.filtered, link.clicked",
+      "reason": "The allow-list of event TYPE names. These are wire identifiers written to analytics_events.type and forwarded to PostHog as the event name; RecomputeRankCommand matches on them in SQL (lines 51-56). Translating any of them would silently break ranking and split every PostHog funnel in two."
+    },
+    {
+      "file": "src/Listeners/AddDiscussionAttributes.php",
+      "line": "13-15",
+      "string": "viewCount / uniqueViews / hotness",
+      "reason": "JSON:API attribute names, consumed by the frontend as data, not shown as text."
+    }
+  ],
+  "finding": "flarum-analytics has NO user-visible strings. Every quoted literal in src/ and js/ is an event-type identifier, a database column, a JSON:API attribute name, SQL, or console output. It renders nothing: js/src/forum/index.js contains no text either (it is pure instrumentation), and extend.php only attaches it when js/dist/forum.js exists, which it does not on disk. No locale/en.yml or locale/es.yml is written, and no Extend\\Locales line is added, because an empty locale pack is a maintenance liability rather than coverage. The audit reported 92.9% coverage / 13 'translated' strings for this extension; those 13 are dotted identifiers (event type names like `discussion.dwell`) that its KEY_RE happens to match, not translations.",
+  "out_of_scope_defects": [
+    {
+      "file": "extend.php",
+      "line": "71-72",
+      "problem": "`Api\\IngestController::class` and `Api\\FeedController::class` are written relative, but the file has no `use Local\\Analytics\\Api;` (only Models, Listeners and the two Console classes are imported). In the global namespace of extend.php these resolve to `\\Api\\IngestController` and `\\Api\\FeedController`.",
+      "impact": "Extend\\Routes resolves the handler lazily, so this is a 500 on POST /api/analytics/events rather than a boot error — the client instrumentation endpoint is dead.",
+      "fix": "Add `use Local\\Analytics\\Api;` beside the existing `use Local\\Analytics\\Listeners;` on line 27."
+    },
+    {
+      "file": "extend.php",
+      "line": 72,
+      "problem": "`Local\\Analytics\\Api\\FeedController` does not exist. src/Api/ contains only IngestController.php.",
+      "impact": "GET /api/analytics/feed 500s.",
+      "fix": "Write the class or drop the route."
+    },
+    {
+      "file": "extend.php",
+      "line": 63,
+      "problem": "`Listeners\\CaptureModeration::class` does not exist. src/Listeners/ has no CaptureModeration.php.",
+      "impact": "This one IS a boot-path failure. Extend\\Event->listen() registers the listener at extender-application time and the container resolves the class when Flarum\\Post\\Event\\Hidden or Flarum\\Discussion\\Event\\Renamed fires — a hide or a rename throws instead of completing. Two of the eight listeners on that extender point at it.",
+      "fix": "Write Local\\Analytics\\Listeners\\CaptureModeration (the other seven Capture* classes are three lines each and are the template), or remove the two ->listen() calls."
+    },
+    {
+      "file": "js/",
+      "line": null,
+      "problem": "js/src/forum/index.js exists and js/dist/ does not, so the guard in extend.php:36 never attaches the bundle.",
+      "impact": "All client-side capture (dwell, read depth, composer funnel) is currently dead code. Server-side capture is unaffected.",
+      "fix": "Build it, or say out loud that server-side capture is the whole product for now."
+    }
+  ]
+}

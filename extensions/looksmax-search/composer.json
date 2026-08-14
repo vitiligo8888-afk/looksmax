@@ -1,0 +1,15 @@
+{
+  "name": "local/looksmax-search",
+  "description": "Search: Meilisearch engine, incremental sync, query language, facets, results page, autocomplete, command palette, gap reporting",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\Search\\": "src/" } },
+  "extra": {
+    "flarum-extension": {
+      "title": "Looksmax Search",
+      "category": "feature",
+      "icon": { "name": "fas fa-magnifying-glass", "backgroundColor": "#12161c", "color": "#7aa2f7" }
+    }
+  }
+}

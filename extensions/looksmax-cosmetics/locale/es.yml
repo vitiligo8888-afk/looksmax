@@ -1,0 +1,147 @@
+##
+# looksmax-cosmetics — español, IDIOMA FUENTE.
+#
+# El español es el idioma por defecto de este foro, así que este archivo es el
+# original y locale/en.yml es la traducción, no al revés. Ninguna cadena visible
+# para la persona usuaria se escribe en el código: todas salen de aquí.
+#
+# Decisiones explícitas:
+#
+#  * MARCOS. Los ocho marcos que también conoce looksmax-ranks llevan
+#    EXACTAMENTE los mismos nombres que en su locale/es.yml (Laurel de bronce,
+#    Brasa, Glaciar…). Dos extensiones que dibujan el mismo objeto no pueden
+#    llamarlo de dos maneras: quien compró "Brasa" en la tienda tiene que
+#    encontrar "Brasa" en su armario.
+#
+#  * MARCOS GANADOS. Los cinco que añade esta extensión toman el nombre de la
+#    insignia que los desbloquea, ya traducida por looksmax-ranks (Old Guard ->
+#    "Vieja guardia", Contributor -> "Quien aporta"), para que la relación entre
+#    la insignia y el marco se lea sin explicación.
+#
+#  * PORTADAS. "Portada de perfil" y no "banner": el foro original usaba
+#    "banners" para las etiquetas de rol que van bajo el nombre, y esas ya
+#    existen aquí (looksmax-userinfo). Usar la misma palabra para dos cosas
+#    distintas es cómo se pierde una función.
+#
+#  * "Marco" en masculino y "portada" en femenino; las cadenas de la interfaz
+#    están escritas para no tener que concordar con el género de quien lee.
+##
+local-looksmax-cosmetics:
+
+  forum:
+
+    title: Personalización
+    sub: Marcos y portadas que ya tienes. Pruébalos aquí antes de ponértelos.
+    loading: Cargando…
+    guest: Inicia sesión para personalizar tu perfil.
+
+    none: Ninguno
+    none_hint: Sin decoración
+
+    apply: Aplicar
+    applying: Aplicando…
+    revert: Descartar
+
+    note: >-
+      Los marcos animados se detienen solos cuando no están en pantalla y se
+      apagan si tu sistema pide menos movimiento.
+
+    mirror:
+      saved: Así te ve el foro
+      unsaved: Vista previa sin guardar
+
+    section:
+      frames: Marcos de avatar
+      banners: Portadas de perfil
+      # {owned} de {total}: cuántos tienes de los que existen.
+      count: "{owned} de {total}"
+
+    owned:
+      bought: Comprado
+      tier: Incluido en tu membresía
+      badge: Ganado
+      generic: En tu inventario
+
+    lock:
+      # {price} ya viene con separadores de millares del idioma de quien lee.
+      buy: En la tienda por {price}
+      tier: Requiere membresía {tier}
+      badge: Requiere la insignia {badge}
+      award: Solo por concesión
+
+    error:
+      guest: Inicia sesión primero.
+      unknown_action: Esa acción no existe.
+      unknown_kind: Ese tipo de cosmético no existe.
+      no_such_item: Ese cosmético no existe.
+      not_owned: No tienes ese cosmético.
+      failed: No se pudo guardar. Inténtalo otra vez.
+
+  ##
+  # El catálogo. La clave es el `slug`, que nunca cambia; el nombre visible sí.
+  ##
+  lib:
+
+    frame:
+      # --- los ocho que también conoce looksmax-ranks --------------------
+      bronze-laurel:
+        name: Laurel de bronce
+        blurb: Un aro cálido y sencillo.
+      silver-laurel:
+        name: Laurel de plata
+        blurb: Metal cepillado.
+      gold-laurel:
+        name: Laurel de oro
+        blurb: Oro a dos tonos, estático.
+      neon:
+        name: Neón
+        blurb: Halo cian con resplandor.
+      ember:
+        name: Brasa
+        blurb: Un barrido cónico de calor, girando.
+      glacier:
+        name: Glaciar
+        blurb: Barrido cónico frío, girando.
+      circuit:
+        name: Circuito
+        blurb: Trazo discontinuo que recorre el perímetro.
+      ascendant:
+        name: Ascendente
+        blurb: Se otorga. Anillo doble que gira en sentidos opuestos.
+
+      # --- los que se ganan con historial real del foro ------------------
+      elder:
+        name: Vieja guardia
+        blurb: Para las cuentas que ya estaban aquí antes de la migración.
+      veteran:
+        name: Cinco años
+        blurb: Un aro de platino por cinco años en el foro.
+      consensus:
+        name: Consenso
+        blurb: Diez mil reacciones recibidas, girando despacio.
+      contributor:
+        name: Quien aporta
+        blurb: Para quien mantuvo las luces encendidas.
+      staff:
+        name: Staff
+        blurb: Doble anillo. No se compra.
+
+    banner:
+      nebula:
+        name: Nebulosa
+        blurb: La portada de la casa. Incluida con VIP.
+      aurora:
+        name: Aurora
+        blurb: Violeta que se abre a cian. Incluida con Élite.
+      founder:
+        name: Fundación
+        blurb: Solo para las cuentas fundadoras.
+      elder:
+        name: Archivo
+        blurb: Rejilla oscura para las cuentas que vinieron del foro original.
+      veteran:
+        name: Estación
+        blurb: Para quien lleva cinco años aquí.
+      staff:
+        name: Sala de máquinas
+        blurb: Para quien administra el foro.

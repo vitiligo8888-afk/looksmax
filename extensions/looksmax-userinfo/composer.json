@@ -1,0 +1,15 @@
+{
+  "name": "local/looksmax-userinfo",
+  "description": "The author identity surface: a rich per-post author panel, hover cards and a full profile header, driven only by data that actually exists",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\UserInfo\\": "src/" } },
+  "extra": {
+    "flarum-extension": {
+      "title": "Looksmax User Info",
+      "category": "feature",
+      "icon": { "name": "fas fa-address-card", "backgroundColor": "#11151c", "color": "#6ea8fe" }
+    }
+  }
+}

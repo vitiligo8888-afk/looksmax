@@ -1,0 +1,15 @@
+{
+  "name": "local/looksmax-cosmetics",
+  "description": "Cosmetic personalisation: data-driven avatar frames and profile banners, rendered at every avatar on the forum, gated on real ownership",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\Cosmetics\\": "src/" } },
+  "extra": {
+    "flarum-extension": {
+      "title": "Looksmax Cosmetics",
+      "category": "theme",
+      "icon": { "name": "fas fa-palette", "backgroundColor": "#151322", "color": "#9b7dfb" }
+    }
+  }
+}

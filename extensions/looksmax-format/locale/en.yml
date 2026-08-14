@@ -1,0 +1,53 @@
+local-looksmax-format:
+  forum:
+    # Chrome that this extension renders INSIDE post content. Everything under
+    # `post.*`, `quote.*` and `label.*` is emitted by the XSLT templates in
+    # src/Configure.php, which are compiled ONCE and cached — see
+    # locale/i18n-map.json `design` for how these reach a template at request
+    # time (XSL parameters set from a render hook). The values here are also the
+    # compile-time defaults, so an install that never sets the parameters still
+    # renders exactly this English.
+    post:
+      # Fallback label on a [spoiler] with no title of its own.
+      spoiler: Spoiler
+      # aria-label on an inline [ispoiler]: a blurred run of text mid-sentence.
+      spoiler_hidden: Hidden text, activate to reveal
+      spoiler_revealed: Hidden text, revealed
+      # [hideposts] — the source board hid this until you replied. That gate
+      # does not exist here, so the content is shown with this note.
+      reply_gated: Was reply-gated on the source board
+      deleted: Content removed
+      # [umention] / [user] — a member of the old board who was never imported.
+      unimported_member: Member of the source board, not imported here
+      lightbox_close: Close
+      copy: Copy
+      copied: Copied
+      # Shown when the clipboard API is unavailable or refused the write.
+      copy_manual: Press Ctrl+C
+    quote:
+      # Rendered as "<author> said:" — the space before it is in the template.
+      said: 'said:'
+      # [lolquote]: a quote posted in order to mock it. Rendered after an em
+      # dash, which the template owns: "<author> — posted to mock".
+      mock: posted to mock
+      jump: Go to the quoted post
+      show_rest: Show the rest of this quote
+      collapse: Collapse quote
+    # The source board's own post labels, written inline as [serious], [guide],
+    # [gtfih]… They are chips, not sentences: keep them short enough to sit on
+    # one line beside a thread title.
+    label:
+      serious: Serious
+      guide: Guide
+      theory: Theory
+      discussion: Discussion
+      method: Method
+      motivation: Motivation
+      rage: Rage
+      nsfw: NSFW
+      fake: Fake
+      op: OP
+      # "get the fuck in here" — a summons. Left as the acronym.
+      gtfih: GTFIH
+      high_iq: High IQ
+      meme: Meme

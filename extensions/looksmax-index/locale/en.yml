@@ -1,0 +1,203 @@
+# Looksmax Index — English.
+#
+# Namespace = the Flarum extension id for composer name `local/looksmax-index`.
+# Loaded into `messages+intl-icu` (Flarum\Locale\LocaleManager:68), so ICU
+# MessageFormat is available on every key.
+#
+# NOTE: for the six section names, and for the front page generally, SPANISH is
+# the source string and this file is the translation — the operator named the
+# sections in Spanish. That is the reverse of every other file in this repo.
+#
+# Everything here is rendered SERVER-SIDE, so there is no JS translator and no
+# window.lmxI18n on this surface. No string carries a number's FORMATTING and
+# none carries a `#`: figures are emitted by PHP. `#` is avoided even here
+# because it prints an ungrouped integer wherever Flarum's JS formatter renders
+# a string (core registers `plural` and `select` type handlers and no `number`
+# handler, js/src/common/Translator.tsx:41-46), and a key that cannot move to
+# the client is a trap for whoever moves it.
+#
+# No message contains markup. `<` means nothing to ICU, but it IS rich-tag
+# syntax to formatjs and to Flarum's own RichMessageFormatter, so a message
+# carrying `<b>` could never be reused from JS. Tags live in the calling code.
+
+local-looksmax-index:
+  # DEPRECATED, kept on purpose.
+  #
+  # An earlier revision of i18n-map.json shipped a RenderIndex::n() that calls
+  # this key, and that revision is already applied to the tree. The map carries
+  # a corrective replacement; until it lands, deleting this key would make every
+  # count render as the literal "local-looksmax-index.lib.number".
+  lib:
+    number: "{n, number}"
+
+  forum:
+    # ── The block front page (src/Blocks/*) ─────────────────────────────────
+    #
+    # Every block asks for `forum.index.<id>.heading` via AbstractBlock:19 even
+    # when it does not draw one, so all ten ids carry a heading here. A block
+    # that starts rendering its header must not be the thing that discovers a
+    # missing key.
+    index:
+      # ---------------------------------------------------------------- feed
+      # Six curated views of the same forum. The names are deliberately short —
+      # they are tabs, not headlines, and six of them have to fit in 390px.
+      feed:
+        heading: What is happening
+        hot: Active
+        new: New
+        top: Popular
+        reacted: Most reacted
+        unanswered: Unanswered
+        guides: Guides
+        all: See all
+        replies: replies
+        views: views
+        reactions: reactions
+        empty: Nothing here yet.
+      hero:
+        heading: Welcome
+        title: A serious room for how you look
+        lede: Guides, protocols, and people who answer with evidence. Read before you ask and you will get further, faster.
+        cta_join: Create an account
+        cta_browse: See the sections
+        # {username} carries no gender, so nothing in the sentence agrees.
+        member_greeting: "Good to see you, {username}"
+        member_lede: "You have {count} discussions with new activity."
+        cta_post: Write something
+        cta_unread: See what is new
+
+      stats:
+        heading: The board in numbers
+        threads: threads
+        posts: posts
+        members: members
+
+      news:
+        heading: News
+        more: See everything
+        show: Show news
+        new_badge: New
+        by: by
+        empty: Nothing new right now.
+        dismiss: Hide news
+
+      sections:
+        heading: Where to start
+        lede: Six sections, built from what the board actually discusses.
+        threads: threads
+        empty: Nothing here yet.
+
+      view:
+        label: How to show the sections
+        cards: Cards
+        list: List
+
+      browse:
+        heading: "All {count} forums"
+        hint: The full tree, exactly as it came over from the old board.
+
+      nav:
+        heading: Go to
+        all: All discussions
+        newest: Newest first
+        best: Best guides
+        tags: Every forum
+
+      onboarding:
+        heading: Your first steps
+        step1_title: Find your section
+        step1_body: Pick where you belong and keep it.
+        step2_title: Read two guides
+        step2_body: The best ones are collected, and free.
+        step3_title: Ask for your first rating
+        step3_body: Rate somebody else before you ask.
+        dismiss: Hide these steps
+
+      trending:
+        heading: Trending
+        replies: replies
+
+      activity:
+        heading: Latest activity
+        by: by
+
+      ad:
+        heading: Advertisement
+        label: Advertisement
+
+    # ── The six front-page sections ─────────────────────────────────────────
+    #
+    # Requested by name and shipped as written. Three are the same word in both
+    # files on purpose: Softmaxing and Looksmaxing are the subculture's own
+    # coinages and are used unchanged in Spanish, and Peligrosomaxing was coined
+    # IN Spanish, from `peligroso` — there is no established English rendering
+    # and inventing one is not this lane's call.
+    #
+    # `Peptides` is in English in the requested list even though the Spanish
+    # word is `Péptidos`. That is the requester's choice and is left alone.
+    #
+    # Accents live here, in the display string. Sections::SECTIONS keeps the tag
+    # slugs ASCII (`anabolicos`, `mejores-guias`), which is right: a slug is a
+    # URL, a title is text.
+    section:
+      peptides:
+        title: Peptides
+        desc: Peptides, dosing and protocols. What each one does, and what it does not.
+      anabolicos:
+        title: Anabolics
+        desc: Cycles, compounds and damage control. With bloodwork, not anecdotes.
+      softmaxing:
+        title: Softmaxing
+        desc: Skin, hair, posture, teeth. What changes without surgery.
+      looksmaxing:
+        title: Looksmaxing
+        desc: "The whole of it: face, body, and everything that gets measured."
+      peligrosomaxing:
+        title: Peligrosomaxing
+        desc: What can go wrong. Extreme procedures and real risk.
+      mejores_guias:
+        title: Best Guides
+        desc: The guides people come back to.
+
+    # ── The previous front page (src/RenderIndex.php) ───────────────────────
+    #
+    # Still what extend.php mounts today. Kept in full while both exist: delete
+    # these and the page currently being served prints raw keys.
+    row:
+      threads: "{count, plural, one {thread} other {threads}}"
+      posts: "{count, plural, one {post} other {posts}}"
+      last_by: "by {name}"
+      quiet: no threads yet
+
+    motd:
+      title: Before you post
+      body: Read the guides first. Rate others before asking to be rated. Claims need evidence, and evidence beats confidence.
+
+    card:
+      pinned: Pinned
+      trending: Trending
+      recent: Latest activity
+      stats: Board stats
+
+    list:
+      replies: "{count, plural, one {{n} reply} other {{n} replies}}"
+      by: "by {name}"
+
+    stats:
+      threads: Threads
+      posts: Posts
+      members: Members
+      newest: Newest
+
+    ad:
+      label: Advertisement
+
+    # The standalone `forum.news.*` block that predates the NewsBlock rewrite.
+    # NewsBlock reads `forum.index.news.*`; nothing reads these. Retained only
+    # so that whoever wrote them can move or delete them deliberately.
+    news:
+      heading: News
+      empty: Nothing new right now.
+      see_all: See everything
+      pinned: Pinned
+      dismiss: Dismiss

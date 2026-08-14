@@ -1,0 +1,105 @@
+//
+// The bespoke VIP name treatment.
+//
+// looksmax-ranks owns the name-style catalogue (Catalog::STYLES -> the ns-*
+// classes in its styles.less) and this lane may not edit it, so a treatment
+// that is genuinely NEW rather than one of the existing 24 has to be expressed
+// from outside. It is keyed on the username in the profile href, which is the
+// only per-user identifier that reaches CSS -- there is no data-user attribute
+// anywhere in this forum.
+//
+// Three rules for not breaking the extension that does own names:
+//
+//  1. Namespace. `ns-*`, `rk-*` and `fr-*` belong to looksmax-ranks; a
+//     collision would be silently overwritten by its paintName(). This uses
+//     `lmxr-`.
+//  2. Specificity. looksmax-userinfo's paintNames() writes an INLINE
+//     style.color on every username link, and ranks' rules are (0,2,0). An
+//     inline style is only beatable with !important, so the two properties
+//     that carry the gradient are marked and nothing else is.
+//  3. Reduced motion. ranks kills animation on .lmx-name globally with
+//     !important; that selector also matches this node once its decorator has
+//     run, so the shimmer stops for those users automatically. The explicit
+//     block at the end covers the window before ranks has painted.
+//
+// Layered deliberately over a real looksmax-ranks grant (see ChrisCommand):
+// if this extension is disabled, Chris still renders as ns-obsidian rather
+// than reverting to a plain username.
+//
+
+@lmxr-vip-a: #ffe9a8;
+@lmxr-vip-b: #e6b169;
+@lmxr-vip-c: #fff6df;
+@lmxr-vip-d: #c98d3f;
+@lmxr-vip-e: #c4a2f5;
+
+.lmxr-vip-paint() {
+  background-image: linear-gradient(
+    100deg,
+    @lmxr-vip-d 0%,
+    @lmxr-vip-b 14%,
+    @lmxr-vip-c 30%,
+    @lmxr-vip-a 42%,
+    @lmxr-vip-e 55%,
+    @lmxr-vip-a 68%,
+    @lmxr-vip-b 84%,
+    @lmxr-vip-d 100%
+  );
+  background-size: 280% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  text-shadow: none;
+  filter: drop-shadow(0 0 5px rgba(230, 177, 105, 0.45))
+          drop-shadow(0 0 14px rgba(196, 162, 245, 0.22));
+  animation: lmxr-vip-sweep 7s linear infinite;
+  will-change: background-position;
+}
+
+// Every surface a username can appear in. Core renders `.username` inside the
+// profile link; looksmax-userinfo renders `.LmxAuthor-name` as the link itself.
+a[href$="/u/Chris"] .username,
+a[href$="/u/chris"] .username,
+a[href$="/u/Chris"].LmxAuthor-name,
+a[href$="/u/chris"].LmxAuthor-name,
+a[href$="/u/Chris"] .LmxAuthor-name,
+.lmxr-vip {
+  .lmxr-vip-paint();
+}
+
+@keyframes lmxr-vip-sweep {
+  from { background-position: 0% 50%; }
+  to   { background-position: 280% 50%; }
+}
+
+// A crown before the name, so the treatment survives a screenshot, a
+// colour-blind reader and `prefers-reduced-motion` -- an animated gradient
+// alone is a decoration that three separate populations never see.
+a[href$="/u/Chris"] .username::before,
+a[href$="/u/chris"] .username::before,
+a[href$="/u/Chris"].LmxAuthor-name::before,
+a[href$="/u/chris"].LmxAuthor-name::before {
+  content: "";
+  display: inline-block;
+  width: 0.92em;
+  height: 0.92em;
+  margin-right: 0.28em;
+  vertical-align: -0.09em;
+  background: url("../assets/emoji/1f451.svg") center / contain no-repeat;
+  -webkit-text-fill-color: initial;
+  filter: drop-shadow(0 0 3px rgba(230, 177, 105, 0.7));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a[href$="/u/Chris"] .username,
+  a[href$="/u/chris"] .username,
+  a[href$="/u/Chris"].LmxAuthor-name,
+  a[href$="/u/chris"].LmxAuthor-name,
+  .lmxr-vip {
+    animation: none !important;
+    background-position: 40% 50%;
+    filter: none;
+  }
+}

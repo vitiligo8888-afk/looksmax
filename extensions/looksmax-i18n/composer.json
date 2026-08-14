@@ -1,0 +1,25 @@
+{
+    "name": "local/looksmax-i18n",
+    "description": "Locale negotiation, the language switcher, per-locale document metadata and the translation tooling for Looksmax.lat.",
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Local\\I18n\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Looksmax i18n",
+            "category": "language",
+            "icon": {
+                "name": "fas fa-language",
+                "backgroundColor": "#161d28",
+                "color": "#e6b169"
+            }
+        }
+    }
+}

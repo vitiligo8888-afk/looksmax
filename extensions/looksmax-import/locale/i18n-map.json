@@ -1,0 +1,41 @@
+{
+  "extension": "looksmax-import",
+  "prefix": "local-looksmax-import",
+  "replacements": [
+    {
+      "file": "src/Console/ImportCommand.php",
+      "line": 286,
+      "key": "lib.no_body",
+      "find": "            $body = $this->bodyOf($posts[0] ?? null) ?: ($r['title'] . \"\\n\\n_(body not scraped for this thread)_\");",
+      "replace": "            $body = $this->bodyOf($posts[0] ?? null)\n                ?: ($r['title'] . \"\\n\\n\" . resolve('translator')->trans('local-looksmax-import.lib.no_body'));",
+      "note": "Produced by a CLI tool but written into a POST BODY, so it is content: every visitor who opens that thread reads it, forever. Translated in the locale the importer runs under (the default_locale setting — Console has no SetLocale middleware), which for this forum is Spanish. See `deferred` for what a per-reader version would take."
+    },
+    {
+      "file": "src/Console/ImportCommand.php",
+      "line": 288,
+      "key": "lib.untitled",
+      "find": "            $title = (string) ($r['title'] ?: 'Untitled');",
+      "replace": "            $title = (string) ($r['title'] ?: resolve('translator')->trans('local-looksmax-import.lib.untitled'));",
+      "note": "MISSED BY THE AUDIT (excluded with the rest of src/Console/). It is not CLI output: it becomes the discussion title, i.e. the link text in every thread list, every search result and the <title> of that page."
+    },
+    {
+      "file": "src/Console/ImportCommand.php",
+      "line": 305,
+      "key": "lib.empty_post",
+      "find": "                $reply = CommentPost::reply($discussion->id, $this->bodyOf($p) ?: '(empty)', $pa->id, null);",
+      "replace": "                $reply = CommentPost::reply($discussion->id, $this->bodyOf($p) ?: resolve('translator')->trans('local-looksmax-import.lib.empty_post'), $pa->id, null);",
+      "note": "MISSED BY THE AUDIT, same exclusion. This is the entire visible body of a post whose html converted to nothing."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/Console/ImportCommand.php",
+      "line": 286,
+      "string": "the three content strings above, considered as PER-READER text",
+      "reason": "The replacements above fix the language but not the mechanism: these strings are frozen into the row at import time, so a reader who switches the forum to English still sees them in the importer's locale. Making them per-reader means writing a marker instead of a sentence — a BBCode tag such as [IMPORTNOTE kind=nobody] emitted here, with the template and the wording owned by looksmax-format (which already renders every other import artefact: [umention], [hideposts], [deleted]) and localised through the same XSL-parameter hook described in looksmax-format/locale/i18n-map.json. That crosses two extensions and rewrites already-imported rows (`lmx:import --reconvert` exists and would carry it), so it is a deliberate decision, not a patch. 'Untitled' cannot be done this way at all: a discussion title is a plain column, not formatter XML."
+    }
+  ],
+  "notes": {
+    "not_translatable": "All five audit findings in src/HtmlToBbcode.php (:518 '\\n[unfurl url=\"', :627 '[emote name=\"', :790 '\\n[embed site=', :928 '[gmention name=\"', :1002 '[umention name=\"') are BBCode tags the converter emits into the stored source text. They are syntax, and the audit's own bbcode-definition rule excludes the identical strings on the looksmax-format side; translating one would produce an unparseable post. Read the whole converter for prose: it emits none. src/Console/ImportCommand.php's ->info() / ->error() output and the 21 option descriptions are operator-facing CLI, correctly excluded. 'user'.$srcId (ImportCommand.php:790) is a generated username, an identifier, not a label."
+  }
+}

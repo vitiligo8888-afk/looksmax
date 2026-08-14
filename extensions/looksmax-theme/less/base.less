@@ -1,0 +1,322 @@
+// Foundations: layering, the background system, and the accessibility floor.
+//
+// This file owns the two things that are systemic rather than per-component —
+// what paints above what, and what the page sits on. Everything else in the
+// theme assumes both are already correct.
+
+// ============================================================ 1. LAYERING
+//
+// The bug this replaces, in full, because it will otherwise be reintroduced:
+//
+//   .App, .App-header, #content, .App-content { position: relative; z-index: 1 }
+//
+// That single line was written to lift content above a decorative background.
+// It also stripped `position: fixed` off .App-header (same specificity as
+// core's rule, later in the cascade) and gave the header and the content column
+// the same z-index. Two boxes at the same z-index paint in DOM order, and
+// .App-content comes after .App-header, so every image in every post painted
+// over the sticky header. Nothing in the LESS looked wrong.
+//
+// The rule below is the whole fix, and it works by NOT assigning layers:
+//
+//   * <html> paints the page colour to the canvas.
+//   * <body> is made a stacking context at z-index 0 with a transparent
+//     background, so its negative-z pseudo elements can sit behind its content
+//     but in front of the canvas.
+//   * the decor lives on those pseudo elements at --z-behind.
+//   * everything else keeps core's own layering, which is already correct:
+//     .App-header is fixed at --z-header, .App-content is static and therefore
+//     paints in the in-flow block layer, which is unconditionally below any
+//     positioned box with a non-negative z-index.
+//
+// Consequence: content cannot reach the header without explicitly opting into
+// a layer. Which is the point — and e2e/visual/sweep.ts asserts it with
+// elementFromPoint over the real composited header, not by reading z-index.
+
+html {
+  background-color: var(--bg);
+  // stop iOS/Android from re-scaling our type and breaking the rhythm
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  position: relative;
+  z-index: var(--z-base);
+  // long threads scroll for a long time; keep the scroll anchored when images
+  // above the viewport finish loading
+  overflow-anchor: auto;
+}
+
+// Core paints .App with --body-bg. Ours is the page, not a card.
+.App,
+.App-content,
+#content,
+.IndexPage-results,
+.DiscussionPage-discussion {
+  background: transparent;
+}
+
+// Anything that legitimately needs to clear its siblings says so by name.
+.App-header { z-index: var(--z-header); }
+.Dropdown-menu { z-index: var(--z-dropdown); }
+.Modal-backdrop, .drawer-backdrop, .composer-backdrop { z-index: var(--z-overlay); }
+.AlertManager { z-index: var(--z-toast); }
+.tooltip { z-index: var(--z-tooltip); }
+
+// The scrubber rail is sticky inside the page, not app chrome: it must clear
+// post content and must never approach the header.
+.DiscussionPage-nav { z-index: var(--z-sticky); }
+
+// ============================================================ 2. BACKGROUND
+//
+// Rich, and cheap. The rules it holds to, because an "alive" background is the
+// fastest way to make a forum feel slow:
+//
+//   * only transform is animated. Never background-position, never filter on a
+//     large surface, never anything that reads or writes layout.
+//   * every moving layer is position:fixed, pointer-events:none and
+//     contain:strict, so it is a compositor layer that cannot trigger layout or
+//     hit testing no matter what the page above it does.
+//   * three slow, co-prime durations so the composition never visibly loops.
+//   * all of it is off under prefers-reduced-motion, and retargetable at
+//     runtime via the --decor-* tokens or data-decor on <html>.
+//
+// Measured on a real 50-post thread with images: see the scroll frame times in
+// e2e/visual/sweep.ts, which fails the run if p95 exceeds 34ms.
+
+@keyframes decor-drift-a {
+  0%   { transform: translate3d(-7%, -5%, 0) scale(1); }
+  50%  { transform: translate3d(6%, 4%, 0) scale(1.14); }
+  100% { transform: translate3d(-7%, -5%, 0) scale(1); }
+}
+
+@keyframes decor-drift-b {
+  0%   { transform: translate3d(6%, 7%, 0) scale(1.1); }
+  50%  { transform: translate3d(-5%, -6%, 0) scale(1); }
+  100% { transform: translate3d(6%, 7%, 0) scale(1.1); }
+}
+
+// Layer 1 — a hairline grid, masked so it never draws a hard edge against the
+// viewport. Static: one paint at load, no compositor cost.
+html::before {
+  background-image:
+    linear-gradient(var(--decor-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--decor-grid) 1px, transparent 1px);
+  background-size: 100% var(--decor-grid-size), var(--decor-grid-size) 100%;
+  content: '';
+  contain: strict;
+  inset: 0;
+  opacity: var(--decor-opacity);
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--z-behind);
+  -webkit-mask-image: radial-gradient(135% 105% at 50% 0%, #000 24%, transparent 80%);
+  mask-image: radial-gradient(135% 105% at 50% 0%, #000 24%, transparent 80%);
+}
+
+// warm field, top left
+body::before {
+  animation: decor-drift-a var(--decor-speed-a) var(--ease-in-out) infinite;
+  background: radial-gradient(closest-side, var(--decor-a) 0%, transparent 72%);
+  content: '';
+  contain: strict;
+  height: 92vmax;
+  left: -26vmax;
+  opacity: var(--decor-opacity);
+  pointer-events: none;
+  position: fixed;
+  top: -34vmax;
+  width: 92vmax;
+  will-change: transform;
+  z-index: var(--z-behind);
+}
+
+// cool field bottom right + a third accent field mid right, plus the vignette
+// on top of both so the edges of the page settle down
+body::after {
+  animation: decor-drift-b var(--decor-speed-b) var(--ease-in-out) infinite;
+  background:
+    radial-gradient(closest-side at 78% 34%, var(--decor-c) 0%, transparent 66%),
+    radial-gradient(closest-side at 30% 70%, var(--decor-b) 0%, transparent 70%);
+  bottom: -34vmax;
+  content: '';
+  contain: strict;
+  height: 96vmax;
+  opacity: var(--decor-opacity);
+  pointer-events: none;
+  position: fixed;
+  right: -28vmax;
+  width: 96vmax;
+  will-change: transform;
+  z-index: var(--z-behind);
+}
+
+// Layer 4 — fine grain. Its own layer because its opacity is an independent
+// token: grain and colour fields want very different strengths, and combining
+// them into one background list would couple the two. Inline SVG, so no request.
+.App::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  content: '';
+  contain: strict;
+  inset: 0;
+  opacity: var(--decor-noise-opacity);
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--z-behind);
+}
+
+// Layer 5 — vignette, on top of the fields so the edges of the page settle
+// down. Its own layer rather than a background on a drifting field, because it
+// must not move with them.
+.App::after {
+  background: radial-gradient(125% 85% at 50% 0%, transparent 45%, #000 125%);
+  content: '';
+  contain: strict;
+  inset: 0;
+  opacity: var(--decor-vignette);
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--z-behind);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
+}
+
+// ============================================================ 3. TYPOGRAPHY BASE
+body,
+.App {
+  font-size: var(--fs-md);
+  line-height: var(--lh);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ink);
+  letter-spacing: -0.018em;
+  line-height: var(--lh-tight);
+}
+
+a {
+  color: var(--accent-2);
+  text-decoration: none;
+  transition: color var(--t-fast) var(--ease);
+}
+
+a:hover { color: var(--accent-2); text-decoration: underline; text-underline-offset: 2px; }
+
+hr {
+  background: var(--line);
+  border: 0;
+  height: 1px;
+  margin: var(--gap-lg) 0;
+}
+
+code, kbd, pre, samp { font-family: var(--font-mono); }
+
+::selection {
+  background: var(--accent-a45);
+  color: var(--ink);
+}
+
+// ============================================================ 4. SCROLLBARS
+* {
+  scrollbar-color: var(--surface-3) transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar { height: 10px; width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: var(--r-pill);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--line-strong); background-clip: padding-box; }
+
+// ============================================================ 5. FOCUS
+//
+// One visible focus treatment for the whole forum. Two rules make it work:
+// :focus-visible so a mouse click does not draw a ring, and a two-tone ring
+// (page colour then accent) so it is visible against a card AND against the
+// page, which a single-colour outline is not.
+:focus { outline: none; }
+
+:focus-visible {
+  border-radius: var(--r-xs);
+  box-shadow: var(--ring);
+  outline: 2px solid transparent; // keeps a ring in forced-colors mode
+  outline-offset: 2px;
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+// A keyboard user should not have to tab through the whole header to reach a
+// thread. Core ships no skip link, so this styles one for whoever adds it and
+// costs nothing until then.
+.SkipLink,
+a.skip-to-content {
+  background: var(--accent);
+  border-radius: 0 0 var(--r-md) 0;
+  color: var(--accent-ink);
+  font-weight: 700;
+  left: 0;
+  padding: 10px 18px;
+  position: fixed;
+  top: 0;
+  transform: translateY(-120%);
+  transition: transform var(--t-base) var(--ease);
+  z-index: var(--z-skip);
+}
+
+.SkipLink:focus-visible,
+a.skip-to-content:focus-visible { transform: none; }
+
+// ============================================================ 6. A11Y FLOOR
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Windows high-contrast: our colour system is bypassed entirely, so make sure
+// boundaries survive it rather than collapsing to invisible.
+@media (forced-colors: active) {
+  .Button,
+  .FormControl,
+  .Post,
+  .DiscussionListItem,
+  .TagTile,
+  .Dropdown-menu,
+  .Modal-content { border: 1px solid CanvasText; }
+
+  html::before,
+  body::before,
+  body::after,
+  .App::before { display: none; }
+}
+
+// Screen-reader-only text, used by the states in components.less
+.u-visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

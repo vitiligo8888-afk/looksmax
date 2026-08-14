@@ -1,0 +1,356 @@
+{
+  "extension": "looksmax-index",
+  "prefix": "local-looksmax-index",
+  "format_note": "Matching is by content, not by line. Every `find` occurs exactly once in the pre-patch file AND zero times after its own replacement, so applying this map twice is a no-op rather than a duplication — verified mechanically, not asserted.",
+  "replacements": [
+    {
+      "file": "src/RenderIndex.php",
+      "line": 231,
+      "find": "    private function esc(?string $s): string\n    {\n        return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');\n    }\n\n    /**\n     * Mount on the index route only, and re-mount after Mithril redraws, which\n     * replace subtrees wholesale. Polling is deliberate: hooking the router",
+      "replace": "    private function esc(?string $s): string\n    {\n        return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8');\n    }\n\n    /**\n     * A translated string, safe to concatenate into this file's markup.\n     *\n     * Every interpolated VALUE is escaped here, before it can reach the message.\n     * The messages themselves contain no markup — `<` means nothing to ICU but\n     * IS rich-tag syntax to formatjs and to Flarum's own RichMessageFormatter,\n     * so a message carrying `<b>` is one that can never be reused from JS. The\n     * `<b>` stays in the concatenation below, where it belongs.\n     */\n    private function t(string $key, array $params = []): string\n    {\n        foreach ($params as $k => $v) {\n            if (is_string($v)) {\n                $params[$k] = $this->esc($v);\n            }\n        }\n\n        return (string) resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)\n            ->trans('local-looksmax-index.'.$key, $params);\n    }\n\n    /**\n     * A figure grouped the way this reader's locale groups it.\n     *\n     * Not number_format(), which is hardwired to the English 1,234 — and not an\n     * ICU `{n, number}` key either, because ICU would be handed Flarum's locale\n     * code `es`, and GENERIC Spanish groups differently from MEXICAN Spanish.\n     * Measured against CLDR:\n     *\n     *     es -> 12.431      es-MX -> 12,431      es-419 -> 12,431      en -> 12,431\n     *\n     * The audience here is Mexican, and window.lmxI18n already maps es -> es-MX\n     * for everything it formats on the client (looksmax-i18n/js/dist/forum.js:44).\n     * Without the same mapping on this side, the server-rendered index would\n     * print 12.431 beside a client-rendered search result printing 12,431, on\n     * the same page.\n     */\n    private function n(int $v): string\n    {\n        $locale = resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->getLocale();\n        if ($locale === 'es') {\n            $locale = 'es-MX';\n        }\n\n        if (class_exists(\\NumberFormatter::class)) {\n            $formatted = (new \\NumberFormatter($locale, \\NumberFormatter::DECIMAL))->format($v);\n            if ($formatted !== false) {\n                return $formatted;\n            }\n        }\n\n        return number_format($v);\n    }\n\n    /**\n     * Mount on the index route only, and re-mount after Mithril redraws, which\n     * replace subtrees wholesale. Polling is deliberate: hooking the router",
+      "key": "(helpers)",
+      "note": "RenderIndex has no translator injected and is constructed by the container from extend.php, so resolve() is the cheapest correct form. The find deliberately runs on into the head of the NEXT docblock: inserting the two helpers between them destroys the matched span, so applying this map twice is a no-op instead of a fatal 'Cannot redeclare RenderIndex::t()'. Same reason every other entry here already survives a second pass."
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 90,
+      "find": "                    . '<div class=\"LmxForum-stats\">'\n                    . '<span><b>' . number_format((int) $f->discussion_count) . '</b> threads</span>'\n                    . '<span><b>' . number_format((int) ($postCounts[$f->id] ?? 0)) . '</b> posts</span>'\n                    . '</div>'",
+      "replace": "                    . '<div class=\"LmxForum-stats\">'\n                    . '<span><b>' . $this->n((int) $f->discussion_count) . '</b> ' . $this->t('forum.row.threads', ['count' => (int) $f->discussion_count]) . '</span>'\n                    . '<span><b>' . $this->n((int) ($postCounts[$f->id] ?? 0)) . '</b> ' . $this->t('forum.row.posts', ['count' => (int) ($postCounts[$f->id] ?? 0)]) . '</span>'\n                    . '</div>'",
+      "key": "forum.row.threads / forum.row.posts",
+      "note": "Removes number_format(), which hardcodes the English 1,234 grouping: n() asks ICU for the locale's separator instead. The message is the NOUN only and the plural category is still chosen by ICU from {count} — English and Spanish both put the figure first, so nothing is lost by keeping the <b> outside the message."
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 94,
+      "find": "                    . '<div class=\"LmxForum-last\">'\n                    . ($l\n                        ? '<a href=\"/d/' . (int) $l->id . '-' . $this->esc($l->slug) . '\">' . $this->esc(mb_strimwidth($l->title, 0, 46, '…')) . '</a>'\n                          . '<span>by ' . $this->esc($l->username) . '</span>'\n                        : '<span class=\"LmxForum-quiet\">no threads yet</span>')\n                    . '</div></li>';",
+      "replace": "                    . '<div class=\"LmxForum-last\">'\n                    . ($l\n                        ? '<a href=\"/d/' . (int) $l->id . '-' . $this->esc($l->slug) . '\">' . $this->esc(mb_strimwidth($l->title, 0, 46, '…')) . '</a>'\n                          . '<span>' . $this->t('forum.row.last_by', ['name' => $l->username]) . '</span>'\n                        : '<span class=\"LmxForum-quiet\">' . $this->t('forum.row.quiet') . '</span>')\n                    . '</div></li>';",
+      "key": "forum.row.last_by / forum.row.quiet"
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 136,
+      "find": "                    . ($meta ? '<span>' . $this->esc($meta($r)) . '</span>' : '') . '</li>';",
+      "replace": "                    . ($meta ? '<span>' . $meta($r) . '</span>' : '') . '</li>';",
+      "key": "(meta closures)",
+      "note": "esc() drops out because the two $meta closures below now return translated markup from t(), which has already escaped every value it interpolated. Escaping it a second time would print &lt;b&gt; on the page."
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 146,
+      "find": "            . '<h3>' . $this->icon('fas fa-bullhorn') . 'Before you post</h3>'\n            . '<p>Read the guides first. Rate others before asking to be rated. '\n            . 'Claims need evidence, and evidence beats confidence.</p>'",
+      "replace": "            . '<h3>' . $this->icon('fas fa-bullhorn') . $this->t('forum.motd.title') . '</h3>'\n            . '<p>' . $this->t('forum.motd.body') . '</p>'",
+      "key": "forum.motd.title / forum.motd.body"
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 152,
+      "find": "                ? '<section class=\"LmxCard\"><h3>' . $this->icon('fas fa-thumbtack') . 'Pinned</h3>' . $list($pinned) . '</section>'",
+      "replace": "                ? '<section class=\"LmxCard\"><h3>' . $this->icon('fas fa-thumbtack') . $this->t('forum.card.pinned') . '</h3>' . $list($pinned) . '</section>'",
+      "key": "forum.card.pinned"
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 155,
+      "find": "            . '<section class=\"LmxCard\"><h3>' . $this->icon('fas fa-fire') . 'Trending</h3>'\n            . $list($trending, fn ($r) => $r->comment_count . ' replies') . '</section>'",
+      "replace": "            . '<section class=\"LmxCard\"><h3>' . $this->icon('fas fa-fire') . $this->t('forum.card.trending') . '</h3>'\n            . $list($trending, fn ($r) => $this->t('forum.list.replies', ['count' => (int) $r->comment_count, 'n' => $this->n((int) $r->comment_count)])) . '</section>'",
+      "key": "forum.card.trending / forum.list.replies"
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 158,
+      "find": "            . '<section class=\"LmxCard\"><h3>' . $this->icon('fas fa-clock') . 'Latest activity</h3>'\n            . $list($recent, fn ($r) => 'by ' . $r->username) . '</section>'",
+      "replace": "            . '<section class=\"LmxCard\"><h3>' . $this->icon('fas fa-clock') . $this->t('forum.card.recent') . '</h3>'\n            . $list($recent, fn ($r) => $this->t('forum.list.by', ['name' => $r->username])) . '</section>'",
+      "key": "forum.card.recent / forum.list.by"
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 161,
+      "find": "            . '<section class=\"LmxCard LmxCard--stats\"><h3>' . $this->icon('fas fa-chart-line') . 'Board stats</h3>'\n            . '<dl>'\n            . '<div><dt>Threads</dt><dd>' . number_format($stats['discussions']) . '</dd></div>'\n            . '<div><dt>Posts</dt><dd>' . number_format($stats['posts']) . '</dd></div>'\n            . '<div><dt>Members</dt><dd>' . number_format($stats['members']) . '</dd></div>'\n            . '<div><dt>Newest</dt><dd>' . $this->esc((string) $newest) . '</dd></div>'\n            . '</dl></section>'",
+      "replace": "            . '<section class=\"LmxCard LmxCard--stats\"><h3>' . $this->icon('fas fa-chart-line') . $this->t('forum.card.stats') . '</h3>'\n            . '<dl>'\n            . '<div><dt>' . $this->t('forum.stats.threads') . '</dt><dd>' . $this->n($stats['discussions']) . '</dd></div>'\n            . '<div><dt>' . $this->t('forum.stats.posts') . '</dt><dd>' . $this->n($stats['posts']) . '</dd></div>'\n            . '<div><dt>' . $this->t('forum.stats.members') . '</dt><dd>' . $this->n($stats['members']) . '</dd></div>'\n            . '<div><dt>' . $this->t('forum.stats.newest') . '</dt><dd>' . $this->esc((string) $newest) . '</dd></div>'\n            . '</dl></section>'",
+      "key": "forum.card.stats / forum.stats.* / lib.number",
+      "note": "Between here and the forum rows, n() replaces six number_format() calls that were all hardwired to the English 1,234 grouping. See the n() docblock for why it is a \\NumberFormatter on es-MX and not an ICU `{n, number}` key."
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 172,
+      "find": "            . '<section class=\"LmxCard LmxCard--ad\" data-ad-slot=\"sidebar-1\">'\n            . '<span class=\"LmxAd-label\">Advertisement</span>'\n            . '<div class=\"LmxAd-slot\">300 x 250</div>'\n            . '</section>'",
+      "replace": "            . '<section class=\"LmxCard LmxCard--ad\" data-ad-slot=\"sidebar-1\">'\n            . '<span class=\"LmxAd-label\">' . $this->t('forum.ad.label') . '</span>'\n            . '<div class=\"LmxAd-slot\">300 x 250</div>'\n            . '</section>'",
+      "key": "forum.ad.label",
+      "note": "'300 x 250' stays: it is the IAB slot dimension, not prose, and reads the same in both languages."
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 262,
+      "find": "    /**\n     * A figure grouped for the active locale: 12,431 in English, 12.431 in\n     * Spanish. `lib.number` is the one-line ICU message `{n, number}`; routing\n     * through the translator rather than number_format() is what makes the\n     * separator follow the reader instead of the source file.\n     */\n    private function n(int $v): string\n    {\n        return $this->t('lib.number', ['n' => $v]);\n    }",
+      "replace": "    /**\n     * A figure grouped the way this reader's locale groups it.\n     *\n     * Not number_format(), which is hardwired to the English 1,234 — and not an\n     * ICU `{n, number}` key either, because ICU would be handed Flarum's locale\n     * code `es`, and GENERIC Spanish groups differently from MEXICAN Spanish.\n     * Measured against CLDR:\n     *\n     *     es -> 12.431      es-MX -> 12,431      es-419 -> 12,431      en -> 12,431\n     *\n     * The audience here is Mexican, and window.lmxI18n already maps es -> es-MX\n     * for everything it formats on the client (looksmax-i18n/js/dist/forum.js:44).\n     * Without the same mapping on this side, the server-rendered index would\n     * print 12.431 beside a client-rendered search result printing 12,431, on\n     * the same page.\n     */\n    private function n(int $v): string\n    {\n        $locale = resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->getLocale();\n        if ($locale === 'es') {\n            $locale = 'es-MX';\n        }\n\n        if (class_exists(\\NumberFormatter::class)) {\n            $formatted = (new \\NumberFormatter($locale, \\NumberFormatter::DECIMAL))->format($v);\n            if ($formatted !== false) {\n                return $formatted;\n            }\n        }\n\n        return number_format($v);\n    }",
+      "key": "(corrective: n())",
+      "note": "ONLY matches a tree where an earlier revision of this map already landed. That revision's n() delegated to an ICU `lib.number` key, which ICU formats with Flarum's locale code `es` — and generic `es` groups 12.431 while MEXICAN Spanish groups 12,431 (measured: es->12.431, es-MX->12,431, es-419->12,431, en->12,431). window.lmxI18n already maps es->es-MX on the client (looksmax-i18n/js/dist/forum.js:44), so the old form printed 12.431 in the server-rendered index next to 12,431 in the client-rendered search, on the same page. On a fresh tree this find does not exist, before or after the map is applied — verified mechanically at generation time."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/RenderIndex.php",
+      "line": 96,
+      "string": "mb_strimwidth($l->title, 0, 46, '…')",
+      "reason": "NOT a string to translate — the ellipsis is U+2026 and right in both languages — but a place the translation will bite. Titles are clipped at a fixed CHARACTER count tuned on English; Spanish runs roughly 15-25% longer for the same content, and the corpus also holds Russian and German. Sibling case at line 135 (52 chars). Whoever owns less/forum.less should decide whether these become CSS truncation instead."
+    },
+    {
+      "file": "src/Palette.php",
+      "line": 0,
+      "string": "(slug -> colour and icon table)",
+      "reason": "Slugs, hex colours and icon names. No prose in the file."
+    }
+  ],
+  "not_translatable": [
+    {
+      "file": "src/RenderIndex.php",
+      "line": 275,
+      "string": "(function () {\n  var LS_VIEW = 'lmxIndexView', LS_NEWS = 'lmxNewsSeen', LS_ONB = 'lmxOnboardingDone';\n\n  function app() {\n    try { return window.flarum && window.flarum.core && window.flarum.core.app; } catch (e) { return null; }\n  }\n  function user() { var a = app(); return a && a.session && a.session.user; }\n  function ls(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }\n  function setLs(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }\n\n  /* Persist to the account when there is one, and to localStorage always.\n     Both, for a member: the preference is the durable copy that follows them\n     across devices, and localStorage is what makes the NEXT first paint correct\n     before the session payload has been parsed. */\n  function persist(key, value) {\n    setLs(key, String(value));\n    var u = user();\n    if (u && u.savePreferences) {\n      var p = {}; p[key] = value;\n      try { u.savePreferences(p); } catch (e) {}\n    }\n  }\n\n  function isIndex() {\n    /* front page only. /all is the discussion list and previously got the\n       index stacked on top of it. */\n    var p = location.pathname;\n    return p === '/' || p === '' || p === '/tags';\n  }\n\n  function applyView(root, v) {\n    root.setAttribute('data-view', v);\n    var s = root.querySelector('.LmxSections');\n    if (s) s.setAttribute('data-view', v);\n    var btns = root.querySelectorAll('[data-lmx-view]');\n    for (var i = 0; i < btns.length; i++) {\n      var on = btns[i].getAttribute('data-lmx-view') === v;\n      btns[i].classList.toggle('is-on', on);\n      btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');\n    }\n  }\n\n  function wire(root) {\n    if (root.__lmxWired) return;\n    root.__lmxWired = true;\n\n    var stored = ls(LS_VIEW);\n    if (stored === 'cards' || stored === 'list') applyView(root, stored);\n\n    if (ls(LS_ONB) === 'true') {\n      var onb = root.querySelector('[data-block=\"onboarding\"]');\n      if (onb) onb.parentNode.removeChild(onb);\n    }\n    var seen = parseInt(ls(LS_NEWS) || '0', 10);\n    var news0 = root.querySelector('.LmxNews');\n    if (news0 && seen && seen >= (parseInt(news0.getAttribute('data-newest'), 10) || 0)) {\n      news0.className += ' is-collapsed';\n    }\n\n    root.addEventListener('click', function (e) {\n      var t = e.target.closest && e.target.closest('[data-lmx-view]');\n      if (t) {\n        var v = t.getAttribute('data-lmx-view');\n        applyView(root, v);\n        persist(LS_VIEW, v);\n        return;\n      }\n\n      var d = e.target.closest('[data-lmx-news-dismiss]');\n      if (d) {\n        var news = root.querySelector('.LmxNews');\n        if (news) news.classList.add('is-collapsed');\n        persist(LS_NEWS, parseInt(d.getAttribute('data-lmx-news-dismiss'), 10) || 0);\n        return;\n      }\n\n      if (e.target.closest('[data-lmx-news-open]')) {\n        var n2 = root.querySelector('.LmxNews');\n        if (n2) n2.classList.remove('is-collapsed');\n        persist(LS_NEWS, 0);\n        return;\n      }\n\n      var o = e.target.closest('[data-lmx-dismiss]');\n      if (o) {\n        var card = o.closest('.LmxCard');\n        if (card && card.parentNode) card.parentNode.removeChild(card);\n        persist(LS_ONB, true);\n        return;\n      }\n\n      var br = e.target.closest('[data-lmx-browse]');\n      if (br) {\n        var body = br.parentNode.querySelector('.LmxBrowse-body');\n        var open = br.getAttribute('aria-expanded') === 'true';\n        br.setAttribute('aria-expanded', open ? 'false' : 'true');\n        if (body) body.hidden = open;\n        return;\n      }\n\n      /* The two hero buttons open Flarum's own surfaces. Going through the app\n         is the only way they carry its state; clicking the header's own control\n         is the fallback if the compat path ever moves. */\n      if (e.target.closest('[data-lmx-signup]')) {\n        var a = app();\n        try {\n          var SignUp = window.flarum.core.compat['forum/components/SignUpModal'];\n          if (a && a.modal && SignUp) { a.modal.show(SignUp); return; }\n        } catch (err) {}\n        var btn = document.querySelector('.item-signUp button, .item-logIn button');\n        if (btn) btn.click();\n        return;\n      }\n      if (e.target.closest('[data-lmx-compose]')) {\n        var a2 = app();\n        try {\n          var Composer = window.flarum.core.compat['forum/components/DiscussionComposer'];\n          if (a2 && a2.composer && Composer) {\n            a2.composer.load(Composer, { user: a2.session.user });\n            a2.composer.show();\n            return;\n          }\n        } catch (err) {}\n        location.href = '/all';\n      }\n    });\n  }\n\n  var TPL = null;\n  function node() {\n    if (TPL === null) {\n      var el = document.getElementById('lmx-index-template');\n      TPL = (el && el.content) ? el.content : false;\n    }\n    if (!TPL) return null;\n    var frag = TPL.cloneNode(true);\n    return frag.firstElementChild;\n  }\n\n  function mount() {\n    var host = document.querySelector('.IndexPage-results, .TagsPage-content, .IndexPage');\n    if (!host) return;\n    var existing = document.querySelector('.LmxIndex');\n    if (!isIndex()) {\n      if (existing) existing.parentNode.removeChild(existing);\n      document.body.classList.remove('lmx-index-on');\n      return;\n    }\n    if (existing && existing.isConnected) return;\n    var n = node();\n    if (!n) return;\n    host.parentNode.insertBefore(n, host);\n    document.body.classList.add('lmx-index-on');\n    wire(n);\n  }\n\n  function tick() { try { mount(); } catch (e) {} }\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tick);\n  else tick();\n  setInterval(tick, 700);\n  window.addEventListener('popstate', tick);\n})();",
+      "reason": "NOT a string. The audit lexes the whole mountScript() heredoc as one literal. It is a JS program: selectors, a class name and two location checks, with no user-visible text anywhere in it. This was the audit's ONLY finding for this extension and it is a false positive — the 17 strings a visitor actually reads are all in build() and sidebar(), and were missed because they are concatenated into HTML rather than sitting alone in a quoted span."
+    },
+    {
+      "file": "src/RenderIndex.php",
+      "line": 174,
+      "string": "300 x 250",
+      "reason": "IAB ad slot dimensions. Not language."
+    },
+    {
+      "file": "src/Console/PaletteCommand.php",
+      "line": 43,
+      "string": "Apply the per-forum colour and icon palette to the tags table",
+      "reason": "Console command description. `php flarum lmx:index:palette` is run by the operator, in one language."
+    },
+    {
+      "file": "src/Console/PaletteCommand.php",
+      "line": 44,
+      "string": "overwrite colours that were set deliberately",
+      "reason": "Console option help."
+    },
+    {
+      "file": "src/Console/PaletteCommand.php",
+      "line": 45,
+      "string": "print what would change and exit",
+      "reason": "Console option help."
+    },
+    {
+      "file": "src/Console/PaletteCommand.php",
+      "line": 93,
+      "string": "Run `php flarum cache:clear` so the tag payload is re-serialized.",
+      "reason": "Console output, and it names a command the operator must type verbatim."
+    },
+    {
+      "file": "src/Classifier.php",
+      "line": 131,
+      "string": "NFD; [:Nonspacing Mark:] Remove; NFC",
+      "reason": "An ICU transliterator rule passed to transliterator_transliterate(). Changing it by locale would change how post text is accent-folded before classification."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 99,
+      "string": "growth plates",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 102,
+      "string": "iu per",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 115,
+      "string": "aromatase inhibitor",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 115,
+      "string": "blast and cruise",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 115,
+      "string": "first cycle",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 118,
+      "string": "free test",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 124,
+      "string": "skin care",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 124,
+      "string": "skincare routine",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 125,
+      "string": "tongue posture",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 127,
+      "string": "androgenic alopecia",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 128,
+      "string": "cuidado de la piel",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 129,
+      "string": "red light therapy",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 133,
+      "string": "clear skin",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 134,
+      "string": "oily skin",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 143,
+      "string": "facial aesthetics",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 143,
+      "string": "halo effect",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 153,
+      "string": "bone smashing",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 153,
+      "string": "box osteotomy",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 154,
+      "string": "chin implant",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 155,
+      "string": "jaw implants",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 155,
+      "string": "le fort",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 155,
+      "string": "orbital box",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 156,
+      "string": "orbital decompression",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 159,
+      "string": "custom implant",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 160,
+      "string": "limb lengthening",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 163,
+      "string": "post op",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 165,
+      "string": "recovery time",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 206,
+      "string": "definitive guide",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    },
+    {
+      "file": "src/Lexicon.php",
+      "line": 206,
+      "string": "complete guide",
+      "reason": "Classifier vocabulary, matched against post text and never rendered. Lexicon's own docblock records that these terms were DERIVED from 7,144 discussions by log-odds lift, not chosen by hand — so they are measurements of what the board says, and a translation would delete the measurement. Note the list is already multilingual where the corpus is (`cuidado de la piel` sits beside `skin care`); serving more Spanish or Russian jargon means ADDING terms here, not moving them to a locale file."
+    }
+  ],
+  "verification": {
+    "how": "Every claim below was produced by a script in /tmp/claude-0/-root/605d3ebe-a4f4-4fca-ac6b-09db76e73096/scratchpad and re-run after each edit; each check was also deliberately broken once to confirm it goes red.",
+    "checks": [
+      "gate_search_index_analytics.py — en/es key parity, ICU placeholder parity, plural arms present on both sides, every key the map calls exists, no dead keys, php -l / node --check on every touched file.",
+      "icu/render.ts — every ICU string rendered at count 0/1/2/12431 in BOTH en and es-MX, through intl-messageformat (what PHP ext-intl agrees with) AND through RichMessageFormatter constructed exactly as Flarum builds it. The two must agree character for character. Also bans `#` inside a plural and markup inside a message.",
+      "icu/dom.ts — the APPLIED js/dist/forum.js loaded into happy-dom behind a real Flarum-shaped translator, palette driven, Spanish and English text asserted off the rendered DOM, and the DOM scanned for raw keys.",
+      "idempotency.py — every replacement is applied / pending / superseded against the live tree, and no entry can be applied twice.",
+      "keycheck.py — the SUPPLY side, which the i18n audit does not measure: every key the source actually calls must exist in both locales, including the ones built at runtime (AbstractBlock::headingKey, HeroBlock stats, NavBlock links, SectionsBlock view modes, OnboardingBlock steps, Sections::titleKey/descKey). A called-but-missing key renders as a raw key on the page under HTTP 200 with nothing in any log."
+    ],
+    "php_intl": "Dockerfile:19 installs ext-intl, so the real MessageFormatter is used and not symfony/polyfill-intl-messageformatter, whose own docblock says it implements plural rules for English only."
+  },
+  "out_of_scope_defects": [
+    {
+      "file": "src/Html.php",
+      "line": "104-107",
+      "problem": "Html::num() is `return number_format((float) $n);` — the English 1,234 grouping, hardwired. Every figure the new block front page prints goes through it: HeroBlock's three stat tiles, NavBlock's per-section counts, SectionsBlock's and BrowseBlock's thread counts.",
+      "impact": "A Spanish reader sees an English-formatted number beside Spanish text on the front page, and a number formatted DIFFERENTLY from the one the search results on the next page show, because those go through window.lmxI18n.",
+      "fix": "The same shape as the n() in this map's corrective entry: take resolve(TranslatorInterface::class)->getLocale(), map `es` -> `es-MX` (generic es groups 12.431, Mexican es groups 12,431 — measured), and format with \\NumberFormatter, falling back to number_format() when ext-intl is absent. Not edited here: Html.php is outside this lane."
+    },
+    {
+      "file": "locale/en.yml + locale/es.yml",
+      "line": 0,
+      "problem": "`forum.news.*` (heading, empty, see_all, pinned, dismiss) is written but nothing reads it. NewsBlock reads `forum.index.news.*` — a different path, with a different key set (more, show, new_badge, by).",
+      "impact": "None at runtime; five orphan keys. Flagged because they look like the news block's copy and are not, so the next person to edit 'the news strings' will edit the wrong ones.",
+      "fix": "Delete them, or point NewsBlock at them. Left in place because they were written by another lane and deleting somebody else's keys mid-flight is worse than an orphan."
+    },
+    {
+      "file": "src/RenderIndex.php + src/Blocks/*",
+      "line": 0,
+      "problem": "extend.php:26 still mounts RenderIndex, while src/Blocks/* and src/Rails.php are a parallel, more complete front page. Both key sets are therefore live and both are carried in full in the locale files.",
+      "impact": "83 keys where roughly 60 would do. Nothing breaks.",
+      "fix": "When RenderIndex is retired, the `forum.row/motd/card/list/stats/ad` block and `lib.number` can all go, and the corrective n() entry in this map with them. keycheck.py (see `verification`) prints exactly which keys are still reachable."
+    }
+  ]
+}

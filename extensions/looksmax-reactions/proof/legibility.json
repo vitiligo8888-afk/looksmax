@@ -1,0 +1,136 @@
+{
+  "20": {
+    "angel": {
+      "distinct": 29.16,
+      "nearest": "thinking",
+      "detail": 94.08
+    },
+    "angry": {
+      "distinct": 13.96,
+      "nearest": "surprised",
+      "detail": 95.89
+    },
+    "chrigga": {
+      "distinct": 26.2,
+      "nearest": "angry",
+      "detail": 43.92
+    },
+    "chrishammed": {
+      "distinct": 30.3,
+      "nearest": "chrigga",
+      "detail": 128.52
+    },
+    "devil": {
+      "distinct": 25.89,
+      "nearest": "nerd",
+      "detail": 86.34
+    },
+    "error": {
+      "distinct": 39.13,
+      "nearest": "chrigga",
+      "detail": 101.74
+    },
+    "happy": {
+      "distinct": 7.02,
+      "nearest": "surprised",
+      "detail": 110.68
+    },
+    "nerd": {
+      "distinct": 25.89,
+      "nearest": "devil",
+      "detail": 82.4
+    },
+    "neutral": {
+      "distinct": 7.64,
+      "nearest": "sad",
+      "detail": 99.05
+    },
+    "rich": {
+      "distinct": 34.34,
+      "nearest": "chrigga",
+      "detail": 113.96
+    },
+    "sad": {
+      "distinct": 7.64,
+      "nearest": "neutral",
+      "detail": 98.49
+    },
+    "surprised": {
+      "distinct": 7.02,
+      "nearest": "happy",
+      "detail": 104.96
+    },
+    "thinking": {
+      "distinct": 28.94,
+      "nearest": "nerd",
+      "detail": 78.43
+    }
+  },
+  "24": {
+    "angel": {
+      "distinct": 29.41,
+      "nearest": "thinking",
+      "detail": 91.96
+    },
+    "angry": {
+      "distinct": 15.51,
+      "nearest": "surprised",
+      "detail": 94.61
+    },
+    "chrigga": {
+      "distinct": 26.04,
+      "nearest": "happy",
+      "detail": 47.72
+    },
+    "chrishammed": {
+      "distinct": 30.82,
+      "nearest": "chrigga",
+      "detail": 119.88
+    },
+    "devil": {
+      "distinct": 26.8,
+      "nearest": "nerd",
+      "detail": 82.3
+    },
+    "error": {
+      "distinct": 40.15,
+      "nearest": "chrigga",
+      "detail": 93.84
+    },
+    "happy": {
+      "distinct": 15.99,
+      "nearest": "surprised",
+      "detail": 102.92
+    },
+    "nerd": {
+      "distinct": 26.8,
+      "nearest": "devil",
+      "detail": 79.02
+    },
+    "neutral": {
+      "distinct": 9.36,
+      "nearest": "sad",
+      "detail": 97.85
+    },
+    "rich": {
+      "distinct": 34.64,
+      "nearest": "chrigga",
+      "detail": 102.0
+    },
+    "sad": {
+      "distinct": 9.36,
+      "nearest": "neutral",
+      "detail": 97.72
+    },
+    "surprised": {
+      "distinct": 13.62,
+      "nearest": "neutral",
+      "detail": 97.41
+    },
+    "thinking": {
+      "distinct": 29.41,
+      "nearest": "angel",
+      "detail": 72.54
+    }
+  }
+}

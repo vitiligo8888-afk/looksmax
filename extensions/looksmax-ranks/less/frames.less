@@ -1,0 +1,166 @@
+// Avatar frames.
+//
+// Drawn as a pseudo-element ring on a wrapper around the avatar rather than as
+// a border on the avatar itself. Three reasons, all of which were tried the
+// other way first:
+//
+//   1. A border changes the avatar's box and shifts every layout it sits in —
+//      post headers, listings, the chat log — by two pixels each.
+//   2. Core sets border-radius and overflow on `.Avatar`; a rotating conic
+//      gradient inside it gets clipped to nothing.
+//   3. If this CSS fails to load, the avatar still renders. A frame is
+//      decoration and must degrade to absence, not to a broken image.
+//
+// The rotating frames animate `transform` only, which the compositor can do
+// without touching layout or paint, and they are paused until the decorator's
+// IntersectionObserver marks them visible.
+
+@keyframes fr-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes fr-spin-rev {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+
+@keyframes fr-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+.lmx-frame {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+
+  // the ring sits OUTSIDE the avatar box so nothing reflows
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  // rotating frames use a second layer so the gradient can spin independently
+  // of the ::before that masks it
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    z-index: -2;
+    pointer-events: none;
+    animation-play-state: paused;
+  }
+
+  &.is-live::after { animation-play-state: running; }
+}
+
+// ------------------------------------------------------------ static rings
+.lmx-frame.fr-bronze::before {
+  border: 2px solid #c98b5e;
+  box-shadow: 0 0 0 1px fade(#c98b5e, 25%);
+}
+
+.lmx-frame.fr-silver::before {
+  border: 2px solid #c3ccd8;
+  box-shadow: 0 0 6px fade(#c3ccd8, 35%);
+}
+
+.lmx-frame.fr-gold::before {
+  border: 2px solid transparent;
+  background: linear-gradient(140deg, #fff3c4, #e8c07d 40%, #a9762e 70%, #ffe9a8) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  box-shadow: 0 0 8px fade(#e8c07d, 35%);
+}
+
+.lmx-frame.fr-neon::before {
+  border: 2px solid #6ff0ff;
+  box-shadow: 0 0 6px fade(#6ff0ff, 70%), 0 0 16px fade(#6ff0ff, 35%);
+  animation: fr-pulse 3.4s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.lmx-frame.fr-neon.is-live::before { animation-play-state: running; }
+
+// ---------------------------------------------------------- rotating rings
+// The conic gradient lives on ::after and spins; ::before masks it down to a
+// 2px annulus. Masking rather than clipping means the avatar itself is never
+// inside a transformed element, so it never resamples.
+.lmx-frame.fr-ember,
+.lmx-frame.fr-glacier,
+.lmx-frame.fr-circuit,
+.lmx-frame.fr-ascendant {
+  &::before {
+    border: 2px solid transparent;
+    background: inherit;
+  }
+
+  &::after {
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  }
+}
+
+.lmx-frame.fr-ember::after {
+  background: conic-gradient(from 0deg, #ff4d2e, #ffb347, #ffe259, #ff4d2e);
+  animation: fr-spin 4.5s linear infinite;
+}
+
+.lmx-frame.fr-ember::before { box-shadow: 0 0 10px fade(#ff7b32, 45%); }
+
+.lmx-frame.fr-glacier::after {
+  background: conic-gradient(from 0deg, #dff3ff, #8fd3e8, #3d8fd1, #dff3ff);
+  animation: fr-spin 6s linear infinite;
+}
+
+.lmx-frame.fr-glacier::before { box-shadow: 0 0 10px fade(#8fd3e8, 45%); }
+
+.lmx-frame.fr-circuit::after {
+  background: repeating-conic-gradient(from 0deg,
+    #3ddc97 0deg 12deg, transparent 12deg 24deg);
+  animation: fr-spin 8s linear infinite;
+}
+
+.lmx-frame.fr-circuit::before { box-shadow: 0 0 8px fade(#3ddc97, 40%); }
+
+// Two counter-rotating rings. The second lives on the wrapper's own box-shadow
+// ring so it needs no third element.
+.lmx-frame.fr-ascendant {
+  &::after {
+    inset: -5px;
+    background: conic-gradient(from 0deg, #ffffff, #e8c07d, #bb9af7, #ffffff);
+    animation: fr-spin 7s linear infinite;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  }
+
+  &::before {
+    inset: -1px;
+    border: 2px solid transparent;
+    background: conic-gradient(from 180deg, #e8c07d, #ffffff, #e8c07d) border-box;
+    -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: fr-spin-rev 11s linear infinite;
+    animation-play-state: paused;
+    box-shadow: 0 0 14px fade(#e8c07d, 40%);
+  }
+
+  &.is-live::before { animation-play-state: running; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lmx-frame::before,
+  .lmx-frame::after,
+  .lmx-frame.is-live::before,
+  .lmx-frame.is-live::after {
+    animation: none !important;
+  }
+}

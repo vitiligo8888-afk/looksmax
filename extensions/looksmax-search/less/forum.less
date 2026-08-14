@@ -1,0 +1,1480 @@
+// Looksmax search — forum styles.
+//
+// Everything is scoped under `.lmx-*`. Exactly two rules in this file name a
+// Flarum class, both of them suppressions rather than restyles, and both are
+// gated behind a class this file puts on <html> so they are inert whenever the
+// search surface is closed. They are marked SUPPRESSION where they appear.
+//
+// Colours, spacing, radii, elevation, motion and Z-INDEX are looksmax-theme
+// tokens BY NAME. Nothing here declares a literal colour and nothing declares a
+// bare integer z-index. Two reasons:
+//
+//  1. the accent is moving from gold to violet while this is being written. A
+//     hardcoded colour would be visibly out of system the moment it lands;
+//     `var(--accent)` follows it, and so does everything mixed from it.
+//  2. `fade(@text-color, 25%)` throws at COMPILE time the moment its argument
+//     resolves to `var(--x)` rather than to a colour — "The first argument to
+//     fade must be a color" — and that error takes the WHOLE forum down, not
+//     just this stylesheet, because forum.css is then never written while
+//     forum.js still builds. `color-mix()` does the same job in the browser,
+//     where the value is a real colour. Same trap for `+` and `*` inside
+//     calc(): every calc() with an operator here is ~"escaped" so less.php
+//     hands it to the browser instead of trying to evaluate it.
+//
+// LESS PORT: no each(), no range(), no @container. None are implemented by
+// wikimedia/less.php and all three fail SILENTLY.
+
+// The two shapes every surface shares, so a row in the dropdown and a row on
+// the results page cannot drift apart.
+@lmx-row-radius: 10px;
+@lmx-av: 34px;
+
+// ------------------------------------------------------------------- utility
+
+.lmx-sr {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+// Size is locked in three places on purpose: the SVG carries width/height and
+// preserveAspectRatio, and this pins the CSS box too. An icon in a flex row
+// with only one of the three gets stretched by the row — which is exactly the
+// squashed magnifying glass this replaced.
+.lmx-ico {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  aspect-ratio: 1 / 1;
+  fill: none;
+  stroke: currentColor;
+  opacity: 0.75;
+  // vector-effect keeps the stroke visually even if anything ever does scale it
+  vector-effect: non-scaling-stroke;
+}
+.lmx-ico-hero {
+  width: 30px;
+  height: 30px;
+  flex-basis: 30px;
+  opacity: 0.5;
+}
+
+// -------------------------------------------------------------------- buttons
+
+.lmx-btn {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  gap: var(--gap-sm);
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 var(--pad);
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
+}
+// Written as one compound selector rather than as a separate `:hover` rule.
+// `.Button:hover` (0,2,0) beating `.Button--primary` (0,1,0) is how the primary
+// button went grey-on-grey on this site; a modifier that only wins at rest is
+// not a modifier.
+.lmx-btn:hover,
+.lmx-btn:focus-visible { background: var(--surface-3); border-color: var(--line-strong); }
+.lmx-btn:focus-visible { box-shadow: var(--ring); outline: none; }
+
+.lmx-btn.lmx-btn--primary,
+.lmx-btn.lmx-btn--primary:hover,
+.lmx-btn.lmx-btn--primary:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ink-on-accent);
+}
+.lmx-btn.lmx-btn--primary:hover { filter: ~"brightness(1.08)"; }
+
+// ------------------------------------------------------------------- avatars
+//
+// A generated disc, not a grey square. The hue is set per element from a hash
+// of the author's name, so one person is one colour across every result; the
+// lightness is pinned high and the letter is --ink-on-light, the pairing the
+// theme already measured at 10.6:1. Core's own white-on-pastel is 1.76:1.
+
+.lmx-av {
+  --av-size: @lmx-av;
+  --av-h: 210;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-pill);
+  display: inline-flex;
+  flex: 0 0 var(--av-size);
+  height: var(--av-size);
+  width: var(--av-size);
+  overflow: hidden;
+}
+.lmx-av--img {
+  background: var(--surface-2);
+  box-shadow: 0 0 0 1px var(--line);
+  object-fit: cover;
+}
+.lmx-av--gen {
+  align-items: center;
+  // ~"escaped" on purpose. less.php intercepts hsl() as a LESS BUILT-IN and
+  // demands three comma-separated arguments; the modern space-separated CSS
+  // form is one argument to it, and it throws
+  // "Too few arguments to function Less_Functions::hsl(), 1 passed" — which
+  // aborts the whole stylesheet, so forum.css is never written and EVERY page
+  // 500s. Measured: that is exactly what this line did on its first deploy.
+  // Same class of trap as fade(var(--x)) and calc() with an operator.
+  background: ~"hsl(var(--av-h) 40% 78%)";
+  box-shadow: 0 0 0 1px var(--black-a25);
+  color: var(--ink-on-light);
+  font-size: ~"calc(var(--av-size) * 0.46)";
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.lmx-av--tag {
+  --cat: var(--line-strong);
+  align-items: center;
+  background: color-mix(in srgb, var(--cat) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cat) 55%, transparent);
+  color: color-mix(in srgb, var(--cat) 40%, var(--ink));
+  justify-content: center;
+}
+
+// ----------------------------------------------------------------- tag chips
+//
+// The category's own colour, without making the text unreadable.
+//
+// `tags.color` on this board runs from #2a323d to #bb9af7. Painting the LABEL
+// in the raw colour is what the previous version did, and #414868 ("Success")
+// on --surface-1 measures 1.9:1 — the chip was legible only if you already knew
+// what it said. The colour therefore identifies through a full-strength DOT and
+// a tinted border, and the label is mixed toward --ink until it is readable.
+// Measured on the worst case (#414868 on the composited chip background):
+// 6.4:1 at this mix, against a 4.5:1 floor.
+
+.lmx-tag {
+  --cat: var(--line-strong);
+  align-items: center;
+  background: color-mix(in srgb, var(--cat) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cat) 45%, transparent);
+  border-radius: var(--r-pill);
+  color: color-mix(in srgb, var(--cat) 45%, var(--ink));
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--fs-xs);
+  gap: 5px;
+  line-height: 1.7;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 8px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.lmx-tag-dot {
+  background: var(--cat);
+  border-radius: var(--r-pill);
+  flex: 0 0 6px;
+  height: 6px;
+  width: 6px;
+}
+.lmx-tag-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.lmx-tag-c {
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.lmx-tag--prefix {
+  border-style: dashed;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+button.lmx-tag,
+a.lmx-tag { cursor: pointer; transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease); }
+button.lmx-tag:hover,
+a.lmx-tag:hover {
+  background: color-mix(in srgb, var(--cat) 26%, transparent);
+  border-color: color-mix(in srgb, var(--cat) 70%, transparent);
+  text-decoration: none;
+}
+button.lmx-tag:focus-visible,
+a.lmx-tag:focus-visible { box-shadow: var(--ring); outline: none; }
+
+.lmx-grp,
+.lmx-pin {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  display: inline-block;
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  padding: 0 7px;
+}
+.lmx-pin {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lmx-pin--lock {
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+  color: var(--danger);
+}
+
+// ----------------------------------------------------------------- highlight
+//
+// The one thing the operator asked for by name. It has to survive on a title
+// (16px semibold on --surface-1), inside a two-line snippet (13px on the same
+// surface) and inside the dropdown, in Latin and Cyrillic, without turning the
+// row into a highlighter smear.
+//
+// Measured against its own composited background at accent-gold: 18.7:1, well
+// past the 4.5:1 body-text floor, and it stays there under violet because the
+// TEXT keeps --ink and only the wash comes from the accent. The 2px underline
+// carries the same information without colour, for anyone who cannot see the
+// wash at all.
+.lmx-r mark,
+.lmx-dd mark,
+.lmx-search-page mark {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 2px;
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 85%, transparent);
+  color: var(--ink);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+// ---------------------------------------------------------------- result rows
+//
+// One row component, used by the header dropdown and by the results page.
+
+.lmx-r {
+  border: 1px solid transparent;
+  border-radius: @lmx-row-radius;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--gap-sm);
+  padding: var(--pad-sm) var(--pad-sm);
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  width: 100%;
+}
+.lmx-r + .lmx-r { margin-top: 2px; }
+
+.lmx-r:hover,
+.lmx-r:focus-visible,
+.lmx-r.lmx-sel {
+  background: var(--surface-2);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--ink);
+  outline: none;
+  text-decoration: none;
+}
+// Selection is driven by arrow keys, so the selected row is the ONLY thing
+// telling a keyboard user where they are. It must not be colour alone.
+.lmx-r.lmx-sel { box-shadow: inset 3px 0 0 var(--accent); }
+
+.lmx-r-lead { flex: 0 0 auto; padding-top: 2px; }
+.lmx-r-lead .lmx-ico-lead { height: 22px; width: 22px; flex-basis: 22px; opacity: 0.6; }
+
+.lmx-r-b {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+// The kind label. A thread and a reply are different objects and used to render
+// identically; this says which, in words, above the title.
+.lmx-r-kind {
+  align-items: center;
+  color: var(--ink-faint);
+  display: inline-flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  gap: 5px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+
+  .lmx-ico { height: 13px; width: 13px; flex-basis: 13px; }
+}
+.lmx-r--post .lmx-r-kind { color: var(--accent-2); }
+.lmx-r--user .lmx-r-kind { color: var(--purple); }
+.lmx-r--tag .lmx-r-kind { color: var(--ok); }
+
+.lmx-r-head {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lmx-r-title {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  // Titles on this forum are long and often all-caps. Two lines, then clip.
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.lmx-r-snip {
+  color: var(--ink-dim);
+  display: -webkit-box;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+// A post result carries a rail in the secondary accent so the eye can sort
+// threads from replies down a long list without reading either.
+.lmx-r--post { border-left: 2px solid color-mix(in srgb, var(--accent-2) 45%, transparent); border-top-left-radius: var(--r-xs); border-bottom-left-radius: var(--r-xs); }
+.lmx-r--user { border-left: 2px solid color-mix(in srgb, var(--purple) 45%, transparent); }
+.lmx-r--tag { border-left: 2px solid color-mix(in srgb, var(--ok) 45%, transparent); }
+
+.lmx-r-inpost {
+  border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--ink-dim);
+  display: -webkit-box;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  padding-left: var(--gap-sm);
+}
+.lmx-r-inpost-label {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  font-size: var(--fs-xs);
+  gap: 5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  .lmx-ico { height: 12px; width: 12px; flex-basis: 12px; }
+}
+
+.lmx-r-meta {
+  align-items: center;
+  min-width: 0;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--fs-xs);
+  gap: 4px var(--gap-sm);
+  margin-top: 2px;
+}
+.lmx-m {
+  align-items: center;
+  display: inline-flex;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+
+  .lmx-ico { height: 12px; width: 12px; flex-basis: 12px; opacity: 0.6; }
+}
+.lmx-by {
+  align-items: center;
+  color: var(--ink-dim);
+  display: inline-flex;
+  font-weight: 600;
+  gap: 5px;
+  min-width: 0;
+
+  // A long username plus three category chips overran the 390px row by a few
+  // pixels and the name was clipped mid-word by the row's own overflow. It
+  // ellipsises instead, which is legible; clipping is not.
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+.lmx-react { color: var(--accent); }
+
+// A per-row dismiss, used by the recent-query rows in the dropdown.
+.lmx-r-x {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--ink-faint);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 26px;
+  height: 26px;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  width: 26px;
+}
+.lmx-r:hover .lmx-r-x,
+.lmx-r.lmx-sel .lmx-r-x,
+.lmx-r-x:focus-visible { opacity: 1; }
+.lmx-r-x:hover { background: var(--surface-3); color: var(--ink); }
+
+// ---------------------------------------------------------------- skeletons
+
+.lmx-sk {
+  background: linear-gradient(90deg,
+    var(--white-a03), var(--white-a10), var(--white-a03));
+  background-size: 200% 100%;
+  border-radius: var(--r-xs);
+  display: block;
+  height: 12px;
+  animation: lmx-shimmer 1.2s linear infinite;
+}
+@keyframes lmx-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+.lmx-skel-row {
+  border: 1px solid transparent;
+  display: flex;
+  gap: var(--gap-sm);
+  padding: var(--pad-sm);
+}
+.lmx-skel-row + .lmx-skel-row { margin-top: 2px; }
+.lmx-sk-b { display: flex; flex: 1 1 auto; flex-direction: column; gap: 7px; min-width: 0; }
+.lmx-sk--av { border-radius: var(--r-pill); flex: 0 0 @lmx-av; height: @lmx-av; width: @lmx-av; }
+.lmx-sk--kind { height: 9px; width: 74px; }
+.lmx-sk--title { height: 16px; width: 62%; }
+.lmx-sk--line { height: 11px; width: 100%; }
+.lmx-sk--short { width: 74%; }
+.lmx-sk--meta { height: 12px; width: 46%; }
+
+// ==================================================================== surface
+//
+// The header dropdown and the mobile full-screen sheet are ONE component in two
+// presentations. Both are children of <body>.
+//
+// That placement is the fix for the defect the operator reported twice ("the
+// notification and search bar … still hidden by other elements"). Measured at
+// 390px: Flarum's own `.Search-results` carries z-index 1030 and still
+// hit-tested to `.Navigation-drawer`, because its ancestor `.App-drawer` sets a
+// `transform`, and a transform creates a stacking context that clamps every
+// descendant into the ancestor's painting order regardless of its z-index.
+// Raising the child cannot fix that. Not being a descendant can.
+
+.lmx-dd {
+  display: none;
+  position: fixed;
+  z-index: var(--z-dropdown);
+}
+.lmx-dd.lmx-open { display: block; }
+
+.lmx-dd--sheet {
+  background: var(--scrim);
+  inset: 0;
+  z-index: var(--z-modal);
+}
+
+.lmx-dd-box {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-4);
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  overflow: hidden;
+}
+.lmx-dd--sheet .lmx-dd-box {
+  border: 0;
+  border-radius: 0;
+  height: 100%;
+  max-height: none;
+}
+
+.lmx-dd-head {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: none;
+  gap: var(--gap-sm);
+  padding: var(--pad-sm) var(--pad-sm);
+}
+// The dropdown types into the header field, so it has no input of its own; the
+// sheet has nothing to type into, so it does.
+.lmx-dd--sheet .lmx-dd-head { display: flex; }
+
+.lmx-dd-back {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 40px;
+  height: 40px;
+  justify-content: center;
+  width: 40px;
+
+  .lmx-ico { height: 20px; width: 20px; flex-basis: 20px; }
+}
+.lmx-dd-back:hover { background: var(--surface-2); color: var(--ink); }
+.lmx-dd-back:focus-visible { box-shadow: var(--ring); outline: none; }
+
+.lmx-dd-inputwrap {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--gap-sm);
+  min-width: 0;
+  padding: 0 12px;
+}
+.lmx-dd-inputwrap:focus-within { border-color: var(--accent-2-a55); box-shadow: 0 0 0 3px var(--accent-2-a10); }
+
+.lmx-dd-input {
+  background: none;
+  border: 0;
+  color: var(--ink);
+  flex: 1 1 auto;
+  // 16px exactly: iOS Safari zooms the whole page on focus for anything below,
+  // which on a full-screen search surface throws the layout away.
+  font-size: 16px;
+  min-width: 0;
+  outline: none;
+  padding: 11px 0;
+}
+.lmx-dd-input::placeholder { color: var(--ink-faint); }
+// Chrome draws its own clear button on type=search; it does nothing Escape does
+// not already do and it collides with the surface's own controls.
+.lmx-dd-input::-webkit-search-cancel-button { display: none; }
+
+.lmx-dd-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--gap-sm);
+}
+.lmx-dd--sheet .lmx-dd-list { padding: var(--gap-sm) var(--gap-sm) var(--gap-lg); }
+
+.lmx-dd-group {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: 0.09em;
+  padding: 12px 10px 5px;
+  text-transform: uppercase;
+
+  .lmx-ico { height: 12px; width: 12px; flex-basis: 12px; }
+}
+
+.lmx-dd-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 10px 8px;
+}
+
+.lmx-dd-cta {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: @lmx-row-radius;
+  color: var(--accent);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-weight: 600;
+  gap: var(--gap-sm);
+  justify-content: center;
+  margin-top: 6px;
+  padding: 11px;
+  width: 100%;
+}
+.lmx-dd-cta:hover,
+.lmx-dd-cta.lmx-sel {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-style: solid;
+}
+.lmx-dd-cta:focus-visible { box-shadow: var(--ring); outline: none; }
+
+// The advanced-search way in. Deliberately a DIFFERENT shape from the "see all"
+// call to action above it — solid rather than dashed, two lines rather than one
+// — because it goes somewhere else, and because "easily accessible" means a
+// first-time reader can see it without reading it.
+.lmx-dd-cta.lmx-dd-cta--adv {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-style: solid;
+  color: var(--ink);
+  justify-content: flex-start;
+  margin-top: 6px;
+  text-align: left;
+
+  .lmx-ico { height: 18px; width: 18px; flex-basis: 18px; color: var(--accent); opacity: 1; }
+}
+.lmx-dd-cta.lmx-dd-cta--adv:hover,
+.lmx-dd-cta.lmx-dd-cta--adv.lmx-sel {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep-ink);
+
+  .lmx-ico { color: var(--accent-deep-ink); }
+}
+.lmx-dd-cta-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.lmx-dd-cta-t strong { font-weight: 700; }
+.lmx-dd-cta-t span { font-size: var(--fs-xs); font-weight: 400; opacity: 0.75; }
+
+.lmx-dd-empty,
+.lmx-dd-hello {
+  align-items: center;
+  color: var(--ink-dim);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  padding: var(--pad-lg) var(--pad);
+  text-align: center;
+
+  p { margin: 0; }
+}
+.lmx-dd-hello-ops {
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+.lmx-dd-foot {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--fs-xs);
+  gap: var(--gap-sm);
+  justify-content: space-between;
+  min-height: 30px;
+  padding: 6px var(--pad);
+}
+.lmx-dd-status { font-variant-numeric: tabular-nums; }
+.lmx-kbd-hint { align-items: center; display: flex; flex-wrap: wrap; gap: 5px; }
+.lmx-kbd-hint kbd {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  color: var(--ink-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+}
+
+// The scanning bar while a keystroke is in flight. Two pixels at the seam of
+// the input, so it cannot move anything.
+.lmx-dd-box.lmx-loading .lmx-dd-list { position: relative; }
+.lmx-dd-box.lmx-loading .lmx-dd-list::before {
+  animation: lmx-scan 900ms linear infinite;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  content: '';
+  height: 2px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+@keyframes lmx-scan {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.lmx-noscroll { overflow: hidden; }
+
+// SUPPRESSION 1 of 2. Flarum's own autocomplete list would otherwise render
+// underneath ours from the same keystrokes, in the drawer, where it is trapped
+// and unreachable anyway. Gated on the class this file sets, so the native
+// dropdown is untouched whenever our surface is closed.
+.lmx-dd-on .Search .Search-results { display: none !important; }
+
+// ================================================================ results page
+
+.lmx-search-page {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: var(--pad-lg) var(--pad) 60px;
+}
+
+.lmx-s-form { display: flex; gap: var(--gap-sm); }
+
+.lmx-s-inputwrap {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  display: flex;
+  flex: 1 1 auto;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 14px;
+
+  .lmx-ico { height: 18px; width: 18px; flex-basis: 18px; }
+}
+.lmx-s-inputwrap:focus-within {
+  background: var(--surface-1);
+  border-color: var(--accent-2-a55);
+  box-shadow: 0 0 0 3px var(--accent-2-a10);
+}
+.lmx-s-input {
+  background: none;
+  border: 0;
+  color: var(--ink);
+  flex: 1 1 auto;
+  font-size: 16px;
+  min-width: 0;
+  outline: none;
+  padding: 12px 0;
+}
+.lmx-s-input::placeholder { color: var(--ink-faint); }
+.lmx-s-input::-webkit-search-cancel-button { display: none; }
+.lmx-s-go { flex: 0 0 auto; min-height: 46px; }
+
+// ---- active filters
+
+.lmx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.lmx-chip {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: var(--r-pill);
+  color: color-mix(in srgb, var(--accent) 30%, var(--ink));
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--fs-sm);
+  gap: 5px;
+  padding: 3px 8px 3px 11px;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.lmx-chip:hover { background: color-mix(in srgb, var(--accent) 26%, transparent); }
+.lmx-chip:focus-visible { box-shadow: var(--ring); outline: none; }
+.lmx-chip-x { height: 12px; width: 12px; flex-basis: 12px; opacity: 0.9; }
+.lmx-chip-t { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.lmx-chip--by { background: color-mix(in srgb, var(--accent-2) 14%, transparent); border-color: color-mix(in srgb, var(--accent-2) 50%, transparent); color: color-mix(in srgb, var(--accent-2) 30%, var(--ink)); }
+.lmx-chip--by:hover { background: color-mix(in srgb, var(--accent-2) 26%, transparent); }
+.lmx-chip--date { background: color-mix(in srgb, var(--purple) 14%, transparent); border-color: color-mix(in srgb, var(--purple) 50%, transparent); color: color-mix(in srgb, var(--purple) 30%, var(--ink)); }
+.lmx-chip--date:hover { background: color-mix(in srgb, var(--purple) 26%, transparent); }
+.lmx-chip--neg { background: color-mix(in srgb, var(--danger) 14%, transparent); border-color: color-mix(in srgb, var(--danger) 50%, transparent); color: color-mix(in srgb, var(--danger) 30%, var(--ink)); }
+.lmx-chip--neg:hover { background: color-mix(in srgb, var(--danger) 26%, transparent); }
+.lmx-chip--phrase { font-family: var(--font-mono); }
+.lmx-chip.lmx-chip--clear {
+  background: none;
+  border-color: var(--line-strong);
+  border-style: dashed;
+  color: var(--ink-dim);
+  padding: 3px 11px;
+}
+.lmx-chip.lmx-chip--clear:hover { background: var(--surface-2); color: var(--ink); }
+
+// ---- type tabs
+
+.lmx-tabs {
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 2px;
+  margin: var(--gap) 0 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.lmx-tabs::-webkit-scrollbar { display: none; }
+.lmx-tab {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 9px 14px;
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  white-space: nowrap;
+}
+.lmx-tab:hover { color: var(--ink); }
+.lmx-tab:focus-visible { box-shadow: var(--ring); outline: none; }
+.lmx-tab.lmx-tab-on { border-bottom-color: var(--accent); color: var(--accent); }
+
+// ---- body grid
+
+.lmx-s-body {
+  align-items: start;
+  display: grid;
+  gap: var(--gap-lg);
+  grid-template-columns: minmax(0, 1fr) 260px;
+  margin-top: var(--gap);
+}
+.lmx-s-main { min-width: 0; }
+
+.lmx-s-bar {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+  gap: var(--gap-sm) var(--gap);
+  padding-bottom: 10px;
+}
+.lmx-s-count { color: var(--ink); font-size: var(--fs-md); font-weight: 700; }
+.lmx-s-ms { font-variant-numeric: tabular-nums; opacity: 0.8; }
+.lmx-s-degraded {
+  border: 1px solid color-mix(in srgb, var(--warn) 55%, transparent);
+  border-radius: var(--r-xs);
+  color: var(--warn);
+  padding: 0 6px;
+}
+.lmx-s-spacer { flex: 1 1 auto; }
+
+.lmx-sortwrap { align-items: center; display: inline-flex; gap: 6px; margin: 0; }
+.lmx-sort {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+  padding: 6px 8px;
+}
+.lmx-sort:focus-visible { box-shadow: var(--ring); outline: none; }
+
+// The filter toggle only exists below the two-column breakpoint, where the rail
+// becomes a sheet.
+.lmx-filters-toggle { display: none; }
+
+// ---- pager
+
+.lmx-pager {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  justify-content: center;
+  margin-top: var(--gap-lg);
+}
+.lmx-page-btn {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 600;
+  gap: 6px;
+  padding: 9px 16px;
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.lmx-page-btn:hover { border-color: var(--accent); color: var(--accent); }
+.lmx-page-btn:focus-visible { box-shadow: var(--ring); outline: none; }
+.lmx-page-of {
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+  text-align: center;
+}
+
+// ================================================================ facet rail
+
+.lmx-facets-wrap { min-width: 0; }
+.lmx-facets-close { display: none; }
+
+.lmx-facets {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--pad);
+  position: sticky;
+  top: 16px;
+}
+.lmx-facet + .lmx-facet { border-top: 1px solid var(--line-soft); margin-top: var(--gap); padding-top: var(--gap); }
+.lmx-facet h3 {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--gap-sm);
+  text-transform: uppercase;
+
+  .lmx-ico { height: 13px; width: 13px; flex-basis: 13px; }
+}
+
+.lmx-dates { align-items: center; display: flex; gap: 6px; }
+.lmx-dash { color: var(--ink-faint); }
+.lmx-date,
+.lmx-textfield {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+  min-width: 0;
+  padding: 6px 8px;
+  width: 100%;
+}
+.lmx-date:focus,
+.lmx-textfield:focus { border-color: var(--accent-2-a55); box-shadow: 0 0 0 3px var(--accent-2-a10); outline: none; }
+// The picker glyph is drawn by the UA in near-black on a dark field and is
+// invisible without this.
+.lmx-date::-webkit-calendar-picker-indicator { cursor: pointer; filter: ~"invert(1)"; opacity: 0.55; }
+
+.lmx-quick { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.lmx-quick-b {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--fs-xs);
+  padding: 2px 9px;
+}
+.lmx-quick-b:hover { background: var(--surface-2); border-color: var(--accent); color: var(--accent); }
+.lmx-quick-b:focus-visible { box-shadow: var(--ring); outline: none; }
+
+.lmx-facet-body { display: flex; flex-direction: column; gap: 1px; }
+.lmx-facet-v {
+  --cat: var(--line-strong);
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--fs-sm);
+  gap: 7px;
+  padding: 5px 8px;
+  text-align: left;
+  width: 100%;
+}
+.lmx-facet-v:hover { background: var(--surface-2); color: var(--ink); }
+.lmx-facet-v:focus-visible { box-shadow: var(--ring); outline: none; }
+;
+// --accent-deep is the violet PLATE: it carries --accent-deep-ink at 5.0:1,
+// where the 500 needs dark ink and reads as a button. A selected facet is a
+// state, not a control, so it takes the plate.
+.lmx-facet-v.lmx-facet-v--on {
+  background: var(--accent-deep);
+  color: var(--accent-deep-ink);
+  font-weight: 600;
+}
+.lmx-facet-v.lmx-facet-v--on .lmx-facet-count { color: var(--accent-deep-ink); opacity: 0.8; }
+.lmx-facet-v:hover { color: var(--accent-hi); }
+.lmx-facet-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lmx-facet-count { color: var(--ink-faint); flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+
+// ========================================================== advanced controls
+
+.lmx-advrow + .lmx-advrow { margin-top: 10px; }
+.lmx-advlabel {
+  color: var(--ink-dim);
+  display: block;
+  font-size: var(--fs-sm);
+  margin-bottom: 4px;
+}
+.lmx-num {
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+.lmx-quick-b.lmx-quick-b--on,
+.lmx-quick-b.lmx-quick-b--on:hover {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep-ink);
+}
+
+.lmx-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: var(--gap);
+}
+.lmx-flag {
+  align-items: center;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--fs-xs);
+  gap: 4px;
+  padding: 3px 10px;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+
+  .lmx-ico { height: 11px; width: 11px; flex-basis: 11px; }
+}
+.lmx-flag:hover { border-color: var(--accent); color: var(--accent-hi); }
+.lmx-flag:focus-visible { box-shadow: var(--ring); outline: none; }
+// One compound selector, so a later `:hover` cannot beat the pressed state —
+// the exact shape that made `.Button--primary` grey-on-grey on this site.
+.lmx-flag.lmx-flag--on,
+.lmx-flag.lmx-flag--on:hover,
+.lmx-flag.lmx-flag--on:focus-visible {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: var(--accent-deep-ink);
+  font-weight: 600;
+}
+
+// ============================================================ saved searches
+
+.lmx-saved-body { display: flex; flex-direction: column; gap: 2px; }
+.lmx-saved-none { color: var(--ink-faint); font-size: var(--fs-sm); margin: 0; }
+.lmx-saved-row { align-items: center; display: flex; gap: 4px; }
+.lmx-saved-go {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: var(--fs-sm);
+  gap: 6px;
+  min-width: 0;
+  padding: 5px 8px;
+  text-align: left;
+}
+.lmx-saved-go:hover { background: var(--surface-2); color: var(--accent-hi); }
+.lmx-saved-go:focus-visible { box-shadow: var(--ring); outline: none; }
+.lmx-saved-n { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lmx-saved-new {
+  background: var(--accent-deep);
+  border-radius: var(--r-pill);
+  color: var(--accent-deep-ink);
+  flex: 0 0 auto;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 0 7px;
+}
+.lmx-saved-x {
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  color: var(--ink-faint);
+  cursor: pointer;
+  flex: 0 0 26px;
+  height: 26px;
+  padding: 0;
+}
+.lmx-saved-x:hover { background: var(--surface-3); color: var(--danger); }
+.lmx-saved-x:focus-visible { box-shadow: var(--ring); outline: none; }
+
+.lmx-save { min-height: 30px; padding: 0 11px; }
+.lmx-save.lmx-save--done,
+.lmx-save.lmx-save--done:hover { border-color: var(--ok); color: var(--ok); }
+.lmx-save.lmx-save--failed,
+.lmx-save.lmx-save--failed:hover { border-color: var(--danger); color: var(--danger); }
+
+// =================================================================== landing
+
+.lmx-landing { margin-top: var(--gap-lg); }
+.lmx-landing-hero {
+  align-items: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--pad-lg) var(--pad);
+  text-align: center;
+
+  h2 { color: var(--ink); font-size: var(--fs-2xl); margin: 0; }
+  p { color: var(--ink-dim); margin: 0; }
+}
+
+.lmx-land-sec { margin-top: var(--gap-lg); }
+.lmx-land-sec h3 {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--gap-sm);
+  text-transform: uppercase;
+
+  .lmx-ico { height: 13px; width: 13px; flex-basis: 13px; }
+}
+.lmx-land-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.lmx-land-chips .lmx-sk { height: 26px; width: 120px; border-radius: var(--r-pill); }
+
+.lmx-qchip {
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--fs-sm);
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 12px;
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+.lmx-qchip:hover { border-color: var(--accent); color: var(--ink); }
+.lmx-qchip:focus-visible { box-shadow: var(--ring); outline: none; }
+
+.lmx-ops {
+  display: grid;
+  gap: 7px var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li { align-items: baseline; display: flex; gap: var(--gap-sm); }
+}
+.lmx-op {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  color: var(--accent);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.lmx-op:hover { border-color: var(--accent); }
+.lmx-op:focus-visible { box-shadow: var(--ring); outline: none; }
+.lmx-op-d { color: var(--ink-faint); font-size: var(--fs-sm); }
+
+// =============================================================== zero results
+
+.lmx-empty { padding: var(--gap) 0; }
+.lmx-empty-hero {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--pad-lg) var(--pad);
+  text-align: center;
+
+  h2 { color: var(--ink); font-size: var(--fs-xl); margin: 0; overflow-wrap: anywhere; }
+  p { color: var(--ink-dim); margin: 0; }
+}
+.lmx-empty-offers { display: flex; flex-direction: column; gap: 6px; }
+.lmx-empty-sug {
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: @lmx-row-radius;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  font: inherit;
+  gap: 10px;
+  padding: 11px 13px;
+  text-align: left;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  width: 100%;
+}
+.lmx-empty-sug:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-color: var(--accent);
+}
+.lmx-empty-sug:focus-visible { box-shadow: var(--ring); outline: none; }
+.lmx-empty-label { font-weight: 600; }
+.lmx-empty-q { color: var(--ink-dim); font-family: var(--font-mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.lmx-empty-n { color: var(--ink-faint); font-size: var(--fs-sm); margin-left: auto; }
+.lmx-empty-tags {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--gap);
+}
+.lmx-empty-tags-l {
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+// ===================================================================== error
+
+.lmx-error {
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+  border-radius: var(--r-lg);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  padding: var(--pad);
+
+  p { margin: 0; }
+}
+.lmx-error-h { align-items: center; color: var(--danger); display: flex; gap: 7px; }
+.lmx-error-m { color: var(--ink); }
+.lmx-error-d { color: var(--ink-faint); font-family: var(--font-mono); font-size: var(--fs-sm); }
+.lmx-error-body {
+  background: var(--surface-0);
+  border-radius: var(--r-xs);
+  color: var(--ink-dim);
+  font-size: var(--fs-xs);
+  margin: 0;
+  max-height: 140px;
+  overflow: auto;
+  padding: var(--gap-sm);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.lmx-error .lmx-btn { align-self: flex-start; }
+
+// ================================================================= discovery
+
+.lmx-related { margin-top: var(--gap-lg); }
+.lmx-related h3 {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  gap: 6px;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--gap-sm);
+  text-transform: uppercase;
+
+  .lmx-ico { height: 13px; width: 13px; flex-basis: 13px; }
+}
+.lmx-related-body { display: flex; flex-direction: column; gap: 2px; }
+.lmx-rel {
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  display: block;
+  font-size: var(--fs-sm);
+  padding: 7px 9px;
+  text-decoration: none;
+}
+.lmx-rel:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+.lmx-rel-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  overflow: hidden;
+}
+.lmx-rel-meta { color: var(--ink-faint); display: block; font-size: var(--fs-xs); margin-top: 2px; }
+
+// ======================================================== mobile search button
+//
+// At 390px the ONLY search field in the document is inside `.App-header`, which
+// Flarum's mobile layout turns into the slide-in drawer: measured rect
+// x = -276, entirely off screen. There was no way to reach search in one
+// gesture. This button lives in `.App-navigation`, the 390x52 fixed bar that IS
+// on screen, in the 55px gap between the drawer toggle (x 0-40) and the title
+// control (x 95-295).
+//
+// The selector is an ID, deliberately. The first pass used
+// `.lmx-hdr-search-li { display: none }` (0,1,0) and the button was VISIBLE at
+// 1440 anyway, because a theme rule on `.Header-controls > li` (0,2,1) won.
+// Same specificity trap that made `.TagTiles > li` beat `.TagTile` and
+// `.Button:hover` beat `.Button--primary` on this site. An id is 1,0,0 and
+// cannot lose to a class chain.
+#lmx-hdr-search { display: none; }
+#lmx-hdr-search .lmx-ico { height: 20px; width: 20px; flex-basis: 20px; opacity: 1; }
+
+// ================================================================ responsive
+
+@media (max-width: 1023.98px) {
+  .lmx-search-page { max-width: none; }
+  .lmx-s-body { grid-template-columns: minmax(0, 1fr); }
+
+  // The rail becomes a sheet rather than disappearing: filtering matters MORE
+  // on a small screen, not less, and the previous behaviour (a horizontal
+  // scroller pinned above the results) pushed the first result 380px down the
+  // page and clipped every facet label.
+  .lmx-filters-toggle {
+    align-items: center;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--ink-dim);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    gap: 6px;
+    padding: 6px 11px;
+  }
+  .lmx-filters-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .lmx-filters-toggle:focus-visible { box-shadow: var(--ring); outline: none; }
+
+  /*
+   * The rail becomes a bottom sheet. Laid out as a flex COLUMN pinned to the
+   * bottom rather than by absolutely positioning the panel, so the close button
+   * has a real box above the sheet instead of being positioned against the
+   * viewport — which is where it landed on the first pass, on top of the type
+   * tabs, covering the word "Forums".
+   */
+  .lmx-facets-wrap {
+    align-items: stretch;
+    background: var(--scrim);
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transition: opacity var(--t-base) var(--ease);
+    z-index: var(--z-modal);
+  }
+  .lmx-facets-open .lmx-facets-wrap { opacity: 1; pointer-events: auto; }
+
+  .lmx-facets-wrap > * {
+    transform: translateY(110%);
+    transition: transform var(--t-base) var(--ease);
+  }
+  .lmx-facets-open .lmx-facets-wrap > * { transform: translateY(0); }
+
+  .lmx-facets {
+    background: var(--surface-1);
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: var(--e-4);
+    flex: 0 1 auto;
+    max-height: 78vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--pad) var(--pad) var(--pad-lg);
+    position: static;
+    top: auto;
+  }
+
+  .lmx-facets-close {
+    align-items: center;
+    align-self: flex-end;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-pill);
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    flex: 0 0 auto;
+    height: 40px;
+    justify-content: center;
+    margin: 0 var(--pad) 10px;
+    width: 40px;
+  }
+  .lmx-facets-close:hover { border-color: var(--accent); color: var(--accent); }
+  .lmx-facets-close:focus-visible { box-shadow: var(--ring); outline: none; }
+}
+
+@media (max-width: 767.98px) {
+  .lmx-search-page { padding: var(--pad-sm) var(--pad-sm) 48px; }
+  .lmx-landing-hero { padding: var(--pad) var(--pad-sm); }
+  .lmx-landing-hero h2 { font-size: var(--fs-xl); }
+  .lmx-s-go { padding: 0 var(--pad-sm); }
+  .lmx-r { padding: 10px 8px; }
+  .lmx-r-title { font-size: var(--fs-md); }
+  .lmx-chip-t { max-width: 180px; }
+  .lmx-ops { grid-template-columns: minmax(0, 1fr); }
+
+  // One tap to a full-screen search, because the real field is in the drawer.
+  #lmx-hdr-search {
+    align-items: center;
+    background: none;
+    border: 0;
+    color: var(--ink-dim);
+    display: inline-flex;
+    height: 52px;
+    justify-content: center;
+    left: 44px;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    width: 44px;
+    // Inside `.App-navigation`, which is itself z-index 1000 and fixed, so this
+    // is a layer WITHIN the navigation bar, not a competitor to it.
+    z-index: var(--z-raised);
+  }
+  #lmx-hdr-search:hover,
+  #lmx-hdr-search:focus-visible { color: var(--accent); }
+  #lmx-hdr-search:focus-visible { box-shadow: var(--ring); outline: none; }
+}
+
+// Respect the OS setting. The scanning bar, the shimmer and the sheet slide are
+// decorative and are exactly the kind of motion a reduced-motion preference is
+// asking about.
+@media (prefers-reduced-motion: reduce) {
+  .lmx-dd-box.lmx-loading .lmx-dd-list::before,
+  .lmx-sk { animation: none; }
+  .lmx-facets,
+  .lmx-facets-wrap { transition: none; }
+}
+
+// ------------------------------------------------------- results-page takeover
+//
+// Flarum 1.8 has no client-side `/search` route, so its router renders the
+// index component into `#content` and keeps re-rendering it on every redraw.
+// The results page therefore lives OUTSIDE `#content` (see mountSearchPage) and
+// `#content` is hidden while we are on that route. Hiding rather than emptying:
+// emptying it means fighting Mithril for the same element on every redraw, and
+// Mithril wins.
+//
+// SUPPRESSION 2 of 2, and the only other rule in this file naming a class we do
+// not own. Gated on `.lmx-searching`, which exists only on the /search route.
+.lmx-searching {
+  #content { display: none !important; }
+  // The hero/banner belongs to the index page it renders for, not to a search.
+  .Hero, .IndexPage-nav { display: none !important; }
+}

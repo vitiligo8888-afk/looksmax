@@ -1,0 +1,124 @@
+##
+# looksmax-cosmetics — English. This is the TRANSLATION.
+#
+# Spanish is this forum's default locale and locale/es.yml is the source: the
+# strings there were authored, the strings here follow them. If the two ever
+# disagree, es.yml is right.
+#
+# The eight shared frames keep the names looksmax-ranks already uses in English
+# (Bronze Laurel, Ember, Glacier…) for the same reason es.yml keeps its own:
+# somebody who bought "Ember" in the store has to find "Ember" in their
+# wardrobe, in either language.
+##
+local-looksmax-cosmetics:
+
+  forum:
+
+    title: Personalisation
+    sub: The frames and covers you own. Try them on here before you wear them.
+    loading: Loading…
+    guest: Sign in to personalise your profile.
+
+    none: None
+    none_hint: No decoration
+
+    apply: Apply
+    applying: Applying…
+    revert: Discard
+
+    note: >-
+      Animated frames stop on their own when they scroll off screen, and turn
+      off entirely if your system asks for reduced motion.
+
+    mirror:
+      saved: This is how the forum sees you
+      unsaved: Unsaved preview
+
+    section:
+      frames: Avatar frames
+      banners: Profile covers
+      count: "{owned} of {total}"
+
+    owned:
+      bought: Bought
+      tier: Included with your membership
+      badge: Earned
+      generic: In your inventory
+
+    lock:
+      buy: In the store for {price}
+      tier: Needs {tier} membership
+      badge: Needs the {badge} badge
+      award: Awarded only
+
+    error:
+      guest: Sign in first.
+      unknown_action: No such action.
+      unknown_kind: No such cosmetic type.
+      no_such_item: No such cosmetic.
+      not_owned: You do not own that cosmetic.
+      failed: Could not save. Try again.
+
+  lib:
+
+    frame:
+      bronze-laurel:
+        name: Bronze Laurel
+        blurb: A plain warm ring.
+      silver-laurel:
+        name: Silver Laurel
+        blurb: Brushed metal.
+      gold-laurel:
+        name: Gold Laurel
+        blurb: Two-tone gold, static.
+      neon:
+        name: Neon
+        blurb: Cyan halo with bloom.
+      ember:
+        name: Ember
+        blurb: A conic sweep of heat, rotating.
+      glacier:
+        name: Glacier
+        blurb: Cold conic sweep, rotating.
+      circuit:
+        name: Circuit
+        blurb: Dashed trace that runs the perimeter.
+      ascendant:
+        name: Ascendant
+        blurb: Awarded. Double ring, counter-rotating.
+
+      elder:
+        name: Old Guard
+        blurb: For the accounts that were already here before the migration.
+      veteran:
+        name: Five Years
+        blurb: A platinum ring for five years on the board.
+      consensus:
+        name: Consensus
+        blurb: Ten thousand reactions received, turning slowly.
+      contributor:
+        name: Contributor
+        blurb: For whoever kept the lights on.
+      staff:
+        name: Staff
+        blurb: Double ring. Not for sale.
+
+    banner:
+      nebula:
+        name: Nebula
+        blurb: The house cover. Included with VIP.
+      aurora:
+        name: Aurora
+        blurb: Violet opening into cyan. Included with Elite.
+      founder:
+        name: Founding
+        blurb: Founder accounts only.
+      elder:
+        name: Archive
+        blurb: A dark grid for the accounts that came from the source board.
+      veteran:
+        name: Season
+        blurb: For five years on the board.
+      staff:
+        name: Engine Room
+        blurb: For whoever runs the place.

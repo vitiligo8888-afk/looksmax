@@ -1,0 +1,254 @@
+# Looksmax Search — English source strings.
+#
+# Namespace is the Flarum extension id: composer name `local/looksmax-search`
+# -> `local-looksmax-search` (Extension::nameToId strips only `flarum-`/
+# `flarum-ext-`, so `looksmax-` survives).
+#
+# Loaded into the `messages+intl-icu` domain (Flarum\Locale\LocaleManager:68),
+# so ICU MessageFormat is live on both sides: PHP via intl, JS via
+# @askvortsov/rich-icu-message-formatter. Plurals are ICU, never concatenation.
+#
+# Every plural in here prints `{n}`, never `#`, and that is not a style choice.
+# Flarum's frontend Translator registers `plural` and `select` type handlers and
+# NO `number` handler (core js/src/common/Translator.tsx:41-46), so a `#` inside
+# a plural comes out as an ungrouped integer — "12431". `{n}` is a figure that
+# window.lmxI18n has already formatted (compact "12.4K"/"12.4 k", grouped
+# "12,431", or carrying the "+" of a capped estimate); the plural still selects
+# on {count}, and {n} is only what gets printed.
+#
+# Never put a thousands separator in a string here — that is lmxI18n's job, and
+# it is not the obvious one: this forum's Spanish is MEXICAN, and es-MX groups
+# 12,431 with a comma exactly like English, while generic `es` would give
+# 12.431. lmxI18n maps es -> es-MX for precisely that reason
+# (looksmax-i18n/js/dist/forum.js:37-45).
+
+local-looksmax-search:
+  forum:
+    # The core header input. This extension does not own that box; it only
+    # replaces the placeholder with one that advertises the "/" shortcut.
+    header:
+      placeholder: Search — press /
+
+    # Cmd/Ctrl-K command palette.
+    palette:
+      # The operators (tag: by: after:) are parsed server-side and are NOT
+      # translatable — QueryParser only understands the English ones. Only the
+      # prose and the example VALUES change language.
+      placeholder: "Search threads, posts, people…   try  tag:looksmaxing  by:name  after:2023"
+      aria_label: Search
+      recent: Recent
+      no_matches: "No matches for “{query}”"
+      see_all: "See all results for “{query}”"
+      # Shown when the engine is down. Says what happened and why the list is
+      # empty, because an empty palette with no explanation reads as "no results".
+      unavailable: search engine unavailable — showing nothing rather than something wrong
+      failed: "search failed: {error}"
+
+    # The header dropdown and its mobile full-screen twin: one component, so one
+    # block of strings.
+    surface:
+      close: Close search
+      forget: Remove from history
+      # The keyboard legend along the bottom edge. Each fragment follows a <kbd>
+      # glyph, so it starts lower case and reads as one sentence with the key.
+      hint_move: to move
+      hint_open: to open
+      hint_close: to close
+      count: "{count, plural, one {{n} suggestion} other {{n} suggestions}}"
+
+    # Group headings in the palette. The suffix is the API's `kind`, a closed
+    # set: discussions | posts | users | tags.
+    groups:
+      discussions: Threads
+      posts: Posts
+      users: People
+      tags: Forums
+
+    # Result-type tabs on the results page. Suffix is the wire value.
+    types:
+      label: Result type
+      all: Everything
+      discussions: Threads
+      posts: Posts
+      users: People
+      tags: Forums
+
+    sort:
+      label: Sort results
+      relevance: Relevance
+      new: Newest
+      old: Oldest
+      top: Most reactions
+      replies: Most replies
+      views: Most viewed
+      active: Recently active
+
+    results:
+      query_label: Search query
+      submit: Search
+      # {n} carries the "+" when the estimate is capped at 1000; {count} is the
+      # raw number and is what the plural selects on.
+      count: "{count, plural, one {{n} result} other {{n} results}}"
+      none: No results
+      timing: "engine {engine} ms · total {total} ms"
+      degraded: "degraded: database fallback"
+      prev: ← Previous
+      next: Next →
+      failed: "Search failed: {error}"
+      placeholder: Search the forum…
+      pager: Result pages
+      page_of: "{from}–{to} of {total}"
+
+    # Active-filter chips. The LABEL is translated; the token written back into
+    # the query box keeps the English operator.
+    filters:
+      panel_label: Refine results
+      remove: Remove this filter
+      # The accessible name of the same control. `remove` alone is announced
+      # identically for every chip in the row, so a screen reader user cannot
+      # tell which filter a button removes.
+      remove_named: "Remove filter: {filter}"
+      tag: "forum: {value}"
+      prefix: "prefix: {value}"
+      author: "by: {value}"
+      lang: "lang: {value}"
+      flag: "is: {value}"
+      after: "after: {value}"
+      before: "before: {value}"
+      phrase: "phrase: “{value}”"
+      # U+2212 MINUS SIGN, not a hyphen: it is the negation the query operator
+      # `-word` expresses, and a hyphen reads as part of the word.
+      negative: "without: {value}"
+      sort: "sort: {value}"
+      type: "type: {value}"
+      clear_all: Clear all
+      toggle: Filters
+      date: Date
+      date_from: From
+      date_to: To
+      author_ph: username
+      last_day: last day
+      last_week: last week
+      last_month: last month
+      last_year: last year
+      # Advanced controls. Each maps onto an operator QueryParser already
+      # understands, so a control and a hand-typed token are the same thing.
+      advanced: Advanced
+      any: any
+      min_replies: Minimum replies
+      min_reactions: Minimum reactions
+      min_views: Minimum views
+      min_length: Minimum length (words)
+
+    # The `is:` flags QueryParser accepts, as toggle buttons. The VALUE stays
+    # English because the parser only knows the English one; only the label
+    # changes language.
+    flags:
+      unanswered: Unanswered
+      answered: Answered
+      guide: Guides
+      sticky: Pinned
+      locked: Locked
+      op: First post only
+
+    # The advanced-search entry point, in the header dropdown.
+    advanced:
+      title: Advanced search
+      sub: "filter by forum, author, date, replies…"
+
+    saved:
+      save: Save this search
+      done: Saved
+      none: Nothing saved yet.
+      delete: "Delete saved search: {name}"
+      new_count: "{count, plural, one {{n} new} other {{n} new}}"
+
+    # Facet panel headings. Suffix is the Meilisearch field name
+    # (Engine::shapeFacets), not a display string.
+    facets:
+      tag_names: Forum
+      prefixes: Prefix
+      author: Author
+      lang: Language
+      group_names: Group
+
+    # Zero results. The most-read screen in any search UI, so it says plainly
+    # what happened and every suggestion below it was executed against the
+    # engine before being offered.
+    empty:
+      heading: "Nothing matched “{query}”"
+      try: "Try {label}"
+      count: "{count, plural, one {{n} result} other {{n} results}}"
+      related_forums: "Related forums: "
+      sub: Try fewer words, or drop a filter.
+      all_types: Search everything
+      # Offered only after the engine has confirmed the shortened word actually
+      # returns hits, so this is never a guess presented as advice.
+      try_stem: "Try “{word}”"
+      # The other recovery the server does not do: the query MINUS the word that
+      # is stopping it matching. Offered only when the engine confirms hits.
+      try_without: "Try without “{word}”"
+      everything: everything
+
+    # The suggestion labels themselves, built by Engine::recover. Lower case
+    # and no leading capital: each one is substituted into `empty.try`.
+    recovery:
+      without_filters: without filters
+      without_phrase: without exact phrase
+      without_word: "without “{word}”"
+
+    # Per-result metadata.
+    hit:
+      replies: "{count, plural, one {{n} reply} other {{n} replies}}"
+      views: "{count, plural, one {{n} view} other {{n} views}}"
+      posts: "{count, plural, one {{n} post} other {{n} posts}}"
+      threads: "{count, plural, one {{n} thread} other {{n} threads}}"
+      pinned: pinned
+      locked: locked
+      matched_in_reply: "matched in reply by {author}:"
+      # {when} is already a localised relative time from lmxI18n.rel().
+      related_meta: "{count, plural, one {{n} reply} other {{n} replies}} · {when}"
+
+    # What a result IS. A thread and a reply used to render identically; this
+    # is the word above the title that says which.
+    kind:
+      discussion: Thread
+      post: Reply
+      user: Person
+      tag: Forum
+
+    # The landing state: /search with no query, and the dropdown before anything
+    # is typed. It used to render "Nothing matched “”" on a blank page.
+    landing:
+      heading: What are you looking for?
+      sub: Search every thread, post and member.
+      saved: Saved searches
+      popular_tags: Busiest forums
+      search_tag: "Search in {tag}"
+      hello: Search threads, posts and people.
+      operators: "Try  tag:looksmaxing · by:name · after:2023"
+      operators_h: Query operators
+      # Each of these labels a clickable example of the operator beside it, so
+      # it is a description, not a sentence, and takes no leading capital.
+      op_tag: only inside one forum
+      op_by: only from one person
+      op_after: from that date onwards
+      op_phrase: that exact phrase
+      op_neg: excludes that word
+      op_sort: changes the order
+
+    # The error state. `status` and the response body are shown because a bare
+    # "search failed" is unactionable for the reader AND for the operator.
+    error:
+      heading: Search failed
+      status: "HTTP {status}"
+      retry: Try again
+
+    discovery:
+      related: Related threads
+
+    # <title>. Set server-side by RenderSearchPage and again client-side on
+    # navigation, from the same two keys.
+    page:
+      title: Search
+      title_with_query: "Search: {query}"

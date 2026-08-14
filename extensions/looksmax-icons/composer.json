@@ -1,0 +1,15 @@
+{
+  "name": "local/looksmax-icons",
+  "description": "Iconify icon sets for Flarum: 200k+ icons, self-hosted API, per-concept icon mapping",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\Icons\\": "src/" } },
+  "extra": {
+    "flarum-extension": {
+      "title": "Looksmax Icons",
+      "category": "theme",
+      "icon": { "name": "fas fa-icons", "backgroundColor": "#12161c", "color": "#7aa2f7" }
+    }
+  }
+}

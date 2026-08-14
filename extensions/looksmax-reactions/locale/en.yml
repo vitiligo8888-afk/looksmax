@@ -1,0 +1,168 @@
+local-looksmax-reactions:
+  forum:
+    # ── Keys that were already here ─────────────────────────────────────────
+    # The names below are load-bearing and unchanged. Two values were widened
+    # to match what the code actually renders today, so switching the source
+    # over to these keys is a byte-for-byte no-op in English:
+    #   too_many    now carries {max}, which the picker error has always shown
+    #   rate_burst  now carries the "(abuse limit)" the admin screen shows
+    react: React
+    reacted_by: Reacted by
+    who_reacted: Who reacted
+    remove: Remove your reaction
+    legacy_note: Imported from the old board
+    legacy_unknown: count not recorded
+    leaderboard: Reaction leaderboard
+    rate_limited: Too fast — try again in a moment.
+    too_many: "You have already used {max, plural, one {# reaction} other {# reactions}} on this post."
+    notification_text: "{username} reacted to your post"
+    # Same notification, when the catalogue could name the reaction. Kept
+    # separate rather than folded into notification_text with an empty
+    # {reaction}, which renders a double space.
+    notification_text_with_reaction: "{username} reacted {reaction} to your post"
+
+    # ── Shared ──────────────────────────────────────────────────────────────
+    loading: Loading…
+    add: Add a reaction
+    post_ref: "post #{number}"
+
+    notification:
+      # The alert row falls back to this when the reacting account is gone.
+      someone: Someone
+
+    # ── The picker ──────────────────────────────────────────────────────────
+    picker:
+      search_placeholder: "{count, plural, one {Search # reaction…} other {Search # reactions…}}"
+      no_match: 'nothing matches "{query}"'
+      hint_react: click to react
+      hint_remove: click to remove
+      limit_hint: up to {max} per post
+      # Section headings. "Chrigger" is the house set and is a proper noun in
+      # both languages.
+      group_chrigger: Chrigger
+      group_classic: Classic
+      group_extra: More
+
+    # ── Chips in the post footer (title attributes) ─────────────────────────
+    chip:
+      title_mine: "{name} — click to remove"
+      title_legacy: "{name} — imported from the old board"
+      title_legacy_unknown: "{name} — imported from the old board, exact count not recorded"
+
+    # ── The imported XenForo history ────────────────────────────────────────
+    # The scrape recorded WHICH reactions a post drew and the total score, but
+    # never who left them, and for most posts not even how many of each type.
+    # That distinction is the whole point of these strings: they are history,
+    # not a reactor list, and a missing number is "not recorded", not zero.
+    legacy:
+      total_count: "{count, plural, one {# reaction in total.} other {# reactions in total.}}"
+      total_title: Total reactions on the old board
+      total_title_with: "Total reactions on the old board: {summary}"
+      explainer: The old board recorded which reactions a post drew and the total, but not who left them — so these are shown as history rather than as reactors.
+
+    reactors:
+      empty: Nobody has reacted to this post yet.
+
+    error:
+      save_failed: Could not save that reaction.
+
+    # ── "Most reacted in this thread" panel ─────────────────────────────────
+    thread:
+      open: Most reacted…
+      title: Most reacted in this thread
+      filter_label: filter
+      filter_all: all
+      chip_title: "{name} — {count} here"
+      chip_title_legacy: "{name} — {count} here, {legacy, plural, one {# imported post} other {# imported posts}}"
+      row_native: "{count} here"
+      row_both: "{count} here · {legacy} imported"
+      empty: No reactions in this thread yet.
+
+    # ── The leaderboard ─────────────────────────────────────────────────────
+    board:
+      tab_received: Most reacted
+      tab_given: Most generous
+      tab_posts: Top posts
+      period_day: 24h
+      period_week: week
+      period_month: month
+      period_all: all time
+      # {total} and {points} arrive pre-formatted from window.lmxI18n.num();
+      # {count} is the raw number and only drives the plural arm. This is the
+      # shape core itself uses (core.forum.post_scrubber.viewing_text).
+      user_stats: "{count, plural, one {{total} reaction} other {{total} reactions}} · {points} pts"
+      post_total_split: "{total} ({native} here, {legacy} imported)"
+      all_time_note: All-time counts native reactions only — the imported board recorded which reactions a post drew but never who left them.
+
+    # ── Catalogue display names ─────────────────────────────────────────────
+    # NOT WIRED YET — see locale/i18n-map.json → deferred.catalogue_display.
+    # `reactions.display` is an admin-editable column, so a key must never win
+    # over a rename an admin made on the catalogue screen. Shipped now so the
+    # wiring is a one-line change when that precedence question is settled.
+    #
+    # The looksmaxing slang (JFL, WTF, Based, Chad, Ascend) is left in English
+    # on purpose: Spanish-language looksmaxing communities use those words
+    # untranslated, and "Basado" would read as a machine translation.
+    reaction:
+      happy: Happy
+      chrigga: Chrigga
+      angry: Angry
+      sad: Sad
+      surprised: Surprised
+      thinking: Thinking
+      nerd: Nerd
+      devil: Devil
+      angel: Angel
+      rich: Rich
+      chrishammed: Chrishammed
+      neutral: Neutral
+      error: Error
+      plus1: "+1"
+      jfl: JFL
+      love: Love it
+      hmm: Hmm...
+      sosad: So Sad
+      woah: Woah
+      ugh: Ugh..
+      wtf: WTF
+      geek: Nerd
+      based: Based
+      dead: Dead
+      brain: Brain
+      chad: Chad
+      clown: Clown
+      ascend: Ascend
+      blessed: Blessed
+      ice: Ice
+      eyes: Eyes
+
+  admin:
+    loading: Loading…
+
+    settings:
+      title: Reactions
+      self_react: Allow reacting to your own posts
+      max_per_post: Maximum reactions one user may leave on one post
+      rate_burst: Reactions allowed per minute (abuse limit)
+      rate_hourly: Reactions allowed per hour (abuse limit)
+      strip_size: Reaction icon size in the post footer (px)
+
+    permissions:
+      react: React to posts
+      see_reactors: See who reacted
+
+    catalogue:
+      title: Reaction catalogue
+      summary: "{count, plural, one {# reaction} other {# reactions}}, {enabled} enabled. Order here is the order in the picker and in the post strip."
+      points: "{points} pts"
+      enabled: Enabled
+      disabled: Disabled
+      # The ↑ / ↓ buttons carry no text at all today; these become their
+      # title and aria-label.
+      move_up: Move up
+      move_down: Move down
+
+    error:
+      # Returned on DELETE of a reaction that has rows. Deleting cascades, so
+      # the refusal has to say what to do instead.
+      in_use_hint: disable it instead; deleting would cascade these rows away

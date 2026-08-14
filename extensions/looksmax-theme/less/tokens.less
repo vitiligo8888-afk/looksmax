@@ -1,0 +1,452 @@
+// Design tokens — the only file in this theme that owns a literal value.
+//
+// Everything downstream resolves to var(--token). Two reasons the indirection
+// earns its keep:
+//
+//   1. it is configurable at runtime. Custom properties can be retargeted from
+//      the admin panel, a user preference or a data attribute on <html> without
+//      recompiling LESS, which a compile-time @variable cannot do. The light
+//      scheme and the three density/decor modes at the bottom are the proof.
+//   2. it makes the system legible. One place answers "what is our accent" and
+//      "what layer does a dropdown sit on", and a component that reaches past
+//      these tokens is visibly wrong in review.
+//
+// Compile-time LESS variables exist only where colour maths is needed (fade(),
+// which custom properties cannot express) and are defined FROM the same source
+// numbers, so the two cannot drift.
+//
+// CONTRAST: every text token below is checked against every surface token it
+// can legally sit on by e2e/visual/sweep.ts, which walks the rendered page and
+// fails the build under WCAG AA. The numbers in the comments are measured, not
+// asserted. Do not darken a text token without re-running that sweep.
+//
+// LESS PORT WARNING: Flarum compiles with the PHP port of LESS, which does not
+// implement each() or range(). Using them fails SILENTLY — forum.css is never
+// written while forum.js still builds. Never use them here.
+
+// ---- source palette (compile-time, for colour maths only) ------------------
+//
+// THE HOUSE COLOUR IS VIOLET. Changed 2026-08-13 from warm gold on cool
+// near-black, because the operator asked for "the purple palette and shit" and
+// a token rename would not have been that: the surfaces move with it. Every
+// value below is COPIED from looksmax-brand/less/brand.less, which is generated
+// by looksmax-brand/tools/palette.py and which measures every pair it emits.
+// The duplication is deliberate and one-directional — LESS colour functions
+// (fade/darken/lighten) are evaluated at COMPILE time and cannot read a custom
+// property, so the maths needs literals. If you change one, regenerate the
+// other with `python3 tools/palette.py --write` and copy it across; the sweep
+// in e2e/visual/sweep.ts measures the result either way.
+//
+// The surface ramp rises in LIGHTNESS AND CHROMA together, so elevation still
+// reads when the lightness difference is flattened (OLED, forced-colors). All
+// measured ratios in the comments come from that script or from
+// e2e/visual/sweep.ts, never from estimation.
+@c-bg:         #0a0911;   // the page
+@c-surface-0:  #050409;   // wells, insets, code — the only thing BELOW the page
+@c-surface-1:  #171429;   // cards, posts, list rows        1.10:1 vs --bg
+@c-surface-2:  #1f1b30;   // raised: inputs, chips          1.11:1 vs surface-1
+@c-surface-3:  #2b2542;   // hover / pressed                1.16:1 vs surface-2
+// A card cannot be identified by fill at 1.10:1. It never is here: every card
+// carries this hairline AND an elevation, and the sweep asserts both, because
+// "the post tiles can't be seen" was a real operator report caused by relying
+// on fill alone. 1.75:1 against a card is a line you can see and not a box you
+// have to look at.
+@c-line:       #443a66;
+@c-line-strong:#7d7a90;   // 4.33:1 on surface-1 — control boundaries (1.4.11 wants 3:1)
+@c-ink:        #f0eff4;
+@c-ink-dim:    #b6b4be;
+@c-ink-faint:  #9896a3;
+@c-accent:     #9b7dfb;   // violet 500 — the house colour
+@c-accent-2:   #4ecee5;   // cyan 500, secondary / links
+// Gold is NOT deleted. It was the brand for a day and it is what the source
+// board's whole cosmetic economy is denominated in — VIP, gold laurel frames,
+// the Gold rank, the credit balance. Demoting it to a third, semantic accent
+// ("this costs money / this is earned status") is what lets violet lead without
+// throwing away a signal the audience already reads.
+@c-gold:       #e8c07d;
+@c-ok:         #6dd88e;
+@c-warn:       #ffb346;
+@c-danger:     #f75d59;
+// Kept as a name because ~40 rules across five extensions already say
+// var(--purple). It is now the same colour as the accent by definition rather
+// than a near-miss third violet sitting next to it, which is what it was.
+@c-purple:     @c-accent;
+
+:root {
+  // ======================================================== surfaces
+  // Measured separation from --bg is 1.18:1 for surface-1. A card is therefore
+  // never identified by fill alone: every card also carries a --line border and
+  // an elevation. The sweep asserts both, because "the post tiles can't be
+  // seen" was a real bug caused by relying on fill alone.
+  --bg: @c-bg;
+  --surface-0: @c-surface-0;      // wells, insets, code blocks
+  --surface-1: @c-surface-1;      // cards, posts, list rows
+  --surface-2: @c-surface-2;      // raised: inputs, chips, nested blocks
+  --surface-3: @c-surface-3;      // hover / pressed
+  --line: @c-line;                // decorative hairline
+  --line-soft: fade(@c-line, 60%);
+  --line-strong: @c-line-strong;  // 3.6:1 on surface-1 — control boundaries
+  --scrim: fade(#05070b, 72%);
+
+  // ======================================================== text
+  // vs --bg / --surface-1 / --surface-2 / --surface-3
+  --ink: @c-ink;                  // 17.3 / 15.7 / 14.2 / 12.2
+  --ink-dim: @c-ink-dim;          //  9.7 /  8.8 /  7.9 /  6.8
+  --ink-faint: @c-ink-faint;      //  6.8 /  6.2 /  5.6 /  4.8
+  --ink-on-accent: #030306;       //  6.6 on --accent
+  --ink-on-light: #0a0911;        // for avatars and coloured chips
+
+  // ======================================================== brand
+  --accent: @c-accent;            //  6.3 /  5.8 /  5.2 /  4.7
+  --accent-ink: #030306;
+  --accent-2: @c-accent-2;        // 10.6 /  9.7 /  8.7 /  7.5
+  --ok: @c-ok;
+  --warn: @c-warn;
+  --danger: @c-danger;            //  6.3 /  5.7 /  5.1 /  4.6
+  --purple: @c-purple;            // === --accent; see the source palette note
+  // The status/economy accent. Deliberately NOT --accent-2: a credit balance
+  // and a link are different kinds of thing and must not share a colour.
+  --gold: @c-gold;                // 11.6 / 10.5 /  9.5 /  8.2
+  --gold-ink: #241a06;            // dark ink for a filled gold chip
+  // A deep violet PLATE — a fill that carries light ink, for surfaces that must
+  // read as "ours" without becoming a button. The 500 cannot do this job: light
+  // ink on it measures 2.6:1. The 700 measures 5.0:1 and is what section
+  // headers, the hero plate and active nav use.
+  --accent-deep: #6e54bd;
+  --accent-deep-ink: @c-ink;      //  5.0 on --accent-deep
+  --accent-hi: #ccc3ff;           // violet 400 — hover/active text on dark
+
+  // tints, precomputed because rgba() of a var() is not expressible in css
+  --accent-a06: fade(@c-accent, 6%);
+  --accent-a08: fade(@c-accent, 8%);
+  --accent-a14: fade(@c-accent, 14%);
+  --accent-a22: fade(@c-accent, 22%);
+  --accent-a28: fade(@c-accent, 28%);
+  --accent-a45: fade(@c-accent, 45%);
+  --accent-a70: fade(@c-accent, 70%);
+  --accent-2-a10: fade(@c-accent-2, 10%);
+  --accent-2-a22: fade(@c-accent-2, 22%);
+  --accent-2-a30: fade(@c-accent-2, 30%);
+  --accent-2-a55: fade(@c-accent-2, 55%);
+  --ok-a14: fade(@c-ok, 14%);
+  --danger-a14: fade(@c-danger, 14%);
+  --danger-a45: fade(@c-danger, 45%);
+  --purple-a14: fade(@c-purple, 14%);
+  --gold-a10: fade(@c-gold, 10%);
+  --gold-a18: fade(@c-gold, 18%);
+  --gold-a35: fade(@c-gold, 35%);
+  --accent-deep-a30: fade(#6e54bd, 30%);
+  --white-a03: fade(#fff, 3%);
+  --white-a04: fade(#fff, 4%);
+  --white-a06: fade(#fff, 6%);
+  --white-a10: fade(#fff, 10%);
+  --black-a25: fade(#000, 25%);
+  --black-a40: fade(#000, 40%);
+  --black-a60: fade(#000, 60%);
+
+  // ======================================================== layers
+  // ONE stacking scale for the whole forum. Flarum core already ships
+  // --zindex-* custom properties, so rather than inventing a parallel ladder
+  // that fights it, ours is the source and core's are re-pointed at it below.
+  // A component that writes a bare integer z-index is a bug: it has opted out
+  // of the ladder and will eventually paint through something.
+  //
+  // The failure this replaces: a blanket rule gave .App-header and .App-content
+  // the same z-index:1, so post images painted over the sticky header purely by
+  // DOM order. Nothing about that was visible in the LESS.
+  --z-behind: -1;      // background decor, below all content
+  --z-base: 0;         // default flow
+  --z-raised: 10;      // hovered/active cards, focus rings that must clear siblings
+  --z-sticky: 100;     // in-page sticky: scrubber rail, sticky filters
+  --z-header: 1000;    // the app header — nothing from content may exceed this
+  --z-pane: 1010;
+  --z-composer: 1020;
+  --z-dropdown: 1030;
+  --z-overlay: 1040;   // modal backdrop
+  --z-modal: 1050;
+  --z-toast: 1060;
+  --z-tooltip: 1070;
+  --z-skip: 2000;      // skip-to-content link, must clear everything
+
+  // core's ladder, re-pointed so there is exactly one scale in the document
+  --zindex-header: var(--z-header);
+  --zindex-pane: var(--z-pane);
+  --zindex-composer: var(--z-composer);
+  --zindex-dropdown: var(--z-dropdown);
+  --zindex-modal-background: var(--z-overlay);
+  --zindex-modal: var(--z-modal);
+  --zindex-alerts: var(--z-toast);
+  --zindex-tooltip: var(--z-tooltip);
+
+  // ======================================================== radii
+  --r-xs: 4px;
+  --r-sm: 7px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  // ======================================================== elevation
+  // Dark UIs read depth from a top highlight plus a wide soft shadow, not from
+  // a heavy drop shadow.
+  --e-0: 0 0 0 1px fade(#000, 0%);
+  --e-1: 0 1px 0 fade(#fff, 4%) inset, 0 1px 2px fade(#000, 35%);
+  --e-2: 0 1px 0 fade(#fff, 5%) inset, 0 8px 22px -14px fade(#000, 80%);
+  --e-3: 0 1px 0 fade(#fff, 6%) inset, 0 20px 44px -22px fade(#000, 88%);
+  --e-4: 0 1px 0 fade(#fff, 7%) inset, 0 34px 70px -28px fade(#000, 92%);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-a70);
+  --ring-danger: 0 0 0 2px var(--bg), 0 0 0 4px var(--danger-a45);
+
+  // ======================================================== motion
+  // Anything longer than --t-slow on a repeated interaction feels slow, and a
+  // forum is all repeat use.
+  --t-fast: 110ms;
+  --t-base: 170ms;
+  --t-slow: 260ms;
+  --t-lazy: 420ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  // ======================================================== type
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --fs-xs: 11px;
+  --fs-sm: 12.5px;
+  --fs-md: 14px;
+  --fs-lg: 15.5px;
+  --fs-xl: 19px;
+  --fs-2xl: 24px;
+  --fs-3xl: 31px;
+  --lh: 1.55;
+  --lh-tight: 1.3;
+
+  // ======================================================== layout
+  //
+  // COMPACTED 2026-08-13. Operator: "the compaction" — more information per
+  // screen. The old values were the `roomy` density wearing the default's name.
+  // Measured on /all at 1440x900 before and after: 8 discussion rows in the
+  // first viewport, then 12. Nothing here changes a font size; the air went,
+  // the type did not shrink.
+  --gap-xs: 4px;
+  --gap-sm: 6px;
+  --gap: 10px;
+  --gap-lg: 16px;
+  --pad-sm: 8px;
+  --pad: 12px;
+  --pad-lg: 16px;
+
+  // ---- the horizontal budget ------------------------------------------------
+  // Measured before this existed: a 1100px container at viewport 1920 left
+  // 820px — 43% of the width — as empty margin, with no left rail at all.
+  // Operator: "on desktop you're not utilizing horizontal space correctly".
+  //
+  //   --shell      single-column pages (a discussion body, settings)
+  //   --shell-wide the three-column shell: left rail + content + right rail
+  //   --rail-*     the two rails; content takes the rest, so the CONTENT column
+  //                grows with the viewport instead of the margins growing.
+  --shell: 1240px;
+  --shell-wide: 1660px;
+  --rail-left: 232px;
+  --rail-right: 316px;
+  --card-radius: var(--r-lg);
+
+  // ======================================================== decor
+  // The background system. Every knob a deployment might want to turn without
+  // recompiling lives here; base.less only reads them.
+  --decor-opacity: 1;
+  --decor-blur: 90px;
+  --decor-a: var(--accent-a22);        // warm field, top-left
+  --decor-b: var(--accent-2-a22);      // cool field, bottom-right
+  --decor-c: var(--purple-a14);        // third field, mid-right
+  --decor-speed-a: 52s;
+  --decor-speed-b: 68s;
+  --decor-speed-c: 84s;
+  --decor-grid: fade(#8ea3c4, 5%);     // hairline grid over the page
+  --decor-grid-size: 46px;
+  --decor-noise-opacity: 0.028;
+  --decor-vignette: 0.55;
+
+  // ======================================================== core re-point
+  // Flarum core components we never touch read these. Setting them from our
+  // tokens fixes contrast across the whole surface at once instead of chasing
+  // core selectors one at a time — which is how --muted-color at #6c7c93
+  // (4.45:1, just under AA) reached production on eight different components.
+  --body-bg: var(--surface-1);
+  --body-bg-shaded: var(--bg);
+  --body-bg-light: var(--surface-2);
+  --body-bg-faded: fade(@c-surface-1, 94%);
+  --text-color: var(--ink);
+  --heading-color: var(--ink);
+  --link-color: var(--accent-2);
+  --muted-color: var(--ink-faint);
+  --muted-color-light: var(--ink-dim);
+  --muted-color-dark: var(--ink-faint);
+  --shadow-color: fade(#000, 60%);
+  --control-bg: var(--surface-2);
+  --control-bg-light: var(--surface-3);
+  --control-bg-shaded: var(--surface-1);
+  --control-color: var(--ink-dim);
+  --text-on-dark: var(--ink);
+  --text-on-light: var(--ink-on-light);
+  --header-bg: transparent;
+  --header-color: var(--ink);
+  --header-control-bg: transparent;
+  --header-control-color: var(--ink-dim);
+  --header-colored-color: var(--ink);
+  --header-colored-control-color: var(--ink-dim);
+  --header-colored-control-bg: var(--white-a06);
+  --header-colored-control-bg-shaded: var(--white-a10);
+  --header-colored-control-bg-fadedin: var(--white-a06);
+  --overlay-bg: var(--scrim);
+  --code-bg: var(--surface-0);
+  --code-color: var(--ink);
+  --tooltip-bg: @c-surface-3;
+  --tooltip-color: var(--ink);
+  --hero-bg: transparent;
+  --hero-color: var(--ink-dim);
+  // core paints the letter of a generated avatar in #fff over a light pastel
+  // background it generates itself: 1.76:1, unreadable. Dark ink over the same
+  // pastel measures 10.6:1, and the fallback surface is forced light to match.
+  --avatar-bg: #c3ceda;
+  --usercard-bg: var(--surface-2);
+  --badge-bg: var(--surface-3);
+  --badge-color: var(--ink);
+  --badge-hidden-bg: var(--surface-3);
+  --error-color: var(--danger);
+  --validation-error-color: var(--danger);
+  --alert-bg: var(--surface-2);
+  --alert-color: var(--ink);
+  --alert-error-bg: fade(@c-danger, 16%);
+  --alert-error-color: var(--danger);
+  --alert-success-bg: fade(@c-ok, 16%);
+  --alert-success-color: var(--ok);
+  --discussion-title-color: var(--ink);
+  --discussion-list-item-bg-hover: var(--surface-2);
+  --online-user-circle-color: var(--ok);
+  --border-radius: var(--r-sm);
+  --button-color: var(--ink);
+  --button-bg: var(--surface-2);
+  --button-bg-hover: var(--surface-3);
+  --button-bg-active: var(--surface-3);
+  --button-bg-disabled: var(--surface-1);
+  --button-primary-color: var(--accent-ink);
+  --button-primary-bg: var(--accent);
+  // Hover goes LIGHTER, not darker, and the ink stays dark. That direction is
+  // not taste: the previous theme's `.Button:hover` (0,2,0) beat
+  // `.Button--primary` (0,1,0) and repainted the primary button grey-on-grey on
+  // hover — the gate that catches it now samples the HOVER state, and this pair
+  // measures 8.9:1 against #030306 where the resting pair measures 6.6:1.
+  --button-primary-bg-hover: lighten(@c-accent, 9%);
+  --button-primary-bg-active: darken(@c-accent, 6%);
+  --button-primary-bg-disabled: fade(@c-accent, 40%);
+  --button-inverted-color: var(--ink-dim);
+  --button-inverted-bg: transparent;
+  --button-inverted-bg-hover: var(--white-a06);
+  --button-inverted-bg-active: var(--white-a10);
+  --button-inverted-bg-disabled: transparent;
+  --control-danger-color: var(--danger);
+  --control-danger-bg: fade(@c-danger, 14%);
+  --control-danger-bg-hover: fade(@c-danger, 22%);
+  --control-danger-bg-active: fade(@c-danger, 28%);
+  --control-danger-bg-disabled: fade(@c-danger, 8%);
+  --muted-more-color: var(--ink-faint);
+  --muted-more-bg: var(--white-a04);
+  --muted-more-bg-hover: var(--white-a06);
+  --muted-more-bg-active: var(--white-a10);
+  --muted-more-bg-disabled: var(--white-a03);
+  --light-content-color: var(--ink);
+  --light-content-control-color: var(--ink);
+  --light-content-control-bg: var(--white-a06);
+  --light-content-control-bg-shaded: var(--white-a10);
+  --light-content-control-bg-fadedin: var(--white-a06);
+  --header-height: 56px;
+  --header-height-phone: 52px;
+  --sticky-bg: var(--danger);
+  --following-bg: var(--accent-a22);
+  --following-color: var(--accent);
+  --ignoring-bg: var(--surface-3);
+  --lock-color: var(--ink-faint);
+}
+
+// ---------------------------------------------------------------- schemes
+// A light scheme costs almost nothing once everything is tokenised, and it is
+// the proof that the indirection works: not one component below changes.
+:root[data-scheme='light'] {
+  --bg: #eeecf4;
+  --surface-0: #e3e0ec;
+  --surface-1: #ffffff;
+  --surface-2: #f4f2f9;
+  --surface-3: #e7e3f1;
+  --line: #d8d3e4;
+  --line-strong: #7b7590;
+  --scrim: fade(#1a1430, 55%);
+  --ink: #100d1c;
+  --ink-dim: #4a4560;
+  --ink-faint: #625c78;
+  // The 500 violet is a DARK-scheme colour: on white it measures 2.5:1. This is
+  // violet 700, 5.7:1 on --surface-1 and 5.2:1 on --surface-2, so it is legible
+  // as body-weight link text and not only as a heading.
+  --accent: #6e54bd;
+  --accent-hi: #4a3289;
+  --accent-deep: #4a3289;
+  --accent-deep-ink: #ffffff;
+  --accent-2: #016a79;       // cyan 500 is 1.9:1 on white; this is the 800, 6.3:1
+  --gold: #8a5a06;           // 5.9:1 — the dark-scheme gold is 1.4:1 here
+  --gold-ink: #ffffff;
+  --ok: #17703a;
+  --warn: #8a5a06;
+  --danger: #b3243f;
+  --purple: #6e54bd;
+  --accent-ink: #ffffff;
+  --ink-on-accent: #ffffff;
+  --avatar-bg: #33405a;
+  --ink-on-light: #ffffff;
+  --e-1: 0 1px 2px fade(#1a2230, 12%);
+  --e-2: 0 6px 18px -10px fade(#1a2230, 30%);
+  --e-3: 0 18px 40px -18px fade(#1a2230, 34%);
+  --e-4: 0 30px 64px -24px fade(#1a2230, 36%);
+  --decor-grid: fade(#33405a, 6%);
+  --decor-noise-opacity: 0.02;
+  --decor-vignette: 0.18;
+  --text-on-dark: #ffffff;
+}
+
+// ---------------------------------------------------------------- density
+// Set data-density on <html> to retarget row and card rhythm forum-wide. The
+// source board is dense; not every deployment wants that.
+// Re-based after the default was compacted: `compact` has to stay tighter than
+// the new default or the mode does nothing, and `roomy` is now what the default
+// used to be, so the airy layout is still one attribute away for anyone who
+// wants it back.
+:root[data-density='compact'] {
+  --pad-sm: 6px;
+  --pad: 9px;
+  --pad-lg: 12px;
+  --gap-sm: 5px;
+  --gap: 8px;
+  --gap-lg: 12px;
+  --fs-md: 13.5px;
+  --lh: 1.45;
+}
+
+:root[data-density='roomy'] {
+  --pad-sm: 13px;
+  --pad: 20px;
+  --pad-lg: 30px;
+  --gap: 18px;
+  --lh: 1.65;
+}
+
+// ---------------------------------------------------------------- decor modes
+:root[data-decor='off'] {
+  --decor-opacity: 0;
+  --decor-grid: transparent;
+  --decor-noise-opacity: 0;
+  --decor-vignette: 0;
+}
+
+:root[data-decor='subtle'] {
+  --decor-opacity: 0.45;
+  --decor-noise-opacity: 0.018;
+  --decor-vignette: 0.3;
+}

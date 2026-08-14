@@ -1,0 +1,615 @@
+{
+  "extension": "looksmax-search",
+  "prefix": "local-looksmax-search",
+  "format_note": "Matching is by content, not by line. Every `find` occurs exactly once in the pre-patch file AND zero times after its own replacement, so applying this map twice is a no-op rather than a duplication — verified mechanically, not asserted.",
+  "replacements": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 144,
+      "find": "  function timeAgo(unix) {\n    if (!unix) return '';\n    var s = Math.max(0, Date.now() / 1000 - unix);\n    var u = [[31536000, 'y'], [2592000, 'mo'], [604800, 'w'], [86400, 'd'], [3600, 'h'], [60, 'm']];\n    for (var i = 0; i < u.length; i++) {\n      if (s >= u[i][0]) return Math.floor(s / u[i][0]) + u[i][1];\n    }\n    return 'now';\n  }\n\n  function num(n) {\n    if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';\n    if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'k';\n    return String(n || 0);\n  }",
+      "replace": "  /*\n   * i18n.\n   *\n   * This file is injected into <head> and runs before Flarum boots, so the\n   * translator cannot be captured at eval time — every call resolves it fresh.\n   * `window.lmxI18n.t` records a miss so the i18n gate can fail the deploy on a\n   * raw key reaching the screen, while the English fallback keeps this surface\n   * readable if looksmax-i18n is not loaded at all.\n   */\n  var NS = 'local-looksmax-search.';\n  function tr(key, params, fallback) {\n    var k = NS + key;\n    try {\n      if (window.lmxI18n) return window.lmxI18n.t(k, params || {}, fallback);\n      var s = window.flarum.core.app.translator.trans(k, params || {});\n      if (typeof s === 'string' && s !== k) return s;\n      if (s && typeof s.join === 'function') return s.join('');\n    } catch (e) {}\n    return fallback == null ? k : fallback;\n  }\n\n  // \"hace 3 horas\", not \"3h\". Unix SECONDS in, so scale to ms for Intl.\n  function timeAgo(unix) {\n    if (!unix) return '';\n    try { if (window.lmxI18n) return window.lmxI18n.rel(unix * 1000); } catch (e) {}\n    var s = Math.max(0, Date.now() / 1000 - unix);\n    var u = [[31536000, 'y'], [2592000, 'mo'], [604800, 'w'], [86400, 'd'], [3600, 'h'], [60, 'm']];\n    for (var i = 0; i < u.length; i++) {\n      if (s >= u[i][0]) return Math.floor(s / u[i][0]) + u[i][1];\n    }\n    return 'now';\n  }\n\n  // \"12.4K\" / \"12,4 mil\". The k/M suffixes below are English; Intl's are not.\n  function num(n) {\n    var x = Number(n);\n    if (!isFinite(x)) x = 0;\n    try { if (window.lmxI18n) return window.lmxI18n.compact(x); } catch (e) {}\n    if (x >= 1000000) return (x / 1000000).toFixed(1).replace('.0', '') + 'M';\n    if (x >= 1000) return (x / 1000).toFixed(1).replace('.0', '') + 'k';\n    return String(x || 0);\n  }\n\n  // Exact and grouped: \"12,431\" / \"12.431\". For a figure that must not round.\n  function nnum(n) {\n    var x = Number(n);\n    if (!isFinite(x)) x = 0;\n    try { if (window.lmxI18n) return window.lmxI18n.num(x); } catch (e) {}\n    return String(x);\n  }",
+      "key": "(helpers)",
+      "note": "Installs t() and routes every count and every relative time through window.lmxI18n. num()/timeAgo() are the single funnel for both in this file, so replacing their bodies localises every call site at once. Both keep their original body as an offline fallback. The helper is tr(), not t(): three callbacks in this file already bind `t`."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 215,
+      "find": "      if (hit.commentCount) meta.push(el('span', {}, [num(hit.commentCount) + ' replies']));",
+      "replace": "      if (hit.commentCount) meta.push(el('span', {}, [tr('forum.hit.replies', { count: hit.commentCount, n: num(hit.commentCount) }, num(hit.commentCount) + ' replies')]));",
+      "key": "forum.hit.replies"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 217,
+      "find": "      if (hit.views) meta.push(el('span', {}, [num(hit.views) + ' views']));",
+      "replace": "      if (hit.views) meta.push(el('span', {}, [tr('forum.hit.views', { count: hit.views, n: num(hit.views) }, num(hit.views) + ' views')]));",
+      "key": "forum.hit.views"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 219,
+      "find": "      if (hit.postsCount) meta.push(el('span', {}, [num(hit.postsCount) + ' posts']));",
+      "replace": "      if (hit.postsCount) meta.push(el('span', {}, [tr('forum.hit.posts', { count: hit.postsCount, n: num(hit.postsCount) }, num(hit.postsCount) + ' posts')]));",
+      "key": "forum.hit.posts"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 222,
+      "find": "      meta.push(el('span', {}, [num(hit.discussionCount) + ' threads']));",
+      "replace": "      meta.push(el('span', {}, [tr('forum.hit.threads', { count: hit.discussionCount || 0, n: num(hit.discussionCount) }, num(hit.discussionCount) + ' threads')]));",
+      "key": "forum.hit.threads"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 236,
+      "find": "      el('div', { class: 'lmx-r-head' }, [icon(hit.type)].concat([titleEl]).concat(\n        hit.isSticky ? [el('span', { class: 'lmx-pin' }, ['pinned'])] : []\n      ).concat(hit.isLocked ? [el('span', { class: 'lmx-pin' }, ['locked'])] : [])),",
+      "replace": "      el('div', { class: 'lmx-r-head' }, [icon(hit.type)].concat([titleEl]).concat(\n        hit.isSticky ? [el('span', { class: 'lmx-pin' }, [tr('forum.hit.pinned', {}, 'pinned')])] : []\n      ).concat(hit.isLocked ? [el('span', { class: 'lmx-pin' }, [tr('forum.hit.locked', {}, 'locked')])] : [])),",
+      "key": "forum.hit.pinned / forum.hit.locked"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 251,
+      "find": "        el('span', { class: 'lmx-r-inpost-label' }, ['matched in reply by ' + (hit.matchedPost.author || '?') + ':']),",
+      "replace": "        el('span', { class: 'lmx-r-inpost-label' }, [tr('forum.hit.matched_in_reply', { author: hit.matchedPost.author || '?' }, 'matched in reply by ' + (hit.matchedPost.author || '?') + ':')]),",
+      "key": "forum.hit.matched_in_reply"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 289,
+      "find": "      placeholder: 'Search threads, posts, people…   try  tag:looksmaxing  by:name  after:2023',\n      'aria-label': 'Search',",
+      "replace": "      placeholder: tr('forum.palette.placeholder', {}, 'Search threads, posts, people…   try  tag:looksmaxing  by:name  after:2023'),\n      'aria-label': tr('forum.palette.aria_label', {}, 'Search'),",
+      "key": "forum.palette.placeholder / forum.palette.aria_label",
+      "note": "The tag:/by:/after: operators are parsed server-side in English and are NOT translated; only the surrounding prose and the example values are."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 294,
+      "find": "    var box = el('div', { class: 'lmx-p-box', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Search' }, [",
+      "replace": "    var box = el('div', { class: 'lmx-p-box', role: 'dialog', 'aria-modal': 'true', 'aria-label': tr('forum.palette.dialog_label', {}, 'Search') }, [",
+      "key": "forum.palette.dialog_label"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 308,
+      "find": "          results.appendChild(el('div', { class: 'lmx-p-empty' }, [\n            el('div', {}, ['No matches for “' + input.value.trim() + '”']),\n            el('button', {\n              class: 'lmx-p-cta',\n              onclick: function () { go(input.value); },\n            }, ['Open full search →']),\n          ]));",
+      "replace": "          results.appendChild(el('div', { class: 'lmx-p-empty' }, [\n            el('div', {}, [tr('forum.palette.no_matches', { query: input.value.trim() }, 'No matches for “' + input.value.trim() + '”')]),\n            el('button', {\n              class: 'lmx-p-cta',\n              onclick: function () { go(input.value); },\n            }, [tr('forum.palette.open_full', {}, 'Open full search →')]),\n          ]));",
+      "key": "forum.palette.no_matches / forum.palette.open_full"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 318,
+      "find": "            results.appendChild(el('div', { class: 'lmx-p-group' }, ['Recent']));",
+      "replace": "            results.appendChild(el('div', { class: 'lmx-p-group' }, [tr('forum.palette.recent', {}, 'Recent')]));",
+      "key": "forum.palette.recent"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 337,
+      "find": "        results.appendChild(el('div', { class: 'lmx-p-group' }, [\n          { discussions: 'Threads', posts: 'Posts', users: 'People', tags: 'Forums' }[g.kind] || g.kind,\n        ]));",
+      "replace": "        results.appendChild(el('div', { class: 'lmx-p-group' }, [\n          tr('forum.groups.' + g.kind, {}, { discussions: 'Threads', posts: 'Posts', users: 'People', tags: 'Forums' }[g.kind] || g.kind),\n        ]));",
+      "key": "forum.groups.*",
+      "note": "g.kind is one of discussions/posts/users/tags — a closed set fixed by SearchController::ALLOWED, so the dynamic key suffix cannot miss."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 346,
+      "find": "      var all = el('button', { class: 'lmx-p-cta', onclick: function () { go(input.value); } },\n        ['See all results for “' + input.value.trim() + '”']);",
+      "replace": "      var all = el('button', { class: 'lmx-p-cta', onclick: function () { go(input.value); } },\n        [tr('forum.palette.see_all', { query: input.value.trim() }, 'See all results for “' + input.value.trim() + '”')]);",
+      "key": "forum.palette.see_all"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 376,
+      "find": "          stat.textContent = d.degraded\n            ? 'search engine unavailable — showing nothing rather than something wrong'\n            : (d.engineMs != null ? 'engine ' + d.engineMs + ' ms · round trip ' + Math.round(d.totalMs) + ' ms' : '');",
+      "replace": "          stat.textContent = d.degraded\n            ? tr('forum.palette.unavailable', {}, 'search engine unavailable — showing nothing rather than something wrong')\n            : (d.engineMs != null ? tr('forum.palette.timing', { engine: nnum(d.engineMs), total: nnum(Math.round(d.totalMs)) }, 'engine ' + d.engineMs + ' ms · round trip ' + Math.round(d.totalMs) + ' ms') : '');",
+      "key": "forum.palette.unavailable / forum.palette.timing"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 382,
+      "find": "          stat.textContent = 'search failed: ' + e.message;",
+      "replace": "          stat.textContent = tr('forum.palette.failed', { error: e.message }, 'search failed: ' + e.message);",
+      "key": "forum.palette.failed"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 434,
+      "find": "    var wrap = el('aside', { class: 'lmx-facets', 'aria-label': 'Refine results' });",
+      "replace": "    var wrap = el('aside', { class: 'lmx-facets', 'aria-label': tr('forum.filters.panel_label', {}, 'Refine results') });",
+      "key": "forum.filters.panel_label"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 454,
+      "find": "  var SORTS = [\n    ['', 'Relevance'], ['new', 'Newest'], ['old', 'Oldest'],\n    ['top', 'Most reactions'], ['replies', 'Most replies'],\n    ['views', 'Most viewed'], ['active', 'Recently active'],\n  ];\n  var TYPES = [['all', 'Everything'], ['discussions', 'Threads'], ['posts', 'Posts'], ['users', 'People'], ['tags', 'Forums']];",
+      "replace": "  var SORTS = [\n    ['', 'relevance'], ['new', 'new'], ['old', 'old'],\n    ['top', 'top'], ['replies', 'replies'],\n    ['views', 'views'], ['active', 'active'],\n  ];\n  var TYPES = [['all', 'all'], ['discussions', 'discussions'], ['posts', 'posts'], ['users', 'users'], ['tags', 'tags']];",
+      "key": "forum.sort.* / forum.types.*",
+      "note": "The second element stops being a label and becomes a key suffix; the two render sites (lines ~508 and ~519) are patched to call tr() on it. The first element is the wire value that goes into the query string and is untouched."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 503,
+      "find": "    var tabs = el('div', { class: 'lmx-tabs', role: 'tablist' }, TYPES.map(function (t) {\n      return el('button', {\n        class: 'lmx-tab' + (PAGE.type === t[0] ? ' lmx-tab-on' : ''),\n        role: 'tab', 'aria-selected': PAGE.type === t[0] ? 'true' : 'false',\n        onclick: function () { PAGE.type = t[0]; PAGE.offset = 0; pushAndLoad(root); },\n      }, [t[1]]);\n    }));",
+      "replace": "    var tabs = el('div', { class: 'lmx-tabs', role: 'tablist' }, TYPES.map(function (t) {\n      return el('button', {\n        class: 'lmx-tab' + (PAGE.type === t[0] ? ' lmx-tab-on' : ''),\n        role: 'tab', 'aria-selected': PAGE.type === t[0] ? 'true' : 'false',\n        onclick: function () { PAGE.type = t[0]; PAGE.offset = 0; pushAndLoad(root); },\n      }, [tr('forum.types.' + t[1], {}, t[1])]);\n    }));",
+      "key": "forum.types.* (render)",
+      "note": "TYPES[i][1] stops being a label and becomes a key suffix. The helper is called tr(), not t(), precisely because three callbacks in this file already bind `t` (lines 225, 503, 560) and a shadowed translator would be a silent TypeError."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 466,
+      "find": "    var input = el('input', {\n      class: 'lmx-s-input', type: 'search', value: PAGE.q, autocomplete: 'off',\n      'aria-label': 'Search query',\n    });",
+      "replace": "    var input = el('input', {\n      class: 'lmx-s-input', type: 'search', value: PAGE.q, autocomplete: 'off',\n      'aria-label': tr('forum.results.query_label', {}, 'Search query'),\n    });",
+      "key": "forum.results.query_label"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 478,
+      "find": "      }, [input, el('button', { class: 'lmx-s-go', type: 'submit' }, ['Search'])]),",
+      "replace": "      }, [input, el('button', { class: 'lmx-s-go', type: 'submit' }, [tr('forum.results.submit', {}, 'Search')])]),",
+      "key": "forum.results.submit"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 488,
+      "find": "      chips.push(el('button', {\n        class: 'lmx-chip', title: 'Remove this filter',\n        onclick: function () {\n          PAGE.q = PAGE.q.replace(token, '').replace(/\\s+/g, ' ').trim();\n          PAGE.offset = 0; pushAndLoad(root);\n        },\n      }, [label, el('span', { class: 'lmx-chip-x' }, ['×'])]));\n    }",
+      "replace": "      chips.push(el('button', {\n        class: 'lmx-chip', title: tr('forum.filters.remove', {}, 'Remove this filter'),\n        onclick: function () {\n          PAGE.q = PAGE.q.replace(token, '').replace(/\\s+/g, ' ').trim();\n          PAGE.offset = 0; pushAndLoad(root);\n        },\n      }, [label, el('span', { class: 'lmx-chip-x' }, ['×'])]));\n    }",
+      "key": "forum.filters.remove"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 496,
+      "find": "    (p.tags || []).forEach(function (t) { chip('forum: ' + t, 'tag:' + t); });\n    (p.prefixes || []).forEach(function (t) { chip('prefix: ' + t, 'prefix:' + t); });\n    (p.authors || []).forEach(function (t) { chip('by: ' + t, 'by:' + t); });\n    (p.langs || []).forEach(function (t) { chip('lang: ' + t, 'lang:' + t); });\n    (p.flags || []).forEach(function (t) { chip('is: ' + t, 'is:' + t); });",
+      "replace": "    (p.tags || []).forEach(function (x) { chip(tr('forum.filters.tag', { value: x }, 'forum: ' + x), 'tag:' + x); });\n    (p.prefixes || []).forEach(function (x) { chip(tr('forum.filters.prefix', { value: x }, 'prefix: ' + x), 'prefix:' + x); });\n    (p.authors || []).forEach(function (x) { chip(tr('forum.filters.author', { value: x }, 'by: ' + x), 'by:' + x); });\n    (p.langs || []).forEach(function (x) { chip(tr('forum.filters.lang', { value: x }, 'lang: ' + x), 'lang:' + x); });\n    (p.flags || []).forEach(function (x) { chip(tr('forum.filters.flag', { value: x }, 'is: ' + x), 'is:' + x); });",
+      "key": "forum.filters.tag|prefix|author|lang|flag",
+      "note": "The chip LABEL is translated; the token that goes back into the query string keeps the English operator, because the parser only understands the English one."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 511,
+      "find": "    var sortSel = el('select', {\n      class: 'lmx-sort', 'aria-label': 'Sort results',",
+      "replace": "    var sortSel = el('select', {\n      class: 'lmx-sort', 'aria-label': tr('forum.sort.label', {}, 'Sort results'),",
+      "key": "forum.sort.label"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 518,
+      "find": "    }, SORTS.map(function (s) {\n      return el('option', { value: s[0], selected: (p.sort || '') === s[0] ? 'selected' : null }, [s[1]]);\n    }));",
+      "replace": "    }, SORTS.map(function (s) {\n      return el('option', { value: s[0], selected: (p.sort || '') === s[0] ? 'selected' : null }, [tr('forum.sort.' + s[1], {}, s[1])]);\n    }));",
+      "key": "forum.sort.* (render)"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 522,
+      "find": "    var total = d.estimatedTotalHits || 0;\n    var bar = el('div', { class: 'lmx-s-bar' }, [\n      el('span', { class: 'lmx-s-count' }, [\n        total ? num(total) + (total >= 1000 ? '+' : '') + ' result' + (total === 1 ? '' : 's') : 'No results',\n      ]),\n      d.engineMs != null ? el('span', { class: 'lmx-s-ms' }, ['engine ' + d.engineMs + ' ms · total ' + Math.round(d.totalMs) + ' ms']) : null,\n      d.degraded ? el('span', { class: 'lmx-s-degraded' }, ['degraded: database fallback']) : null,\n      el('span', { class: 'lmx-s-spacer' }),\n      sortSel,\n    ]);",
+      "replace": "    var total = d.estimatedTotalHits || 0;\n    var bar = el('div', { class: 'lmx-s-bar' }, [\n      el('span', { class: 'lmx-s-count' }, [\n        total\n          ? tr('forum.results.count', { count: total, n: nnum(total) + (total >= 1000 ? '+' : '') }, nnum(total) + (total >= 1000 ? '+' : '') + ' result' + (total === 1 ? '' : 's'))\n          : tr('forum.results.none', {}, 'No results'),\n      ]),\n      d.engineMs != null ? el('span', { class: 'lmx-s-ms' }, [tr('forum.results.timing', { engine: nnum(d.engineMs), total: nnum(Math.round(d.totalMs)) }, 'engine ' + d.engineMs + ' ms · total ' + Math.round(d.totalMs) + ' ms')]) : null,\n      d.degraded ? el('span', { class: 'lmx-s-degraded' }, [tr('forum.results.degraded', {}, 'degraded: database fallback')]) : null,\n      el('span', { class: 'lmx-s-spacer' }),\n      sortSel,\n    ]);",
+      "key": "forum.results.count / none / timing / degraded",
+      "note": "estimatedTotalHits is capped, hence the '+'. It is appended to the FORMATTED figure and passed in as {n}, so the ICU plural still selects on the raw count."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 545,
+      "find": "      var empty = el('div', { class: 'lmx-empty' }, [\n        el('h2', {}, ['Nothing matched “' + PAGE.q + '”']),\n      ]);",
+      "replace": "      var empty = el('div', { class: 'lmx-empty' }, [\n        el('h2', {}, [tr('forum.empty.heading', { query: PAGE.q }, 'Nothing matched “' + PAGE.q + '”')]),\n      ]);",
+      "key": "forum.empty.heading"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 552,
+      "find": "        }, [\n          el('span', { class: 'lmx-empty-label' }, ['Try ' + s.label]),\n          el('span', { class: 'lmx-empty-q' }, [s.query]),\n          el('span', { class: 'lmx-empty-n' }, [num(s.count) + ' results']),\n        ]));",
+      "replace": "        }, [\n          el('span', { class: 'lmx-empty-label' }, [tr('forum.empty.try', { label: s.label }, 'Try ' + s.label)]),\n          el('span', { class: 'lmx-empty-q' }, [s.query]),\n          el('span', { class: 'lmx-empty-n' }, [tr('forum.empty.count', { count: s.count || 0, n: num(s.count) }, num(s.count) + ' results')]),\n        ]));",
+      "key": "forum.empty.try / forum.empty.count",
+      "note": "s.label arrives already translated from Engine::recover."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 559,
+      "find": "        empty.appendChild(el('div', { class: 'lmx-empty-tags' }, [el('span', {}, ['Related forums: '])].concat(",
+      "replace": "        empty.appendChild(el('div', { class: 'lmx-empty-tags' }, [el('span', {}, [tr('forum.empty.related_forums', {}, 'Related forums: ')])].concat(",
+      "key": "forum.empty.related_forums"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 571,
+      "find": "      }, ['← Previous']));",
+      "replace": "      }, [tr('forum.results.prev', {}, '← Previous')]));",
+      "key": "forum.results.prev"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 577,
+      "find": "      }, ['Next →']));",
+      "replace": "      }, [tr('forum.results.next', {}, 'Next →')]));",
+      "key": "forum.results.next"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 612,
+      "find": "        root.appendChild(el('div', { class: 'lmx-error' }, ['Search failed: ' + e.message]));",
+      "replace": "        root.appendChild(el('div', { class: 'lmx-error' }, [tr('forum.results.failed', { error: e.message }, 'Search failed: ' + e.message)]));",
+      "key": "forum.results.failed"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 652,
+      "find": "    document.title = PAGE.q ? 'Search: ' + PAGE.q : 'Search';",
+      "replace": "    document.title = PAGE.q ? tr('forum.page.title_with_query', { query: PAGE.q }, 'Search: ' + PAGE.q) : tr('forum.page.title', {}, 'Search');",
+      "key": "forum.page.title / forum.page.title_with_query"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 690,
+      "find": "      el('h3', {}, ['Related threads']),",
+      "replace": "      el('h3', {}, [tr('forum.discovery.related', {}, 'Related threads')]),",
+      "key": "forum.discovery.related"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 707,
+      "find": "            el('span', { class: 'lmx-rel-meta' }, [num(h.commentCount) + ' replies · ' + timeAgo(h.lastPostAt)]),",
+      "replace": "            el('span', { class: 'lmx-rel-meta' }, [tr('forum.hit.related_meta', { count: h.commentCount || 0, n: num(h.commentCount), when: timeAgo(h.lastPostAt) }, num(h.commentCount) + ' replies · ' + timeAgo(h.lastPostAt))]),",
+      "key": "forum.hit.related_meta"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 737,
+      "find": "    if (!input.placeholder || /^search/i.test(input.placeholder)) {\n      input.placeholder = 'Search — press /';\n    }",
+      "replace": "    if (!input.placeholder || /^search/i.test(input.placeholder)) {\n      input.placeholder = tr('forum.header.placeholder', {}, 'Search — press /');\n    }",
+      "key": "forum.header.placeholder",
+      "note": "The /^search/i guard tests the placeholder core rendered, which is core's own translated string. In Spanish core renders 'Buscar…', which does not match, so the hint is not applied. Flagged rather than changed: widening the test is a behaviour change outside a string swap."
+    },
+    {
+      "file": "src/Search/Engine.php",
+      "line": 658,
+      "find": "                'label' => match ($field) {\n                    'tag_names' => 'Forum',\n                    'prefixes' => 'Prefix',\n                    'author' => 'Author',\n                    'lang' => 'Language',\n                    'group_names' => 'Group',\n                    default => ucfirst(str_replace('_', ' ', $field)),\n                },",
+      "replace": "                'label' => match ($field) {\n                    'tag_names', 'prefixes', 'author', 'lang', 'group_names' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)\n                        ->trans('local-looksmax-search.forum.facets.' . $field),\n                    default => ucfirst(str_replace('_', ' ', $field)),\n                },",
+      "key": "forum.facets.*",
+      "note": "These are the <h3> headings of the facet panel (js/dist/forum.js:448), so they are read on every results page. The audit excluded them as [identifier]; that is wrong. Engine has no translator injected and its constructor is shared, hence resolve()."
+    },
+    {
+      "file": "src/Search/Engine.php",
+      "line": 793,
+      "find": "            $probes[] = ['label' => 'without filters', 'query' => $bare, 'reason' => 'filters'];",
+      "replace": "            $probes[] = ['label' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-search.forum.recovery.without_filters'), 'query' => $bare, 'reason' => 'filters'];",
+      "key": "forum.recovery.without_filters"
+    },
+    {
+      "file": "src/Search/Engine.php",
+      "line": 799,
+      "find": "            $probes[] = ['label' => 'without exact phrase', 'query' => $loose, 'reason' => 'phrase'];",
+      "replace": "            $probes[] = ['label' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-search.forum.recovery.without_phrase'), 'query' => $loose, 'reason' => 'phrase'];",
+      "key": "forum.recovery.without_phrase"
+    },
+    {
+      "file": "src/Search/Engine.php",
+      "line": 809,
+      "find": "                $probes[] = ['label' => 'without \"' . $w . '\"', 'query' => implode(' ', $rest), 'reason' => 'term'];",
+      "replace": "                $probes[] = ['label' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-search.forum.recovery.without_word', ['word' => $w]), 'query' => implode(' ', $rest), 'reason' => 'term'];",
+      "key": "forum.recovery.without_word",
+      "note": "Missed by the audit: the literal is split by concatenation, so no single quoted span reads as prose. It renders as 'Try without \\\"jaw\\\"' on every zero-result page."
+    },
+    {
+      "file": "src/Listeners/RenderSearchPage.php",
+      "line": 41,
+      "find": "        $document->title = $q === '' ? 'Search' : 'Search: ' . $q;",
+      "replace": "        $document->title = $q === ''\n            ? resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-search.forum.page.title')\n            : resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)->trans('local-looksmax-search.forum.page.title_with_query', ['query' => $q]);",
+      "key": "forum.page.title / forum.page.title_with_query",
+      "note": "The server-rendered <title>. Same two keys the client sets on navigation (js/dist/forum.js:652), so the tab text does not change language when the SPA takes over."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 295,
+      "string": "esc",
+      "reason": "A keyboard legend inside <kbd>. The key is engraved Esc on a Spanish keyboard too, so translating it would be wrong, not merely unnecessary."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 494,
+      "string": "×",
+      "reason": "U+00D7 as the chip dismiss glyph. Not language. It has no accessible name either, which is a real defect but belongs to whoever owns accessibility."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 216,
+      "string": "♥ ",
+      "reason": "A glyph plus a figure; the figure is now localised through num(). No text to translate, and again no accessible name."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 774,
+      "string": "/^search/i.test(input.placeholder)",
+      "reason": "NOT a string, but a bug the translation EXPOSES and the one thing in this extension I could not fix inside a string swap. The header placeholder is only overwritten when core's own placeholder starts with 'search'. Once core renders in Spanish it is 'Buscar…', the guard fails, and forum.header.placeholder (“Busca — presiona /”) never appears — so the '/' shortcut becomes undiscoverable in exactly the language most readers use. The key is written and wired; widening the condition (match core's .Search-input element rather than its text) is a behaviour change and belongs to whoever owns the header."
+    },
+    {
+      "file": "src/Console",
+      "line": 0,
+      "string": "(every console command description, option help and output line)",
+      "reason": "`php flarum search:index|search:sync|search:status` are run by the operator over ssh, in one language, and their output is parsed by lmx-search-sync.service and by the deploy gate. Translating them would break both. The audit already excludes them as [cli] and that is the right call."
+    }
+  ],
+  "not_translatable": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 286,
+      "string": "matched in reply by ",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 344,
+      "string": "No matches for “",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 382,
+      "string": "See all results for “",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 413,
+      "string": " ms · round trip ",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 417,
+      "string": "search failed: ",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 583,
+      "string": "Nothing matched “",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 596,
+      "string": "Related forums: ",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 649,
+      "string": "Search failed: ",
+      "reason": "Not an independent string: it is a fragment of the ENGLISH FALLBACK argument of the tr(...) call on the same line, which exists so a half-deployed extension stays readable instead of printing a raw key. The user-visible text is the translation key beside it."
+    },
+    {
+      "file": "src/Api/SearchController.php",
+      "line": 69,
+      "string": "search: falling back to database",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Api/SearchController.php",
+      "line": 80,
+      "string": "search: recovery failed",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Api/SearchController.php",
+      "line": 142,
+      "string": "search: could not record query",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Search/Engine.php",
+      "line": 302,
+      "string": "search: engine failure",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Search/MeiliFulltextGambit.php",
+      "line": 72,
+      "string": "search gambit: engine unavailable, falling back to title match",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Listeners/QueueIndexChanges.php",
+      "line": 126,
+      "string": "search: failed to enqueue post",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Listeners/QueueIndexChanges.php",
+      "line": 152,
+      "string": "search: failed to enqueue discussion",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Listeners/QueueIndexChanges.php",
+      "line": 164,
+      "string": "search: failed to enqueue ",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Listeners/QueueIndexChanges.php",
+      "line": 198,
+      "string": "search: enqueue failed",
+      "reason": "Logger message. Goes to the log file and to `php flarum search:status`; no HTTP response, view or notification carries it. Translating it would make the logs locale-dependent, which is strictly worse for the operator."
+    },
+    {
+      "file": "src/Meili/Client.php",
+      "line": 86,
+      "string": "payload could not be encoded: ",
+      "reason": "MeiliException message. Every call site catches MeiliException and degrades (SearchController:68, Engine:301, FacetController:50), so the reader gets the `degraded` banner and this text reaches only the log and the CLI."
+    },
+    {
+      "file": "src/Meili/Client.php",
+      "line": 117,
+      "string": "HTTP %d %s %s — %s (code=%s type=%s)",
+      "reason": "MeiliException message. Every call site catches MeiliException and degrades (SearchController:68, Engine:301, FacetController:50), so the reader gets the `degraded` banner and this text reaches only the log and the CLI."
+    },
+    {
+      "file": "src/Meili/Client.php",
+      "line": 129,
+      "string": "non-JSON response: ",
+      "reason": "MeiliException message. Every call site catches MeiliException and degrades (SearchController:68, Engine:301, FacetController:50), so the reader gets the `degraded` banner and this text reaches only the log and the CLI."
+    },
+    {
+      "file": "src/Meili/Client.php",
+      "line": 256,
+      "string": "task $uid did not settle in {$timeoutMs}ms",
+      "reason": "MeiliException message. Every call site catches MeiliException and degrades (SearchController:68, Engine:301, FacetController:50), so the reader gets the `degraded` banner and this text reaches only the log and the CLI."
+    },
+    {
+      "file": "src/Meili/Indexer.php",
+      "line": 301,
+      "string": "indexing tasks failed: ",
+      "reason": "MeiliException message. Every call site catches MeiliException and degrades (SearchController:68, Engine:301, FacetController:50), so the reader gets the `degraded` banner and this text reaches only the log and the CLI."
+    },
+    {
+      "file": "src/Api/FacetController.php",
+      "line": 39,
+      "string": "unknown facet",
+      "reason": "Machine-readable `error` member of a 400 JSON body, the same slot as `engine-unavailable` on line 51. Nothing renders it: js/dist/forum.js never calls /facet-search and js/dist/admin.js is a two-line no-op stub. If a facet type-ahead is ever built, the UI must map the code to a key rather than print it."
+    },
+    {
+      "file": "src/Search/Engine.php",
+      "line": 104,
+      "string": "NOT restricted_tag_ids IN [",
+      "reason": "A Meilisearch filter expression."
+    },
+    {
+      "file": "src/Search/Fallback.php",
+      "line": 49,
+      "string": "MATCH(discussions.title) AGAINST (? IN NATURAL LANGUAGE MODE)",
+      "reason": "SQL fragment."
+    },
+    {
+      "file": "src/Search/MeiliFulltextGambit.php",
+      "line": 185,
+      "string": ") AGAINST (? IN NATURAL LANGUAGE MODE)",
+      "reason": "SQL fragment."
+    },
+    {
+      "file": "src/Search/MeiliFulltextGambit.php",
+      "line": 165,
+      "string": "CASE discussions.id",
+      "reason": "SQL fragment."
+    },
+    {
+      "file": "src/Search/MeiliFulltextGambit.php",
+      "line": 165,
+      "string": "END ASC",
+      "reason": "SQL fragment."
+    },
+    {
+      "file": "src/Meili/DocumentBuilder.php",
+      "line": 72,
+      "string": "u.nickname as author_nick",
+      "reason": "SQL column alias. It becomes an array key in DocumentBuilder and then a Meilisearch document field name; changing it by locale would produce a different index per language."
+    },
+    {
+      "file": "src/Meili/DocumentBuilder.php",
+      "line": 245,
+      "string": "d.title as discussion_title",
+      "reason": "SQL column alias. It becomes an array key in DocumentBuilder and then a Meilisearch document field name; changing it by locale would produce a different index per language."
+    },
+    {
+      "file": "src/Meili/DocumentBuilder.php",
+      "line": 245,
+      "string": "d.slug as discussion_slug",
+      "reason": "SQL column alias. It becomes an array key in DocumentBuilder and then a Meilisearch document field name; changing it by locale would produce a different index per language."
+    },
+    {
+      "file": "src/Meili/DocumentBuilder.php",
+      "line": 246,
+      "string": "d.is_private as d_private",
+      "reason": "SQL column alias. It becomes an array key in DocumentBuilder and then a Meilisearch document field name; changing it by locale would produce a different index per language."
+    },
+    {
+      "file": "src/Meili/DocumentBuilder.php",
+      "line": 246,
+      "string": "d.hidden_at as d_hidden",
+      "reason": "SQL column alias. It becomes an array key in DocumentBuilder and then a Meilisearch document field name; changing it by locale would produce a different index per language."
+    },
+    {
+      "file": "src/Meili/DocumentBuilder.php",
+      "line": 383,
+      "string": "p.name as parent_name",
+      "reason": "SQL column alias. It becomes an array key in DocumentBuilder and then a Meilisearch document field name; changing it by locale would produce a different index per language."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 54,
+      "string": "psl god",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 55,
+      "string": "normie tier",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 59,
+      "string": "nose job",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 74,
+      "string": "limb lengthening",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 76,
+      "string": "bone smashing",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 80,
+      "string": "black pill",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 81,
+      "string": "white pill",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    },
+    {
+      "file": "src/Meili/IndexSettings.php",
+      "line": 82,
+      "string": "blue pill",
+      "reason": "Meilisearch SYNONYM table entry, not UI text. Synonyms are matched against the CORPUS, and the corpus is EN/ES/RU/TR/DE/FR — see /root/search-notes/meili-capabilities.md §7 (one-way, 50 per term, 1-3 word keys, re-derived when tokenizer settings change). Replacing these with a locale file would break recall; the way to serve Spanish or Russian jargon is MORE entries in this same map, in both directions."
+    }
+  ],
+  "verification": {
+    "how": "Every claim below was produced by a script in /tmp/claude-0/-root/605d3ebe-a4f4-4fca-ac6b-09db76e73096/scratchpad and re-run after each edit; each check was also deliberately broken once to confirm it goes red.",
+    "checks": [
+      "gate_search_index_analytics.py — en/es key parity, ICU placeholder parity, plural arms present on both sides, every key the map calls exists, no dead keys, php -l / node --check on every touched file.",
+      "icu/render.ts — every ICU string rendered at count 0/1/2/12431 in BOTH en and es-MX, through intl-messageformat (what PHP ext-intl agrees with) AND through RichMessageFormatter constructed exactly as Flarum builds it. The two must agree character for character. Also bans `#` inside a plural and markup inside a message.",
+      "icu/dom.ts — the APPLIED js/dist/forum.js loaded into happy-dom behind a real Flarum-shaped translator, palette driven, Spanish and English text asserted off the rendered DOM, and the DOM scanned for raw keys.",
+      "idempotency.py — every replacement is applied / pending / superseded against the live tree, and no entry can be applied twice."
+    ],
+    "php_intl": "Dockerfile:19 installs ext-intl, so the real MessageFormatter is used and not symfony/polyfill-intl-messageformatter, whose own docblock says it implements plural rules for English only."
+  },
+  "native_keys": {
+    "note": "Keys added AFTER the i18n migration recorded in `replacements`. They are not find/replace entries because the code that renders them was written i18n-native — there is no pre-patch English literal to match. Recorded here so the map stays a complete account of this extension's strings. es.yml is the SOURCE and en.yml the translation, as everywhere else on this forum.",
+    "total_keys_now": 116,
+    "families": {
+      "forum.surface.*": "The header dropdown / mobile sheet, which did not exist as a distinct component before. close, forget, hint_move, hint_open, hint_close, count.",
+      "forum.kind.*": "The word above a result title saying WHAT it is. discussion|post|user|tag — a closed set fixed by Engine::shape*, so the dynamic suffix cannot miss.",
+      "forum.landing.*": "The /search landing state and the pre-typing dropdown. Both previously rendered `empty.heading` with an empty {query}, i.e. the literal string “No encontramos nada para “””.",
+      "forum.error.*": "The designed error state. heading, status, retry. `results.failed` is still the sentence; these are the frame around it.",
+      "forum.filters.after|before|phrase|negative|sort|type|clear_all|toggle|date|date_from|date_to|author_ph|last_*|remove_named": "Filter controls and chips that had no UI at all: date range, phrase, negation, sort and type were parsed by QueryParser and shown nowhere.",
+      "forum.types.label": "Accessible name of the type tablist.",
+      "forum.results.placeholder|pager|page_of": "The results input placeholder and the pager, which announced nothing and showed no position.",
+      "forum.empty.sub|all_types|try_stem|everything": "Zero-result recovery beyond what Engine::recover returns (measured: it returns [] for a single unknown word)."
+    },
+    "removed": {
+      "forum.palette.dialog_label": "The palette is no longer a role=dialog; the surface is a combobox popup (dropdown) or a full-screen sheet, neither of which is a modal dialog.",
+      "forum.palette.open_full": "Superseded by forum.palette.see_all, which is now the single call to action in both the empty and non-empty dropdown.",
+      "forum.palette.timing": "The dropdown footer shows the suggestion COUNT (forum.surface.count) rather than engine timings; timings stayed on the results page (forum.results.timing) where they are actionable."
+    },
+    "verified": "yaml parse + key parity (116 = 116, zero one-sided keys) + ICU placeholder parity per key + every tr() key present + zero unreferenced keys, run over locale/*.yml and js/dist/forum.js after the edit."
+  }
+}

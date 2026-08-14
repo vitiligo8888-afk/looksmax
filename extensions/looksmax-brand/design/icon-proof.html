@@ -1,0 +1,53 @@
+<!doctype html><meta charset=utf-8>
+<!--
+  Proof that the icons SERVED BY THE LIVE SITE work at the sizes a user sees.
+  Every src here is an absolute https URL against the running forum, not a
+  local file: this is the deployed bytes, decoded by a browser, at 1:1.
+-->
+<style>
+  body{margin:0;background:#0e1116;color:#c8d2e0;font:12px/1.5 "DejaVu Sans",sans-serif;padding:24px 28px}
+  h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8b96a8;margin:26px 0 10px;font-weight:700}
+  .strip{display:flex;align-items:center;height:36px;border-radius:9px 9px 0 0;padding:0 10px;gap:8px;font-size:12px;width:520px}
+  .strip img{width:16px;height:16px;display:block;flex:none}
+  .light{background:#dee1e6;color:#3c4043}
+  .lighttab{background:#fff;border-radius:8px 8px 0 0;padding:6px 12px;display:flex;gap:8px;align-items:center}
+  .dark{background:#202124;color:#e8eaed}
+  .darktab{background:#35363a;border-radius:8px 8px 0 0;padding:6px 12px;display:flex;gap:8px;align-items:center}
+  .row{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px}
+  .cell{text-align:center;color:#8b96a8;font-size:11px}
+  .cell img{display:block;margin:0 auto 6px}
+  .ios{background:linear-gradient(160deg,#2b3444,#0e1116);padding:22px;border-radius:16px;display:flex;gap:22px}
+  .ios .app{text-align:center;color:#eef2f7;font-size:11px;width:76px}
+  .ios .app img{width:60px;height:60px;border-radius:13.5px;display:block;margin:0 auto 6px}
+  .mask{width:96px;height:96px;border-radius:50%;overflow:hidden;display:block;margin:0 auto 6px}
+  .mask img{width:96px;height:96px;display:block}
+  code{color:#e8c07d}
+</style>
+<h2>chrome tab strip, light theme — favicon.ico at 16px, 1:1</h2>
+<div class="strip light"><div class="lighttab"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon.ico"><span>Looksmax.lat</span></div><div class="lighttab" style="background:#f1f3f4"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon-16.png"><span>Ratings</span></div></div>
+<h2>chrome tab strip, dark theme</h2>
+<div class="strip dark"><div class="darktab"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon.ico"><span>Looksmax.lat</span></div><div class="darktab" style="background:#292a2d"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon-16.png"><span>Ratings</span></div></div>
+<h2>served rasters at 1:1</h2>
+<div class="row">
+  <div class="cell"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon-16.png" width="16" height="16">16</div>
+  <div class="cell"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon-32.png" width="32" height="32">32</div>
+  <div class="cell"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/favicon-48.png" width="48" height="48">48</div>
+  <div class="cell"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/icon-192.png" width="192" height="192">192</div>
+  <div class="cell"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/icon.svg" width="96" height="96">svg 96</div>
+</div>
+<h2>ios home screen — apple-touch-icon.png, system corner radius applied</h2>
+<div class="ios">
+  <div class="app"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/apple-touch-icon.png">Looksmax</div>
+  <div class="app"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/apple-touch-icon.png" style="width:44px;height:44px;border-radius:10px">Looksmax</div>
+</div>
+<h2>android maskable — circle crop, the harshest mask a launcher applies</h2>
+<div class="row">
+  <div class="cell"><span class="mask"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/icon-maskable-512.png"></span>circle</div>
+  <div class="cell"><span class="mask" style="border-radius:24px"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/icon-maskable-512.png"></span>squircle</div>
+  <div class="cell"><img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/icon-512.png" width="96" height="96" style="border-radius:0">any 512</div>
+</div>
+<h2>email header band, 600px wide, on the white body flarum mail uses</h2>
+<div style="background:#fff;padding:0 0 18px;width:600px">
+  <img src="https://colleague-eligibility-workers-slides.trycloudflare.com/assets/extensions/local-looksmax-brand/email-header.png" width="600" style="display:block">
+  <div style="font:14px/1.6 Arial,sans-serif;color:#12161c;padding:18px 32px 0">Someone replied to a discussion you follow.</div>
+</div>

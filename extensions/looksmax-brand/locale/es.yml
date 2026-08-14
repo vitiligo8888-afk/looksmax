@@ -1,0 +1,23 @@
+local-looksmax-brand:
+  forum:
+    error:
+      go_home: Ir a la portada
+      not_found:
+        title: Página no encontrada
+        heading: Esa página no está aquí.
+        # "hilo" y "portada" son los términos que ya usan las demás extensiones
+        # de este foro; no cambiar por "tema" ni por "inicio".
+        body: Puede que el enlace sea viejo, o que el hilo se haya movido o eliminado. Prueba con la portada o busca el título.
+      default:
+        title: Algo salió mal
+        heading: Algo salió mal.
+        # Mismo registro que el inglés: sin disculpas de más y sin "¡Ups!".
+        # {email} es un enlace mailto que arma la plantilla; Offtopic es el
+        # nombre de una sección y se queda igual.
+        body: "El foro tuvo un error al procesar esa solicitud. Ya quedó registrado. Vuelve a intentarlo en un minuto; si sigue pasando, publica en Offtopic o escríbenos a {email}."
+  lib:
+    # Se evita "las guías detrás de ellas" (calco del inglés) y la coma final.
+    og_image_alt: "{title}: calificaciones de cara y cuerpo, y las guías que hay detrás"
+    # es_MX, no es_ES: el público es mexicano. Facebook acepta ambos y usa el
+    # territorio para elegir la variante del idioma.
+    og_locale: es_MX

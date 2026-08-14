@@ -1,0 +1,272 @@
+{
+  "extension": "looksmax-format",
+  "prefix": "local-looksmax-format",
+  "replacements": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 10,
+      "key": "(helper)",
+      "find": "  if (window.__lmxFormat) return;\n  window.__lmxFormat = true;\n",
+      "replace": "  if (window.__lmxFormat) return;\n  window.__lmxFormat = true;\n\n  /*\n   * i18n.\n   *\n   * This file is injected into <head> as its own <script> (src/InjectScript.php)\n   * and runs before Flarum boots, so the translator cannot be captured at eval\n   * time — every call resolves it fresh. window.lmxI18n.t records a miss so the\n   * i18n gate can fail the deploy on a raw key reaching the screen, and the\n   * English fallback keeps post chrome readable if looksmax-i18n is absent.\n   */\n  var NS = 'local-looksmax-format.';\n  function t(key, params, fallback) {\n    var k = NS + key;\n    try {\n      if (window.lmxI18n) return window.lmxI18n.t(k, params || {}, fallback);\n      var s = window.flarum.core.app.translator.trans(k, params || {});\n      if (typeof s === 'string' && s !== k) return s;\n      if (s && typeof s.join === 'function') return s.join('');\n    } catch (e) {}\n    return fallback == null ? k : fallback;\n  }\n",
+      "note": "Installs t(). Same shape as looksmax-search's, deliberately: this file is a standalone IIFE in <head> with no `app` binding of its own, so every call has to resolve the translator lazily and fall back to English rather than to a raw key."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 79,
+      "key": "forum.post.lightbox_close",
+      "find": "    box.innerHTML =\n      '<button class=\"lmxLightbox-close\" aria-label=\"Close\">&times;</button>' +\n      '<img class=\"lmxLightbox-img\" alt=\"\">';",
+      "replace": "    box.innerHTML =\n      '<button class=\"lmxLightbox-close\">&times;</button>' +\n      '<img class=\"lmxLightbox-img\" alt=\"\">';\n    // Set as a property rather than interpolated into the innerHTML above: a\n    // translation is text, and text concatenated into markup is a bug waiting.\n    box.querySelector('.lmxLightbox-close').setAttribute('aria-label', t('forum.post.lightbox_close', {}, 'Close'));",
+      "note": "The only label on the lightbox close button; without it a screen reader announces the × glyph."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 142,
+      "key": "forum.post.spoiler_revealed",
+      "find": "    el.setAttribute('aria-label', 'Hidden text, revealed');",
+      "replace": "    el.setAttribute('aria-label', t('forum.post.spoiler_revealed', {}, 'Hidden text, revealed'));",
+      "note": "Counterpart of the ispoiler aria-label baked into the XSLT (Configure.php:175, deferred). Both must land or a revealed inline spoiler announces in one language and a hidden one in the other."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 209,
+      "key": "forum.quote.show_rest",
+      "find": "    btn.setAttribute('aria-expanded', 'false');\n    btn.textContent = 'Show the rest of this quote';",
+      "replace": "    btn.setAttribute('aria-expanded', 'false');\n    btn.textContent = t('forum.quote.show_rest', {}, 'Show the rest of this quote');",
+      "note": "First of two identical literals; the preceding line is what makes this span unique (the other occurrence has setAttribute AFTER textContent)."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 215,
+      "key": "forum.quote.show_rest",
+      "find": "        btn.textContent = 'Show the rest of this quote';\n        btn.setAttribute('aria-expanded', 'false');",
+      "replace": "        btn.textContent = t('forum.quote.show_rest', {}, 'Show the rest of this quote');\n        btn.setAttribute('aria-expanded', 'false');",
+      "note": "Second occurrence: re-collapsing a quote restores this label."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 223,
+      "key": "forum.quote.collapse",
+      "find": "        btn.textContent = 'Collapse quote';",
+      "replace": "        btn.textContent = t('forum.quote.collapse', {}, 'Collapse quote');"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 268,
+      "key": "forum.post.copy",
+      "find": "    btn.className = 'lmxCode-copy';\n    btn.textContent = 'Copy';",
+      "replace": "    btn.className = 'lmxCode-copy';\n    btn.textContent = t('forum.post.copy', {}, 'Copy');",
+      "note": "'Copy' appears twice; the className line disambiguates the initial label from the 1.6s revert inside the click handler."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 272,
+      "key": "forum.post.copied",
+      "find": "        btn.textContent = 'Copied';\n        setTimeout(function () { btn.textContent = 'Copy'; }, 1600);",
+      "replace": "        btn.textContent = t('forum.post.copied', {}, 'Copied');\n        setTimeout(function () { btn.textContent = t('forum.post.copy', {}, 'Copy'); }, 1600);",
+      "note": "Covers forum.post.copied and the second forum.post.copy in one span."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 276,
+      "key": "forum.post.copy_manual",
+      "find": "navigator.clipboard.writeText(text).then(done, function () { btn.textContent = 'Press Ctrl+C'; });",
+      "replace": "navigator.clipboard.writeText(text).then(done, function () { btn.textContent = t('forum.post.copy_manual', {}, 'Press Ctrl+C'); });",
+      "note": "Clipboard write rejected (permission denied)."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 284,
+      "key": "forum.post.copy_manual",
+      "find": "        sel.addRange(r);\n        btn.textContent = 'Press Ctrl+C';",
+      "replace": "        sel.addRange(r);\n        btn.textContent = t('forum.post.copy_manual', {}, 'Press Ctrl+C');",
+      "note": "No clipboard API at all (insecure origin)."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/Configure.php",
+      "line": 175,
+      "string": "aria-label=\"Hidden text, activate to reveal\"",
+      "key": "forum.post.spoiler_hidden",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 191,
+      "string": "'SERIOUS' => ['Serious', 'serious'] … 13 post labels through 'MEME' => ['Meme', 'meme']",
+      "key": "forum.label.*",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary. All 13 chips are emitted by one foreach, so one patch covers them."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 235,
+      "string": "<div class=\"lmxHidden-note\">Was reply-gated on the source board</div>",
+      "key": "forum.post.reply_gated",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 255,
+      "string": "<span class=\"lmxDeleted-text\">Content removed</span>",
+      "key": "forum.post.deleted",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 276,
+      "string": "<span class=\"lmxQuote-said\"> — posted to mock</span>",
+      "key": "forum.quote.mock",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 291,
+      "string": "title=\"Member of the source board, not imported here\"  ([USER])",
+      "key": "forum.post.unimported_member",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 347,
+      "string": "<xsl:otherwise>Spoiler</xsl:otherwise>",
+      "key": "forum.post.spoiler",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 382,
+      "string": "<span class=\"lmxQuote-said\"> said:</span>",
+      "key": "forum.quote.said",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 384,
+      "string": "title=\"Go to the quoted post\"",
+      "key": "forum.quote.jump",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    },
+    {
+      "file": "src/Configure.php",
+      "line": 526,
+      "string": "title=\"Member of the source board, not imported here\"  ([UMENTION])",
+      "key": "forum.post.unimported_member",
+      "reason": "Rendered from an XSLT template that s9e compiles ONCE and Flarum caches for the whole install (cache key 'flarum.formatter'), not per locale. A translator call here would bake whichever locale warmed the cache into every future request, for every reader. Needs the XSL-parameter mechanism in `design` below — a new src/Localize.php render hook — which is one new file and therefore outside this lane's write boundary."
+    }
+  ],
+  "design": {
+    "problem": "Eleven of this extension's strings are rendered by XSLT templates that s9e compiles once and Flarum caches under the 'flarum.formatter' cache key for the whole install. The cache is not keyed on locale, so translating where the string is written freezes whichever locale warmed the cache into every future request for every reader.",
+    "mechanism": "s9e XSL parameters. Declare a default at compile time ($config->rendering->parameters['L_X'] = 'English'; a TemplateParameterCollection, see s9e/TextFormatter src/Configurator/Rendering.php), reference it from the template as <xsl:value-of select=\"$L_X\"/> or as {$L_X} inside an attribute value, and override it per request with Renderer::setParameters() (src/Renderer.php:126-143) from a render hook.",
+    "why_not_compile_time": "Calling the translator inside Configure runs exactly once per cache warm, not once per request. It would produce a forum whose post chrome is in the language of whoever happened to hit the site after the last `php flarum cache:clear`.",
+    "why_not_js": "These strings are inside server-rendered post HTML. A JS swap gives every reader a flash of English on every post, and gives crawlers, e-mail digests and no-JS readers English permanently. The parameter route is server-side and costs one translator lookup per locale per request.",
+    "steps": [
+      "1. Apply `template_patches` below to src/Configure.php. They are safe on their own: every parameter keeps its current English as its compile-time DEFAULT, so with nothing else applied the forum renders byte-identically to today.",
+      "2. Add `new_file` as src/Localize.php.",
+      "3. Export the label list from Configure so Localize can walk it: promote the $labels array in community() to a `public const LABELS = ['SERIOUS' => 'serious', …]` mapping tag => locale key (the CSS modifier and the locale key are the same word for all 13 except HIQM => high_iq).",
+      "4. In extend.php, register it FIRST in the Formatter chain: `->render(Localize::class)` before ->render(ResolveQuoteLinks::class). Flarum\\Formatter\\Formatter::render() (core 1.8.5 src/Formatter/Formatter.php:113-121) calls every render callback with ($renderer, $context, $xml, $request) and only then $renderer->render($xml), so parameters set in a callback are in force for that render.",
+      "5. `php flarum cache:clear` — the parameter list is compiled into the cached renderer.",
+      "6. Verify with tests/render.php (vocab-*) and by loading a thread that contains a quote, a spoiler and an unimported mention in each locale."
+    ],
+    "risks": [
+      "s9e's TemplateChecker runs over every template at compile time. Parameters in text nodes and in title/aria-label attribute values are expected to pass — its restrictions on dynamic values are for URL, CSS and JS contexts (DisallowUnsafeDynamicURL / DynamicCSS / DynamicJS) — but this has NOT been executed here: there is no vendor tree and no PHP on this box, so it is reasoned from the s9e source, not measured. If a template is rejected the failure is a thrown exception at cache-warm time, which is loud rather than silent.",
+      "The JS preview renderer (Flarum enables $configurator->enableJavaScript() with exports = ['preview']) gets the compile-time DEFAULTS, i.e. English, unless setParameter is also called client-side. That affects only the composer's live preview of a post being written, not any rendered post; fixing it means reaching flarum.core.s9e from JS and is worth a separate decision."
+    ],
+    "new_file": {
+      "path": "src/Localize.php",
+      "contents": "<?php\n\nnamespace Local\\Format;\n\nuse s9e\\TextFormatter\\Renderer;\nuse Symfony\\Contracts\\Translation\\TranslatorInterface;\n\n/**\n * Locale for the chrome the XSLT templates render inside post content.\n *\n * The formatter is compiled once and cached for the whole install, so the\n * strings in Configure's templates cannot be translated where they are written:\n * whichever locale happened to warm the cache would be frozen into every future\n * request. s9e's answer is XSL parameters — declared with a default at compile\n * time, overridden per render — and Flarum hands every render hook the Renderer\n * itself before it calls render(), which is the seam this uses.\n *\n * Memoised per locale: a discussion page renders ~20 posts through the same\n * hook and the catalogue lookup is not free.\n */\nclass Localize\n{\n    /** @var array<string,array<string,string>> locale => param name => text */\n    private array $cache = [];\n\n    public function __construct(private TranslatorInterface $translator)\n    {\n    }\n\n    public function __invoke(Renderer $renderer, $context, string $xml): string\n    {\n        $renderer->setParameters($this->strings());\n\n        return $xml;\n    }\n\n    private function strings(): array\n    {\n        $locale = method_exists($this->translator, 'getLocale') ? $this->translator->getLocale() : '';\n\n        if (isset($this->cache[$locale])) {\n            return $this->cache[$locale];\n        }\n\n        $t = fn (string $key): string => $this->translator->trans('local-looksmax-format.'.$key);\n\n        $params = [\n            'L_SPOILER' => $t('forum.post.spoiler'),\n            'L_SPOILER_HIDDEN' => $t('forum.post.spoiler_hidden'),\n            'L_REPLY_GATED' => $t('forum.post.reply_gated'),\n            'L_DELETED' => $t('forum.post.deleted'),\n            'L_UNIMPORTED' => $t('forum.post.unimported_member'),\n            'L_QUOTE_SAID' => $t('forum.quote.said'),\n            'L_QUOTE_MOCK' => $t('forum.quote.mock'),\n            'L_QUOTE_JUMP' => $t('forum.quote.jump'),\n        ];\n\n        foreach (Configure::LABELS as $tag => $key) {\n            $params['L_LABEL_'.$tag] = $t('forum.label.'.$key);\n        }\n\n        return $this->cache[$locale] = $params;\n    }\n}\n"
+    },
+    "template_patches": [
+      {
+        "file": "src/Configure.php",
+        "line": 172,
+        "find": "        $config->BBCodes->addCustom(\n            '[ISPOILER]{TEXT1}[/ISPOILER]',\n            '<span class=\"lmxISpoiler\" tabindex=\"0\" role=\"button\"\n                   aria-label=\"Hidden text, activate to reveal\"\n                   data-lmx-ispoiler=\"1\"><xsl:apply-templates/></span>'\n        );",
+        "replace": "        $config->rendering->parameters['L_SPOILER_HIDDEN'] = 'Hidden text, activate to reveal';\n        $config->BBCodes->addCustom(\n            '[ISPOILER]{TEXT1}[/ISPOILER]',\n            '<span class=\"lmxISpoiler\" tabindex=\"0\" role=\"button\"\n                   aria-label=\"{$L_SPOILER_HIDDEN}\"\n                   data-lmx-ispoiler=\"1\"><xsl:apply-templates/></span>'\n        );"
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 208,
+        "find": "        foreach ($labels as $tag => [$text, $modifier]) {\n            $config->BBCodes->addCustom(\n                '['.$tag.']',\n                '<span class=\"lmxLabel lmxLabel--'.$modifier.'\">'.$text.'</span>'\n            );\n        }",
+        "replace": "        foreach ($labels as $tag => [$text, $modifier]) {\n            // The English stays as the parameter's DEFAULT, so a template that\n            // renders before Localize has run (or on an install without it)\n            // reads exactly as it does today rather than going blank.\n            $config->rendering->parameters['L_LABEL_'.$tag] = $text;\n            $config->BBCodes->addCustom(\n                '['.$tag.']',\n                '<span class=\"lmxLabel lmxLabel--'.$modifier.'\"><xsl:value-of select=\"$L_LABEL_'.$tag.'\"/></span>'\n            );\n        }"
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 232,
+        "find": "        $config->BBCodes->addCustom(\n            '[HIDEPOSTS]{TEXT1}[/HIDEPOSTS]',\n            '<div class=\"lmxHidden\">\n                <div class=\"lmxHidden-note\">Was reply-gated on the source board</div>\n                <div class=\"lmxHidden-body\"><xsl:apply-templates/></div>\n            </div>'\n        );",
+        "replace": "        $config->rendering->parameters['L_REPLY_GATED'] = 'Was reply-gated on the source board';\n        $config->BBCodes->addCustom(\n            '[HIDEPOSTS]{TEXT1}[/HIDEPOSTS]',\n            '<div class=\"lmxHidden\">\n                <div class=\"lmxHidden-note\"><xsl:value-of select=\"$L_REPLY_GATED\"/></div>\n                <div class=\"lmxHidden-body\"><xsl:apply-templates/></div>\n            </div>'\n        );"
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 251,
+        "find": "            '<div class=\"lmxDeleted\">\n                <span class=\"lmxDeleted-mark\" aria-hidden=\"true\"/>\n                <span class=\"lmxDeleted-text\">Content removed</span>\n            </div>'",
+        "replace": "            '<div class=\"lmxDeleted\">\n                <span class=\"lmxDeleted-mark\" aria-hidden=\"true\"/>\n                <span class=\"lmxDeleted-text\"><xsl:value-of select=\"$L_DELETED\"/></span>\n            </div>'",
+        "note": "Also add, just above this addCustom(): $config->rendering->parameters['L_DELETED'] = 'Content removed';"
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 276,
+        "find": "                    <span class=\"lmxQuote-said\"> — posted to mock</span>",
+        "replace": "                    <span class=\"lmxQuote-said\"><xsl:text> — </xsl:text><xsl:value-of select=\"$L_QUOTE_MOCK\"/></span>",
+        "note": "The em dash and the spaces stay in the template as an explicit <xsl:text>: they are punctuation the design owns, and a whitespace-only literal text node in a stylesheet is not guaranteed to survive. Add $config->rendering->parameters['L_QUOTE_MOCK'] = 'posted to mock'; above it."
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 288,
+        "find": "            '[USER uid={UINT?}]{TEXT1}[/USER]',\n            '<span class=\"UserMention UserMention--unimported\"\n                   title=\"Member of the source board, not imported here\">",
+        "replace": "            '[USER uid={UINT?}]{TEXT1}[/USER]',\n            '<span class=\"UserMention UserMention--unimported\"\n                   title=\"{$L_UNIMPORTED}\">"
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 344,
+        "find": "                    <span class=\"lmxSpoiler-label\">\n                        <xsl:choose>\n                            <xsl:when test=\"@title\"><xsl:value-of select=\"@title\"/></xsl:when>\n                            <xsl:otherwise>Spoiler</xsl:otherwise>\n                        </xsl:choose>\n                    </span>",
+        "replace": "                    <span class=\"lmxSpoiler-label\">\n                        <xsl:choose>\n                            <xsl:when test=\"@title\"><xsl:value-of select=\"@title\"/></xsl:when>\n                            <xsl:otherwise><xsl:value-of select=\"$L_SPOILER\"/></xsl:otherwise>\n                        </xsl:choose>\n                    </span>",
+        "note": "Add $config->rendering->parameters['L_SPOILER'] = 'Spoiler'; at the top of spoiler()."
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 382,
+        "find": "                        <span class=\"lmxQuote-said\"> said:</span>\n                        <xsl:if test=\"@url\">\n                            <a class=\"lmxQuote-jump\" href=\"{@url}\" title=\"Go to the quoted post\">",
+        "replace": "                        <span class=\"lmxQuote-said\"><xsl:text> </xsl:text><xsl:value-of select=\"$L_QUOTE_SAID\"/></span>\n                        <xsl:if test=\"@url\">\n                            <a class=\"lmxQuote-jump\" href=\"{@url}\" title=\"{$L_QUOTE_JUMP}\">",
+        "note": "Add L_QUOTE_SAID = 'said:' and L_QUOTE_JUMP = 'Go to the quoted post' at the top of quote(). The leading space moves out of the translation and into an explicit <xsl:text>, so a translator never has to preserve invisible whitespace."
+      },
+      {
+        "file": "src/Configure.php",
+        "line": 524,
+        "find": "            '[UMENTION name={TEXT1} uid={UINT?}]',\n            '<span class=\"UserMention UserMention--unimported\" title=\"Member of the source board, not imported here\">",
+        "replace": "            '[UMENTION name={TEXT1} uid={UINT?}]',\n            '<span class=\"UserMention UserMention--unimported\" title=\"{$L_UNIMPORTED}\">",
+        "note": "Add $config->rendering->parameters['L_UNIMPORTED'] = 'Member of the source board, not imported here'; at the top of mentions(); it is shared with the [USER] patch above, so declare it once in either place."
+      }
+    ]
+  },
+  "not_translatable": [
+    {
+      "file": "src/Media/Fetcher.php",
+      "line": 37,
+      "string": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 …",
+      "reason": "A User-Agent header. A protocol token, and deliberately a boring one."
+    },
+    {
+      "file": "src/Media/Fetcher.php",
+      "line": 67,
+      "string": "ext-curl is not available / transfer failed / body over cap / content-type not media:",
+      "reason": "fetch() returns these in an `error` key that is logged and recorded in the dead-media store. No caller renders one: a failed fetch becomes a transparent 1x1 GIF (ProxyController::gone()), never text."
+    },
+    {
+      "file": "src/Media/ProxyController.php",
+      "line": 42,
+      "string": "'not found'",
+      "reason": "Body of a 404 on an unsigned media URL. Only ever loaded as an <img> src, where the browser shows a broken image and never the bytes. Translating it would also make the signature-failure path distinguishable by response size."
+    },
+    {
+      "file": "src/SecurityHeaders.php",
+      "line": 79,
+      "string": "frame-src https://www.youtube-nocookie.com …",
+      "reason": "A Content-Security-Policy header value."
+    },
+    {
+      "file": "src/Console/WarmMediaCommand.php",
+      "line": 0,
+      "string": "(21 strings)",
+      "reason": "CLI output for an operator, correctly excluded by the audit."
+    }
+  ]
+}

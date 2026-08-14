@@ -1,0 +1,1348 @@
+{
+  "extension": "looksmax-store",
+  "prefix": "local-looksmax-store",
+  "generated": "2026-08-13",
+  "note": "Authored by the i18n store lane. Applied by extensions/looksmax-i18n/tools/codemod.ts, which matches on `find` content, not on `line`. Read the `deferred` list before treating this extension as done: three of its entries are design work, not leftovers.",
+  "replacements": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 77,
+      "find": "  function num(n) {\n    n = Number(n) || 0;\n    return n.toLocaleString('en-US');\n  }\n\n  function shortNum(n) {\n    n = Number(n) || 0;\n    if (Math.abs(n) >= 1000000) return (n / 1000000).toFixed(1).replace(/\\.0$/, '') + 'M';\n    if (Math.abs(n) >= 10000) return (n / 1000).toFixed(0) + 'k';\n    return num(n);\n  }",
+      "replace": "  // Translation and locale-aware formatting, both routed through the i18n\n  // extension's runtime helper (`window.lmxI18n`, injected on every page).\n  //\n  // `toLocaleString('en-US')` was hardcoded to English separators and the k/M\n  // suffixes below it were English words spelled as letters; Spanish says\n  // \"12.431\" and \"12,4 mil\". Every number in this file goes through num(),\n  // shortNum(), pct(), dec() or money() so that is decided in one place.\n  //\n  // t() falls back to the English source string if the i18n script has not\n  // loaded — this file runs from the document HEAD and must never be able to\n  // render a blank storefront because a sibling extension is disabled.\n  function i18n() { return window.lmxI18n || null; }\n\n  function t(key, params, fallback) {\n    var full = 'local-looksmax-store.' + key;\n    var h = i18n();\n    if (h && h.t) return h.t(full, params || {}, fallback);\n    var a = app();\n    if (a && a.translator) {\n      var out = a.translator.trans(full, params || {});\n      if (typeof out !== 'string' || out !== full) return out;\n    }\n    return fallback;\n  }\n\n  function num(n, opts) {\n    var x = Number(n) || 0;\n    var h = i18n();\n    return h ? h.num(x, opts) : String(x);\n  }\n\n  function shortNum(n) {\n    var h = i18n();\n    return h ? h.compact(Number(n) || 0) : num(n);\n  }\n\n  /** 0.2 -> \"20%\" / \"20 %\". */\n  function pct(fraction) {\n    var h = i18n();\n    return h ? h.pct(Number(fraction) * 100) : Math.round(Number(fraction) * 100) + '%';\n  }\n\n  /** A multiplier: \"1.50\" / \"1,50\". */\n  function dec(n, digits) {\n    return num(n, { minimumFractionDigits: digits, maximumFractionDigits: digits });\n  }\n\n  /** Cents of USD. \"$5.00\" / \"US$ 5.00\" — the currency is the store's, the\n   *  placement of the symbol is the reader's. */\n  function money(cents) {\n    var x = (Number(cents) || 0) / 100;\n    var h = i18n();\n    return h ? h.num(x, { style: 'currency', currency: 'USD' }) : '$' + x.toFixed(2);\n  }\n\n  function rarityLabel(r) { return t('forum.rarity.' + r, {}, r); }\n\n  function kindLabel(k) { return t('forum.kind.' + k, {}, k); }",
+      "key": "forum.rarity.*, forum.kind.*",
+      "note": "One replacement rather than 40: it fixes num/shortNum for every call site at once and defines the t() shim the rest of this spec calls. app() is already defined above it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 93,
+      "find": "  function when(iso) {\n    if (!iso) return '';\n    var d = new Date(String(iso).replace(' ', 'T') + (String(iso).indexOf('Z') < 0 && String(iso).indexOf('+') < 0 ? 'Z' : ''));\n    if (isNaN(d.getTime())) return String(iso);\n    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' ' +\n      d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });\n  }",
+      "replace": "  function when(iso) {\n    if (!iso) return '';\n    // `toLocaleDateString(undefined, …)` follows the BROWSER's locale, not the\n    // forum's, so an English Chrome rendered \"4 Mar\" beside Spanish copy.\n    // lmxI18n.dateTime() reads the forum locale and handles the MySQL\n    // \"Y-m-d H:i:s\" shape this API returns.\n    var h = i18n();\n    if (h) return h.dateTime(iso) || String(iso);\n    var d = new Date(String(iso).replace(' ', 'T') + (String(iso).indexOf('Z') < 0 && String(iso).indexOf('+') < 0 ? 'Z' : ''));\n    return isNaN(d.getTime()) ? String(iso) : d.toISOString().slice(0, 16).replace('T', ' ');\n  }",
+      "note": "Date formatting, not a string: fixes every order/ledger/audit timestamp in the extension."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 101,
+      "find": "    if (d <= 0) return 'ended';\n    var h = Math.floor(d / 3600000);\n    if (h >= 48) return Math.floor(h / 24) + ' days left';\n    if (h >= 1) return h + ' hours left';\n    return Math.max(1, Math.round(d / 60000)) + ' minutes left';",
+      "replace": "    if (d <= 0) return t('forum.time.ended', {}, 'ended');\n    var h = Math.floor(d / 3600000);\n    if (h >= 48) return t('forum.time.days_left', { count: Math.floor(h / 24) }, Math.floor(h / 24) + ' days left');\n    if (h >= 1) return t('forum.time.hours_left', { count: h }, h + ' hours left');\n    var mins = Math.max(1, Math.round(d / 60000));\n    return t('forum.time.minutes_left', { count: mins }, mins + ' minutes left');",
+      "key": "forum.time.ended / days_left / hours_left / minutes_left",
+      "note": "Three concatenated counts become three ICU plurals. Spanish changes the verb as well as the noun: 'queda 1 dia' / 'quedan 2 dias'. 'ended' was missed by the audit (single lowercase word) and is user-visible."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 139,
+      "find": "|| 'The store did not answer. Reload the page.';",
+      "replace": "|| t('forum.error.no_answer', {}, 'The store did not answer. Reload the page.');",
+      "key": "forum.error.no_answer"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 189,
+      "find": "      alertOk(won\n        ? 'The box gave you ' + won.name + ' (' + won.rarity + ', normally ' + num(won.worth) + ').'\n        : (opts.gift ? item.name + ' sent to ' + opts.gift + '.' : item.name + ' is yours.'));",
+      "replace": "      alertOk(won\n        ? t('forum.alert.box_won', { name: won.name, rarity: rarityLabel(won.rarity), worth: num(won.worth) },\n          'The box gave you ' + won.name + ' (' + won.rarity + ', normally ' + num(won.worth) + ').')\n        : (opts.gift\n          ? t('forum.alert.gift_sent', { item: item.name, username: opts.gift }, item.name + ' sent to ' + opts.gift + '.')\n          : t('forum.alert.bought', { item: item.name }, item.name + ' is yours.')));",
+      "key": "forum.alert.box_won / gift_sent / bought",
+      "note": "won.rarity was printed as the raw slug ('legendary'); it now goes through forum.rarity.*. The Spanish for 'is yours' is rewritten to 'Ya tienes {item}' because 'tuyo' would have to agree with the gender of a database row."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 198,
+      "find": "      alertError(res.error || 'That did not go through. Nothing was charged.');",
+      "replace": "      alertError(res.error || t('forum.error.purchase_failed', {}, 'That did not go through. Nothing was charged.'));",
+      "key": "forum.error.purchase_failed"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 206,
+      "find": "      alertOk('Refunded ' + num(order.total) + ' credits.');",
+      "replace": "      alertOk(t('forum.alert.refunded', { count: Number(order.total) || 0 }, 'Refunded ' + num(order.total) + ' credits.'));",
+      "key": "forum.alert.refunded",
+      "note": "Plural: 'Se te devolvio 1 credito' / 'Se te devolvieron 2 creditos' — the verb inflects too."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 209,
+      "find": "      alertError(((e && e.response) || {}).error || 'That order could not be refunded.');",
+      "replace": "      alertError(((e && e.response) || {}).error || t('forum.error.refund_failed', {}, 'That order could not be refunded.'));",
+      "key": "forum.error.refund_failed"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 219,
+      "find": "      alertOk(kind === 'rename'\n        ? 'You are now ' + res.username + '.'\n        : (kind === 'bump' ? 'Thread bumped.' : 'Done. It ends ' + when(res.expiresAt) + '.'));",
+      "replace": "      alertOk(kind === 'rename'\n        ? t('forum.alert.renamed', { username: res.username }, 'You are now ' + res.username + '.')\n        : (kind === 'bump'\n          ? t('forum.alert.bumped', {}, 'Thread bumped.')\n          : t('forum.alert.redeemed', { when: when(res.expiresAt) }, 'Done. It ends ' + when(res.expiresAt) + '.')));",
+      "key": "forum.alert.renamed / bumped / redeemed"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 225,
+      "find": "      alertError(((e && e.response) || {}).error || 'That could not be redeemed.');",
+      "replace": "      alertError(((e && e.response) || {}).error || t('forum.error.redeem_failed', {}, 'That could not be redeemed.'));",
+      "key": "forum.error.redeem_failed"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 250,
+      "find": "        m('div.StoreBar-line', 'Sign in to see your balance and buy anything here.'),",
+      "replace": "        m('div.StoreBar-line', t('forum.bar.guest', {}, 'Sign in to see your balance and buy anything here.')),",
+      "key": "forum.bar.guest"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 260,
+      "find": "        m('span.StoreBar-n', num(me.balance)),\n        m('span.StoreBar-label', 'credits'),",
+      "replace": "        m('span.StoreBar-n', num(me.balance)),\n        m('span.StoreBar-label', t('forum.bar.credits_unit', { count: Number(me.balance) || 0 }, 'credits')),",
+      "key": "forum.bar.credits_unit",
+      "note": "'credits' sits in its own span for styling, so the unit is a plural key on its own with the balance as the count. The audit missed it (one lowercase word)."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 265,
+      "find": "          m('span.StoreFact-k', 'Membership'),\n          m('span.StoreFact-v', { style: me.tierColor ? { color: me.tierColor } : {} }, me.tierName || 'Standard'),",
+      "replace": "          m('span.StoreFact-k', t('forum.bar.membership', {}, 'Membership')),\n          m('span.StoreFact-v', { style: me.tierColor ? { color: me.tierColor } : {} }, me.tierName || t('forum.tier.standard', {}, 'Standard')),",
+      "key": "forum.bar.membership, forum.tier.standard",
+      "note": "me.tierName comes from looksmax-ranks' Catalog and is that lane's to translate; only the fallback is ours."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 270,
+      "find": "          m('span.StoreFact-k', 'Your discount'),\n          m('span.StoreFact-v', Math.round(me.discount * 100) + '%'),\n          m('span.StoreFact-sub', 'applied to the prices below'),",
+      "replace": "          m('span.StoreFact-k', t('forum.bar.discount', {}, 'Your discount')),\n          m('span.StoreFact-v', pct(me.discount)),\n          m('span.StoreFact-sub', t('forum.bar.discount_sub', {}, 'applied to the prices below')),",
+      "key": "forum.bar.discount / discount_sub"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 275,
+      "find": "          m('span.StoreFact-k', 'Earning rate'),\n          m('span.StoreFact-v', multiplier.toFixed(2) + '×'),\n          m('span.StoreFact-sub', boosts.earn > 1 ? 'boost active' : 'base rate for your tier'),",
+      "replace": "          m('span.StoreFact-k', t('forum.bar.earn_rate', {}, 'Earning rate')),\n          m('span.StoreFact-v', dec(multiplier, 2) + '×'),\n          m('span.StoreFact-sub', boosts.earn > 1 ? t('forum.bar.boost_active', {}, 'boost active') : t('forum.bar.base_rate', {}, 'base rate for your tier')),",
+      "key": "forum.bar.earn_rate / boost_active / base_rate",
+      "note": "toFixed(2) always prints a dot; Spanish wants '1,50×'."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 280,
+      "find": "          m('span.StoreFact-k', 'Lifetime earned'),\n          m('span.StoreFact-v', shortNum(me.lifetime)),\n          m('span.StoreFact-sub', 'spending never reduces this'),",
+      "replace": "          m('span.StoreFact-k', t('forum.bar.lifetime', {}, 'Lifetime earned')),\n          m('span.StoreFact-v', shortNum(me.lifetime)),\n          m('span.StoreFact-sub', t('forum.bar.lifetime_sub', {}, 'spending never reduces this')),",
+      "key": "forum.bar.lifetime / lifetime_sub"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 293,
+      "find": "      { path: '/store', label: 'Catalogue', icon: 'ph:storefront-fill' },\n      { path: '/store/inventory', label: 'What you own', icon: 'ph:backpack-fill' },\n      { path: '/store/orders', label: 'Orders', icon: 'ph:receipt-fill' },\n    ];\n    if (me.canAdmin) items.push({ path: '/store/admin', label: 'Manage', icon: 'ph:sliders-fill' });",
+      "replace": "      { path: '/store', label: t('forum.nav.catalogue', {}, 'Catalogue'), icon: 'ph:storefront-fill' },\n      { path: '/store/inventory', label: t('forum.nav.inventory', {}, 'What you own'), icon: 'ph:backpack-fill' },\n      { path: '/store/orders', label: t('forum.nav.orders', {}, 'Orders'), icon: 'ph:receipt-fill' },\n    ];\n    if (me.canAdmin) items.push({ path: '/store/admin', label: t('forum.nav.manage', {}, 'Manage'), icon: 'ph:sliders-fill' });",
+      "key": "forum.nav.*",
+      "note": "Built inside tabs() on every render, so evaluating t() here is safe — the app is up by then."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 314,
+      "find": "        m('span.StoreCard-money', '$' + ((item.money || 0) / 100).toFixed(2)),\n        m('span.StoreCard-note', 'card not live'),",
+      "replace": "        m('span.StoreCard-money', money(item.money)),\n        m('span.StoreCard-note', t('forum.price.card_not_live', {}, 'card not live')),",
+      "key": "forum.price.card_not_live",
+      "note": "Also fixes the currency: a hardcoded '$' with an en-US decimal point becomes Intl currency formatting for USD."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 330,
+      "find": "      return m('div.StorePreview', m('span.lmx-name.StorePreview-name', { class: p.class }, 'Username'));",
+      "replace": "      return m('div.StorePreview', m('span.lmx-name.StorePreview-name', { class: p.class }, t('forum.preview.username_sample', {}, 'Username')));",
+      "key": "forum.preview.username_sample",
+      "note": "A sample name rendered in the style being sold. Audit excluded it as an identifier; it is on the card."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 363,
+      "find": "          m('span.StoreCard-rarity', item.rarity),",
+      "replace": "          m('span.StoreCard-rarity', rarityLabel(item.rarity)),",
+      "key": "forum.rarity.*",
+      "note": "Printed the raw DB slug. Audit missed it because it is a variable, not a literal."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 372,
+      "find": "        item.durationDays ? m('span.StoreChip', [icon('ph:clock-fill'), item.durationDays + ' days']) : null,\n        item.uses ? m('span.StoreChip', [icon('ph:ticket-fill'), item.uses + (item.uses > 1 ? ' uses' : ' use')]) : null,\n        item.stockLeft !== null && item.stockLeft !== undefined\n          ? m('span.StoreChip.StoreChip--stock', [icon('ph:package-fill'), item.stockLeft + ' of ' + item.stockTotal + ' left'])\n          : null,",
+      "replace": "        item.durationDays ? m('span.StoreChip', [icon('ph:clock-fill'), t('forum.chip.days', { count: item.durationDays }, item.durationDays + ' days')]) : null,\n        item.uses ? m('span.StoreChip', [icon('ph:ticket-fill'), t('forum.chip.uses', { count: item.uses }, item.uses + (item.uses > 1 ? ' uses' : ' use'))]) : null,\n        item.stockLeft !== null && item.stockLeft !== undefined\n          ? m('span.StoreChip.StoreChip--stock', [icon('ph:package-fill'), t('forum.chip.stock', { left: num(item.stockLeft), total: num(item.stockTotal) }, item.stockLeft + ' of ' + item.stockTotal + ' left')])\n          : null,",
+      "key": "forum.chip.days / uses / stock"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 380,
+      "find": "        item.holders > 0 ? m('span.StoreChip.StoreChip--holders', [icon('ph:users-fill'), item.holders + (item.holders === 1 ? ' member has this' : ' members have this')]) : null,",
+      "replace": "        item.holders > 0 ? m('span.StoreChip.StoreChip--holders', [icon('ph:users-fill'), t('forum.chip.holders', { count: item.holders }, item.holders + (item.holders === 1 ? ' member has this' : ' members have this'))]) : null,",
+      "key": "forum.chip.holders",
+      "note": "'# miembro lo tiene' / '# miembros lo tienen' — the verb inflects, which is why the English ternary cannot be reused."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 385,
+      "find": "          ? m('span.StoreCard-owned', [icon('ph:check-circle-fill'), 'owned'])",
+      "replace": "          ? m('span.StoreCard-owned', [icon('ph:check-circle-fill'), t('forum.card.owned', {}, 'owned')])",
+      "key": "forum.card.owned",
+      "note": "Missed by the audit (one lowercase word); it is the label on every owned card."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 390,
+      "find": "          }, busy ? 'working…' : buyLabel(item, me)),",
+      "replace": "          }, busy ? t('forum.card.working', {}, 'working…') : buyLabel(item, me)),",
+      "key": "forum.card.working"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 395,
+      "find": "        m('span', num(item.price - (me.balance || 0)) + ' credits short'),",
+      "replace": "        m('span', t('forum.card.short', { count: item.price - (me.balance || 0) }, num(item.price - (me.balance || 0)) + ' credits short')),",
+      "key": "forum.card.short"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 406,
+      "find": "    if (item.currency === 'money') return 'Buy credits';\n    if (item.kind === 'tier' && item.payload && item.payload.tier === me.tier) return 'Renew';\n    if (item.kind === 'tier') return 'Upgrade';\n    return 'Buy';",
+      "replace": "    if (item.currency === 'money') return t('forum.buy.credits', {}, 'Buy credits');\n    if (item.kind === 'tier' && item.payload && item.payload.tier === me.tier) return t('forum.buy.renew', {}, 'Renew');\n    if (item.kind === 'tier') return t('forum.buy.upgrade', {}, 'Upgrade');\n    return t('forum.buy.buy', {}, 'Buy');",
+      "key": "forum.buy.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 431,
+      "find": "          isMoney ? m('dt', 'Price') : null,\n          isMoney ? m('dd', '$' + ((item.money || 0) / 100).toFixed(2)) : null,\n\n          !isMoney && item.saving > 0 ? m('dt', 'List price') : null,\n          !isMoney && item.saving > 0 ? m('dd', num(item.listPrice) + ' credits') : null,\n          !isMoney && item.saving > 0 ? m('dt', 'Your membership discount') : null,\n          !isMoney && item.saving > 0 ? m('dd.is-saving', '-' + num(item.saving)) : null,\n\n          !isMoney ? m('dt', 'You pay') : null,\n          !isMoney ? m('dd', num(item.price) + ' credits') : null,\n          !isMoney ? m('dt', 'Balance after') : null,\n          !isMoney ? m('dd', { class: after < 0 ? 'is-negative' : '' }, num(after) + ' credits') : null,\n          item.durationDays ? m('dt', 'Lasts') : null,\n          item.durationDays ? m('dd', item.durationDays + ' days') : null,",
+      "replace": "          isMoney ? m('dt', t('forum.dialog.price', {}, 'Price')) : null,\n          isMoney ? m('dd', money(item.money)) : null,\n\n          !isMoney && item.saving > 0 ? m('dt', t('forum.dialog.list_price', {}, 'List price')) : null,\n          !isMoney && item.saving > 0 ? m('dd', t('forum.dialog.credits_amount', { count: item.listPrice }, num(item.listPrice) + ' credits')) : null,\n          !isMoney && item.saving > 0 ? m('dt', t('forum.dialog.discount', {}, 'Your membership discount')) : null,\n          !isMoney && item.saving > 0 ? m('dd.is-saving', '-' + num(item.saving)) : null,\n\n          !isMoney ? m('dt', t('forum.dialog.you_pay', {}, 'You pay')) : null,\n          !isMoney ? m('dd', t('forum.dialog.credits_amount', { count: item.price }, num(item.price) + ' credits')) : null,\n          !isMoney ? m('dt', t('forum.dialog.balance_after', {}, 'Balance after')) : null,\n          !isMoney ? m('dd', { class: after < 0 ? 'is-negative' : '' }, t('forum.dialog.credits_amount', { count: after }, num(after) + ' credits')) : null,\n          item.durationDays ? m('dt', t('forum.dialog.lasts', {}, 'Lasts')) : null,\n          item.durationDays ? m('dd', t('forum.chip.days', { count: item.durationDays }, item.durationDays + ' days')) : null,",
+      "key": "forum.dialog.*, forum.chip.days",
+      "note": "'-' + num(saving) is left as a bare minus sign: it is the same glyph in both locales and the figure itself now goes through num()."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 448,
+      "find": "          m('label', 'Buy it for someone else'),\n          m('input.FormControl', {\n            placeholder: 'their username, or leave empty',",
+      "replace": "          m('label', t('forum.dialog.gift_label', {}, 'Buy it for someone else')),\n          m('input.FormControl', {\n            placeholder: t('forum.dialog.gift_placeholder', {}, 'their username, or leave empty'),",
+      "key": "forum.dialog.gift_label / gift_placeholder"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 457,
+      "find": "          m('label', 'Card number'),",
+      "replace": "          m('label', t('forum.dialog.card_label', {}, 'Card number')),",
+      "key": "forum.dialog.card_label"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 463,
+      "find": "          m('p.StoreModal-mock', 'Card payment is not connected yet. This path is wired end to end against a mock provider so the real one can drop in; nothing is charged and no card details are stored or sent anywhere. 4000 0000 0000 0002 is treated as a declined card.'),",
+      "replace": "          m('p.StoreModal-mock', t('forum.dialog.card_mock', {}, 'Card payment is not connected yet. This path is wired end to end against a mock provider so the real one can drop in; nothing is charged and no card details are stored or sent anywhere. 4000 0000 0000 0002 is treated as a declined card.')),",
+      "key": "forum.dialog.card_mock"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 467,
+      "find": "          m('button.Button', { onclick: function () { S.dialog = null; } }, 'Cancel'),",
+      "replace": "          m('button.Button', { onclick: function () { S.dialog = null; } }, t('forum.action.cancel', {}, 'Cancel')),",
+      "key": "forum.action.cancel"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 477,
+      "find": "          }, busy ? 'working…' : (S.dialog.gift ? 'Send it' : 'Confirm')),",
+      "replace": "          }, busy ? t('forum.card.working', {}, 'working…') : (S.dialog.gift ? t('forum.dialog.send', {}, 'Send it') : t('forum.dialog.confirm', {}, 'Confirm'))),",
+      "key": "forum.card.working, forum.dialog.send / confirm"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 486,
+      "find": "    if (!S.data) return m('div.StoreLoading', 'Loading the catalogue…');",
+      "replace": "    if (!S.data) return m('div.StoreLoading', t('forum.loading.catalogue', {}, 'Loading the catalogue…'));",
+      "key": "forum.loading.catalogue"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 502,
+      "find": "      items.length === 0 ? m('p.StoreEmpty', 'Nothing in this section yet.') : null,",
+      "replace": "      items.length === 0 ? m('p.StoreEmpty', t('forum.empty.category', {}, 'Nothing in this section yet.')) : null,",
+      "key": "forum.empty.category"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 509,
+      "find": "    if (!S.data) return m('div.StoreLoading', 'Loading…');",
+      "replace": "    if (!S.data) return m('div.StoreLoading', t('forum.loading.generic', {}, 'Loading…'));",
+      "key": "forum.loading.generic",
+      "note": "Two identical 'Loading…' calls exist; this one is disambiguated by the !S.data guard, the admin one by !S.admin."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 519,
+      "find": "      section('Ready to use', consumables.length ? consumables.map(function (h) {\n        return m('div.StoreHeld', [\n          heldMain(h, h.usesLeft + (h.usesLeft === 1 ? ' use left' : ' uses left')),\n          redeemControl(h, threads),\n        ]);\n      }) : m('p.StoreEmpty', 'Nothing waiting to be used. Pins, highlights, bumps and name changes appear here after you buy them.')),\n\n      section('Running now', timed.length ? timed.map(function (h) {\n        return m('div.StoreHeld', [heldMain(h, countdown(h.expiresAt) + ', ends ' + when(h.expiresAt))]);\n      }) : m('p.StoreEmpty', 'No boosts or memberships running.')),\n\n      section('Kept forever', permanent.length ? permanent.map(function (h) {\n        return m('div.StoreHeld', [\n          heldMain(h, h.from && h.from !== h.name ? 'from ' + h.from : KIND_LABEL[h.kind] || h.kind),",
+      "replace": "      section(t('forum.inventory.ready', {}, 'Ready to use'), consumables.length ? consumables.map(function (h) {\n        return m('div.StoreHeld', [\n          heldMain(h, t('forum.inventory.uses_left', { count: h.usesLeft }, h.usesLeft + (h.usesLeft === 1 ? ' use left' : ' uses left'))),\n          redeemControl(h, threads),\n        ]);\n      }) : m('p.StoreEmpty', t('forum.inventory.ready_empty', {}, 'Nothing waiting to be used. Pins, highlights, bumps and name changes appear here after you buy them.'))),\n\n      section(t('forum.inventory.running', {}, 'Running now'), timed.length ? timed.map(function (h) {\n        return m('div.StoreHeld', [heldMain(h, t('forum.inventory.ends', { countdown: countdown(h.expiresAt), when: when(h.expiresAt) }, countdown(h.expiresAt) + ', ends ' + when(h.expiresAt)))]);\n      }) : m('p.StoreEmpty', t('forum.inventory.running_empty', {}, 'No boosts or memberships running.'))),\n\n      section(t('forum.inventory.permanent', {}, 'Kept forever'), permanent.length ? permanent.map(function (h) {\n        return m('div.StoreHeld', [\n          heldMain(h, h.from && h.from !== h.name ? t('forum.inventory.from', { name: h.from }, 'from ' + h.from) : kindLabel(h.kind)),",
+      "key": "forum.inventory.*",
+      "note": "KIND_LABEL was a module-level object literal evaluated before the app boots, so it could not hold t() calls; it becomes kindLabel(), which resolves per render."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 537,
+      "find": "      }) : m('p.StoreEmpty', 'Colours and frames you buy stay here permanently, even if a membership lapses.')),",
+      "replace": "      }) : m('p.StoreEmpty', t('forum.inventory.permanent_empty', {}, 'Colours and frames you buy stay here permanently, even if a membership lapses.'))),",
+      "key": "forum.inventory.permanent_empty"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 541,
+      "find": "  var KIND_LABEL = {\n    style: 'Username colour', frame: 'Avatar frame', tier: 'Membership',\n    boost: 'Boost', streakfreeze: 'Streak freeze', highlight: 'Thread highlight',\n    sticky: 'Thread pin', bump: 'Thread bump', rename: 'Username change',\n    credits: 'Credits', mystery: 'Box', bundle: 'Bundle',\n  };",
+      "replace": "  // Was a module-level map of English words; the labels now live in\n  // locale/{en,es}.yml under forum.kind.* and are read by kindLabel(), which\n  // runs per render rather than at script-evaluation time.",
+      "key": "forum.kind.*",
+      "note": "The only remaining reader of KIND_LABEL is the inventory row, replaced above. Deleting the map rather than translating it in place is required: it is evaluated in the document HEAD, before app.translator exists."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 565,
+      "find": "          placeholder: 'new username',",
+      "replace": "          placeholder: t('forum.inventory.new_username_placeholder', {}, 'new username'),",
+      "key": "forum.inventory.new_username_placeholder"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 571,
+      "find": "        }, 'Change my name'),",
+      "replace": "        }, t('forum.inventory.rename_button', {}, 'Change my name')),",
+      "key": "forum.inventory.rename_button"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 577,
+      "find": "        return m('span.StoreHeld-sub', 'Start a thread first, then come back.');",
+      "replace": "        return m('span.StoreHeld-sub', t('forum.inventory.no_threads', {}, 'Start a thread first, then come back.'));",
+      "key": "forum.inventory.no_threads"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 588,
+      "find": "        }, kind === 'bump' ? 'Bump it' : (kind === 'sticky' ? 'Pin it' : 'Highlight it')),",
+      "replace": "        }, kind === 'bump' ? t('forum.inventory.bump', {}, 'Bump it') : (kind === 'sticky' ? t('forum.inventory.pin', {}, 'Pin it') : t('forum.inventory.highlight', {}, 'Highlight it'))),",
+      "key": "forum.inventory.bump / pin / highlight"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 602,
+      "find": "    var label = {\n      granted: 'delivered', refused: 'refused', failed: 'failed',\n      refunded: 'refunded', expired: 'ended', pending: 'in flight',\n    }[state] || state;",
+      "replace": "    var label = t('forum.state.' + state, {}, {\n      granted: 'delivered', refused: 'refused', failed: 'failed',\n      refunded: 'refunded', expired: 'ended', pending: 'in flight',\n    }[state] || state);",
+      "key": "forum.state.*",
+      "note": "Only 'in flight' was flagged by the audit; all six are on the orders table. This literal is inside stateChip() so it is evaluated per call, which is why t() is safe here and was not in KIND_LABEL."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 611,
+      "find": "    if (!S.orders) return m('div.StoreLoading', 'Loading your orders…');",
+      "replace": "    if (!S.orders) return m('div.StoreLoading', t('forum.loading.orders', {}, 'Loading your orders…'));",
+      "key": "forum.loading.orders"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 618,
+      "find": "      section('Your orders', orders.length ? [m('table.StoreTable', [\n        m('thead', m('tr', [\n          m('th', 'When'), m('th', 'Item'), m('th', 'Paid'), m('th', 'State'), m('th', ''),\n        ])),",
+      "replace": "      section(t('forum.orders.title', {}, 'Your orders'), orders.length ? [m('table.StoreTable', [\n        m('thead', m('tr', [\n          m('th', t('forum.table.when', {}, 'When')), m('th', t('forum.table.item', {}, 'Item')), m('th', t('forum.table.paid', {}, 'Paid')), m('th', t('forum.table.state', {}, 'State')), m('th', ''),\n        ])),",
+      "key": "forum.orders.title, forum.table.*",
+      "note": "Table headers: all four missed by the audit as 'identifier'. They are column headings on the member-facing orders screen."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 629,
+      "find": "              o.gift ? m('span.StoreTable-sub', 'gift to ' + (o.recipientName || '#' + o.recipientId)) : null,",
+      "replace": "              o.gift ? m('span.StoreTable-sub', t('forum.orders.gift_to', { name: o.recipientName || '#' + o.recipientId }, 'gift to ' + (o.recipientName || '#' + o.recipientId))) : null,",
+      "key": "forum.orders.gift_to"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 634,
+      "find": "            m('td', o.state === 'granted' && o.refundableUntil && new Date(o.refundableUntil) > new Date()\n              ? m('button.Button.Button--text', { onclick: function () { refund(o); } }, 'Refund')\n              : null),",
+      "replace": "            m('td', o.state === 'granted' && o.refundableUntil && new Date(o.refundableUntil) > new Date()\n              ? m('button.Button.Button--text', { onclick: function () { refund(o); } }, t('forum.action.refund', {}, 'Refund'))\n              : null),",
+      "key": "forum.action.refund"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 640,
+      "find": "      }, S.allOrders ? 'Show fewer' : 'Show all ' + orders.length + ' orders') : null,\n      ] : m('p.StoreEmpty', 'You have not bought anything yet.')),\n\n      gifts.length ? section('Gifts you were given', m('table.StoreTable', [\n        m('thead', m('tr', [m('th', 'When'), m('th', 'Item'), m('th', 'From')])),",
+      "replace": "      }, S.allOrders ? t('forum.action.show_fewer', {}, 'Show fewer') : t('forum.orders.show_all', { count: orders.length }, 'Show all ' + orders.length + ' orders')) : null,\n      ] : m('p.StoreEmpty', t('forum.orders.empty', {}, 'You have not bought anything yet.'))),\n\n      gifts.length ? section(t('forum.orders.gifts_title', {}, 'Gifts you were given'), m('table.StoreTable', [\n        m('thead', m('tr', [m('th', t('forum.table.when', {}, 'When')), m('th', t('forum.table.item', {}, 'Item')), m('th', t('forum.table.from', {}, 'From'))])),",
+      "key": "forum.action.show_fewer, forum.orders.show_all / empty / gifts_title, forum.table.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 656,
+      "find": "      section('Credit movements', ledger.length ? [m('table.StoreTable', [\n        m('thead', m('tr', [m('th', 'When'), m('th', 'Reason'), m('th', 'Reference'), m('th', 'Amount')])),",
+      "replace": "      section(t('forum.ledger.title', {}, 'Credit movements'), ledger.length ? [m('table.StoreTable', [\n        m('thead', m('tr', [m('th', t('forum.table.when', {}, 'When')), m('th', t('forum.table.reason', {}, 'Reason')), m('th', t('forum.table.reference', {}, 'Reference')), m('th', t('forum.table.amount', {}, 'Amount'))])),",
+      "key": "forum.ledger.title, forum.table.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 661,
+      "find": "            m('td', l.reason),",
+      "replace": "            m('td', t('forum.ledger.reason.' + l.reason, {}, l.reason)),",
+      "key": "forum.ledger.reason.*",
+      "note": "MISSED BY THE AUDIT and by any literal search: the ledger printed the raw slug — 'store.purchase', 'admin.adjust' — straight into a member-facing table. The key namespace mirrors the slug so the lookup is a concatenation."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 668,
+      "find": "      }, S.allLedger ? 'Show fewer' : 'Show all ' + ledger.length + ' movements') : null,\n      ] : m('p.StoreEmpty', 'No store movements on your ledger yet.')),",
+      "replace": "      }, S.allLedger ? t('forum.action.show_fewer', {}, 'Show fewer') : t('forum.ledger.show_all', { count: ledger.length }, 'Show all ' + ledger.length + ' movements')) : null,\n      ] : m('p.StoreEmpty', t('forum.ledger.empty', {}, 'No store movements on your ledger yet.'))),",
+      "key": "forum.action.show_fewer, forum.ledger.show_all / empty"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 678,
+      "find": "    if (!S.admin) return m('div.StoreLoading', 'Loading…');",
+      "replace": "    if (!S.admin) return m('div.StoreLoading', t('forum.loading.generic', {}, 'Loading…'));",
+      "key": "forum.loading.generic"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 683,
+      "find": "        stat('Items', st.items), stat('Orders', st.orders), stat('Delivered', st.granted),\n        stat('Refused', st.refused), stat('Failed', st.failed), stat('Refunded', st.refunded),\n        stat('Credits spent', shortNum(st.spent)), stat('Credits circulating', shortNum(st.circulating)),\n        stat('Live entitlements', st.entitlements),",
+      "replace": "        stat(t('forum.admin.stat.items', {}, 'Items'), st.items), stat(t('forum.admin.stat.orders', {}, 'Orders'), st.orders), stat(t('forum.admin.stat.delivered', {}, 'Delivered'), st.granted),\n        stat(t('forum.admin.stat.refused', {}, 'Refused'), st.refused), stat(t('forum.admin.stat.failed', {}, 'Failed'), st.failed), stat(t('forum.admin.stat.refunded', {}, 'Refunded'), st.refunded),\n        stat(t('forum.admin.stat.spent', {}, 'Credits spent'), shortNum(st.spent)), stat(t('forum.admin.stat.circulating', {}, 'Credits circulating'), shortNum(st.circulating)),\n        stat(t('forum.admin.stat.entitlements', {}, 'Live entitlements'), st.entitlements),",
+      "key": "forum.admin.stat.*",
+      "note": "Six of the nine were excluded by the audit as identifiers."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 690,
+      "find": "      section('Adjust a balance', m('div.StoreAdminForm', [\n        m('input.FormControl', { placeholder: 'username', id: 'adj-user' }),\n        m('input.FormControl', { placeholder: 'amount, e.g. 500 or -500', id: 'adj-delta', type: 'number' }),\n        m('input.FormControl', { placeholder: 'reason (recorded)', id: 'adj-note' }),",
+      "replace": "      section(t('forum.admin.adjust_title', {}, 'Adjust a balance'), m('div.StoreAdminForm', [\n        m('input.FormControl', { placeholder: t('forum.admin.username_placeholder', {}, 'username'), id: 'adj-user' }),\n        m('input.FormControl', { placeholder: t('forum.admin.amount_placeholder', {}, 'amount, e.g. 500 or -500'), id: 'adj-delta', type: 'number' }),\n        m('input.FormControl', { placeholder: t('forum.admin.reason_placeholder', {}, 'reason (recorded)'), id: 'adj-note' }),",
+      "key": "forum.admin.adjust_title, forum.admin.*_placeholder",
+      "note": "Three placeholders; the audit reports placeholder attributes but excluded these as identifiers."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 701,
+      "find": "                alertOk(r.username + ': ' + num(r.before) + ' to ' + num(r.after));",
+      "replace": "                alertOk(t('forum.admin.adjusted', { username: r.username, before: num(r.before), after: num(r.after) }, r.username + ': ' + num(r.before) + ' to ' + num(r.after)));",
+      "key": "forum.admin.adjusted"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 704,
+      "find": "              .catch(function (e) { alertError(((e && e.response) || {}).error || 'That did not work.'); });\n          },\n        }, 'Apply'),",
+      "replace": "              .catch(function (e) { alertError(((e && e.response) || {}).error || t('forum.admin.failed', {}, 'That did not work.')); });\n          },\n        }, t('forum.action.apply', {}, 'Apply')),",
+      "key": "forum.admin.failed, forum.action.apply"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 710,
+      "find": "        ['catalogue', 'Catalogue', 'ph:tag-fill'],\n        ['orders', 'Recent orders', 'ph:receipt-fill'],\n        ['audit', 'Audit trail', 'ph:scroll-fill'],",
+      "replace": "        ['catalogue', t('forum.admin.tab.catalogue', {}, 'Catalogue'), 'ph:tag-fill'],\n        ['orders', t('forum.admin.tab.orders', {}, 'Recent orders'), 'ph:receipt-fill'],\n        ['audit', t('forum.admin.tab.audit', {}, 'Audit trail'), 'ph:scroll-fill'],",
+      "key": "forum.admin.tab.*",
+      "note": "Built inside adminView(), so t() resolves per render."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 720,
+      "find": "      S.adminTab !== 'catalogue' ? null : section('Catalogue', [",
+      "replace": "      S.adminTab !== 'catalogue' ? null : section(t('forum.admin.catalogue_section', {}, 'Catalogue'), [",
+      "key": "forum.admin.catalogue_section"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 725,
+      "find": "                alertOk('Catalogue synced: ' + r.added + ' added, ' + r.updated + ' refreshed.');",
+      "replace": "                alertOk(t('forum.admin.synced', { added: r.added, updated: r.updated }, 'Catalogue synced: ' + r.added + ' added, ' + r.updated + ' refreshed.'));",
+      "key": "forum.admin.synced",
+      "note": "Two counts in one sentence, so the ICU message nests two plurals."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 729,
+      "find": "          }, 'Sync shipped catalogue'),",
+      "replace": "          }, t('forum.admin.sync_button', {}, 'Sync shipped catalogue')),",
+      "key": "forum.admin.sync_button"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 732,
+      "find": "          }, 'New item'),",
+      "replace": "          }, t('forum.admin.new_item', {}, 'New item')),",
+      "key": "forum.admin.new_item"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 736,
+      "find": "          placeholder: 'filter by SKU, name or kind',",
+      "replace": "          placeholder: t('forum.admin.filter_placeholder', {}, 'filter by SKU, name or kind'),",
+      "key": "forum.admin.filter_placeholder"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 741,
+      "find": "            m('th', 'SKU'), m('th', 'Name'), m('th', 'Kind'), m('th', 'Price'),\n            m('th', 'Stock'), m('th', 'State'), m('th', ''),",
+      "replace": "            m('th', t('forum.table.sku', {}, 'SKU')), m('th', t('forum.table.name', {}, 'Name')), m('th', t('forum.table.kind', {}, 'Kind')), m('th', t('forum.table.price', {}, 'Price')),\n            m('th', t('forum.table.stock', {}, 'Stock')), m('th', t('forum.table.state', {}, 'State')), m('th', ''),",
+      "key": "forum.table.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 758,
+      "find": "              m('td', i.active ? m('span.StoreState.is-granted', 'on sale') : m('span.StoreState.is-refused', 'off')),",
+      "replace": "              m('td', i.active ? m('span.StoreState.is-granted', t('forum.admin.on_sale', {}, 'on sale')) : m('span.StoreState.is-refused', t('forum.admin.off', {}, 'off'))),",
+      "key": "forum.admin.on_sale / off"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 764,
+      "find": "                }, 'Edit'),",
+      "replace": "                }, t('forum.action.edit', {}, 'Edit')),",
+      "key": "forum.action.edit"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 769,
+      "find": "                }, i.active ? 'Retire' : 'Restore'),",
+      "replace": "                }, i.active ? t('forum.action.retire', {}, 'Retire') : t('forum.action.restore', {}, 'Restore')),",
+      "key": "forum.action.retire / restore"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 776,
+      "find": "      S.adminTab !== 'orders' ? null : section('Recent orders', m('table.StoreTable', [\n        m('thead', m('tr', [m('th', 'When'), m('th', 'Buyer'), m('th', 'Item'), m('th', 'Paid'), m('th', 'State'), m('th', '')])),",
+      "replace": "      S.adminTab !== 'orders' ? null : section(t('forum.admin.orders_section', {}, 'Recent orders'), m('table.StoreTable', [\n        m('thead', m('tr', [m('th', t('forum.table.when', {}, 'When')), m('th', t('forum.table.buyer', {}, 'Buyer')), m('th', t('forum.table.item', {}, 'Item')), m('th', t('forum.table.paid', {}, 'Paid')), m('th', t('forum.table.state', {}, 'State')), m('th', '')])),",
+      "key": "forum.admin.orders_section, forum.table.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 782,
+      "find": "            m('td', [o.name, o.gift ? m('span.StoreTable-sub', 'gift to ' + (o.recipientName || o.recipientId)) : null]),",
+      "replace": "            m('td', [o.name, o.gift ? m('span.StoreTable-sub', t('forum.orders.gift_to', { name: o.recipientName || o.recipientId }, 'gift to ' + (o.recipientName || o.recipientId))) : null]),",
+      "key": "forum.orders.gift_to"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 785,
+      "find": "            m('td', o.state === 'granted'\n              ? m('button.Button.Button--text', { onclick: function () { refund(o); } }, 'Refund')\n              : null),",
+      "replace": "            m('td', o.state === 'granted'\n              ? m('button.Button.Button--text', { onclick: function () { refund(o); } }, t('forum.action.refund', {}, 'Refund'))\n              : null),",
+      "key": "forum.action.refund"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 792,
+      "find": "      S.adminTab !== 'audit' ? null : section('Audit trail', m('table.StoreTable', [\n        m('thead', m('tr', [m('th', 'When'), m('th', 'Action'), m('th', 'Subject'), m('th', 'Before'), m('th', 'After'), m('th', 'Note')])),",
+      "replace": "      S.adminTab !== 'audit' ? null : section(t('forum.admin.audit_section', {}, 'Audit trail'), m('table.StoreTable', [\n        m('thead', m('tr', [m('th', t('forum.table.when', {}, 'When')), m('th', t('forum.table.action', {}, 'Action')), m('th', t('forum.table.subject', {}, 'Subject')), m('th', t('forum.table.before', {}, 'Before')), m('th', t('forum.table.after', {}, 'After')), m('th', t('forum.table.note', {}, 'Note'))])),",
+      "key": "forum.admin.audit_section, forum.table.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 809,
+      "find": "    return m('div.StoreStat', [m('span.StoreStat-v', value === undefined || value === null ? '-' : String(value)), m('span.StoreStat-k', label)]);",
+      "replace": "    return m('div.StoreStat', [m('span.StoreStat-v', value === undefined || value === null ? '-' : (typeof value === 'number' ? num(value) : String(value))), m('span.StoreStat-k', label)]);",
+      "note": "Number formatting, not a string: the stat tiles printed raw integers ('12431') with no separators at all."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 833,
+      "find": "        field('sku', 'SKU'), field('name', 'Name'), field('kind', 'Kind'), field('category', 'Category'),\n        field('price', 'Price', 'number'), field('rarity', 'Rarity'), field('icon', 'Icon'), field('color', 'Colour'),\n        field('max_per_user', 'Max per user', 'number'), field('stock_total', 'Stock total', 'number'),\n        field('duration_days', 'Duration (days)', 'number'), field('uses', 'Charges', 'number'),\n        field('refund_minutes', 'Refund window (minutes)', 'number'), field('min_tier', 'Minimum tier'),\n        field('min_rank', 'Minimum rank'), field('available_until', 'Closes at (Y-m-d H:i:s)'),\n        field('sort', 'Sort', 'number'),",
+      "replace": "        field('sku', t('forum.admin.field.sku', {}, 'SKU')), field('name', t('forum.admin.field.name', {}, 'Name')), field('kind', t('forum.admin.field.kind', {}, 'Kind')), field('category', t('forum.admin.field.category', {}, 'Category')),\n        field('price', t('forum.admin.field.price', {}, 'Price'), 'number'), field('rarity', t('forum.admin.field.rarity', {}, 'Rarity')), field('icon', t('forum.admin.field.icon', {}, 'Icon')), field('color', t('forum.admin.field.color', {}, 'Colour')),\n        field('max_per_user', t('forum.admin.field.max_per_user', {}, 'Max per user'), 'number'), field('stock_total', t('forum.admin.field.stock_total', {}, 'Stock total'), 'number'),\n        field('duration_days', t('forum.admin.field.duration_days', {}, 'Duration (days)'), 'number'), field('uses', t('forum.admin.field.uses', {}, 'Charges'), 'number'),\n        field('refund_minutes', t('forum.admin.field.refund_minutes', {}, 'Refund window (minutes)'), 'number'), field('min_tier', t('forum.admin.field.min_tier', {}, 'Minimum tier')),\n        field('min_rank', t('forum.admin.field.min_rank', {}, 'Minimum rank')), field('available_until', t('forum.admin.field.available_until', {}, 'Closes at (Y-m-d H:i:s)')),\n        field('sort', t('forum.admin.field.sort', {}, 'Sort'), 'number'),",
+      "key": "forum.admin.field.*",
+      "note": "Seventeen labels; the audit caught four of them."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 841,
+      "find": "      m('label.StoreField.StoreField--wide', [m('span', 'Blurb'), m('input.FormControl', {",
+      "replace": "      m('label.StoreField.StoreField--wide', [m('span', t('forum.admin.field.blurb', {}, 'Blurb')), m('input.FormControl', {",
+      "key": "forum.admin.field.blurb"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 844,
+      "find": "      m('label.StoreField.StoreField--wide', [m('span', 'Payload (JSON)'), m('textarea.FormControl', {",
+      "replace": "      m('label.StoreField.StoreField--wide', [m('span', t('forum.admin.field.payload', {}, 'Payload (JSON)')), m('textarea.FormControl', {",
+      "key": "forum.admin.field.payload"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 847,
+      "find": "      m('div.StoreEditor-checks', [toggle('active', 'On sale'), toggle('giftable', 'Giftable'), toggle('discountable', 'Membership discount applies')]),",
+      "replace": "      m('div.StoreEditor-checks', [toggle('active', t('forum.admin.field.active', {}, 'On sale')), toggle('giftable', t('forum.admin.field.giftable', {}, 'Giftable')), toggle('discountable', t('forum.admin.field.discountable', {}, 'Membership discount applies'))]),",
+      "key": "forum.admin.field.active / giftable / discountable"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 849,
+      "find": "        m('button.Button', { onclick: function () { S.adminEdit = null; } }, 'Cancel'),",
+      "replace": "        m('button.Button', { onclick: function () { S.adminEdit = null; } }, t('forum.action.cancel', {}, 'Cancel')),",
+      "key": "forum.action.cancel"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 853,
+      "find": "              alertOk('Saved ' + e.sku + '.');",
+      "replace": "              alertOk(t('forum.admin.saved', { sku: e.sku }, 'Saved ' + e.sku + '.'));",
+      "key": "forum.admin.saved"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 856,
+      "find": "            }).catch(function (err) {\n              alertError(((err && err.response) || {}).error || 'That did not save.');\n            });\n          },\n        }, 'Save'),",
+      "replace": "            }).catch(function (err) {\n              alertError(((err && err.response) || {}).error || t('forum.admin.save_failed', {}, 'That did not save.'));\n            });\n          },\n        }, t('forum.action.save', {}, 'Save')),",
+      "key": "forum.admin.save_failed, forum.action.save"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 908,
+      "find": "          a.setTitle({\n            catalogue: 'Store',\n            inventory: 'What you own',\n            orders: 'Your orders',\n            admin: 'Store admin',\n          }[this.view_] || 'Store');",
+      "replace": "          a.setTitle(t('forum.title.' + this.view_, {}, {\n            catalogue: 'Store',\n            inventory: 'What you own',\n            orders: 'Your orders',\n            admin: 'Store admin',\n          }[this.view_] || 'Store'));",
+      "key": "forum.title.*",
+      "note": "Runs in oninit, after boot, so t() resolves. An unknown view_ falls through to the English 'Store' and forum.title.<junk> simply misses."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 953,
+      "find": "            m('h1.StoreHead-title', 'Store'),\n            m('p.StoreHead-sub', 'Credits are earned by posting things people read. Spend them here.'),",
+      "replace": "            m('h1.StoreHead-title', t('forum.head.title', {}, 'Store')),\n            m('p.StoreHead-sub', t('forum.head.sub', {}, 'Credits are earned by posting things people read. Spend them here.')),",
+      "key": "forum.head.title / sub"
+    },
+    {
+      "file": "src/Listeners/InjectAdminLink.php",
+      "line": 39,
+      "find": "    a.textContent = 'Store';",
+      "replace": "    a.textContent = (window.app && app.translator) ? app.translator.trans('local-looksmax-store.admin.nav.store') : 'Store';",
+      "key": "admin.nav.store",
+      "note": "Inside a nowdoc, so PHP cannot interpolate here — but this string is JS running in the admin SPA, where app.translator exists. The audit counted the whole heredoc as one finding; it holds two user-visible strings."
+    },
+    {
+      "file": "src/Listeners/InjectAdminLink.php",
+      "line": 40,
+      "find": "    a.title = 'Catalogue, orders, balances and the audit trail';",
+      "replace": "    a.title = (window.app && app.translator) ? app.translator.trans('local-looksmax-store.admin.nav.store_title') : 'Catalogue, orders, balances and the audit trail';",
+      "key": "admin.nav.store_title"
+    },
+    {
+      "file": "src/Payments/PointsProvider.php",
+      "line": 33,
+      "find": "        return 'Credits';",
+      "replace": "        return resolve('translator')->trans('local-looksmax-store.forum.pay.credits_label');",
+      "key": "forum.pay.credits_label",
+      "note": "PaymentProvider::label() currently has NO caller anywhere in the extension (grepped). It is an interface method intended for a payment picker; translating it is correct for when one appears."
+    },
+    {
+      "file": "src/Payments/PointsProvider.php",
+      "line": 54,
+      "find": "                'You are ' . number_format(max(0, $amount - $balance)) . ' credits short.',",
+      "replace": "                resolve('translator')->trans('local-looksmax-store.forum.pay.short', ['count' => max(0, $amount - $balance)]),",
+      "key": "forum.pay.short",
+      "note": "number_format() with no arguments is en-US separators; ICU's '#' formats to the reader's locale. Also a plural: 'Te falta 1 credito' / 'Te faltan 2 creditos'. The audit mis-bucketed both halves of this concatenation as [date-format]."
+    },
+    {
+      "file": "src/Payments/PointsProvider.php",
+      "line": 68,
+      "find": "            : Charge::failed('already_refunded', 'That order was already refunded.');",
+      "replace": "            : Charge::failed('already_refunded', resolve('translator')->trans('local-looksmax-store.forum.error.already_refunded'));",
+      "key": "forum.error.already_refunded"
+    },
+    {
+      "file": "src/Payments/MockCardProvider.php",
+      "line": 34,
+      "find": "        return 'Card (not live)';",
+      "replace": "        return resolve('translator')->trans('local-looksmax-store.forum.pay.card_label');",
+      "key": "forum.pay.card_label",
+      "note": "Same no-caller note as PointsProvider::label()."
+    },
+    {
+      "file": "src/Payments/MockCardProvider.php",
+      "line": 47,
+      "find": "            return Charge::failed('card_declined', 'That card was declined.');",
+      "replace": "            return Charge::failed('card_declined', resolve('translator')->trans('local-looksmax-store.forum.error.card_declined'));",
+      "key": "forum.error.card_declined"
+    },
+    {
+      "file": "src/Payments/MockCardProvider.php",
+      "line": 50,
+      "find": "            return Charge::failed('card_invalid', 'That card number is not valid.');",
+      "replace": "            return Charge::failed('card_invalid', resolve('translator')->trans('local-looksmax-store.forum.error.card_invalid'));",
+      "key": "forum.error.card_invalid"
+    },
+    {
+      "file": "src/Payments/MockCardProvider.php",
+      "line": 53,
+      "find": "            return Charge::failed('invalid_amount', 'Nothing to charge.');",
+      "replace": "            return Charge::failed('invalid_amount', resolve('translator')->trans('local-looksmax-store.forum.error.nothing_to_charge'));",
+      "key": "forum.error.nothing_to_charge",
+      "note": "Missed by the audit ([date-format]); it reaches the buyer through PurchaseRefused."
+    },
+    {
+      "file": "src/Payments/MockCardProvider.php",
+      "line": 62,
+      "find": "            return Charge::failed('not_mock', 'That charge was not made by the mock provider.');",
+      "replace": "            return Charge::failed('not_mock', resolve('translator')->trans('local-looksmax-store.forum.error.not_mock_charge'));",
+      "key": "forum.error.not_mock_charge"
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 183,
+      "find": "            return ['slug' => 'standard', 'rank' => 0, 'discount' => 0.0, 'name' => 'Standard'];",
+      "replace": "            return ['slug' => 'standard', 'rank' => 0, 'discount' => 0.0, 'name' => resolve('translator')->trans('local-looksmax-store.forum.tier.standard')];",
+      "key": "forum.tier.standard",
+      "note": "Only reached when looksmax-ranks is absent. Excluded by the audit as an identifier; it is printed on the balance bar."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 207,
+      "find": "        if (!$row->active) {\n            return 'Not on sale right now.';\n        }",
+      "replace": "        if (!$row->active) {\n            return resolve('translator')->trans('local-looksmax-store.forum.lock.inactive');\n        }",
+      "key": "forum.lock.inactive"
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 210,
+      "find": "            return 'Opens ' . date('j M H:i', strtotime((string) $row->available_from)) . '.';",
+      "replace": "            return resolve('translator')->trans('local-looksmax-store.forum.lock.opens', ['when' => \\IntlDateFormatter::formatObject(new \\DateTimeImmutable((string) $row->available_from), 'd MMM HH:mm', resolve('translator')->getLocale())]);",
+      "key": "forum.lock.opens",
+      "note": "date('j M H:i') emits English month abbreviations ('4 Mar'). IntlDateFormatter renders '4 mar' in Spanish. ext-intl is installed (Dockerfile:13) and is already required by the messages+intl-icu domain."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 213,
+      "find": "            return 'This one has closed.';",
+      "replace": "            return resolve('translator')->trans('local-looksmax-store.forum.lock.closed');",
+      "key": "forum.lock.closed",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 221,
+      "find": "            return (int) $row->max_per_user === 1 ? 'You already own this.' : 'You have the maximum of these.';",
+      "replace": "            return (int) $row->max_per_user === 1 ? resolve('translator')->trans('local-looksmax-store.forum.lock.owned') : resolve('translator')->trans('local-looksmax-store.forum.lock.max_reached');",
+      "key": "forum.lock.owned / max_reached",
+      "note": "PAIRED WITH the three Purchase.php:101-108 entries below. Purchase re-derives its error code by matching this exact English prose; translating this alone would silently downgrade every 'owned' refusal to code 'locked' and break the gift wording. Apply all four together or none."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 233,
+      "find": "                return 'You are on ' . $tier['name'] . ' already, which is above ' . $target['name'] . '.';",
+      "replace": "                return resolve('translator')->trans('local-looksmax-store.forum.lock.tier_downgrade', ['current' => $tier['name'], 'target' => $target['name']]);",
+      "key": "forum.lock.tier_downgrade",
+      "note": "Falls through Purchase's match() to 'locked' today and still will, so this one is independent of the paired set."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 246,
+      "find": "                return 'Reach ' . $need['name'] . ' first (' . number_format((int) $need['min'] - $lifetime) . ' more lifetime points).';",
+      "replace": "                return resolve('translator')->trans('local-looksmax-store.forum.lock.rank_required', ['rank' => $need['name'], 'count' => (int) $need['min'] - $lifetime]);",
+      "key": "forum.lock.rank_required",
+      "note": "Drops number_format()'s en-US separators and adds the plural arm."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 252,
+      "find": "            return $req ? 'Needs ' . $req->name . ' first.' : null;",
+      "replace": "            return $req ? resolve('translator')->trans('local-looksmax-store.forum.lock.requires', ['item' => $req->name]) : null;",
+      "key": "forum.lock.requires",
+      "note": "Missed by the audit ([date-format]). $req->name is a store_items row, so it stays English until the Seed design in `deferred` lands."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 216,
+      "find": "        if ($stockLeft !== null && $stockLeft <= 0) {\n            return 'Sold out.';\n        }",
+      "replace": "        if ($stockLeft !== null && $stockLeft <= 0) {\n            return resolve('translator')->trans('local-looksmax-store.forum.lock.sold_out');\n        }",
+      "key": "forum.lock.sold_out",
+      "note": "Paired with Purchase.php:101 below — see the note on Catalogue.php:221."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 204,
+      "find": "        if (!$user || $user->isGuest()) {\n            return 'Sign in to buy anything.';\n        }",
+      "replace": "        if (!$user || $user->isGuest()) {\n            return resolve('translator')->trans('local-looksmax-store.forum.lock.guest');\n        }",
+      "key": "forum.lock.guest",
+      "note": "Paired with Purchase.php:104 below."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 68,
+      "find": "            return $this->fail(404, 'no_such_item', 'There is no such item.');",
+      "replace": "            return $this->fail(404, 'no_such_item', resolve('translator')->trans('local-looksmax-store.forum.error.no_such_item'));",
+      "key": "forum.error.no_such_item"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 75,
+      "find": "            return $this->fail(403, 'not_giftable', 'That one cannot be given as a gift.');",
+      "replace": "            return $this->fail(403, 'not_giftable', resolve('translator')->trans('local-looksmax-store.forum.error.not_giftable'));",
+      "key": "forum.error.not_giftable"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 78,
+      "find": "            return $this->fail(404, 'no_such_user', 'No account by that name.');",
+      "replace": "            return $this->fail(404, 'no_such_user', resolve('translator')->trans('local-looksmax-store.forum.error.no_such_user'));",
+      "key": "forum.error.no_such_user"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 96,
+      "find": "            // The sentence is for the buyer; the code is for the client, which\n            // has to tell \"sold out\" (stop offering it) from \"you already own\n            // this\" (show it as owned) from \"not for your tier\" (offer the\n            // upgrade) without parsing English.\n            $code = match (true) {\n                str_starts_with($locked, 'Sold out') => 'sold_out',\n                str_contains($locked, 'already own') => 'owned',\n                str_contains($locked, 'or above') => 'tier_required',\n                str_starts_with($locked, 'Sign in') => 'guest',\n                default => 'locked',\n            };",
+      "replace": "            // The sentence is for the buyer; the code is for the client, which\n            // has to tell \"sold out\" (stop offering it) from \"you already own\n            // this\" (show it as owned) from \"not for your tier\" (offer the\n            // upgrade).\n            //\n            // The sentence is a translation now, so the code can no longer be\n            // sniffed out of English prose. Three of the four arms compare\n            // against the same key Catalogue::lockReason() returned, which is\n            // language-proof. The fourth cannot: the tier gate's sentence\n            // carries a {tier} parameter, so there is no constant to compare\n            // to. That is why lock.min_tier is still hardcoded in\n            // Catalogue.php, and why `deferred` proposes lockReason() return a\n            // code instead of a sentence — which would delete this whole\n            // block.\n            $t = resolve('translator');\n            $code = match (true) {\n                $locked === $t->trans('local-looksmax-store.forum.lock.sold_out') => 'sold_out',\n                $locked === $t->trans('local-looksmax-store.forum.lock.owned') => 'owned',\n                str_contains($locked, 'or above') => 'tier_required',\n                $locked === $t->trans('local-looksmax-store.forum.lock.guest') => 'guest',\n                default => 'locked',\n            };",
+      "key": "forum.lock.sold_out / owned / guest",
+      "note": "PAIRED with the three Catalogue.php lock entries. This is a behaviour fix, not a translation: without it, translating lockReason() would make every sold-out and already-owned refusal report code 'locked'."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 108,
+      "find": "            return $this->fail(409, $code, $gift ? str_replace('You already own this.', 'They already own this.', $locked) : $locked);",
+      "replace": "            return $this->fail(409, $code, $gift ? str_replace($t->trans('local-looksmax-store.forum.lock.owned'), $t->trans('local-looksmax-store.forum.lock.owned_gift'), $locked) : $locked);",
+      "key": "forum.lock.owned / owned_gift",
+      "note": "Uses the $t bound by the previous entry, so the two must be applied together. Keeps the second-person/third-person swap working in Spanish ('Esto ya lo tienes.' -> 'Ya lo tiene.')."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 128,
+      "find": "                'error' => $existing->state === 'granted' ? null : ($existing->error ?: 'That purchase was already submitted.'),",
+      "replace": "                'error' => $existing->state === 'granted' ? null : ($existing->error ?: resolve('translator')->trans('local-looksmax-store.forum.error.duplicate_submitted')),",
+      "key": "forum.error.duplicate_submitted"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 158,
+      "find": "                'error' => 'That purchase is already being processed.', 'code' => 'duplicate',",
+      "replace": "                'error' => resolve('translator')->trans('local-looksmax-store.forum.error.duplicate_processing'), 'code' => 'duplicate',",
+      "key": "forum.error.duplicate_processing"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 169,
+      "find": "                if (!$locked->active) {\n                    throw new PurchaseRefused('not_on_sale', 'That is not on sale right now.');\n                }\n                if ($locked->available_until && strtotime((string) $locked->available_until) < time()) {\n                    throw new PurchaseRefused('closed', 'That one has closed.');\n                }\n                if ($locked->stock_total !== null && (int) $locked->stock_sold >= (int) $locked->stock_total) {\n                    throw new PurchaseRefused('sold_out', 'Sold out.');\n                }",
+      "replace": "                if (!$locked->active) {\n                    throw new PurchaseRefused('not_on_sale', resolve('translator')->trans('local-looksmax-store.forum.error.not_on_sale'));\n                }\n                if ($locked->available_until && strtotime((string) $locked->available_until) < time()) {\n                    throw new PurchaseRefused('closed', resolve('translator')->trans('local-looksmax-store.forum.error.closed'));\n                }\n                if ($locked->stock_total !== null && (int) $locked->stock_sold >= (int) $locked->stock_total) {\n                    throw new PurchaseRefused('sold_out', resolve('translator')->trans('local-looksmax-store.forum.error.sold_out'));\n                }",
+      "key": "forum.error.not_on_sale / closed / sold_out",
+      "note": "Two of these three were missed by the audit ([date-format]). Each already carries its own machine code in the first argument, so translating the sentence changes nothing downstream."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 253,
+      "find": "            return $this->fail(409, 'not_refundable', 'That order is ' . $order->state . '.');",
+      "replace": "            return $this->fail(409, 'not_refundable', resolve('translator')->trans('local-looksmax-store.forum.error.order_state', ['state' => resolve('translator')->trans('local-looksmax-store.forum.state.' . $order->state)]));",
+      "key": "forum.error.order_state, forum.state.*",
+      "note": "Missed by the audit. $order->state was interpolated raw ('That order is refused.'); it now goes through the same state labels the orders table uses. The Spanish state words are adjectives so 'Ese pedido esta fallido.' agrees."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 256,
+      "find": "            return $this->fail(403, 'not_yours', 'That is not your order.');",
+      "replace": "            return $this->fail(403, 'not_yours', resolve('translator')->trans('local-looksmax-store.forum.error.not_your_order'));",
+      "key": "forum.error.not_your_order"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 264,
+      "find": "                return $this->fail(403, 'no_window', 'This item cannot be refunded. Ask staff if something went wrong.');",
+      "replace": "                return $this->fail(403, 'no_window', resolve('translator')->trans('local-looksmax-store.forum.error.no_refund_window'));",
+      "key": "forum.error.no_refund_window"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 267,
+      "find": "                return $this->fail(403, 'window_closed', 'The refund window for this item has closed.');",
+      "replace": "                return $this->fail(403, 'window_closed', resolve('translator')->trans('local-looksmax-store.forum.error.refund_window_closed'));",
+      "key": "forum.error.refund_window_closed"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 272,
+      "find": "            return $this->fail(409, 'already_used', 'That has already been used, so it cannot be refunded.');",
+      "replace": "            return $this->fail(409, 'already_used', resolve('translator')->trans('local-looksmax-store.forum.error.already_used'));",
+      "key": "forum.error.already_used"
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 380,
+      "find": "        if (str_contains($message, 'already owned')) {\n            return 'You already own that.';\n        }\n        if (str_contains($message, 'already own everything')) {\n            return $message;\n        }\n        if (str_contains($message, 'injected fault')) {\n            return 'The purchase was rolled back on purpose (' . $message . '). Nothing was charged.';\n        }\n\n        return 'Something went wrong and nothing was charged.';",
+      "replace": "        // The str_contains() probes stay in English on purpose: they match\n        // internal RuntimeException text thrown by the grant handlers, which is\n        // never shown to anybody. Only the RETURN values are user-visible.\n        if (str_contains($message, 'already owned')) {\n            return resolve('translator')->trans('local-looksmax-store.forum.error.already_owned');\n        }\n        if (str_contains($message, 'already own everything')) {\n            return resolve('translator')->trans(str_contains($message, 'bundle')\n                ? 'local-looksmax-store.forum.error.own_everything_bundle'\n                : 'local-looksmax-store.forum.error.own_everything_box');\n        }\n        if (str_contains($message, 'injected fault')) {\n            return resolve('translator')->trans('local-looksmax-store.forum.error.injected_fault', ['detail' => $message]);\n        }\n\n        return resolve('translator')->trans('local-looksmax-store.forum.error.generic_rollback');",
+      "key": "forum.error.already_owned / own_everything_box / own_everything_bundle / injected_fault / generic_rollback",
+      "note": "`return $message` echoed a raw exception string ('you already own everything this box can contain') straight to the buyer — MysteryGrant.php:47 and BundleGrant.php:64. Those two exception texts stay English because they are now only a discriminator; the sentence the member reads comes from the two new keys."
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 39,
+      "find": "            return ['ok' => false, 'status' => 403, 'error' => 'You have no highlight left to use.'];",
+      "replace": "            return ['ok' => false, 'status' => 403, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.no_highlight')];",
+      "key": "forum.redeem.no_highlight"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 69,
+      "find": "            return ['ok' => false, 'status' => 409, 'error' => 'That thread is already pinned.'];",
+      "replace": "            return ['ok' => false, 'status' => 409, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.already_pinned')];",
+      "key": "forum.redeem.already_pinned"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 74,
+      "find": "            return ['ok' => false, 'status' => 403, 'error' => 'You have no pin left to use.'];",
+      "replace": "            return ['ok' => false, 'status' => 403, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.no_pin')];",
+      "key": "forum.redeem.no_pin"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 114,
+      "find": "            return ['ok' => false, 'status' => 429, 'error' => 'That thread was already bumped this week.'];",
+      "replace": "            return ['ok' => false, 'status' => 429, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.bumped_this_week')];",
+      "key": "forum.redeem.bumped_this_week"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 119,
+      "find": "            return ['ok' => false, 'status' => 403, 'error' => 'You have no bump left to use.'];",
+      "replace": "            return ['ok' => false, 'status' => 403, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.no_bump')];",
+      "key": "forum.redeem.no_bump"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 146,
+      "find": "            return ['ok' => false, 'status' => 422, 'error' => 'Names are 3 to 30 characters, letters, numbers, dashes and underscores.'];",
+      "replace": "            return ['ok' => false, 'status' => 422, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.name_rules')];",
+      "key": "forum.redeem.name_rules"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 149,
+      "find": "            return ['ok' => false, 'status' => 422, 'error' => 'That is already your name.'];",
+      "replace": "            return ['ok' => false, 'status' => 422, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.same_name')];",
+      "key": "forum.redeem.same_name"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 152,
+      "find": "            return ['ok' => false, 'status' => 409, 'error' => 'That name is taken.'];",
+      "replace": "            return ['ok' => false, 'status' => 409, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.name_taken')];",
+      "key": "forum.redeem.name_taken",
+      "note": "Missed by the audit."
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 157,
+      "find": "            return ['ok' => false, 'status' => 403, 'error' => 'You have no username change left to use.'];",
+      "replace": "            return ['ok' => false, 'status' => 403, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.no_rename')];",
+      "key": "forum.redeem.no_rename"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 207,
+      "find": "            return ['ok' => false, 'status' => 404, 'error' => 'No such thread.'];",
+      "replace": "            return ['ok' => false, 'status' => 404, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.no_such_thread')];",
+      "key": "forum.redeem.no_such_thread",
+      "note": "Missed by the audit."
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 210,
+      "find": "            return ['ok' => false, 'status' => 403, 'error' => 'That is not your thread.'];",
+      "replace": "            return ['ok' => false, 'status' => 403, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.not_your_thread')];",
+      "key": "forum.redeem.not_your_thread"
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 213,
+      "find": "            return ['ok' => false, 'status' => 409, 'error' => 'That thread is deleted.'];",
+      "replace": "            return ['ok' => false, 'status' => 409, 'error' => resolve('translator')->trans('local-looksmax-store.forum.redeem.thread_deleted')];",
+      "key": "forum.redeem.thread_deleted"
+    },
+    {
+      "file": "src/Api/StoreController.php",
+      "line": 49,
+      "find": "            default => new JsonResponse(['error' => 'unknown view'], 404),",
+      "replace": "            default => new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.unknown_view')], 404),",
+      "key": "forum.error.unknown_view",
+      "note": "Renders in the store's own error banner (js/dist/forum.js:941) if anybody hits /api/store/<junk>."
+    },
+    {
+      "file": "src/Api/StoreController.php",
+      "line": 73,
+      "find": "                'tierName' => $tier['name'] ?? 'Standard',",
+      "replace": "                'tierName' => $tier['name'] ?? resolve('translator')->trans('local-looksmax-store.forum.tier.standard'),",
+      "key": "forum.tier.standard",
+      "note": "Missed by the audit (identifier)."
+    },
+    {
+      "file": "src/Api/StoreController.php",
+      "line": 148,
+      "find": "        $meta = [\n            'membership' => ['Memberships', 'solar:crown-bold'],\n            'colours' => ['Username colours', 'ph:paint-brush-fill'],\n            'frames' => ['Avatar frames', 'ph:circle-half-tilt-bold'],\n            'boosts' => ['Boosts', 'ph:lightning-fill'],\n            'utility' => ['Thread perks', 'ph:wrench-fill'],\n            'mystery' => ['Boxes', 'ph:package-fill'],\n            'bundles' => ['Bundles', 'ph:shopping-bag-open-fill'],\n            'credits' => ['Credit packs', 'ph:coins-fill'],\n        ];",
+      "replace": "        $t = resolve('translator');\n        $meta = [\n            'membership' => [$t->trans('local-looksmax-store.forum.category.membership'), 'solar:crown-bold'],\n            'colours' => [$t->trans('local-looksmax-store.forum.category.colours'), 'ph:paint-brush-fill'],\n            'frames' => [$t->trans('local-looksmax-store.forum.category.frames'), 'ph:circle-half-tilt-bold'],\n            'boosts' => [$t->trans('local-looksmax-store.forum.category.boosts'), 'ph:lightning-fill'],\n            'utility' => [$t->trans('local-looksmax-store.forum.category.utility'), 'ph:wrench-fill'],\n            'mystery' => [$t->trans('local-looksmax-store.forum.category.mystery'), 'ph:package-fill'],\n            'bundles' => [$t->trans('local-looksmax-store.forum.category.bundles'), 'ph:shopping-bag-open-fill'],\n            'credits' => [$t->trans('local-looksmax-store.forum.category.credits'), 'ph:coins-fill'],\n        ];",
+      "key": "forum.category.*",
+      "note": "Eight category tabs; the audit caught three. ucfirst($key) at line 175 stays as-is: it is a fallback for a category an admin invented at runtime, which has no key to look up."
+    },
+    {
+      "file": "src/Api/StoreController.php",
+      "line": 256,
+      "find": "            return new JsonResponse(['error' => 'not allowed'], 403);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.not_allowed')], 403);",
+      "key": "forum.error.not_allowed",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 46,
+      "find": "            return new JsonResponse(['error' => 'Sign in first.'], 401);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.sign_in')], 401);",
+      "key": "forum.error.sign_in"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 55,
+      "find": "                default => new JsonResponse(['error' => 'unknown action'], 404),",
+      "replace": "                default => new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.unknown_action')], 404),",
+      "key": "forum.error.unknown_action"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 58,
+      "find": "                'error' => 'Something went wrong. Nothing was charged.',",
+      "replace": "                'error' => resolve('translator')->trans('local-looksmax-store.forum.error.generic'),",
+      "key": "forum.error.generic"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 74,
+      "find": "                return new JsonResponse(['error' => 'No account called ' . $name . '.', 'code' => 'no_such_user'], 404);",
+      "replace": "                return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.no_account_named', ['name' => $name]), 'code' => 'no_such_user'], 404);",
+      "key": "forum.error.no_account_named",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 104,
+      "find": "            return new JsonResponse(['error' => 'No such order.'], 404);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.no_such_order')], 404);",
+      "key": "forum.error.no_such_order",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 122,
+      "find": "            default => ['ok' => false, 'status' => 404, 'error' => 'Nothing to redeem of that kind.'],",
+      "replace": "            default => ['ok' => false, 'status' => 404, 'error' => resolve('translator')->trans('local-looksmax-store.forum.error.nothing_to_redeem')],",
+      "key": "forum.error.nothing_to_redeem"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 143,
+      "find": "            return new JsonResponse(['error' => 'not allowed'], 403);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.not_allowed')], 403);",
+      "key": "forum.error.not_allowed",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 154,
+      "find": "            default => new JsonResponse(['error' => 'unknown operation'], 404),",
+      "replace": "            default => new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.unknown_operation')], 404),",
+      "key": "forum.error.unknown_operation"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 162,
+      "find": "            return new JsonResponse(['error' => 'SKUs are lower case letters, numbers and dashes.'], 422);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.admin.sku_rules')], 422);",
+      "key": "forum.admin.sku_rules"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 211,
+      "find": "            return new JsonResponse(['error' => 'No such item.'], 404);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.admin.no_such_item')], 404);",
+      "key": "forum.admin.no_such_item",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 237,
+      "find": "            return new JsonResponse(['ok' => true, 'retired' => true, 'note' => 'It has been sold before, so it was retired rather than deleted.']);",
+      "replace": "            return new JsonResponse(['ok' => true, 'retired' => true, 'note' => resolve('translator')->trans('local-looksmax-store.forum.admin.retired_note')]);",
+      "key": "forum.admin.retired_note"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 253,
+      "find": "            return new JsonResponse(['error' => 'Nothing to adjust.'], 422);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.admin.nothing_to_adjust')], 422);",
+      "key": "forum.admin.nothing_to_adjust",
+      "note": "Missed by the audit ([date-format])."
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 256,
+      "find": "            return new JsonResponse(['error' => 'Say why. The adjustment is recorded with the reason.'], 422);",
+      "replace": "            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.admin.reason_required')], 422);",
+      "key": "forum.admin.reason_required"
+    },
+    {
+      "file": "src/Api/StoreActionController.php",
+      "line": 261,
+      "find": "        $target = User::where('username', $name)->first();\n        if (!$target) {\n            return new JsonResponse(['error' => 'No account called ' . $name . '.'], 404);\n        }",
+      "replace": "        $target = User::where('username', $name)->first();\n        if (!$target) {\n            return new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.no_account_named', ['name' => $name])], 404);\n        }",
+      "key": "forum.error.no_account_named",
+      "note": "Second occurrence of this sentence in the file, so the find is extended to the surrounding block to stay unique."
+    },
+    {
+      "file": "src/Grants/TierGrant.php",
+      "line": 63,
+      "find": "            throw new PurchaseRefused(\n                'tier_downgrade',\n                'You are on ' . $currentTier['name'] . ' already, which is above ' . $tier['name'] . '.'\n            );",
+      "replace": "            throw new PurchaseRefused(\n                'tier_downgrade',\n                resolve('translator')->trans('local-looksmax-store.forum.lock.tier_downgrade', ['current' => $currentTier['name'], 'target' => $tier['name']])\n            );",
+      "key": "forum.lock.tier_downgrade",
+      "note": "Same sentence as Catalogue.php:233, deliberately the same key: the card and the endpoint must not be able to disagree."
+    },
+    {
+      "file": "extend.php",
+      "line": 77,
+      "find": "    (new Extend\\Console())",
+      "replace": "    (new Extend\\Locales(__DIR__ . '/locale')),\n\n    (new Extend\\Console())",
+      "note": "The only structural edit in this spec. `Flarum\\Extend` is already imported at the top of the file."
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/Seed.php",
+      "line": 41,
+      "string": "Double earnings, 24 hours",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 44,
+      "string": "Everything you earn counts double for a day. Stacks with your membership multiplier.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 48,
+      "string": "Double earnings, 7 days",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 51,
+      "string": "The same thing for a week. Cheaper per day than buying seven of the above.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 55,
+      "string": "Raised daily ceiling, 24 hours",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 58,
+      "string": "Doubles the anti-farming daily caps for a day. For the days you actually are writing that much.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 62,
+      "string": "Streak freeze",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 65,
+      "string": "Covers one missed day so a daily streak survives it. Spent automatically, oldest first.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 71,
+      "string": "Highlight a thread, 3 days",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 74,
+      "string": "Your thread gets a marked edge in the discussion list for three days. One thread, your choice, redeemed when you want it.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 78,
+      "string": "Pin a thread, 24 hours",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 81,
+      "string": "Pins one of your threads to the top of its tag for a day, then unpins it. A moderator can end it early.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 85,
+      "string": "Bump a thread",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 88,
+      "string": "Moves one of your threads back to the top of the recent list without posting \"bump\".",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 92,
+      "string": "Username change",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them. MISSED BY THE AUDIT — it is an item name on every card."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 95,
+      "string": "One change of the name on your account. Your old name is recorded on the order.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 104,
+      "string": "Colour box",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 111,
+      "string": "One username style you do not already own. 55% solid, 38% gradient, 7% animated. Cheapest animated style is worth 12,000.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 114,
+      "string": "Frame box",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 120,
+      "string": "One avatar frame you do not already own. 40% common, 30% uncommon, 24% rare, 6% epic.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 132,
+      "string": "VIP for life",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 135,
+      "string": "VIP that never expires and never needs renewing. Twenty five of these exist.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 141,
+      "string": "VIP starter",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 144,
+      "string": "A month of VIP, the Oceanic gradient and a day of doubled earnings. Sold together for less than the three separately.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 154,
+      "string": "10,000 credits",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them. MISSED BY THE AUDIT — it is an item name on every card. It also carries an en-US thousands separator in the name itself ('10,000' must be '10.000' in Spanish), which is why the name cannot simply be left alone."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 157,
+      "string": "Card payment is not live yet. This is a test purchase path and it does not charge anything.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 161,
+      "string": "50,000 credits",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them. MISSED BY THE AUDIT — it is an item name on every card. It also carries an en-US thousands separator in the name itself ('10,000' must be '10.000' in Spanish), which is why the name cannot simply be left alone."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 164,
+      "string": "Card payment is not live yet. This is a test purchase path and it does not charge anything.",
+      "reason": "src/Seed.php writes this prose into the DATABASE (store_items.name / .blurb, via Catalogue::sync(), which re-runs on every deploy and on the admin screen's Sync button). It is not template chrome, so a translator call here would either freeze one language into the column or put a raw key string into a field an admin edits from a plain <input>. The English and Spanish are already written, in locale/{en,es}.yml under forum.item.<sku>.name / .blurb. What it takes: (1) a migration adding nullable `name_key` and `blurb_key` VARCHAR(120) columns to store_items; (2) Seed::native() declaring 'name_key' => 'local-looksmax-store.forum.item.<sku>.name' beside each row, and Catalogue::sync() copying them into the new columns while `name`/`blurb` keep the English as the fallback; (3) one helper — Catalogue::label(?string $key, string $fallback) — that returns trans($key) when the key resolves and $fallback when it does not, called from the four places a name reaches a member: Catalogue::forUser(), StoreController::heldByUser(), Purchase::orderPayload() and Catalogue::lockReason()'s `requires` branch; (4) StoreActionController::saveItem() nulling name_key/blurb_key whenever an admin edits name or blurb, so a hand override wins permanently. Deploy order matters: the locale files must be live before `php flarum store:sync` runs, or rows get keys with nothing behind them."
+    },
+    {
+      "file": "src/Seed.php",
+      "line": 189,
+      "string": "$t['name'] . ' membership'",
+      "reason": "Seed::mirrored() builds names and blurbs by reading Local\\Ranks\\Catalog::TIERS / STYLES / FRAMES — another extension's PHP constants, outside this lane's boundary — and concatenating ' membership' onto the tier name. Same DB-column problem as the native rows above, plus the source strings belong to looksmax-ranks. The name_key for these has to point into local-looksmax-ranks.*, so the ranks lane has to key its catalogue first. Flagged to that lane, not fixed here."
+    },
+    {
+      "file": "src/Catalogue.php",
+      "line": 240,
+      "string": "$need['name'] . ' or above can use this.'",
+      "reason": "The last of the four lock sentences Purchase.php:100-106 re-derives an error code from, and the only one that cannot be rescued by comparing against a translation key: it carries a {tier} parameter, so str_contains() has nothing constant to match. Left in English so `str_contains($locked, 'or above') => 'tier_required'` keeps working — a member gated by tier would otherwise get code 'locked' and the client would stop offering the upgrade. The key forum.lock.min_tier is written in both locales and is a one-line change once the proper fix lands. THE PROPER FIX, and the single highest-value follow-up in this extension: change Catalogue::lockReason() to return ?array{code: string, key: string, params: array} instead of a sentence; Catalogue::forUser() then does trans($lock['key'], $lock['params']) for the card, and Purchase::buy() reads $lock['code'] directly and picks forum.lock.owned_gift by looking at $gift rather than by string-replacing English. That deletes the match(true) block, the str_replace, and this deferral together."
+    },
+    {
+      "file": "src/Redeem.php",
+      "line": 171,
+      "string": "'bought username change'",
+      "reason": "Written into store_audit.note, a persisted column, and rendered months later in the admin audit table (js/dist/forum.js:801). Translating at write time freezes whichever language the buyer had into every historic row; translating at read time needs the column to hold a stable token instead of prose. Recommended: write the literal 'store.rename.bought' to the column and have the audit table render t('forum.audit.note.' + r.note, {}, r.note) — the same shape already used for the ledger reason slugs at forum.js:661 in this spec. Deliberately not done here because it changes what a data column MEANS, and the audit trail is the one table in this extension that exists to be trusted."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 375,
+      "string": "'injected fault at ' . $point",
+      "reason": "Internal RuntimeException text, admin-only and only reachable by POSTing a `fault` parameter. It is the discriminator for humanise()'s third branch and is embedded as the {detail} of forum.error.injected_fault, which IS translated. Leaving the marker in English keeps the branch working."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 381,
+      "string": "'already owned'",
+      "reason": "A str_contains() probe against CosmeticGrant.php:53's exception text, not a displayed string. Correctly a false positive."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 384,
+      "string": "'already own everything'",
+      "reason": "Same: a probe against MysteryGrant.php:47 / BundleGrant.php:64 exception text. The sentence the member actually reads is now forum.error.own_everything_box / _bundle, applied above."
+    },
+    {
+      "file": "src/Purchase.php",
+      "line": 387,
+      "string": "'injected fault'",
+      "reason": "Same class of probe. Not displayed."
+    },
+    {
+      "file": "src/Grants/CosmeticGrant.php",
+      "line": 44,
+      "string": "' has no item in its payload'",
+      "reason": "RuntimeException for a malformed catalogue row. It never reaches a member: Purchase::humanise() does not match it, so the buyer sees forum.error.generic_rollback. It goes in the log and in store_orders.error, both operator surfaces. Audit false positive."
+    },
+    {
+      "file": "src/Grants/TierGrant.php",
+      "line": 65,
+      "string": "' already, which is above '",
+      "reason": "Counted separately by the audit but it is one half of the concatenation replaced above at TierGrant.php:63. Already handled — listed here only so the audit's 162 reconciles."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 971,
+      "string": "'no app'",
+      "reason": "window.__lmxStore.why — a boot-trace breadcrumb read by e2e/probe.ts, never rendered. Audit false positive. Same for 'no initializers' (:972), 'no mithril' (:973), 'watchCore: ' (:1029) and 'register: ' (:1053)."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 978,
+      "string": "'after boot' / 'before boot'",
+      "reason": "window.__lmxStore.at — the same boot trace. Never rendered. Audit false positive."
+    },
+    {
+      "file": "less/forum.less",
+      "line": 228,
+      "string": "content: ''",
+      "reason": "The only `content:` rule in the whole 924-line stylesheet and it is an empty decorative pseudo-element, not text. Nothing in less/forum.less needs translating; the LESS file listed in the assignment is clean."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 459,
+      "string": "'4242 4242 4242 4242'",
+      "reason": "The card-number placeholder. A digit string, identical in every locale; translating it would let a translator break a test fixture. Deliberately not keyed."
+    },
+    {
+      "file": "src/Api/StoreController.php",
+      "line": 175,
+      "string": "ucfirst($key)",
+      "reason": "The tab label for a category an admin invented at runtime through the New item form. There is no key to look up because the category did not exist when the locale files were written. It stays as the raw slug, title-cased. Proper fix if it ever matters: a store_categories table with its own label column, which is a product decision rather than an i18n one."
+    },
+    {
+      "file": "src/Console/SyncCommand.php",
+      "line": 28,
+      "string": "(all four Console commands)",
+      "reason": "src/Console/{Sync,Expire,Reconcile}Command.php hold 24 strings the audit correctly excluded as [cli]. They are `php flarum store:*` descriptions and operator progress lines, seen only over ssh by whoever runs them. Left English on purpose; Flarum's own console output is English too and a half-Spanish CLI is worse than an English one."
+    }
+  ]
+}

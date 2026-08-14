@@ -1,0 +1,125 @@
+{
+  "extension": "looksmax-guides",
+  "prefix": "local-looksmax-guides",
+  "replacements": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 100,
+      "find": "  function relTime(iso) {\n    if (!iso) return null;\n    var then = new Date(String(iso).replace(' ', 'T')).getTime();\n    if (isNaN(then)) return null;\n    var days = Math.floor((Date.now() - then) / 86400000);\n    if (days < 1) return 'today';\n    if (days < 30) return days + ' day' + (days === 1 ? '' : 's') + ' ago';\n    var months = Math.round(days / 30.44);\n    if (months < 24) return months + ' month' + (months === 1 ? '' : 's') + ' ago';\n    return Math.round(months / 12) + ' years ago';\n  }",
+      "replace": "  function relTime(iso) {\n    if (!iso) return null;\n    var then = new Date(String(iso).replace(' ', 'T')).getTime();\n    if (isNaN(then)) return null;\n    // \"hace 3 meses\", not \"3 months ago\". Intl.RelativeTimeFormat picks both\n    // the unit and the wording for the forum's locale; the ladder below is the\n    // fallback for an install without looksmax-i18n.\n    if (window.lmxI18n) return window.lmxI18n.rel(then);\n    var days = Math.floor((Date.now() - then) / 86400000);\n    if (days < 1) return 'today';\n    if (days < 30) return days + ' day' + (days === 1 ? '' : 's') + ' ago';\n    var months = Math.round(days / 30.44);\n    if (months < 24) return months + ' month' + (months === 1 ? '' : 's') + ' ago';\n    return Math.round(months / 12) + ' years ago';\n  }",
+      "key": "(formatting) relTime",
+      "note": "Every caller only ever interpolates the result into a sentence, so swapping the wording is safe. Note lmxI18n.rel() reports sub-day ages as hours rather than as 'today'."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 134,
+      "find": "          title: TIER_LABEL[e.tier] + ': ' + e.count + ' of ' + total,",
+      "replace": "          title: flarum.core.app.translator.trans('local-looksmax-guides.forum.evidence.seg_title', { label: (function (n) { return n ? flarum.core.app.translator.trans('local-looksmax-guides.forum.tier.' + n.toLowerCase()) : ''; })(TIER_LABEL[e.tier]), count: e.count, total: total }),",
+      "key": "forum.evidence.seg_title + forum.tier.*"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 144,
+      "find": "            TIER_SHORT[e.tier] + ' ' + TIER_LABEL[e.tier] + ' · ' + e.count,",
+      "replace": "            TIER_SHORT[e.tier] + ' ' + (function (n) { return n ? flarum.core.app.translator.trans('local-looksmax-guides.forum.tier.' + n.toLowerCase()) : ''; })(TIER_LABEL[e.tier]) + ' · ' + e.count,",
+      "key": "forum.tier.*",
+      "note": "TIER_SHORT stays untranslated: T0..T5/TX are codes, and the legend prints the code and the name side by side."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 154,
+      "find": "    var label = {\n      fresh: 'Reviewed ' + (relTime(guide.reviewedAt) || 'recently'),\n      due: 'Review due',\n      stale: 'Not reviewed since ' + (relTime(guide.reviewedAt) || 'a long time'),\n      unknown: 'Never reviewed',\n    }[guide.freshness] || 'Never reviewed';",
+      "replace": "    var A = flarum.core.app.translator;\n    var K = 'local-looksmax-guides.forum.freshness.';\n    var seen = relTime(guide.reviewedAt);\n    var label = {\n      fresh: A.trans(K + 'reviewed', { when: seen || A.trans(K + 'recently') }),\n      due: A.trans(K + 'due'),\n      stale: A.trans(K + 'stale', { when: seen || A.trans(K + 'long_time') }),\n      unknown: A.trans(K + 'never'),\n    }[guide.freshness] || A.trans(K + 'never');",
+      "key": "forum.freshness.reviewed / .recently / .due / .stale / .long_time / .never",
+      "note": "relTime() was being called twice for the two arms; hoisted into `seen` because the object literal evaluates every arm. Spanish agrees with 'la guia' (feminine): 'Revisada', 'Sin revisar desde …'."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 171,
+      "find": "      m('span.GuideHeader-badge', 'Guide'),\n      m('span.GuideHeader-meta', [\n        guide.readMinutes + ' min read',\n        guide.sectionCount ? ' · ' + guide.sectionCount + ' sections' : '',\n        guide.version > 1 ? ' · v' + guide.version : '',\n        guide.wordCount ? ' · ' + guide.wordCount.toLocaleString() + ' words' : '',\n      ].join('')),",
+      "replace": "      m('span.GuideHeader-badge', flarum.core.app.translator.trans('local-looksmax-guides.forum.badge.guide')),\n      m('span.GuideHeader-meta', [\n        flarum.core.app.translator.trans('local-looksmax-guides.forum.header.read_time', { minutes: guide.readMinutes }),\n        guide.sectionCount ? ' · ' + flarum.core.app.translator.trans('local-looksmax-guides.forum.header.sections', { n: guide.sectionCount, count: guide.sectionCount }) : '',\n        guide.version > 1 ? ' · ' + flarum.core.app.translator.trans('local-looksmax-guides.forum.header.version', { version: guide.version }) : '',\n        // wordCount.toLocaleString() carried NO locale argument, so it followed\n        // the browser: \"12,431\" on an en-US browser reading a Spanish page.\n        guide.wordCount ? ' · ' + flarum.core.app.translator.trans('local-looksmax-guides.forum.header.words', { n: guide.wordCount, count: window.lmxI18n ? window.lmxI18n.num(guide.wordCount) : String(guide.wordCount) }) : '',\n      ].join('')),",
+      "key": "forum.badge.guide + forum.header.read_time / .sections / .version / .words",
+      "note": "The array is .join('')-ed, so every element must be a plain string. It is: none of these messages contains a tag and no parameter is a vnode."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 186,
+      "find": "      bits.push(m('.GuideHeader-meta', { style: { marginTop: '6px' } },\n        guide.sourcedCount + ' of ' + guide.claimCount + ' claims carry a source'));",
+      "replace": "      bits.push(m('.GuideHeader-meta', { style: { marginTop: '6px' } },\n        flarum.core.app.translator.trans('local-looksmax-guides.forum.header.sourced', { n: guide.claimCount, sourced: guide.sourcedCount, total: guide.claimCount })));",
+      "key": "forum.header.sourced"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 200,
+      "find": "      m('strong', due ? 'Review due.' : 'Out of date.'),\n      m('span', due\n        ? ' This guide was last checked ' + (when || 'some time ago') +\n          ' and is due for review. Treat specifics with care.'\n        : ' This guide has not been reviewed since ' + (when || 'it was written') +\n          '. It is no longer recommended in rankings until someone checks it.'),",
+      "replace": "      m('strong', due\n        ? flarum.core.app.translator.trans('local-looksmax-guides.forum.banner.due_title')\n        : flarum.core.app.translator.trans('local-looksmax-guides.forum.banner.stale_title')),\n      m('span', due\n        ? flarum.core.app.translator.trans('local-looksmax-guides.forum.banner.due_body', { when: when || flarum.core.app.translator.trans('local-looksmax-guides.forum.banner.some_time_ago') })\n        : flarum.core.app.translator.trans('local-looksmax-guides.forum.banner.stale_body', { when: when || flarum.core.app.translator.trans('local-looksmax-guides.forum.banner.since_written') })),",
+      "key": "forum.banner.due_title / .stale_title / .due_body / .stale_body / .some_time_ago / .since_written"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 253,
+      "find": "      a.setAttribute('aria-label', 'Link to this section');",
+      "replace": "      a.setAttribute('aria-label', flarum.core.app.translator.trans('local-looksmax-guides.forum.anchor_label'));",
+      "key": "forum.anchor_label",
+      "note": "setAttribute needs a string; this message has no tags, so trans() returns one."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 372,
+      "find": "          m('span.DiscussionListItem-guideBadge' + (stale ? '.DiscussionListItem-guideBadge--stale' : ''), {\n            title: guide\n              ? guide.readMinutes + ' min read · ' + guide.claimCount + ' claims, ' +\n                guide.sourcedCount + ' sourced'\n              : 'Guide',\n          }, stale ? 'Guide · stale' : 'Guide'),",
+      "replace": "          m('span.DiscussionListItem-guideBadge' + (stale ? '.DiscussionListItem-guideBadge--stale' : ''), {\n            title: guide\n              ? flarum.core.app.translator.trans('local-looksmax-guides.forum.list.badge_title', { minutes: guide.readMinutes, n: guide.claimCount, claims: guide.claimCount, sourced: guide.sourcedCount })\n              : flarum.core.app.translator.trans('local-looksmax-guides.forum.badge.guide'),\n          }, stale\n            ? flarum.core.app.translator.trans('local-looksmax-guides.forum.badge.guide_stale')\n            : flarum.core.app.translator.trans('local-looksmax-guides.forum.badge.guide')),",
+      "key": "forum.list.badge_title + forum.badge.guide / .guide_stale"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 435,
+      "find": "          m('nav.GuideToc', { 'aria-label': 'Guide contents' }, [\n            m('.GuideToc-title', 'Contents'),",
+      "replace": "          m('nav.GuideToc', { 'aria-label': flarum.core.app.translator.trans('local-looksmax-guides.forum.toc.aria') }, [\n            m('.GuideToc-title', flarum.core.app.translator.trans('local-looksmax-guides.forum.toc.title')),",
+      "key": "forum.toc.aria / .title"
+    }
+  ],
+  "deferred": [
+    {
+      "file": "src/Formatter/Configure.php",
+      "line": 71,
+      "string": "'TL;DR', 'Note', 'Tip', 'Warning', 'Danger', 'Key takeaway', 'Risk', 'Difficulty', 'Cost', 'Results in', 'Reversibility', 'Needs a professional', 'Yes', 'Item', 'Dose', 'Frequency', 'Duration', 'Before', 'After', ' — source attached', and the Tiers::LABEL/SHORT values interpolated at lines 137 and 197",
+      "reason": "USER-VISIBLE and the largest untranslated surface in this extension, but it CANNOT be a string swap. These literals are compiled into the s9e/TextFormatter XSLT by Extend\\Formatter::configure, which Flarum builds ONCE and caches (storage/formatter/*); the renderer is not rebuilt per request, so a trans() here would freeze whichever locale happened to be active when the cache was warmed and serve it to everybody. The audit's xml-fragment/not-prose rule excluded all of them, correctly by its own rule and wrongly for the reader.\n\nWhat it would take, in the order it should be done: (1) in Configure.php emit a marker instead of the text — '<span class=\"GuideCallout-label\" data-lmx-t=\"forum.callout.warn\">Warning</span>' — keeping the English as the element's text so an un-swapped render is still readable; (2) add one sweep to js/dist/forum.js decorate(), after the header is inserted, that does body.querySelectorAll('[data-lmx-t]').forEach(el => el.textContent = flarum.core.app.translator.trans('local-looksmax-guides.' + el.dataset.lmxT)); (3) do the same for the img alt= on GuideBA-before/after, which needs setAttribute rather than textContent. Every key it needs is already written and translated in locale/en.yml and locale/es.yml under forum.block, forum.callout, forum.spec, forum.stack, forum.ba, forum.claim and forum.tier. Around 25 lines across the two files."
+    },
+    {
+      "file": "src/Guide/Tiers.php",
+      "line": 48,
+      "string": "'Community report' (and the six other Tiers::LABEL values)",
+      "reason": "Same mechanism as above: Tiers::LABEL is read by Configure::claim() at line 137 and baked into the cached XSLT. Also note a real divergence that is not an i18n bug but reads as one — Tiers::LABEL[1] is 'Community report' while js/dist/forum.js:62 TIER_LABEL[1] is 'Community', so the same tier is named differently in the post body and in the evidence legend. Both spellings are translated (forum.tier.community_report and forum.tier.community); unifying them is a product decision, not mine to take."
+    },
+    {
+      "file": "less/forum.less",
+      "line": 627,
+      "string": "content: \"Dose: \"; / content: \"Frequency: \"; / content: \"Duration: \";",
+      "reason": "USER-VISIBLE and untranslatable in CSS. These are the stacked-layout row labels for the regimen table on narrow viewports — on a phone they are the ONLY labels the table has, because the .GuideStack-head row is hidden there. A text content: rule cannot read a translation. Proposal: drop the three rules and have Configure::stack() emit the label inside each cell as a real element (it already emits the cells), which then rides along on the data-lmx-t sweep above. Keys are ready: forum.stack.dose / .frequency / .duration."
+    },
+    {
+      "file": "less/forum.less",
+      "line": 205,
+      "string": "content: \" / 5\";",
+      "reason": "Leave as-is. It is a numeric denominator, not prose, and reads identically in both languages."
+    },
+    {
+      "file": "src/Api/ListGuidesController.php",
+      "line": 79,
+      "string": "'discussion_tag as dt', 'd.created_at as started_at'",
+      "reason": "FALSE POSITIVE. SQL aliases inside a query builder. Never rendered."
+    },
+    {
+      "file": "src/Listeners/IndexGuide.php",
+      "line": 74,
+      "string": "'[guides] indexing failed for post '",
+      "reason": "NOT user-visible. A log line. Leave it in English so it greps the same on every install."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 52,
+      "string": "return registry()['forum/app'];",
+      "reason": "NOT an i18n issue — reported because it is in a file I was reading and would otherwise be lost. forumApp() returns the MODULE, whose app is on .default (compare looksmax-userinfo/js/dist/forum.js:1050-1057, which does `appModule.default || appModule`). So sweep()'s guard `if (!app || !app.current || !app.current.get) return false;` at line 477 is always false-y and the cold-load sweeper at line 528 runs all 15 attempts and never decorates. Fix is one line: `var mod = registry()['app'] || registry()['forum/app']; return (mod && mod.default) || mod;`. This is in another lane's file, so it is not in `replacements`."
+    }
+  ]
+}

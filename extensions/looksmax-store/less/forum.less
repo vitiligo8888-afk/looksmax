@@ -1,0 +1,924 @@
+// The store.
+//
+// Every value here resolves to a theme token from looksmax-theme/less/tokens
+// — surfaces, radii, elevation, motion, type. Nothing in this file invents a
+// colour except the four rarity accents, which have to be their own scale
+// because rarity is information, not decoration, and it has to read the same
+// on a card, a chip and a toast.
+//
+// Two rules held throughout:
+//   * a card is never identified by fill alone; it carries a border and an
+//     elevation, because the measured separation between --surface-1 and --bg
+//     is 1.18:1 and fill-only cards were a real bug on this theme.
+//   * every interactive element has a visible :focus-visible ring. The store is
+//     a form, and a form you cannot tab through is broken for a real fraction
+//     of the people using it.
+
+.StorePage {
+  padding: var(--gap-lg) 0 60px;
+
+  .container {
+    max-width: var(--shell);
+  }
+}
+
+// ---------------------------------------------------------------- page head
+
+.StoreHead {
+  margin-bottom: var(--gap);
+
+  &-title {
+    font-size: var(--fs-3xl);
+    line-height: var(--lh-tight);
+    margin: 0 0 4px;
+    letter-spacing: -0.02em;
+  }
+
+  &-sub {
+    color: var(--ink-faint);
+    font-size: var(--fs-md);
+    margin: 0;
+  }
+}
+
+// -------------------------------------------------------------------- tabs
+
+.StoreTabs {
+  display: flex;
+  gap: var(--gap-xs);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--gap-lg);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.StoreTab {
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-dim);
+  display: inline-flex;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  gap: 7px;
+  padding: 10px 14px;
+  text-decoration: none;
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  white-space: nowrap;
+
+  iconify-icon { font-size: 17px; }
+
+  &:hover { color: var(--ink); text-decoration: none; }
+
+  &.active {
+    border-bottom-color: var(--accent);
+    color: var(--ink);
+  }
+
+  &:focus-visible {
+    border-radius: var(--r-sm);
+    box-shadow: var(--ring);
+    outline: none;
+  }
+}
+
+// ----------------------------------------------------------------- balance
+
+.StoreBar {
+  align-items: center;
+  background: linear-gradient(135deg, var(--accent-a08), transparent 60%), var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  box-shadow: var(--e-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-lg);
+  justify-content: space-between;
+  margin-bottom: var(--gap-lg);
+  padding: var(--pad-lg);
+
+  &--guest {
+    color: var(--ink-dim);
+    justify-content: flex-start;
+  }
+
+  &-balance {
+    align-items: baseline;
+    display: flex;
+    gap: 8px;
+  }
+
+  &-coin {
+    color: var(--accent);
+    font-size: 26px;
+    transform: translateY(3px);
+  }
+
+  &-n {
+    font-size: var(--fs-3xl);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  &-label {
+    color: var(--ink-faint);
+    font-size: var(--fs-md);
+  }
+
+  &-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-lg);
+  }
+}
+
+.StoreFact {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 110px;
+
+  &-k {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &-v {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+  }
+
+  &-sub {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+  }
+}
+
+// -------------------------------------------------------------- categories
+
+.StoreCats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-xs);
+  margin-bottom: var(--gap);
+}
+
+.StoreCat {
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  gap: 6px;
+  padding: 6px 13px;
+  transition: all var(--t-fast) var(--ease);
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  &.active {
+    background: var(--accent-a14);
+    border-color: var(--accent-a45);
+    color: var(--accent);
+  }
+
+  &:focus-visible { box-shadow: var(--ring); outline: none; }
+
+  &-n {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ------------------------------------------------------------------- cards
+
+.StoreGrid {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+}
+
+.StoreCard {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  box-shadow: var(--e-1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--pad);
+  position: relative;
+  transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
+
+  // The rarity accent is a top edge rather than a wash, so the card fill stays
+  // the same surface everywhere and rarity never costs contrast.
+  &::before {
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+    content: '';
+    height: 3px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: var(--rarity, var(--line-strong));
+    opacity: 0.9;
+  }
+
+  &.rarity-common { --rarity: #9aa4b2; }
+  &.rarity-uncommon { --rarity: #9ece6a; }
+  &.rarity-rare { --rarity: #7aa2f7; }
+  &.rarity-epic { --rarity: #bb9af7; }
+  &.rarity-legendary { --rarity: #e8c07d; }
+
+  &:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--e-3);
+    transform: translateY(-2px);
+  }
+
+  &.is-locked,
+  &.is-owned {
+    opacity: 0.82;
+
+    &:hover { transform: none; }
+  }
+
+  &-head {
+    align-items: flex-start;
+    display: flex;
+    gap: 10px;
+  }
+
+  &-icon {
+    align-items: center;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    color: var(--accent);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 20px;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+  }
+
+  &-title {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+
+    h3 {
+      font-size: var(--fs-lg);
+      line-height: var(--lh-tight);
+      margin: 0;
+    }
+  }
+
+  &-rarity {
+    color: var(--rarity, var(--ink-faint));
+    font-size: var(--fs-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &-blurb {
+    color: var(--ink-dim);
+    font-size: var(--fs-sm);
+    line-height: var(--lh);
+    margin: 0;
+  }
+
+  &-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  &-foot {
+    align-items: center;
+    border-top: 1px solid var(--line-soft);
+    display: flex;
+    gap: var(--gap-sm);
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 10px;
+  }
+
+  &-price {
+    align-items: center;
+    display: flex;
+    gap: 5px;
+  }
+
+  &-coin { color: var(--accent); font-size: 15px; }
+
+  &-n {
+    font-size: var(--fs-lg);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+
+  &-money {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+  }
+
+  &-was {
+    color: var(--ink-faint);
+    font-size: var(--fs-sm);
+    text-decoration: line-through;
+  }
+
+  &-save {
+    background: var(--ok-a14);
+    border-radius: var(--r-xs);
+    color: var(--ok);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    padding: 1px 5px;
+  }
+
+  &-note {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+  }
+
+  &-owned {
+    align-items: center;
+    color: var(--ok);
+    display: inline-flex;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    gap: 5px;
+  }
+
+  &-buy {
+    background: var(--accent);
+    border-radius: var(--r-sm);
+    color: var(--accent-ink);
+    font-weight: 700;
+    padding: 7px 18px;
+
+    &:hover:not(:disabled) { filter: brightness(1.08); }
+
+    &:disabled { cursor: not-allowed; opacity: 0.45; }
+
+    &.is-poor {
+      background: var(--surface-2);
+      border: 1px solid var(--line-strong);
+      color: var(--ink-dim);
+    }
+  }
+
+  &-locked {
+    align-items: flex-start;
+    color: var(--ink-faint);
+    display: flex;
+    font-size: var(--fs-xs);
+    gap: 5px;
+    line-height: 1.4;
+
+    iconify-icon { flex: 0 0 auto; margin-top: 1px; }
+  }
+}
+
+.StoreChip {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  color: var(--ink-dim);
+  display: inline-flex;
+  font-size: var(--fs-xs);
+  gap: 4px;
+  padding: 2px 6px;
+
+  &--stock { border-color: var(--accent-2-a30); color: var(--accent-2); }
+  &--timed { border-color: var(--danger-a45); color: var(--danger); }
+}
+
+// ---------------------------------------------------------------- previews
+
+.StorePreview {
+  align-items: center;
+  background: var(--surface-0);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-md);
+  display: flex;
+  justify-content: center;
+  min-height: 54px;
+  padding: 10px;
+
+  &-name {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+  }
+
+  &-frame {
+    display: inline-block;
+    position: relative;
+  }
+
+  &-avatar {
+    align-items: center;
+    background: var(--surface-2);
+    border-radius: 50%;
+    color: var(--ink-faint);
+    display: flex;
+    font-size: 20px;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+  }
+
+  &--tier {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &-perk {
+    align-items: center;
+    color: var(--ink-dim);
+    display: flex;
+    font-size: var(--fs-sm);
+    gap: 6px;
+
+    iconify-icon { color: var(--ok); }
+  }
+}
+
+// ------------------------------------------------------------------ modal
+
+.StoreModal {
+  align-items: center;
+  background: var(--scrim);
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  padding: var(--pad);
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: var(--z-modal);
+
+  &-panel {
+    background: var(--surface-1);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--e-4);
+    max-height: 90vh;
+    max-width: 460px;
+    overflow-y: auto;
+    padding: var(--pad-lg);
+    width: 100%;
+  }
+
+  &-title {
+    font-size: var(--fs-xl);
+    margin: 0 0 4px;
+  }
+
+  &-blurb {
+    color: var(--ink-dim);
+    font-size: var(--fs-sm);
+    margin: 0 0 var(--gap);
+  }
+
+  &-lines {
+    border-top: 1px solid var(--line-soft);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    margin: 0 0 var(--gap);
+
+    dt, dd {
+      border-bottom: 1px solid var(--line-soft);
+      margin: 0;
+      padding: 8px 0;
+    }
+
+    dt { color: var(--ink-faint); font-size: var(--fs-sm); }
+
+    dd {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      text-align: right;
+
+      &.is-negative { color: var(--danger); }
+    }
+  }
+
+  &-gift,
+  &-card {
+    margin-bottom: var(--gap);
+
+    label {
+      color: var(--ink-faint);
+      display: block;
+      font-size: var(--fs-xs);
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+  }
+
+  &-mock {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    line-height: 1.5;
+    margin: 6px 0 0;
+  }
+
+  &-actions {
+    display: flex;
+    gap: var(--gap-sm);
+    justify-content: flex-end;
+  }
+}
+
+// --------------------------------------------------------------- sections
+
+.StoreSection {
+  margin-bottom: var(--gap-lg);
+
+  &-title {
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-lg);
+    margin: 0 0 var(--gap);
+    padding-bottom: 6px;
+  }
+}
+
+.StoreEmpty {
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+
+.StoreLoading {
+  color: var(--ink-faint);
+  padding: 40px 0;
+  text-align: center;
+}
+
+.StoreError {
+  align-items: center;
+  background: var(--danger-a14);
+  border: 1px solid var(--danger-a45);
+  border-radius: var(--r-md);
+  color: var(--danger);
+  display: flex;
+  gap: 8px;
+  padding: var(--pad);
+}
+
+// ------------------------------------------------------------- inventory
+
+.StoreHeld {
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  justify-content: space-between;
+  margin-bottom: var(--gap-sm);
+  padding: var(--pad-sm) var(--pad);
+
+  &-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &-sub {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+  }
+
+  &-action {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-sm);
+
+    .FormControl { max-width: 260px; }
+  }
+}
+
+// ---------------------------------------------------------------- tables
+
+.StoreTable {
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  width: 100%;
+
+  th {
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 6px 10px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  td {
+    border-bottom: 1px solid var(--line-soft);
+    padding: 9px 10px;
+    vertical-align: top;
+  }
+
+  tr.is-off { opacity: 0.5; }
+
+  &-when { color: var(--ink-faint); white-space: nowrap; }
+
+  &-num {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+
+    &.is-debit { color: var(--danger); }
+    &.is-credit { color: var(--ok); }
+  }
+
+  &-sub {
+    color: var(--ink-faint);
+    display: block;
+    font-size: var(--fs-xs);
+
+    &.is-error { color: var(--danger); }
+  }
+
+  &--admin td { vertical-align: middle; }
+}
+
+.StoreState {
+  border-radius: var(--r-xs);
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  text-transform: uppercase;
+
+  &.is-granted { background: var(--ok-a14); color: var(--ok); }
+  &.is-refused { background: var(--surface-2); color: var(--ink-faint); }
+  &.is-failed { background: var(--danger-a14); color: var(--danger); }
+  &.is-refunded { background: var(--accent-2-a10); color: var(--accent-2); }
+  &.is-expired { background: var(--surface-2); color: var(--ink-faint); }
+  &.is-pending { background: var(--accent-a14); color: var(--accent); }
+}
+
+// ----------------------------------------------------------------- admin
+
+.StoreStats {
+  display: grid;
+  gap: var(--gap-sm);
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  margin-bottom: var(--gap-lg);
+}
+
+.StoreStat {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pad-sm) var(--pad);
+
+  &-v {
+    font-size: var(--fs-xl);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+
+  &-k {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+  }
+}
+
+.StoreAdminForm,
+.StoreAdminBar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap);
+
+  .FormControl { max-width: 220px; }
+}
+
+.StoreEditor {
+  background: var(--surface-0);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  margin-bottom: var(--gap);
+  padding: var(--pad);
+
+  &-grid {
+    display: grid;
+    gap: var(--gap-sm);
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    margin-bottom: var(--gap-sm);
+  }
+
+  &-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+    margin: var(--gap-sm) 0;
+  }
+
+  &-actions {
+    display: flex;
+    gap: var(--gap-sm);
+    justify-content: flex-end;
+  }
+}
+
+.StoreField {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  > span {
+    color: var(--ink-faint);
+    font-size: var(--fs-xs);
+  }
+
+  &--wide {
+    margin-bottom: var(--gap-sm);
+  }
+
+  &--check {
+    align-items: center;
+    flex-direction: row;
+    gap: 6px;
+  }
+}
+
+// ------------------------------------------------------- thread highlight
+// Bought highlights render on the discussion list. Deliberately an edge and a
+// faint wash rather than a background colour: the list has to stay readable
+// and a paid thread must not out-shout an unpaid one to the point where the
+// list stops being sorted by what people are reading.
+
+.DiscussionListItem--storeHighlight {
+  border-left: 3px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-a08), transparent 40%);
+}
+
+// ------------------------------------------------------------ small screens
+
+@media (max-width: 767px) {
+  .StorePage { padding-top: var(--gap); }
+
+  .StoreHead-title { font-size: var(--fs-2xl); }
+
+  .StoreBar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--gap);
+    padding: var(--pad);
+  }
+
+  .StoreBar-facts { gap: var(--gap); }
+
+  .StoreFact { min-width: 96px; }
+
+  .StoreGrid { grid-template-columns: 1fr; }
+
+  // Wrap rather than scroll. A horizontal scroller at 390 hides the last tab
+  // behind an edge nobody knows to drag, and the measured overflow was 479px
+  // of tabs in a 390px viewport.
+  .StoreTabs {
+    flex-wrap: wrap;
+    margin-bottom: var(--gap);
+    overflow-x: visible;
+  }
+
+  .StoreTab {
+    font-size: var(--fs-sm);
+    padding: 8px 10px;
+  }
+
+  .StoreHeld {
+    align-items: stretch;
+    flex-direction: column;
+
+    &-action .FormControl { max-width: none; }
+  }
+
+  // Tables become label/value stacks rather than a horizontal scroll nobody
+  // finds. The header row is hidden and each cell carries its own label.
+  .StoreTable {
+    thead { display: none; }
+
+    tr {
+      border-bottom: 1px solid var(--line);
+      display: block;
+      padding: var(--pad-sm) 0;
+    }
+
+    td {
+      border: 0;
+      display: block;
+      padding: 2px 0;
+      text-align: left;
+    }
+
+    &-num { text-align: left; }
+  }
+
+  .StoreModal-panel { padding: var(--pad); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .StoreCard { transition: none; }
+  .StoreCard:hover { transform: none; }
+}
+
+// ---------------------------------------------------- inventory row detail
+// Added after reading the first screenshots: the page listed raw SKUs, eight
+// identical "box-colour" lines and a leftover test item. A row now says what
+// the thing is called, what it came from and what it looks like.
+
+.StoreHeld {
+  // Explicitly a row. The earlier .StoreHeld-main rule sets column direction
+  // for the two-line label, and without resetting it here the icon stacked on
+  // top of the name instead of sitting beside it — visible in the screenshot,
+  // invisible to every DOM assertion.
+  &-main {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  &-icon {
+    align-items: center;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--accent);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 16px;
+    height: 30px;
+    justify-content: center;
+    width: 30px;
+  }
+
+  &-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &-preview {
+    font-size: var(--fs-md);
+    font-weight: 700;
+  }
+}
+
+.StoreChip--holders {
+  border-color: var(--line);
+  color: var(--ink-faint);
+}
+
+.StoreModal-lines dd.is-saving { color: var(--ok); }
+
+.StoreAdminSearch {
+  margin-bottom: var(--gap-sm);
+  max-width: 320px;
+}
+
+.StoreCats--admin {
+  margin-bottom: var(--gap);
+}
+
+.StoreMore {
+  color: var(--accent-2);
+  font-size: var(--fs-sm);
+  margin-top: var(--gap-sm);
+  padding: 4px 0;
+}

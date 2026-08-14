@@ -1,0 +1,234 @@
+// Icon geometry.
+//
+// ── Why every rule here is about SIZE, not about looks ──────────────────────
+//
+// `<iconify-icon>` is a custom element. Until its geometry is registered it is
+// a replaced element with NO intrinsic width or height, and a replaced element
+// with no intrinsic size takes whatever its parent offers — which in a flex row
+// is "all of it". The operator's report was "the loading spinner thingy is a
+// weird stretched like rotating big icon" and "the search bar icon it appears
+// stretched and weird". Neither is the wrong glyph. Both are an unsized box in
+// a flex parent.
+//
+// The geometry is bundled and registered synchronously (src/InjectScript.php)
+// and the component's lazy IntersectionObserver — which DELETES the rendered
+// <svg> from the shadow root when an element scrolls out of view — is disabled
+// in js/dist/forum.js. Those two remove the cause. Everything here is the
+// second line of defence: even with no icon data at all, every icon occupies a
+// correct square and nothing can stretch it.
+//
+// Applied to EVERY iconify-icon, not only `.iconify-glyph`. The class is added
+// by the FontAwesome swap; icons emitted directly by our own PHP and by other
+// extensions never had it, which is why the index and the header were affected
+// and the swapped ones mostly were not.
+//
+// ── Compiler constraints, learned the hard way ──────────────────────────────
+//
+// Flarum compiles this with wikimedia/less.php. It has no each(), no range(),
+// cannot parse @container, and ABORTS SILENTLY on darken()/fade()/lighten()/
+// mix() given a CSS custom property or on `+` inside calc(). When it aborts,
+// forum.js still builds and forum.css is simply never written, so every page
+// renders unstyled while returning 200. Nothing here does any of that: no
+// colour function takes a var(), and no calc() adds.
+//
+// Colours come from extensions/looksmax-theme/less/tokens.less BY NAME. The
+// accent is being retuned from gold to violet, so a literal hex here would be
+// visibly out of system the moment that lands.
+
+// ---------------------------------------------------------------- geometry
+iconify-icon {
+  // 1em square, always. font-size is the one knob.
+  //
+  // Every icon this forum ships is square — tools/verify-icons.py fails the
+  // build if a non-square one is ever added, precisely because this rule would
+  // squash it. That check is what makes a hard 1/1 safe to state here, and a
+  // hard 1/1 is what makes an UNRESOLVED element harmless.
+  aspect-ratio: 1 / 1;
+  display: inline-block;
+  flex: none;            // a flex parent may not grow or shrink an icon
+  height: 1em;
+  width: 1em;
+  line-height: 1;
+  // an icon is a glyph: it never wants the text baseline's descender space
+  vertical-align: -0.125em;
+}
+
+// Inside a grid, `flex: none` does nothing — say it again in grid terms.
+// `align-self` also covers the flex COLUMN case, where the cross axis is width
+// and `align-items: stretch` would otherwise widen the icon.
+iconify-icon {
+  align-self: center;
+  justify-self: center;
+  min-height: 0;
+  min-width: 0;
+}
+
+// Deliberately NOT here: `inset: auto` and `iconify-icon svg { … }`. The first
+// would fight any theme rule that positions an icon absolutely, and the
+// explicit width/height above already make inset-stretching impossible. The
+// second matches nothing at all — the <svg> lives in a shadow root and document
+// stylesheets do not cross that boundary, so a rule written against it looks
+// like a safeguard while doing nothing.
+
+// The swapped-from-FontAwesome ones keep the same optical baseline as the
+// glyphs they replace, so mixed rows do not jitter.
+iconify-icon.iconify-glyph {
+  vertical-align: -0.125em;
+}
+
+// A FontAwesome element that has no mapping renders as an empty box of
+// whatever width the font gives it. Hide the box rather than show a blank.
+i[class*='fa-']:empty:not([data-iconified]) {
+  display: none;
+}
+
+// ---------------------------------------------------------------- motion
+//
+// `fa-spin` and `fa-pulse` are Font Awesome MODIFIERS, not icons: they say "and
+// rotate this". The swap preserves them as .iconify-spin / .iconify-pulse
+// because dropping them leaves a motionless glyph exactly where a reader is
+// being told to wait. Font Awesome's own @keyframes are not guaranteed to be in
+// the compiled bundle once the webfont is not being used, so they are declared
+// here under our own names rather than borrowed.
+@keyframes iconify-spin {
+  from { transform: rotate(0); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes iconify-pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.35; }
+  100% { opacity: 1; }
+}
+
+.iconify-spin {
+  animation: iconify-spin 1s linear infinite;
+  // Rotating a box that is not centred on its own middle wobbles.
+  transform-origin: 50% 50%;
+}
+
+.iconify-spin-reverse {
+  animation: iconify-spin 1s linear infinite reverse;
+  transform-origin: 50% 50%;
+}
+
+.iconify-pulse {
+  animation: iconify-pulse 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconify-spin,
+  .iconify-spin-reverse,
+  .iconify-pulse {
+    animation: none;
+  }
+}
+
+// ------------------------------------------------- core's fixed-width column
+//
+// Flarum core declares, at 0-2-0 specificity, which beats the bare
+// `iconify-icon` type selector above:
+//
+//     .NotificationGrid-groupToggle .icon,
+//     .Table-groupToggle .icon        { width: 1.25em; text-align: center; }
+//     .Select-caret                   { width: 1.25em; text-align: center; }
+//
+// 1.25em is FontAwesome's `fa-fw` convention: reserve one column wide enough
+// for the widest glyph in a variable-width icon FONT, then centre each glyph in
+// it with text-align. Neither half of that works for an SVG icon. The host box
+// becomes 1.25:1 — measured 17.5x14 on six icons on /settings, at both widths —
+// and `text-align` cannot centre the svg because the component renders it
+// `display: block`, so the glyph sits hard against the left edge of a box that
+// was supposed to centre it.
+//
+// Our icons are all one width already, so the column is uniform without the
+// extra 0.25em. Restated at 0-2-1 so it wins, and only where core sets it.
+.NotificationGrid-groupToggle iconify-icon.icon,
+.Table-groupToggle iconify-icon.icon,
+iconify-icon.Select-caret {
+  width: 1em;
+}
+
+// ---------------------------------------------------------------- contexts
+.Button iconify-icon { font-size: 15px; }
+.Dropdown-menu iconify-icon { margin-right: 6px; opacity: 0.85; }
+.DiscussionListItem iconify-icon { font-size: 13px; }
+
+// The header's controls are a flex row of 34px targets; the glyphs inside them
+// are the case that broke.
+.Header-controls iconify-icon,
+.Search-input iconify-icon { font-size: 16px; }
+
+// ------------------------------------------------------------- the spinner
+//
+// Flarum's .LoadingIndicator is NOT an icon. It is a bordered <div> with
+// border-radius 50% on a `spin` keyframe, and core sizes it with
+//
+//     width: var(--size); height: var(--size); border-width: var(--thickness);
+//
+// where --size and --thickness are declared on .LoadingIndicator-container and
+// INHERITED by the spinner. That inheritance is the whole failure mode the
+// operator reported as "the loading spinner thingy is a weird stretched like
+// rotating big icon": if anything renders a bare .LoadingIndicator without
+// core's container — an extension writing its own markup, or a redraw that
+// swaps the container out from under it — then --size does not resolve, width
+// and height fall back to `auto`, and a `border-radius: 50%` box that is as
+// wide as its flex parent and one line tall spins as an enormous ellipse.
+//
+// A FALLBACK IN THE CONSUMER makes that impossible. Note what this deliberately
+// does not do: it does not declare `--size` on .LoadingIndicator. A declaration
+// on the element itself would beat the value inherited from the container, and
+// core's own .LoadingIndicator-container--large / --small work by setting
+// --size on that container — so declaring it here would silently flatten every
+// size variant to one size. The fallback only applies when the variable really
+// is missing, which is exactly the broken case.
+.LoadingIndicator {
+  aspect-ratio: 1 / 1;
+  flex: none;
+  // The two that stop `auto` from ever resolving against the parent's width.
+  min-height: var(--size, 24px);
+  min-width: var(--size, 24px);
+}
+
+// ── The measured cause of "a weird stretched like rotating big icon" ────────
+//
+// Flarum core's NotificationList and FlagList render their spinner as
+//
+//     <div class="LoadingIndicator-container … --block --medium">
+//       <div class="LoadingIndicator LoadingIndicator--block">
+//
+// — the legacy `--block` modifier is put on the SPINNER as well as on the
+// container. extensions/looksmax-theme/less/components.less:473 then declares
+//
+//     .LoadingIndicator--block { padding: 40px 0; }
+//
+// which is spacing meant for the container, applied to the circle. With
+// box-sizing: border-box and height: var(--size) = 24px, 80px of vertical
+// padding cannot fit inside 24px, so the border box grows to ~104px tall while
+// staying 24px wide — and `border-radius: 50%` turns a 24x104 box into a tall
+// ELLIPSE, which `animation: spin` then rotates. Measured on the live forum,
+// logged in: 24x104 layout box on /notifications, the notifications tray and
+// /flags, at BOTH widths. Its rotating client rect swung between 41x87 and
+// 86x38 depending on the frame, which is exactly "big", "stretched" and
+// "rotating".
+//
+// This is a defect in looksmax-theme, not here, and it is reported as such
+// rather than edited. But a spinner's geometry is this extension's problem
+// whoever breaks it, so it is nailed down from this side too: padding on a
+// circle is never correct — the space belongs to the container, which core
+// already gives `height: 100px` for exactly this purpose.
+//
+// 0-2-0 so it beats a single-class rule, and matching on the container so a
+// spinner core did not put in one is still covered.
+.LoadingIndicator.LoadingIndicator--block,
+.LoadingIndicator-container > .LoadingIndicator {
+  border-radius: 50%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0;
+}
+
+// Icons that live inside a loading container are sized like the spinner, not
+// like the surrounding text.
+.LoadingIndicator iconify-icon,
+.LoadingIndicator-container iconify-icon { font-size: 20px; }

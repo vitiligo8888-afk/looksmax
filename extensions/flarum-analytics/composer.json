@@ -1,0 +1,19 @@
+{
+  "name": "local/flarum-analytics",
+  "description": "Event-sourced analytics for Flarum with PostHog forwarding, feeding ranking and filtering",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": {
+    "flarum/core": "^1.8"
+  },
+  "autoload": {
+    "psr-4": { "Local\\Analytics\\": "src/" }
+  },
+  "extra": {
+    "flarum-extension": {
+      "title": "Analytics",
+      "category": "feature",
+      "icon": { "name": "fas fa-chart-line", "backgroundColor": "#1d2b3a", "color": "#fff" }
+    }
+  }
+}

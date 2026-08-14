@@ -1,0 +1,419 @@
+{
+  "extension": "looksmax-reactions",
+  "prefix": "local-looksmax-reactions",
+  "flarum_id": "local-looksmax-reactions",
+  "locales_extender": "already present in extend.php:69 — not added again",
+  "replacements": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 233,
+      "find": "        var groups = [\n          ['chrigger', 'Chrigger'],\n          ['classic', 'Classic'],\n          ['extra', 'More']\n        ];",
+      "replace": "        var groups = [\n          ['chrigger', app.translator.trans('local-looksmax-reactions.forum.picker.group_chrigger')],\n          ['classic', app.translator.trans('local-looksmax-reactions.forum.picker.group_classic')],\n          ['extra', app.translator.trans('local-looksmax-reactions.forum.picker.group_extra')]\n        ];",
+      "key": "forum.picker.group_*",
+      "note": "Section headings in the picker. The audit missed all three: they are data in an array literal, not an argument to m()."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 270,
+      "find": "m('.LmxRx-groupLabel', 'nothing matches \"' + v.state.q + '\"')",
+      "replace": "m('.LmxRx-groupLabel', app.translator.trans('local-looksmax-reactions.forum.picker.no_match', { query: v.state.q }))",
+      "key": "forum.picker.no_match"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 279,
+      "find": "            placeholder: 'Search ' + CAT.length + ' reactions…',",
+      "replace": "            placeholder: app.translator.trans('local-looksmax-reactions.forum.picker.search_placeholder', { count: CAT.length }),",
+      "key": "forum.picker.search_placeholder",
+      "note": "Audit missed this: it is a placeholder attribute. Plural, because the catalogue can be trimmed to one entry from the admin screen."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 287,
+      "find": "            m('span.LmxRx-previewHint',\n              mineHas(state, hovered.id) ? 'click to remove' : 'click to react')",
+      "replace": "            m('span.LmxRx-previewHint',\n              mineHas(state, hovered.id)\n                ? app.translator.trans('local-looksmax-reactions.forum.picker.hint_remove')\n                : app.translator.trans('local-looksmax-reactions.forum.picker.hint_react'))",
+      "key": "forum.picker.hint_remove / hint_react"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 289,
+      "find": "          ] : m('span.LmxRx-previewHint', 'up to ' + MAX_PER_POST + ' per post'))",
+      "replace": "          ] : m('span.LmxRx-previewHint', app.translator.trans('local-looksmax-reactions.forum.picker.limit_hint', { max: window.lmxI18n.num(MAX_PER_POST) })))",
+      "key": "forum.picker.limit_hint"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 298,
+      "find": "  function reactorsView(m, app, post, payload) {\n    if (!payload) return m('div', 'Loading…');",
+      "replace": "  function reactorsView(m, app, post, payload) {\n    if (!payload) return m('div', app.translator.trans('local-looksmax-reactions.forum.loading'));",
+      "key": "forum.loading",
+      "note": "The bare `if (!payload) return m('div', 'Loading…');` is not unique — threadPanel has the same line — so the find carries the function signature above it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 306,
+      "find": "          m('span.LmxRxModal-groupCount', String(g.count))",
+      "replace": "          m('span.LmxRxModal-groupCount', window.lmxI18n.num(g.count))",
+      "key": "(number formatting)",
+      "note": "A reaction group on a busy post reaches four figures; String() gives 1234 in both languages, num() gives 1,234 / 1.234."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 322,
+      "find": "          m('strong', 'Imported from the old board — '),\n          legacy.score\n            ? m('span', legacy.score + ' reaction' + (legacy.score === 1 ? '' : 's') + ' in total.')\n            : null",
+      "replace": "          m('strong', [app.translator.trans('local-looksmax-reactions.forum.legacy_note'), ' — ']),\n          legacy.score\n            ? m('span', app.translator.trans('local-looksmax-reactions.forum.legacy.total_count', { count: legacy.score }))\n            : null",
+      "key": "forum.legacy_note + forum.legacy.total_count",
+      "note": "Audit missed both. The second is a hand-rolled English plural. The em dash stays in the code as a sibling child so legacy_note keeps the exact value it already had in en.yml."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 332,
+      "find": "            m('span', { style: { opacity: 0.65 } },\n              t.count === null ? '(count not recorded)' : String(t.count))",
+      "replace": "            m('span', { style: { opacity: 0.65 } },\n              t.count === null\n                ? ['(', app.translator.trans('local-looksmax-reactions.forum.legacy_unknown'), ')']\n                : window.lmxI18n.num(t.count))",
+      "key": "forum.legacy_unknown",
+      "note": "Reuses the existing key rather than shipping a second, parenthesised copy of the same three words: the brackets become sibling children of the span."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 339,
+      "find": "        m('div', { style: { marginTop: '8px', opacity: 0.7 } },\n          'The old board recorded which reactions a post drew and the total, '\n          + 'but not who left them — so these are shown as history rather than as reactors.')",
+      "replace": "        m('div', { style: { marginTop: '8px', opacity: 0.7 } },\n          app.translator.trans('local-looksmax-reactions.forum.legacy.explainer'))",
+      "key": "forum.legacy.explainer"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 345,
+      "find": "    if (!blocks.length) return m('div', 'Nobody has reacted to this post yet.');",
+      "replace": "    if (!blocks.length) return m('div', app.translator.trans('local-looksmax-reactions.forum.reactors.empty'));",
+      "key": "forum.reactors.empty"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 348,
+      "find": "      m('h3', { style: { margin: '0 0 14px', font: '700 16px/1 var(--font-ui)', color: 'var(--ink)' } },\n        'Who reacted'),",
+      "replace": "      m('h3', { style: { margin: '0 0 14px', font: '700 16px/1 var(--font-ui)', color: 'var(--ink)' } },\n        app.translator.trans('local-looksmax-reactions.forum.who_reacted')),",
+      "key": "forum.who_reacted",
+      "note": "Audit missed this heading. 'Who reacted' appears three times in the file, so the find carries the h3 style line."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 469,
+      "find": "            st.error = body.error === 'rate-limited'\n              ? 'Too fast — try again in a moment.'\n              : body.error === 'too-many-on-post'\n                ? 'You have already used ' + body.max + ' reactions on this post.'\n                : 'Could not save that reaction.';",
+      "replace": "            st.error = body.error === 'rate-limited'\n              ? app.translator.trans('local-looksmax-reactions.forum.rate_limited')\n              : body.error === 'too-many-on-post'\n                ? app.translator.trans('local-looksmax-reactions.forum.too_many', { max: body.max })\n                : app.translator.trans('local-looksmax-reactions.forum.error.save_failed');",
+      "key": "forum.rate_limited / forum.too_many / forum.error.save_failed",
+      "note": "rate_limited and too_many are the two pre-existing keys; their en.yml values were widened to the exact text the code renders today, so English is unchanged. too_many now carries {max}, which this line has always interpolated."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 490,
+      "find": "              title: r.display + (mine ? ' — click to remove' : ''),",
+      "replace": "              title: mine\n                ? app.translator.trans('local-looksmax-reactions.forum.chip.title_mine', { name: r.display })\n                : r.display,",
+      "key": "forum.chip.title_mine"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 496,
+      "find": "            }, [icon(m, r, STRIP_PX), m('span.LmxRx-chip-count', String(kv[1]))]);",
+      "replace": "            }, [icon(m, r, STRIP_PX), m('span.LmxRx-chip-count', window.lmxI18n.num(kv[1]))]);",
+      "key": "(number formatting)"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 510,
+      "find": "              title: r.display + ' — imported from the old board'\n                + (n === null ? ', exact count not recorded' : ''),",
+      "replace": "              title: n === null\n                ? app.translator.trans('local-looksmax-reactions.forum.chip.title_legacy_unknown', { name: r.display })\n                : app.translator.trans('local-looksmax-reactions.forum.chip.title_legacy', { name: r.display }),",
+      "key": "forum.chip.title_legacy / title_legacy_unknown",
+      "note": "Two whole sentences rather than a translated stem plus a translated tail: Spanish puts the comma clause differently and concatenation would fix the English word order into the Spanish."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 517,
+      "find": "                : m('span.LmxRx-chip-count', String(n))",
+      "replace": "                : m('span.LmxRx-chip-count', window.lmxI18n.num(n))",
+      "key": "(number formatting)"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 523,
+      "find": "              title: 'Total reactions on the old board'\n                + (state.legacySummary ? ': ' + state.legacySummary : ''),",
+      "replace": "              title: state.legacySummary\n                ? app.translator.trans('local-looksmax-reactions.forum.legacy.total_title_with', { summary: state.legacySummary })\n                : app.translator.trans('local-looksmax-reactions.forum.legacy.total_title'),",
+      "key": "forum.legacy.total_title / total_title_with"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 527,
+      "find": "            }, [m('span', '★'), m('span', String(total))])",
+      "replace": "            }, [m('span', '★'), m('span', window.lmxI18n.num(total))])",
+      "key": "(number formatting)",
+      "note": "The imported score is the largest number the strip shows — 381,716 rows were imported across the board."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 534,
+      "find": "                'aria-label': 'Add a reaction',",
+      "replace": "                'aria-label': app.translator.trans('local-looksmax-reactions.forum.add'),",
+      "key": "forum.add",
+      "note": "Audit missed this: it is an aria-label, and it is the only label the picker button has."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 578,
+      "find": "                type: 'button',\n                title: 'Who reacted',\n                'aria-label': 'Who reacted',",
+      "replace": "                type: 'button',\n                title: app.translator.trans('local-looksmax-reactions.forum.who_reacted'),\n                'aria-label': app.translator.trans('local-looksmax-reactions.forum.who_reacted'),",
+      "key": "forum.who_reacted",
+      "note": "Audit missed both."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 603,
+      "find": "  function threadPanel(m, app, discussion, payload) {\n    if (!payload) return m('div', 'Loading…');",
+      "replace": "  function threadPanel(m, app, discussion, payload) {\n    if (!payload) return m('div', app.translator.trans('local-looksmax-reactions.forum.loading'));",
+      "key": "forum.loading"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 609,
+      "find": "      m('h3', { style: { margin: '0 0 12px', font: '700 16px/1 var(--font-ui)', color: 'var(--ink)' } },\n        'Most reacted in this thread'),",
+      "replace": "      m('h3', { style: { margin: '0 0 12px', font: '700 16px/1 var(--font-ui)', color: 'var(--ink)' } },\n        app.translator.trans('local-looksmax-reactions.forum.thread.title')),",
+      "key": "forum.thread.title"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 612,
+      "find": "        m('span.LmxRx-filterLabel', 'filter'),",
+      "replace": "        m('span.LmxRx-filterLabel', app.translator.trans('local-looksmax-reactions.forum.thread.filter_label')),",
+      "key": "forum.thread.filter_label",
+      "note": "Audit missed it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 613,
+      "find": "        m('button.LmxRx-chip', {\n          className: payload._slug ? '' : 'is-mine',\n          onclick: function () { loadThread(m, app, discussion, null); }\n        }, 'all'),",
+      "replace": "        m('button.LmxRx-chip', {\n          className: payload._slug ? '' : 'is-mine',\n          onclick: function () { loadThread(m, app, discussion, null); }\n        }, app.translator.trans('local-looksmax-reactions.forum.thread.filter_all')),",
+      "key": "forum.thread.filter_all",
+      "note": "Audit missed it. The bare literal 'all' also occurs as a period id on line 673, so the find carries the whole button."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 626,
+      "find": "            title: r.display + ' — ' + native + ' here'\n              + (leg ? ', ' + leg.posts + ' imported posts' : ''),",
+      "replace": "            title: leg\n              ? app.translator.trans('local-looksmax-reactions.forum.thread.chip_title_legacy', { name: r.display, count: window.lmxI18n.num(native), legacy: leg.posts })\n              : app.translator.trans('local-looksmax-reactions.forum.thread.chip_title', { name: r.display, count: window.lmxI18n.num(native) }),",
+      "key": "forum.thread.chip_title / chip_title_legacy",
+      "note": "`legacy` stays a raw number because it drives the plural arm; `count` is pre-formatted because it does not."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 629,
+      "find": "          }, [icon(m, r, 20), m('span.LmxRx-chip-count', String(native + (leg ? leg.posts : 0)))]);",
+      "replace": "          }, [icon(m, r, 20), m('span.LmxRx-chip-count', window.lmxI18n.num(native + (leg ? leg.posts : 0)))]);",
+      "key": "(number formatting)"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 640,
+      "find": "                }, 'post #' + p.number),",
+      "replace": "                }, app.translator.trans('local-looksmax-reactions.forum.post_ref', { number: window.lmxI18n.num(p.number) })),",
+      "key": "forum.post_ref",
+      "note": "Audit missed it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 641,
+      "find": "                m('span', { style: { marginLeft: '8px', opacity: 0.75 } },\n                  p.native + ' here'\n                  + (p.legacy ? ' · ' + p.legacy + ' imported' : ''))",
+      "replace": "                m('span', { style: { marginLeft: '8px', opacity: 0.75 } },\n                  p.legacy\n                    ? app.translator.trans('local-looksmax-reactions.forum.thread.row_both', { count: window.lmxI18n.num(p.native), legacy: window.lmxI18n.num(p.legacy) })\n                    : app.translator.trans('local-looksmax-reactions.forum.thread.row_native', { count: window.lmxI18n.num(p.native) }))",
+      "key": "forum.thread.row_both / row_native",
+      "note": "Audit missed it."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 646,
+      "find": "        : m('div', { style: { opacity: 0.7 } }, 'No reactions in this thread yet.')",
+      "replace": "        : m('div', { style: { opacity: 0.7 } }, app.translator.trans('local-looksmax-reactions.forum.thread.empty'))",
+      "key": "forum.thread.empty"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 672,
+      "find": "    var tabs = [['received', 'Most reacted'], ['given', 'Most generous'], ['posts', 'Top posts']];\n    var periods = [['day', '24h'], ['week', 'week'], ['month', 'month'], ['all', 'all time']];",
+      "replace": "    var tabs = [\n      ['received', app.translator.trans('local-looksmax-reactions.forum.board.tab_received')],\n      ['given', app.translator.trans('local-looksmax-reactions.forum.board.tab_given')],\n      ['posts', app.translator.trans('local-looksmax-reactions.forum.board.tab_posts')]\n    ];\n    var periods = [\n      ['day', app.translator.trans('local-looksmax-reactions.forum.board.period_day')],\n      ['week', app.translator.trans('local-looksmax-reactions.forum.board.period_week')],\n      ['month', app.translator.trans('local-looksmax-reactions.forum.board.period_month')],\n      ['all', app.translator.trans('local-looksmax-reactions.forum.board.period_all')]\n    ];",
+      "key": "forum.board.tab_* / period_*",
+      "note": "The audit caught only 'Top posts' of these seven — the rest are the second element of an array literal."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 676,
+      "find": "      m('h3', { style: { margin: '0 0 12px', font: '700 16px/1 var(--font-ui)', color: 'var(--ink)' } },\n        'Reaction leaderboard'),",
+      "replace": "      m('h3', { style: { margin: '0 0 12px', font: '700 16px/1 var(--font-ui)', color: 'var(--ink)' } },\n        app.translator.trans('local-looksmax-reactions.forum.leaderboard')),",
+      "key": "forum.leaderboard"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 696,
+      "find": "      !st.data ? m('div', 'Loading…') : m('ol', {",
+      "replace": "      !st.data ? m('div', app.translator.trans('local-looksmax-reactions.forum.loading')) : m('ol', {",
+      "key": "forum.loading"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 701,
+      "find": "              m('a', { href: r.url, style: { color: 'var(--accent-2)' },\n                onclick: function () { closeOverlay(); } }, r.title || ('post #' + r.postId)),\n              m('span', { style: { marginLeft: '8px', opacity: 0.75 } },\n                r.total + (r.legacy ? ' (' + r.native + ' here, ' + r.legacy + ' imported)' : ''))",
+      "replace": "              m('a', { href: r.url, style: { color: 'var(--accent-2)' },\n                onclick: function () { closeOverlay(); } },\n                r.title || app.translator.trans('local-looksmax-reactions.forum.post_ref', { number: window.lmxI18n.num(r.postId) })),\n              m('span', { style: { marginLeft: '8px', opacity: 0.75 } },\n                r.legacy\n                  ? app.translator.trans('local-looksmax-reactions.forum.board.post_total_split', { total: window.lmxI18n.num(r.total), native: window.lmxI18n.num(r.native), legacy: window.lmxI18n.num(r.legacy) })\n                  : window.lmxI18n.num(r.total))",
+      "key": "forum.post_ref / forum.board.post_total_split",
+      "note": "Audit missed both."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 709,
+      "find": "              m('span', { style: { marginLeft: '8px', opacity: 0.75 } },\n                r.total + ' reactions · ' + r.points + ' pts')",
+      "replace": "              m('span', { style: { marginLeft: '8px', opacity: 0.75 } },\n                app.translator.trans('local-looksmax-reactions.forum.board.user_stats', { count: r.total, total: window.lmxI18n.num(r.total), points: window.lmxI18n.num(r.points) }))",
+      "key": "forum.board.user_stats",
+      "note": "Audit missed it. {count} is the raw number and only selects the plural arm; {total} and {points} arrive pre-formatted, which is the shape core uses in post_scrubber.viewing_text."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 714,
+      "find": "        ? m('div', { style: { marginTop: '12px', opacity: 0.65, fontSize: '12px' } },\n            'All-time counts native reactions only — the imported board recorded '\n            + 'which reactions a post drew but never who left them.')",
+      "replace": "        ? m('div', { style: { marginTop: '12px', opacity: 0.65, fontSize: '12px' } },\n            app.translator.trans('local-looksmax-reactions.forum.board.all_time_note'))",
+      "key": "forum.board.all_time_note"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 804,
+      "find": "          }, 'Most reacted…'), -5);",
+      "replace": "          }, app.translator.trans('local-looksmax-reactions.forum.thread.open')), -5);",
+      "key": "forum.thread.open"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 817,
+      "find": "          }, 'Reaction leaderboard'), -10);",
+      "replace": "          }, app.translator.trans('local-looksmax-reactions.forum.leaderboard')), -10);",
+      "key": "forum.leaderboard"
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 837,
+      "find": "              m('span', [\n                m('strong', n.fromUser() ? n.fromUser().username() : 'Someone'),\n                ' reacted ' + ((r && r.display) || '') + ' to your post'\n              ])",
+      "replace": "              m('span', app.translator.trans(\n                r && r.display\n                  ? 'local-looksmax-reactions.forum.notification_text_with_reaction'\n                  : 'local-looksmax-reactions.forum.notification_text',\n                {\n                  username: m('strong', n.fromUser() ? n.fromUser().username() : app.translator.trans('local-looksmax-reactions.forum.notification.someone')),\n                  reaction: (r && r.display) || ''\n                }\n              ))",
+      "key": "forum.notification_text / notification_text_with_reaction / notification.someone",
+      "note": "Follows the shape of the notification_text key that was already in en.yml. The username stays bold by passing an m('strong') vnode as the parameter, which is how core interpolates users into notifications; trans() then returns an array, which is a valid Mithril child. A second key is used when the catalogue could not name the reaction, because an empty {reaction} in one key renders a double space."
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 46,
+      "find": "        if (!rows) return m('.ExtensionPage', m('.container', 'Loading…'));",
+      "replace": "        if (!rows) return m('.ExtensionPage', m('.container', app.translator.trans('local-looksmax-reactions.admin.loading')));",
+      "key": "admin.loading"
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 74,
+      "find": "        return m('.ExtensionPage', m('.container', [\n          m('h2', 'Reaction catalogue'),\n          m('p', rows.length + ' reactions, '\n            + rows.filter(function (r) { return r.enabled; }).length + ' enabled. '\n            + 'Order here is the order in the picker and in the post strip.'),",
+      "replace": "        return m('.ExtensionPage', m('.container', [\n          m('h2', app.translator.trans('local-looksmax-reactions.admin.catalogue.title')),\n          m('p', app.translator.trans('local-looksmax-reactions.admin.catalogue.summary', {\n            count: rows.length,\n            enabled: rows.filter(function (r) { return r.enabled; }).length\n          })),",
+      "key": "admin.catalogue.title / admin.catalogue.summary",
+      "note": "No window.lmxI18n here: looksmax-i18n registers CSS but no JS on the admin frontend, so the runtime is forum-only. The two numbers on this screen are the catalogue size (31), so raw values are correct."
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 86,
+      "find": "              m('span', { style: { opacity: 0.7 } }, r.points + ' pts'),",
+      "replace": "              m('span', { style: { opacity: 0.7 } }, app.translator.trans('local-looksmax-reactions.admin.catalogue.points', { points: r.points })),",
+      "key": "admin.catalogue.points",
+      "note": "Audit missed it."
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 89,
+      "find": "                m('button.Button.Button--icon', { onclick: function () { move(i, -1); } }, '↑'),\n                m('button.Button.Button--icon', { onclick: function () { move(i, 1); } }, '↓'),",
+      "replace": "                m('button.Button.Button--icon', {\n                  title: app.translator.trans('local-looksmax-reactions.admin.catalogue.move_up'),\n                  'aria-label': app.translator.trans('local-looksmax-reactions.admin.catalogue.move_up'),\n                  onclick: function () { move(i, -1); }\n                }, '↑'),\n                m('button.Button.Button--icon', {\n                  title: app.translator.trans('local-looksmax-reactions.admin.catalogue.move_down'),\n                  'aria-label': app.translator.trans('local-looksmax-reactions.admin.catalogue.move_down'),\n                  onclick: function () { move(i, 1); }\n                }, '↓'),",
+      "key": "admin.catalogue.move_up / move_down",
+      "note": "These two buttons carry no accessible name at all today — the glyph is their only content, and a screen reader reads \"up arrow\". The replacement adds the label as well as translating it."
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 95,
+      "find": "                }, r.enabled ? 'Enabled' : 'Disabled')",
+      "replace": "                }, r.enabled\n                  ? app.translator.trans('local-looksmax-reactions.admin.catalogue.enabled')\n                  : app.translator.trans('local-looksmax-reactions.admin.catalogue.disabled'))",
+      "key": "admin.catalogue.enabled / disabled",
+      "note": "Audit missed both."
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 115,
+      "find": "      d.registerSetting({ setting: 'lmxreactions.selfReact', type: 'boolean',\n        label: 'Allow reacting to your own posts' });\n      d.registerSetting({ setting: 'lmxreactions.maxPerPost', type: 'number',\n        label: 'Maximum reactions one user may leave on one post' });\n      d.registerSetting({ setting: 'lmxreactions.stripSize', type: 'number',\n        label: 'Reaction icon size in the post footer (px)' });\n      d.registerSetting({ setting: 'lmxreactions.rateBurst', type: 'number',\n        label: 'Reactions allowed per minute (abuse limit)' });\n      d.registerSetting({ setting: 'lmxreactions.rateHourly', type: 'number',\n        label: 'Reactions allowed per hour (abuse limit)' });\n      d.registerPermission({ icon: 'fas fa-face-smile', label: 'React to posts',\n        permission: 'lmxreactions.react' }, 'reply');\n      d.registerPermission({ icon: 'fas fa-users', label: 'See who reacted',\n        permission: 'lmxreactions.seeReactors' }, 'view');",
+      "replace": "      d.registerSetting({ setting: 'lmxreactions.selfReact', type: 'boolean',\n        label: app.translator.trans('local-looksmax-reactions.admin.settings.self_react') });\n      d.registerSetting({ setting: 'lmxreactions.maxPerPost', type: 'number',\n        label: app.translator.trans('local-looksmax-reactions.admin.settings.max_per_post') });\n      d.registerSetting({ setting: 'lmxreactions.stripSize', type: 'number',\n        label: app.translator.trans('local-looksmax-reactions.admin.settings.strip_size') });\n      d.registerSetting({ setting: 'lmxreactions.rateBurst', type: 'number',\n        label: app.translator.trans('local-looksmax-reactions.admin.settings.rate_burst') });\n      d.registerSetting({ setting: 'lmxreactions.rateHourly', type: 'number',\n        label: app.translator.trans('local-looksmax-reactions.admin.settings.rate_hourly') });\n      d.registerPermission({ icon: 'fas fa-face-smile', label: app.translator.trans('local-looksmax-reactions.admin.permissions.react'),\n        permission: 'lmxreactions.react' }, 'reply');\n      d.registerPermission({ icon: 'fas fa-users', label: app.translator.trans('local-looksmax-reactions.admin.permissions.see_reactors'),\n        permission: 'lmxreactions.seeReactors' }, 'view');",
+      "key": "admin.settings.* / admin.permissions.*",
+      "note": "'See who reacted' was missed by the audit. `app` here is the `var app = window.app` bound at the top of this IIFE's attempt(), which is in scope for the whole block."
+    },
+    {
+      "file": "src/Api/AdminController.php",
+      "line": 78,
+      "find": "                    'hint' => 'disable it instead; deleting would cascade these rows away',",
+      "replace": "                    'hint' => resolve(\\Symfony\\Contracts\\Translation\\TranslatorInterface::class)\n                        ->trans('local-looksmax-reactions.admin.error.in_use_hint'),",
+      "key": "admin.error.in_use_hint",
+      "note": "AdminController has no injected translator and is constructed by the router, so resolve() is used rather than a constructor change. Note this body is only reachable via DELETE /api/lmx/reactions/{id}, which no screen calls today — the admin UI offers disable instead. Translated anyway because it is a user-facing `hint` on a 409 and the next UI that adds a delete button will render it."
+    }
+  ],
+  "deferred": [
+    {
+      "id": "catalogue_display",
+      "file": "src/Catalog.php",
+      "line": 49,
+      "string": "ITEMS[*][0] — 'Happy', 'Love it', 'Hmm...', 'So Sad', 'Ugh..', 'Nerd', 'Based', 'Clown', … (31 names)",
+      "reason": "These 31 names are seeded into the `reactions.display` COLUMN by migrations/2026_08_13_120002_seed_catalog.php and served from the DB on the forum payload, so they are not a string in the JS at all — forum.js reads r.display in eight places (icon() alt, the picker preview, both chip titles, the reactors modal, the thread filter chips, the admin rows). They are also admin-editable: AdminController's PATCH accepts `display`. A translation key would therefore silently override a rename an admin made on the catalogue screen, which is a precedence decision this lane cannot make alone.",
+      "what_it_would_take": "The keys are already written and shipped: local-looksmax-reactions.forum.reaction.<slug> in both locale files, for all 31 slugs. Wiring is one helper in js/dist/forum.js — `function name(r) { return window.lmxI18n.t('local-looksmax-reactions.forum.reaction.' + r.slug, {}, r.display); }` — plus replacing r.display with name(r) at forum.js:91, 245, 286, 306(fallback), 331, 490, 510, 626 and admin.js:28, 82. The precedence rule to agree first: either (a) the key always wins, and the admin `display` column becomes an English-only fallback for reactions added after this catalogue, or (b) the DB wins when it differs from the seeded value, which needs the seed value kept alongside it. (b) is correct but needs a schema column."
+    },
+    {
+      "id": "legacy_summary",
+      "file": "js/dist/forum.js",
+      "line": 337,
+      "string": "legacy.summary (rendered verbatim)",
+      "reason": "XenForo's own byline for an imported post — 'Alice, Bob and 12 others'. It is stored data, in English, with no structure to interpolate; ReactorsController.php:94 keeps it verbatim on purpose because most of the names in it are 'Deleted member 6401' and there is no id to resolve. It cannot be translated without re-parsing 381k rows.",
+      "what_it_would_take": "A migration that re-parses the scraped byline into (names[], othersCount) so the sentence can be rebuilt from a key. Worth doing only if the byline is judged worth keeping at all."
+    }
+  ],
+  "not_translatable": [
+    {
+      "file": "js/dist/forum.js",
+      "line": 194,
+      "string": "'var(--e-4, 0 24px 64px rgba(0,0,0,.6))'",
+      "why": "A CSS box-shadow value in an inline style object. Audit false positive."
+    },
+    {
+      "file": "src/Api/DiscussionReactionsController.php",
+      "line": 67,
+      "string": "'legacy_post_totals as l'",
+      "why": "SQL table alias. Audit false positive."
+    },
+    {
+      "file": "src/Api/DiscussionReactionsController.php",
+      "line": 72,
+      "string": "'legacy_post_reactions as lr'",
+      "why": "SQL table alias. Audit false positive."
+    },
+    {
+      "file": "src/Api/DiscussionReactionsController.php",
+      "line": 73,
+      "string": "'reactions as r2'",
+      "why": "SQL table alias. Audit false positive."
+    },
+    {
+      "file": "js/dist/admin.js",
+      "line": 87,
+      "string": "'xf#' + r.xf_id",
+      "why": "The XenForo reaction id, shown to an admin as a provenance marker. An identifier, not prose; 'xf' is the source system's name."
+    },
+    {
+      "file": "js/dist/forum.js",
+      "line": 527,
+      "string": "'★'",
+      "why": "Decorative glyph on the imported-total chip; the chip carries a translated title attribute."
+    },
+    {
+      "file": "less/chris.less",
+      "line": 84,
+      "string": "content: \"\"",
+      "why": "Empty decorative pseudo-element. No LESS file in this extension has a text content: rule."
+    }
+  ]
+}

@@ -1,0 +1,736 @@
+{
+  "brass": {
+    "100": "#fff7ea",
+    "200": "#ffe7c1",
+    "300": "#ffd99a",
+    "400": "#f3cc8a",
+    "500": "#e8c07d",
+    "600": "#c29e62",
+    "700": "#a18049",
+    "800": "#745929",
+    "900": "#473105"
+  },
+  "azure": {
+    "100": "#eef4ff",
+    "200": "#dbe7fe",
+    "300": "#c7dafe",
+    "400": "#b3ccff",
+    "500": "#7aa2f7",
+    "600": "#688ddb",
+    "700": "#5475bc",
+    "800": "#34508b",
+    "900": "#162a5a"
+  },
+  "surface": {
+    "void": "#070910",
+    "header": "#0b0e14",
+    "bg": "#0e1116",
+    "surface": "#12161c",
+    "raised": "#1a2029",
+    "hover": "#232c39",
+    "line": "#232c39",
+    "line-strong": "#5f6d82"
+  },
+  "ink": {
+    "ink": "#eef2f7",
+    "ink-dim": "#aab5c6",
+    "ink-faint": "#8b96a8",
+    "ink-invert": "#0e1116"
+  },
+  "semantic": {
+    "ok": "#7fd18b",
+    "warn": "#f0b352",
+    "danger": "#ff8fa3",
+    "info": "#7aa2f7"
+  },
+  "ranks": [
+    [
+      "greycel",
+      "#7c8695"
+    ],
+    [
+      "iron",
+      "#9aa4b2"
+    ],
+    [
+      "bronze",
+      "#c98b5e"
+    ],
+    [
+      "silver",
+      "#c3ccd8"
+    ],
+    [
+      "gold",
+      "#e8c07d"
+    ],
+    [
+      "platinum",
+      "#8fd3e8"
+    ],
+    [
+      "diamond",
+      "#7ee0d3"
+    ],
+    [
+      "master",
+      "#a78bfa"
+    ],
+    [
+      "luminary",
+      "#f0a5d0"
+    ],
+    [
+      "ascended",
+      "#ffffff"
+    ]
+  ],
+  "tiers": [
+    [
+      "standard",
+      "#7c8695"
+    ],
+    [
+      "plus",
+      "#7aa2f7"
+    ],
+    [
+      "vip",
+      "#e8c07d"
+    ],
+    [
+      "elite",
+      "#bb9af7"
+    ],
+    [
+      "founder",
+      "#f7768e"
+    ]
+  ],
+  "checks": [
+    {
+      "label": "--brand-ink",
+      "fg": "#eef2f7",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 16.82
+    },
+    {
+      "label": "--brand-ink",
+      "fg": "#eef2f7",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 16.14
+    },
+    {
+      "label": "--brand-ink",
+      "fg": "#eef2f7",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 14.56
+    },
+    {
+      "label": "--brand-ink",
+      "fg": "#eef2f7",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 17.18
+    },
+    {
+      "label": "--brand-ink-dim",
+      "fg": "#aab5c6",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 9.13
+    },
+    {
+      "label": "--brand-ink-dim",
+      "fg": "#aab5c6",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 8.76
+    },
+    {
+      "label": "--brand-ink-dim",
+      "fg": "#aab5c6",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 7.9
+    },
+    {
+      "label": "--brand-ink-dim",
+      "fg": "#aab5c6",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 9.32
+    },
+    {
+      "label": "--brand-ink-faint",
+      "fg": "#8b96a8",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 6.33
+    },
+    {
+      "label": "--brand-ink-faint",
+      "fg": "#8b96a8",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 6.07
+    },
+    {
+      "label": "--brand-ink-faint",
+      "fg": "#8b96a8",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 5.48
+    },
+    {
+      "label": "--brand-ink-faint",
+      "fg": "#8b96a8",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 6.46
+    },
+    {
+      "label": "--brand-brass-500",
+      "fg": "#e8c07d",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 11.05
+    },
+    {
+      "label": "--brand-brass-500",
+      "fg": "#e8c07d",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 10.6
+    },
+    {
+      "label": "--brand-brass-500",
+      "fg": "#e8c07d",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 9.56
+    },
+    {
+      "label": "--brand-brass-500",
+      "fg": "#e8c07d",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 11.28
+    },
+    {
+      "label": "--brand-brass-400",
+      "fg": "#f3cc8a",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 12.44
+    },
+    {
+      "label": "--brand-brass-400",
+      "fg": "#f3cc8a",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 11.94
+    },
+    {
+      "label": "--brand-brass-400",
+      "fg": "#f3cc8a",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 10.77
+    },
+    {
+      "label": "--brand-brass-400",
+      "fg": "#f3cc8a",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 12.71
+    },
+    {
+      "label": "--brand-brass-600",
+      "fg": "#c29e62",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "large",
+      "ratio": 7.53
+    },
+    {
+      "label": "--brand-brass-600",
+      "fg": "#c29e62",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "large",
+      "ratio": 7.22
+    },
+    {
+      "label": "--brand-brass-600",
+      "fg": "#c29e62",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "large",
+      "ratio": 6.52
+    },
+    {
+      "label": "--brand-brass-600",
+      "fg": "#c29e62",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "large",
+      "ratio": 7.69
+    },
+    {
+      "label": "--brand-azure-500",
+      "fg": "#7aa2f7",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 7.51
+    },
+    {
+      "label": "--brand-azure-500",
+      "fg": "#7aa2f7",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 7.21
+    },
+    {
+      "label": "--brand-azure-500",
+      "fg": "#7aa2f7",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 6.5
+    },
+    {
+      "label": "--brand-azure-500",
+      "fg": "#7aa2f7",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 7.67
+    },
+    {
+      "label": "--brand-azure-400",
+      "fg": "#b3ccff",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 11.71
+    },
+    {
+      "label": "--brand-azure-400",
+      "fg": "#b3ccff",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 11.23
+    },
+    {
+      "label": "--brand-azure-400",
+      "fg": "#b3ccff",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 10.13
+    },
+    {
+      "label": "--brand-azure-400",
+      "fg": "#b3ccff",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 11.96
+    },
+    {
+      "label": "--brand-ok",
+      "fg": "#7fd18b",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 10.26
+    },
+    {
+      "label": "--brand-ok",
+      "fg": "#7fd18b",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 9.85
+    },
+    {
+      "label": "--brand-ok",
+      "fg": "#7fd18b",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 8.88
+    },
+    {
+      "label": "--brand-ok",
+      "fg": "#7fd18b",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 10.48
+    },
+    {
+      "label": "--brand-warn",
+      "fg": "#f0b352",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 10.15
+    },
+    {
+      "label": "--brand-warn",
+      "fg": "#f0b352",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 9.74
+    },
+    {
+      "label": "--brand-warn",
+      "fg": "#f0b352",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 8.79
+    },
+    {
+      "label": "--brand-warn",
+      "fg": "#f0b352",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 10.37
+    },
+    {
+      "label": "--brand-danger",
+      "fg": "#ff8fa3",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 8.74
+    },
+    {
+      "label": "--brand-danger",
+      "fg": "#ff8fa3",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 8.39
+    },
+    {
+      "label": "--brand-danger",
+      "fg": "#ff8fa3",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 7.57
+    },
+    {
+      "label": "--brand-danger",
+      "fg": "#ff8fa3",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 8.93
+    },
+    {
+      "label": "--brand-info",
+      "fg": "#7aa2f7",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "text",
+      "ratio": 7.51
+    },
+    {
+      "label": "--brand-info",
+      "fg": "#7aa2f7",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 7.21
+    },
+    {
+      "label": "--brand-info",
+      "fg": "#7aa2f7",
+      "bg": "raised",
+      "bgHex": "#1a2029",
+      "role": "text",
+      "ratio": 6.5
+    },
+    {
+      "label": "--brand-info",
+      "fg": "#7aa2f7",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 7.67
+    },
+    {
+      "label": "--brand-line-strong",
+      "fg": "#5f6d82",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "ui",
+      "ratio": 3.6
+    },
+    {
+      "label": "--brand-line-strong",
+      "fg": "#5f6d82",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "ui",
+      "ratio": 3.45
+    },
+    {
+      "label": "--brand-line",
+      "fg": "#232c39",
+      "bg": "bg",
+      "bgHex": "#0e1116",
+      "role": "decor",
+      "ratio": 1.34
+    },
+    {
+      "label": "--brand-line",
+      "fg": "#232c39",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "decor",
+      "ratio": 1.29
+    },
+    {
+      "label": "--brand-ink-invert",
+      "fg": "#0e1116",
+      "bg": "brass-500",
+      "bgHex": "#e8c07d",
+      "role": "text",
+      "ratio": 11.05
+    },
+    {
+      "label": "--brand-ink-invert",
+      "fg": "#0e1116",
+      "bg": "brass-400",
+      "bgHex": "#f3cc8a",
+      "role": "text",
+      "ratio": 12.44
+    },
+    {
+      "label": "--brand-ink-invert",
+      "fg": "#0e1116",
+      "bg": "white",
+      "bgHex": "#ffffff",
+      "role": "text",
+      "ratio": 18.91
+    },
+    {
+      "label": "--brand-brass-800 (on light)",
+      "fg": "#745929",
+      "bg": "white",
+      "bgHex": "#ffffff",
+      "role": "text",
+      "ratio": 6.56
+    },
+    {
+      "label": "--brand-brass-700 (on light)",
+      "fg": "#a18049",
+      "bg": "white",
+      "bgHex": "#ffffff",
+      "role": "large",
+      "ratio": 3.68
+    },
+    {
+      "label": "--brand-brass-500 (on light)",
+      "fg": "#e8c07d",
+      "bg": "white",
+      "bgHex": "#ffffff",
+      "role": "decor",
+      "ratio": 1.71
+    },
+    {
+      "label": "mark brass on icon plate",
+      "fg": "#e8c07d",
+      "bg": "plate #12161c",
+      "bgHex": "#12161c",
+      "role": "ui",
+      "ratio": 10.6
+    },
+    {
+      "label": "icon plate on light tab strip",
+      "fg": "#12161c",
+      "bg": "chrome light #dee1e6",
+      "bgHex": "#dee1e6",
+      "role": "ui",
+      "ratio": 13.84
+    },
+    {
+      "label": "mark brass on dark tab strip",
+      "fg": "#e8c07d",
+      "bg": "chrome dark #202124",
+      "bgHex": "#202124",
+      "role": "ui",
+      "ratio": 9.4
+    },
+    {
+      "label": "lockup ink on header",
+      "fg": "#eef2f7",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "text",
+      "ratio": 17.18
+    },
+    {
+      "label": "lockup brass on header",
+      "fg": "#e8c07d",
+      "bg": "header",
+      "bgHex": "#0b0e14",
+      "role": "ui",
+      "ratio": 11.28
+    },
+    {
+      "label": "rank greycel",
+      "fg": "#7c8695",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 4.93
+    },
+    {
+      "label": "rank iron",
+      "fg": "#9aa4b2",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 7.2
+    },
+    {
+      "label": "rank bronze",
+      "fg": "#c98b5e",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 6.34
+    },
+    {
+      "label": "rank silver",
+      "fg": "#c3ccd8",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 11.19
+    },
+    {
+      "label": "rank gold",
+      "fg": "#e8c07d",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 10.6
+    },
+    {
+      "label": "rank platinum",
+      "fg": "#8fd3e8",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 10.93
+    },
+    {
+      "label": "rank diamond",
+      "fg": "#7ee0d3",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 11.66
+    },
+    {
+      "label": "rank master",
+      "fg": "#a78bfa",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 6.67
+    },
+    {
+      "label": "rank luminary",
+      "fg": "#f0a5d0",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 9.5
+    },
+    {
+      "label": "rank ascended",
+      "fg": "#ffffff",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 18.15
+    },
+    {
+      "label": "tier standard",
+      "fg": "#7c8695",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 4.93
+    },
+    {
+      "label": "tier plus",
+      "fg": "#7aa2f7",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 7.21
+    },
+    {
+      "label": "tier vip",
+      "fg": "#e8c07d",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 10.6
+    },
+    {
+      "label": "tier elite",
+      "fg": "#bb9af7",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 7.84
+    },
+    {
+      "label": "tier founder",
+      "fg": "#f7768e",
+      "bg": "surface",
+      "bgHex": "#12161c",
+      "role": "text",
+      "ratio": 6.86
+    }
+  ]
+}

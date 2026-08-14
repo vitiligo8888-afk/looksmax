@@ -1,0 +1,262 @@
+// Username styles.
+//
+// Every rule here is hand-written and there is not a loop in the file. Flarum's
+// LESS compiles through the PHP port, which has no each() and no range(), and
+// which fails SILENTLY: forum.css simply never gets written while forum.js
+// builds fine, so the whole theme vanishes and nothing tells you why. A
+// generated colour ramp would have been elegant and would have cost an
+// afternoon. This is the tradeoff, taken deliberately.
+//
+// Performance rules the animated styles follow, because a discussion listing
+// can carry fifty names and a busy thread twenty:
+//
+//   1. Only `background-position`, `filter` and `text-shadow` are animated.
+//      Nothing here animates a property that triggers layout.
+//   2. Every animation starts PAUSED. The decorator adds `.is-live` through an
+//      IntersectionObserver, so a name that is scrolled off screen costs
+//      nothing. A CSS animation on an off-screen element still ticks the
+//      compositor otherwise — this is the difference between 4 animated names
+//      running and 50.
+//   3. `prefers-reduced-motion` freezes everything to a static gradient. The
+//      colour survives, the motion does not.
+//
+// Gradient names are painted with background-clip:text, so the text colour is
+// the gradient and `color` is ignored. That means specificity has to beat core:
+// `.lmx-name.ns-x` is (0,2,0) against core's `.username` at (0,1,0).
+
+@ns-speed-slow: 9s;
+@ns-speed: 5.5s;
+@ns-speed-fast: 3.2s;
+
+// ---------------------------------------------------------------- foundation
+.lmx-name {
+  font-weight: 600;
+  // isolate the paint so a gradient name inside a link does not inherit the
+  // link colour and does not bleed its background onto the row behind it
+  background-repeat: no-repeat;
+}
+
+// The gradient recipe, applied by every non-solid style. Kept as a mixin rather
+// than a shared class so the decorator only has to add one class per name.
+.ns-gradient-base() {
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.ns-animate(@name; @duration; @timing: linear) {
+  animation: @name @duration @timing infinite;
+  animation-play-state: paused;
+  will-change: background-position;
+}
+
+// Only names the observer has marked visible actually run.
+.lmx-name.is-live { animation-play-state: running; }
+
+// ------------------------------------------------------------------- keyframes
+@keyframes ns-sweep {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes ns-sweep-back {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes ns-drip {
+  0%   { background-position: 50% 0%; }
+  100% { background-position: 50% 200%; }
+}
+
+@keyframes ns-hue {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes ns-glow {
+  0%, 100% { text-shadow: 0 0 4px fade(#ffffff, 55%), 0 0 12px fade(#cfe4ff, 30%); }
+  50%      { text-shadow: 0 0 9px fade(#ffffff, 85%), 0 0 22px fade(#cfe4ff, 55%); }
+}
+
+@keyframes ns-flicker {
+  0%, 100% { background-position: 0% 50%; text-shadow: 0 0 6px fade(#ff7b32, 45%); }
+  50%      { background-position: 100% 50%; text-shadow: 0 0 10px fade(#ffb347, 65%); }
+}
+
+// ==================================================================== rank
+// The default: painted by the rank the ledger says you hold. The colour comes
+// from a CSS variable the decorator sets from the catalogue, so the ladder can
+// be re-coloured in Catalog.php without touching this file.
+.lmx-name.ns-rank { color: var(--lmx-rank-color, inherit); }
+
+// The bare rank colouring, applied to every styled name that has no cosmetic.
+.lmx-name.rk-greycel  { color: #7c8695; }
+.lmx-name.rk-iron     { color: #9aa4b2; }
+.lmx-name.rk-bronze   { color: #c98b5e; }
+.lmx-name.rk-silver   { color: #c3ccd8; }
+.lmx-name.rk-gold     { color: #e8c07d; }
+.lmx-name.rk-platinum { color: #8fd3e8; }
+.lmx-name.rk-diamond  { color: #7ee0d3; }
+.lmx-name.rk-master   { color: #a78bfa; font-weight: 700; }
+.lmx-name.rk-luminary { color: #f0a5d0; font-weight: 700; }
+.lmx-name.rk-ascended { color: #ffffff; font-weight: 700; }
+
+// =================================================================== solids
+.lmx-name.ns-crimson { color: #f2555f; }
+.lmx-name.ns-azure   { color: #4aa8ff; }
+.lmx-name.ns-emerald { color: #3ddc97; }
+.lmx-name.ns-apricot { color: #ffab6b; }
+.lmx-name.ns-fuchsia { color: #ff5fc8; }
+.lmx-name.ns-slate   { color: #8c98a8; }
+
+// ================================================================ gradients
+// Static gradients: colour without motion, which is what most people actually
+// want. Nine of these names are the source board's own VIP colours.
+.lmx-name.ns-zephir {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #cfe8ff 0%, #7ea8d8 45%, #4d6b8f 100%);
+}
+
+.lmx-name.ns-mistral {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #a8e6f0 0%, #5aa9c4 50%, #2d6b85 100%);
+}
+
+.lmx-name.ns-solstice {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #ffd89b 0%, #ff9a6b 50%, #e0574f 100%);
+}
+
+.lmx-name.ns-equinox {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #f5f0e6 0%, #9a8fb5 52%, #2b2740 100%);
+}
+
+.lmx-name.ns-sphinx {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #e5c98f 0%, #b08a4f 45%, #4a4137 100%);
+}
+
+.lmx-name.ns-vaporwave {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #6ff0ff 0%, #c88bff 50%, #ff5fc8 100%);
+}
+
+.lmx-name.ns-goldleaf {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #fff3c4 0%, #e8c07d 30%, #a9762e 60%, #ffe9a8 100%);
+}
+
+.lmx-name.ns-oceanic {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #7ee0d3 0%, #3d8fd1 55%, #1d3f7a 100%);
+}
+
+// ================================================================= animated
+.lmx-name.ns-winter {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #dff3ff 0%, #ffffff 18%, #8fd3e8 38%, #dff3ff 58%, #ffffff 78%, #8fd3e8 100%);
+  background-size: 320% 100%;
+  .ns-animate(ns-sweep; @ns-speed-slow);
+}
+
+.lmx-name.ns-slime {
+  .ns-gradient-base();
+  background-image: linear-gradient(180deg, #b9ff5c 0%, #4ddc4d 35%, #1f7a2e 65%, #b9ff5c 100%);
+  background-size: 100% 320%;
+  .ns-animate(ns-drip; @ns-speed-slow);
+}
+
+.lmx-name.ns-striped {
+  .ns-gradient-base();
+  background-image: repeating-linear-gradient(115deg,
+    #e8c07d 0px, #e8c07d 9px,
+    #12161c 9px, #12161c 15px,
+    #f7f2e6 15px, #f7f2e6 24px);
+  background-size: 200% 100%;
+  .ns-animate(ns-sweep; 6.5s);
+}
+
+.lmx-name.ns-kraken {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #123a4d 0%, #2ec6c0 25%, #7ee0d3 45%, #1a5f7a 70%, #2ec6c0 100%);
+  background-size: 300% 100%;
+  .ns-animate(ns-sweep-back; 7s; ease-in-out);
+}
+
+.lmx-name.ns-fire {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #ffe259 0%, #ff9a3c 25%, #ff4d2e 50%, #ffb347 75%, #ffe259 100%);
+  background-size: 260% 100%;
+  .ns-animate(ns-flicker; @ns-speed-fast; ease-in-out);
+}
+
+.lmx-name.ns-aurora {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #3ddc97 0%, #6ff0ff 25%, #a78bfa 50%, #3ddc97 75%, #6ff0ff 100%);
+  background-size: 300% 100%;
+  .ns-animate(ns-sweep; 11s);
+}
+
+.lmx-name.ns-prism {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #ff5f6d 0%, #ffc371 20%, #47e891 40%, #4aa8ff 60%, #c88bff 80%, #ff5f6d 100%);
+  background-size: 200% 100%;
+  .ns-animate(ns-hue; 6s);
+}
+
+// ================================================================ legendary
+.lmx-name.ns-luminary {
+  color: #ffffff;
+  font-weight: 700;
+  .ns-animate(ns-glow; 4.5s; ease-in-out);
+  will-change: text-shadow;
+}
+
+// Not a gradient: an outline. -webkit-text-stroke draws the gold edge and the
+// fill stays near-black, which is legible on this theme's #0e1116 page only
+// because of the stroke — hence the fallback colour for anything that does not
+// support the stroke property.
+.lmx-name.ns-obsidian {
+  color: #15181f;
+  font-weight: 800;
+  -webkit-text-stroke: 0.6px #e8c07d;
+  text-shadow: 0 0 6px fade(#e8c07d, 35%);
+}
+
+@supports not (-webkit-text-stroke: 1px #000) {
+  .lmx-name.ns-obsidian { color: #e8c07d; }
+}
+
+.lmx-name.ns-staff {
+  .ns-gradient-base();
+  background-image: linear-gradient(100deg, #f7768e 0%, #e8c07d 50%, #f7768e 100%);
+  background-size: 200% 100%;
+  .ns-animate(ns-sweep; 8s);
+  letter-spacing: 0.01em;
+}
+
+// ============================================================ accessibility
+// Motion is decoration here, colour is the information. Under reduced-motion
+// the gradients stay and the movement stops — the style is still identifiable,
+// which is the point of owning it.
+@media (prefers-reduced-motion: reduce) {
+  .lmx-name,
+  .lmx-name.is-live {
+    animation: none !important;
+    background-position: 25% 50% !important;
+    filter: none !important;
+  }
+}
+
+// Selection has to stay readable on background-clipped text, which otherwise
+// selects as an invisible transparent glyph on the selection colour.
+.lmx-name::selection {
+  -webkit-text-fill-color: #0e1116;
+  background: #e8c07d;
+}

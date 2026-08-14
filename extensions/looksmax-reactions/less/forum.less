@@ -1,0 +1,401 @@
+//
+// Reactions.
+//
+// COMPILER WARNING, read before editing. Flarum compiles LESS through
+// wikimedia/less.php, which evaluates every colour function at COMPILE time.
+// fade(var(--x), 40%), darken(var(--surface-1), 2%), calc(var(--a) + var(--b))
+// and each()/range() all abort compilation — and when that happens forum.js
+// still builds while forum.css is simply never written, so the site comes back
+// unstyled with a green deploy. Everything below therefore uses CSS-native
+// color-mix() and rgb(from ...) style constructs the BROWSER evaluates, or the
+// theme's precomputed --*-a## alpha tokens. Do not introduce a LESS colour
+// function over a custom property here.
+//
+// The per-reaction accent arrives as an inline --rx custom property set by the
+// frontend from the catalogue's `tint`. That indirection exists because of a
+// measurement: bin/legibility.py scores neutral and sad at 9.36 ΔLab apart at
+// 24px, which is not enough to tell two chips apart at a glance, so a chip is
+// made identifiable by colour as well as by the face inside it.
+//
+
+// ---------------------------------------------------------------- the strip
+
+.LmxRx {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 2px;
+  min-height: 30px;
+}
+
+.LmxRx-chip {
+  --rx: var(--ink-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px 0 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill, 999px);
+  background: var(--surface-2);
+  color: var(--ink-dim);
+  font: 600 12px/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--t-fast, 120ms) var(--ease, ease),
+              background-color var(--t-fast, 120ms) var(--ease, ease),
+              border-color var(--t-fast, 120ms) var(--ease, ease),
+              box-shadow var(--t-fast, 120ms) var(--ease, ease);
+
+  &:hover {
+    background: var(--surface-3);
+    border-color: color-mix(in srgb, var(--rx) 55%, var(--line));
+    transform: translateY(-1px);
+  }
+
+  &:active { transform: translateY(0) scale(0.96); }
+
+  &:focus-visible {
+    outline: 2px solid var(--rx);
+    outline-offset: 2px;
+  }
+
+  img, svg { display: block; }
+}
+
+// the actor's own reaction: tinted, and not by colour alone -- the ring is a
+// second, non-chromatic cue for anyone who cannot separate the two
+.LmxRx-chip.is-mine {
+  background: color-mix(in srgb, var(--rx) 16%, var(--surface-2));
+  border-color: color-mix(in srgb, var(--rx) 62%, transparent);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rx) 32%, transparent);
+}
+
+.LmxRx-chip-count {
+  min-width: 8px;
+  letter-spacing: 0.01em;
+}
+
+// Imported reactions. Visually distinct because they ARE distinct: the source
+// board recorded which types a post drew and a total, never who or how many
+// per type. A dashed edge says "this is history, not a live count", and the
+// count is only rendered when it was derivable rather than invented.
+.LmxRx-chip--legacy {
+  border-style: dashed;
+  cursor: default;
+  opacity: 0.92;
+
+  &:hover { transform: none; background: var(--surface-2); }
+}
+
+.LmxRx-chip--legacy .LmxRx-chip-count--unknown {
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.LmxRx-legacyTotal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--r-pill, 999px);
+  background: var(--white-a04, rgba(255, 255, 255, 0.04));
+  border: 1px dashed var(--line);
+  color: var(--ink-faint);
+  font: 600 11px/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  cursor: help;
+}
+
+// ------------------------------------------------------------- add + picker
+
+.LmxRx-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-pill, 999px);
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color var(--t-fast, 120ms) var(--ease, ease),
+              border-color var(--t-fast, 120ms) var(--ease, ease),
+              background-color var(--t-fast, 120ms) var(--ease, ease);
+
+  &:hover, &.is-open {
+    color: var(--accent);
+    border-color: var(--accent-a45);
+    background: var(--accent-a08);
+    border-style: solid;
+  }
+
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+
+.LmxRx-pickerWrap { position: relative; }
+
+.LmxRx-picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: var(--z-popover, 1030);
+  width: 328px;
+  max-width: calc(100vw - 24px);
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg, 12px);
+  background: var(--surface-1);
+  box-shadow: var(--e-3, 0 18px 44px rgba(0, 0, 0, 0.55));
+  animation: lmxrx-pop 160ms var(--ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+// flip up-or-down is decided in JS; this is the variant
+.LmxRx-picker--below { bottom: auto; top: calc(100% + 8px); }
+.LmxRx-picker--right { left: auto; right: 0; }
+
+@keyframes lmxrx-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.LmxRx-search {
+  width: 100%;
+  height: 32px;
+  margin-bottom: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 8px);
+  background: var(--surface-0);
+  color: var(--ink);
+  font: 500 13px/1 var(--font-ui);
+
+  &::placeholder { color: var(--ink-faint); }
+  &:focus { outline: none; border-color: var(--accent-a45); }
+}
+
+.LmxRx-groupLabel {
+  margin: 8px 2px 5px;
+  color: var(--ink-faint);
+  font: 700 10px/1 var(--font-ui);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+
+  &:first-child { margin-top: 2px; }
+}
+
+.LmxRx-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.LmxRx-option {
+  --rx: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm, 6px);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 90ms var(--ease, ease), transform 90ms var(--ease, ease);
+
+  &:hover, &.is-cursor {
+    background: color-mix(in srgb, var(--rx) 20%, var(--surface-2));
+    transform: scale(1.14);
+  }
+
+  &.is-mine {
+    border-color: color-mix(in srgb, var(--rx) 70%, transparent);
+    background: color-mix(in srgb, var(--rx) 14%, transparent);
+  }
+
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  img, svg { display: block; max-width: 100%; max-height: 100%; }
+}
+
+.LmxRx-preview {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft, var(--line));
+  min-height: 30px;
+  color: var(--ink);
+  font: 600 12px/1 var(--font-ui);
+}
+
+.LmxRx-previewHint {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+// -------------------------------------------------------------- flying icon
+
+// Feedback that the click registered, before the request resolves. Purely
+// decorative, pointer-events:none, and removed on animationend.
+.LmxRx-fly {
+  position: fixed;
+  z-index: var(--z-toast, 1040);
+  pointer-events: none;
+  animation: lmxrx-fly 720ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+@keyframes lmxrx-fly {
+  0%   { opacity: 0.95; transform: translateY(0) scale(1); }
+  35%  { opacity: 1;    transform: translateY(-16px) scale(1.5); }
+  100% { opacity: 0;    transform: translateY(-46px) scale(0.85); }
+}
+
+.LmxRx-chip.just-added { animation: lmxrx-bump 320ms var(--ease, ease); }
+
+@keyframes lmxrx-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.16); }
+  100% { transform: scale(1); }
+}
+
+// ----------------------------------------------------------- who reacted
+
+.LmxRxModal-groups { display: flex; flex-direction: column; gap: 14px; }
+
+.LmxRxModal-group {
+  --rx: var(--ink-faint);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--rx);
+  border-radius: var(--r-md, 8px);
+  background: var(--surface-1);
+}
+
+.LmxRxModal-groupHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--ink);
+  font: 700 13px/1 var(--font-ui);
+}
+
+.LmxRxModal-groupCount {
+  margin-left: auto;
+  color: var(--ink-faint);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.LmxRxModal-users { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+
+.LmxRxModal-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-dim);
+  font: 600 12px/1 var(--font-ui);
+  text-decoration: none;
+
+  &:hover { color: var(--ink); }
+
+  img {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--avatar-bg, #c3ceda);
+  }
+}
+
+.LmxRxModal-legacy {
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md, 8px);
+  color: var(--ink-faint);
+  font: 500 12px/1.55 var(--font-ui);
+}
+
+.LmxRxModal-legacy strong { color: var(--ink-dim); }
+
+// ------------------------------------------------------------- thread filter
+
+.LmxRx-filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md, 8px);
+  background: var(--surface-1);
+}
+
+.LmxRx-filterLabel {
+  margin-right: 4px;
+  color: var(--ink-faint);
+  font: 700 10px/1 var(--font-ui);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+// -------------------------------------------------------------- narrow
+
+@media (max-width: 767px) {
+  .LmxRx { gap: 5px; }
+
+  .LmxRx-chip, .LmxRx-add, .LmxRx-legacyTotal { height: 28px; }
+
+  // A hover popover is unreachable on touch. On narrow viewports the picker is
+  // a bottom sheet instead, which is also why open/close is a real click
+  // handler here rather than a :hover rule -- fof/reactions drives its mobile
+  // path with jQuery .unbind() inside a Mithril oncreate, rebinding a global
+  // document handler once per post on the page. That is not copied.
+  .LmxRx-picker {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: auto;
+    max-width: none;
+    border-radius: var(--r-lg, 12px) var(--r-lg, 12px) 0 0;
+    border-bottom: 0;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+    animation: lmxrx-sheet 200ms var(--ease, cubic-bezier(0.2, 0.8, 0.2, 1));
+  }
+
+  .LmxRx-grid { grid-template-columns: repeat(8, 1fr); }
+
+  .LmxRx-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-popover, 1030);
+    background: var(--scrim, rgba(5, 7, 11, 0.72));
+  }
+}
+
+@keyframes lmxrx-sheet {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .LmxRx-chip, .LmxRx-option, .LmxRx-picker, .LmxRx-fly, .LmxRx-chip.just-added {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .LmxRx-chip:hover, .LmxRx-option:hover { transform: none !important; }
+}
+@import "chris.less";

@@ -1,0 +1,147 @@
+local-looksmax-reactions:
+  forum:
+    react: Reaccionar
+    reacted_by: Reaccionaron
+    who_reacted: Quién reaccionó
+    remove: Quitar tu reacción
+    # "the old board" is the XenForo forum this install imported from. "foro
+    # anterior" rather than "tablón"/"tablero", which nobody here would say.
+    legacy_note: Importado del foro anterior
+    legacy_unknown: no se registró la cantidad
+    # "leaderboard": "ranking" is what a Mexican forum says. "Clasificación"
+    # reads like a sports table and "tabla de posiciones" is too long for the
+    # sidebar button this also fills.
+    leaderboard: Ranking de reacciones
+    rate_limited: Vas muy rápido — inténtalo en un momento.
+    too_many: "Ya usaste {max, plural, one {# reacción} other {# reacciones}} en esta publicación."
+    notification_text: "{username} reaccionó a tu publicación"
+    notification_text_with_reaction: "{username} reaccionó con {reaction} a tu publicación"
+
+    loading: Cargando…
+    add: Agregar una reacción
+    post_ref: "publicación #{number}"
+
+    notification:
+      someone: Alguien
+
+    picker:
+      search_placeholder: "{count, plural, one {Buscar # reacción…} other {Buscar # reacciones…}}"
+      no_match: 'nada coincide con "{query}"'
+      hint_react: clic para reaccionar
+      hint_remove: clic para quitar
+      limit_hint: hasta {max} por publicación
+      group_chrigger: Chrigger
+      group_classic: Clásicas
+      group_extra: Más
+
+    chip:
+      # A chip is a reacción, so the participles agree in the feminine.
+      title_mine: "{name} — clic para quitar"
+      title_legacy: "{name} — importada del foro anterior"
+      title_legacy_unknown: "{name} — importada del foro anterior, no se registró la cantidad exacta"
+
+    legacy:
+      total_count: "{count, plural, one {# reacción en total.} other {# reacciones en total.}}"
+      total_title: Total de reacciones en el foro anterior
+      # {summary} is XenForo's own byline ("A, B and 3 others"), stored
+      # verbatim and English. It is history, not UI text, so it is not
+      # translated and must not be rebuilt from parts.
+      total_title_with: "Total de reacciones en el foro anterior: {summary}"
+      explainer: El foro anterior registraba qué reacciones recibía una publicación y el total, pero no quién las dejó — por eso aparecen como historial y no como una lista de personas.
+
+    reactors:
+      empty: Nadie ha reaccionado a esta publicación todavía.
+
+    error:
+      save_failed: No se pudo guardar esa reacción.
+
+    thread:
+      # "Lo más reaccionado" avoids agreeing with a noun that is not in the
+      # string; "Los más reaccionados" would guess wrong on the sidebar button.
+      open: Lo más reaccionado…
+      title: Lo más reaccionado en esta discusión
+      filter_label: filtrar
+      filter_all: todas
+      chip_title: "{name} — {count} aquí"
+      chip_title_legacy: "{name} — {count} aquí, {legacy, plural, one {# publicación importada} other {# publicaciones importadas}}"
+      row_native: "{count} aquí"
+      row_both: "{count} aquí · {legacy} importadas"
+      empty: Todavía no hay reacciones en esta discusión.
+
+    board:
+      # Verb phrases instead of "Más reaccionados"/"Más generosos": the rows
+      # are people, and a masculine plural adjective would be guessing their
+      # gender on every row. These say the same thing and agree with nothing.
+      tab_received: Reciben más
+      tab_given: Dan más
+      tab_posts: Mejores publicaciones
+      period_day: 24 h
+      period_week: semana
+      period_month: mes
+      period_all: histórico
+      user_stats: "{count, plural, one {{total} reacción} other {{total} reacciones}} · {points} pts"
+      post_total_split: "{total} ({native} aquí, {legacy} importadas)"
+      all_time_note: El histórico cuenta solo las reacciones de este foro — el foro anterior registraba qué reacciones recibía una publicación, pero nunca quién las dejó.
+
+    # Catálogo. Ver el comentario equivalente en en.yml: todavía no está
+    # conectado. La jerga looksmax (JFL, WTF, Based, Chad, Ascend) se queda en
+    # inglés a propósito: así se usa en español y traducirla sonaría a máquina.
+    reaction:
+      happy: Feliz
+      chrigga: Chrigga
+      angry: Enojado
+      sad: Triste
+      surprised: Sorprendido
+      thinking: Pensando
+      nerd: Nerd
+      devil: Diablo
+      angel: Ángel
+      rich: Rico
+      chrishammed: Chrishammed
+      neutral: Neutral
+      error: Error
+      plus1: "+1"
+      jfl: JFL
+      love: Me encanta
+      hmm: Mmm...
+      sosad: Qué triste
+      woah: Wow
+      ugh: Uf..
+      wtf: WTF
+      geek: Nerd
+      based: Based
+      dead: Muerto
+      brain: Cerebro
+      chad: Chad
+      clown: Payaso
+      ascend: Ascend
+      blessed: Bendecido
+      ice: Hielo
+      eyes: Ojos
+
+  admin:
+    loading: Cargando…
+
+    settings:
+      title: Reacciones
+      self_react: Permitir reaccionar a tus propias publicaciones
+      max_per_post: Máximo de reacciones que una persona puede dejar en una publicación
+      rate_burst: Reacciones permitidas por minuto (límite antiabuso)
+      rate_hourly: Reacciones permitidas por hora (límite antiabuso)
+      strip_size: Tamaño del icono de reacción en el pie de la publicación (px)
+
+    permissions:
+      react: Reaccionar a las publicaciones
+      see_reactors: Ver quién reaccionó
+
+    catalogue:
+      title: Catálogo de reacciones
+      summary: "{count, plural, one {# reacción} other {# reacciones}}, {enabled} activadas. El orden de aquí es el orden en el selector y en la barra de la publicación."
+      points: "{points} pts"
+      enabled: Activada
+      disabled: Desactivada
+      move_up: Subir
+      move_down: Bajar
+
+    error:
+      in_use_hint: desactívala en lugar de borrarla; borrarla eliminaría en cascada esos registros

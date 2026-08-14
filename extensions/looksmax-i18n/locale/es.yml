@@ -1,0 +1,89 @@
+local-looksmax-i18n:
+  forum:
+    switcher:
+      label: Idioma
+      tooltip: Cambiar el idioma de la interfaz
+      current: "Idioma de la interfaz: {language}"
+      autodetected: Lo elegimos según tu navegador. Puedes cambiarlo cuando quieras.
+
+    content:
+      language_label: "Escrito en {language}"
+      mixed: Esta discusión tiene mensajes en más de un idioma.
+      filter_all: Todos los idiomas
+      filter_mine: Solo mi idioma
+      translate: Traducir este mensaje
+      translating: Traduciendo…
+      show_original: Ver el original
+      translation_failed: No se pudo traducir en este momento.
+
+    languages:
+      en: Inglés
+      es: Español
+      ru: Ruso
+      tr: Turco
+      de: Alemán
+      fr: Francés
+      unknown: Desconocido
+
+    welcome:
+      title: Looksmax.lat
+      message: >-
+        Calificaciones de cara y cuerpo, guías y protocolos, con la evidencia
+        adjunta. Lee las guías antes de publicar, y califica a alguien antes de
+        pedir que te califiquen.
+
+    meta:
+      description: >-
+        Calificaciones de cara y cuerpo, y las guías que hay detrás. Lee las
+        guías antes de publicar, y cuenta con que alguien te va a discutir.
+
+    # Los seis nombres son del operador y van tal cual están escritos.
+    # Softmaxing, Looksmaxing y Peligrosomaxing no se traducen: son términos
+    # acuñados en la propia comunidad. `Peptides` está en inglés en la lista
+    # original y se respeta.
+    sections:
+      peptides: Peptides
+      anabolics: Anabólicos
+      softmaxing: Softmaxing
+      looksmaxing: Looksmaxing
+      peligrosomaxing: Peligrosomaxing
+      best_guides: Mejores Guías
+
+    news:
+      heading: Novedades
+      empty: Nada nuevo por ahora.
+      see_all: Ver todo
+      posted: "{when}"
+      dismiss: Ocultar
+      pinned: Fijado
+
+# ── Overrides on the sourced pack ────────────────────────────────────────────
+#
+# flarum-lang/spanish 1.13.2 is good Spanish and is used as-is almost
+# everywhere. Two kinds of key are replaced here, and only those two.
+#
+# 1. Keys the pack has not caught up with. It tracks core up to roughly 1.8.15
+#    and this install runs 1.8.18; the two additions a forum visitor can
+#    actually see are the connection errors below.
+#
+# 2. A handful of interjections. The pack renders errors as "¡Recórcholis!",
+#    "¡Nanay de la China!", "¡Para el carro!" and "¡Caramba!". Those are dated
+#    peninsular exclamations — "nanay de la China" in particular reads as a
+#    grandparent's phrase and is not something anyone in Mexico says. The
+#    audience here is Mexican and the register of the rest of the forum is
+#    plain, so the error text is plain too. The information in each message is
+#    unchanged; only the exclamation is dropped.
+core:
+  lib:
+    error:
+      network_message: Parece que hay un problema con tu conexión. Revísala e inténtalo de nuevo.
+      offline_message: Parece que no tienes conexión. Revísala e inténtalo de nuevo.
+      generic_message: Algo salió mal. Recarga la página e inténtalo de nuevo.
+      not_found_message: No encontramos lo que pediste.
+      permission_denied_message: No tienes permiso para hacer eso.
+      rate_limit_exceeded_message: Vas demasiado rápido. Espera unos segundos e inténtalo otra vez.
+  views:
+    error:
+      not_found: No encontramos esa página.
+      permission_denied: No tienes permiso para ver esta página.
+      unknown: Hubo un error al cargar la página.
