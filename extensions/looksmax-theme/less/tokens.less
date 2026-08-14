@@ -84,7 +84,13 @@
 @c-ink:        #f0eff4;
 @c-ink-dim:    #b6b4be;
 @c-ink-faint:  #9896a3;
-@c-accent:     #9b7dfb;   // violet 500 — the house colour
+// HEAVENLY WHITE is the house colour as of 2026-08-14, replacing violet 500
+// on operator instruction ("replace all the purple for a heavenly white").
+// #eaf0ff, not #ffffff: a pure white accent is indistinguishable from --ink
+// at 17.3:1, so a link, a filled button and body copy would all read as the
+// same material. The faint cool cast keeps it separable from the ink while
+// still reading as white, and it measures 18.6:1 on the true-black page.
+@c-accent:     #eaf0ff;   // heavenly white — the house colour
 @c-accent-2:   #4ecee5;   // cyan 500, secondary / links
 // Gold is NOT deleted. It was the brand for a day and it is what the source
 // board's whole cosmetic economy is denominated in — VIP, gold laurel frames,
@@ -126,7 +132,8 @@
 
   // ======================================================== brand
   --accent: @c-accent;            //  6.3 /  5.8 /  5.2 /  4.7
-  --accent-ink: #030306;
+  // Dark, because --accent is now a near-white fill. 17.9:1 on it.
+  --accent-ink: #0a0b10;
   --accent-2: @c-accent-2;        // 10.6 /  9.7 /  8.7 /  7.5
   --ok: @c-ok;
   --warn: @c-warn;
@@ -140,9 +147,14 @@
   // read as "ours" without becoming a button. The 500 cannot do this job: light
   // ink on it measures 2.6:1. The 700 measures 5.0:1 and is what section
   // headers, the hero plate and active nav use.
-  --accent-deep: #6e54bd;
-  --accent-deep-ink: @c-ink;      //  5.0 on --accent-deep
-  --accent-hi: #ccc3ff;           // violet 400 — hover/active text on dark
+  // The PLATE that carries light ink. With a white accent this cannot be a
+  // tint of the accent any more — a white plate needs dark ink, which is what
+  // --accent / --accent-ink already are. So the deep variant inverts: a cool
+  // near-black that light ink sits on at 13.9:1, for section headers, the hero
+  // plate and active nav.
+  --accent-deep: #1b1d26;
+  --accent-deep-ink: @c-ink;      // 13.9 on --accent-deep
+  --accent-hi: #ffffff;           // pure white — hover/active text on dark
 
   // tints, precomputed because rgba() of a var() is not expressible in css
   --accent-a06: fade(@c-accent, 6%);
@@ -163,7 +175,7 @@
   --gold-a10: fade(@c-gold, 10%);
   --gold-a18: fade(@c-gold, 18%);
   --gold-a35: fade(@c-gold, 35%);
-  --accent-deep-a30: fade(#6e54bd, 30%);
+  --accent-deep-a30: fade(#1b1d26, 30%);
   --white-a03: fade(#fff, 3%);
   --white-a04: fade(#fff, 4%);
   --white-a06: fade(#fff, 6%);
@@ -255,13 +267,16 @@
   // Measured on /all at 1440x900 before and after: 8 discussion rows in the
   // first viewport, then 12. Nothing here changes a font size; the air went,
   // the type did not shrink.
-  --gap-xs: 4px;
-  --gap-sm: 6px;
-  --gap: 10px;
-  --gap-lg: 16px;
-  --pad-sm: 8px;
-  --pad: 12px;
-  --pad-lg: 16px;
+  // COMPACTED one step. Every card, rail and row on the forum spaces itself
+  // from these seven values, so tightening here is what makes the whole page
+  // denser at once rather than tuning components one at a time.
+  --gap-xs: 3px;
+  --gap-sm: 5px;
+  --gap: 8px;
+  --gap-lg: 12px;
+  --pad-sm: 6px;
+  --pad: 9px;
+  --pad-lg: 12px;
 
   // ---- the horizontal budget ------------------------------------------------
   // Measured before this existed: a 1100px container at viewport 1920 left
@@ -449,9 +464,13 @@
   // The 500 violet is a DARK-scheme colour: on white it measures 2.5:1. This is
   // violet 700, 5.7:1 on --surface-1 and 5.2:1 on --surface-2, so it is legible
   // as body-weight link text and not only as a heading.
-  --accent: #6e54bd;
-  --accent-hi: #4a3289;
-  --accent-deep: #4a3289;
+  // INVERTED for the light scheme. "Heavenly white" is a DARK-page colour: on
+  // a near-white surface it disappears entirely (1.05:1). The light scheme
+  // therefore takes the same idea from the other end of the ramp — a cool
+  // near-black that reads as the same restrained, neutral accent.
+  --accent: #23262f;
+  --accent-hi: #000000;
+  --accent-deep: #23262f;
   --accent-deep-ink: #ffffff;
   --accent-2: #016a79;       // cyan 500 is 1.9:1 on white; this is the 800, 6.3:1
   --gold: #8a5a06;           // 5.9:1 — the dark-scheme gold is 1.4:1 here
@@ -459,7 +478,7 @@
   --ok: #17703a;
   --warn: #8a5a06;
   --danger: #b3243f;
-  --purple: #6e54bd;
+  --purple: #1b1d26;
   --accent-ink: #ffffff;
   --ink-on-accent: #ffffff;
   --avatar-bg: #33405a;

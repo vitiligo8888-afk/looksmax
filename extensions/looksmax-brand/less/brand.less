@@ -38,16 +38,26 @@
   --brand-ink-invert: #030306;
 
 
-  /* violet — primary */
-  --brand-violet-100: #f3f2ff;
-  --brand-violet-200: #e6e2fe;
-  --brand-violet-300: #d9d3fe;
-  --brand-violet-400: #ccc3ff;
-  --brand-violet-500: #9b7dfb;
-  --brand-violet-600: #8669dd;
-  --brand-violet-700: #6e54bd;
-  --brand-violet-800: #4a3289;
-  --brand-violet-900: #270e56;
+  /* heavenly white — primary
+   *
+   * Was a violet ramp (500 #9b7dfb). Replaced 2026-08-14 on operator
+   * instruction: "replace all the purple for a heavenly white". The KEY NAMES
+   * are kept — five extensions and ~40 rules already read --brand-violet-*,
+   * and renaming them would be a rename commit pretending to be a colour
+   * change. What moved is the ramp itself.
+   *
+   * It runs light-to-dark now instead of pale-to-saturated, because a white
+   * primary has nowhere brighter to go: 100 is the pure highlight, 500 is the
+   * accent proper, and 700-900 are the dark plates that carry light ink. */
+  --brand-violet-100: #ffffff;
+  --brand-violet-200: #f7f9ff;
+  --brand-violet-300: #f1f5ff;
+  --brand-violet-400: #ffffff;
+  --brand-violet-500: #eaf0ff;
+  --brand-violet-600: #cdd6e8;
+  --brand-violet-700: #1b1d26;
+  --brand-violet-800: #15171e;
+  --brand-violet-900: #0e1016;
 
 
   /* cyan — secondary */
@@ -82,7 +92,8 @@
   --brand-primary           : var(--brand-violet-500);
   --brand-primary-hover     : var(--brand-violet-400);
   --brand-primary-press     : var(--brand-violet-600);
-  --brand-on-primary        : var(--brand-ink-invert);
+  // Dark: the primary is a near-white fill now, not a violet one.
+  --brand-on-primary        : #0a0b10;
   --brand-primary-deep      : var(--brand-violet-700);
   --brand-primary-deep-hover: var(--brand-violet-600);
   --brand-on-primary-deep   : var(--brand-ink);
@@ -90,10 +101,12 @@
   --brand-focus             : var(--brand-cyan-400);
 
 
-  /* translucent accent (literal rgba: fade() cannot take a var()) */
-  --brand-primary-a08: rgba(155, 125, 251, 0.08);
-  --brand-primary-a16: rgba(155, 125, 251, 0.16);
-  --brand-primary-a28: rgba(155, 125, 251, 0.28);
+  /* translucent accent (literal rgba: fade() cannot take a var())
+   * Re-derived from #eaf0ff, the new primary. Left as violet these would have
+   * kept a lilac wash behind white controls. */
+  --brand-primary-a08: rgba(234, 240, 255, 0.08);
+  --brand-primary-a16: rgba(234, 240, 255, 0.16);
+  --brand-primary-a28: rgba(234, 240, 255, 0.28);
   --brand-scrim      : rgba(4, 2, 11, 0.72);
 
 
@@ -105,7 +118,7 @@
   --brand-rank-gold    : #e8c07d;
   --brand-rank-platinum: #8fd3e8;
   --brand-rank-diamond : #7ee0d3;
-  --brand-rank-master  : #a78bfa;
+  --brand-rank-master  : #dfe6f5;   // was violet #dfe6f5
   --brand-rank-luminary: #f0a5d0;
   --brand-rank-ascended: #ffffff;
 
@@ -114,7 +127,7 @@
   --brand-tier-standard: #7c8695;
   --brand-tier-plus    : #7aa2f7;
   --brand-tier-vip     : #e8c07d;
-  --brand-tier-elite   : #bb9af7;
+  --brand-tier-elite   : #e3e9f7;   // was violet #dfe6f5
   --brand-tier-founder : #f7768e;
 
 

@@ -18,7 +18,7 @@
 @ink: #f0eff4;
 @ink-dim: #b6b4be;
 @ink-faint: #9896a3;
-@accent: #9b7dfb;
+@accent: #eaf0ff;
 @accent-2: #4ecee5;
 
 // hide Flarum's own tile grid wherever ours is mounted
@@ -106,7 +106,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   // The rail: 2px of the forum's colour, revealed on hover and on focus so
   // keyboard traversal shows the same thing the mouse does.
   &::before {
-    background: var(--row, var(--accent, #9b7dfb));
+    background: var(--row, var(--accent, #eaf0ff));
     border-radius: 0 2px 2px 0;
     bottom: 6px;
     content: '';
@@ -124,8 +124,8 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
     // "this one" and low enough that the text contrast underneath is unchanged
     background:
       linear-gradient(90deg,
-        color-mix(in srgb, var(--row, var(--accent, #9b7dfb)) 9%, transparent),
-        color-mix(in srgb, var(--row, var(--accent, #9b7dfb)) 2%, transparent) 40%,
+        color-mix(in srgb, var(--row, var(--accent, #eaf0ff)) 9%, transparent),
+        color-mix(in srgb, var(--row, var(--accent, #eaf0ff)) 2%, transparent) 40%,
         transparent 70%),
       var(--surface-2, #1f1b30);
 
@@ -146,11 +146,11 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   // swatch, over the forum's own colour. The palette holds every hue at one
   // lightness (see src/Palette.php), which is what lets a single dark ink work
   // on all 47 of them — measured worst case 6.45:1.
-  background: linear-gradient(145deg, fade(#fff, 22%), fade(#fff, 0%) 62%), var(--tag, var(--accent, #9b7dfb));
+  background: linear-gradient(145deg, fade(#fff, 22%), fade(#fff, 0%) 62%), var(--tag, var(--accent, #eaf0ff));
   border-radius: 10px;
   box-shadow:
     0 1px 0 fade(#fff, 22%) inset,
-    0 6px 16px -8px var(--tag, var(--accent, #9b7dfb));
+    0 6px 16px -8px var(--tag, var(--accent, #eaf0ff));
   color: var(--ink-on-light, #10151d);
   display: flex;
   height: 38px;
@@ -165,14 +165,14 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   &:focus-visible {
     box-shadow:
       0 1px 0 fade(#fff, 28%) inset,
-      0 10px 22px -8px var(--tag, var(--accent, #9b7dfb));
+      0 10px 22px -8px var(--tag, var(--accent, #eaf0ff));
     transform: translateY(-1px) scale(1.04);
   }
 }
 
 // One name for "this row's colour", so every rule below reads the same thing
 // whether the server wrote --tag or not.
-.LmxForum { --row: var(--tag, var(--accent, #9b7dfb)); }
+.LmxForum { --row: var(--tag, var(--accent, #eaf0ff)); }
 
 .LmxForum-name {
   color: var(--ink, #f0eff4);
@@ -183,7 +183,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   &:hover,
   &:focus-visible {
     // the forum's own colour, so hovering a row is unambiguous about which one
-    color: var(--row, var(--accent, #9b7dfb));
+    color: var(--row, var(--accent, #eaf0ff));
     text-decoration: none;
   }
 }
@@ -220,7 +220,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    &:hover { color: var(--accent, #9b7dfb); }
+    &:hover { color: var(--accent, #eaf0ff); }
   }
 
   span { color: var(--ink-faint, #9896a3); display: block; }
@@ -252,15 +252,15 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
     margin: 0 0 10px;
     text-transform: uppercase;
 
-    i, iconify-icon { color: var(--accent, #9b7dfb); font-size: 14px; }
+    i, iconify-icon { color: var(--accent, #eaf0ff); font-size: 14px; }
   }
 
   p { color: var(--ink-dim, #b6b4be); font-size: 12.5px; line-height: 1.55; margin: 0; }
 }
 
 .LmxCard--motd {
-  background: linear-gradient(160deg, fade(#9b7dfb, 8%), var(--surface-1, #171429) 60%);
-  border-color: fade(#9b7dfb, 28%);
+  background: linear-gradient(160deg, fade(#eaf0ff, 8%), var(--surface-1, #171429) 60%);
+  border-color: fade(#eaf0ff, 28%);
 }
 
 .LmxList {
@@ -281,7 +281,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
     font-size: 12.5px;
     line-height: 1.4;
 
-    &:hover { color: var(--accent, #9b7dfb); text-decoration: none; }
+    &:hover { color: var(--accent, #eaf0ff); text-decoration: none; }
   }
 
   span {
