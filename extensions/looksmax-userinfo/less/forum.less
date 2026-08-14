@@ -1675,3 +1675,23 @@ html.lmx-dm-open body {
   color: var(--ink-faint);
   font-size: var(--fs-sm);
 }
+
+// ---------------------------------------------- scheme-aware painted names
+// js/dist/forum.js paints author names from the rank/name catalogue. It used
+// to write an inline `color`, which no stylesheet could override, so those
+// pale catalogue hues stayed pale on the light scheme (measured 1.63:1). It
+// now hands the raw hue over as --lmx-name-color and this mixes it toward
+// --ink, letting the active scheme choose the direction.
+//
+// Scoped to elements that actually carry the property, so a name with no
+// catalogue colour is untouched and keeps inheriting normally.
+[style*='--lmx-name-color'] {
+  color: color-mix(in srgb, var(--lmx-name-color) 55%, var(--ink));
+}
+
+// Core's tag link button publishes the tag hue as --color and paints the label
+// with it directly. Same pale-on-light problem: "Mejores Guías" (#bea7ff)
+// measured 1.77:1. Mixed toward --ink, the tag stays identifiable by hue.
+.TagLinkButton[style*='--color'] .Button-label {
+  color: color-mix(in srgb, var(--color) 60%, var(--ink));
+}

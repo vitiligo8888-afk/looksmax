@@ -57,7 +57,7 @@
   background: @surface-2;
   border: 1px solid @line;
   border-radius: 999px;
-  color: @ink-dim;
+  color: var(--ink-dim);
   cursor: default;
   display: flex;
   font-size: 10px;
@@ -93,15 +93,15 @@
 }
 
 .LmxChat-online {
-  color: @ink;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 
   &.is-bumped { animation: LmxChatBump 0.45s ease; }
 }
 
 @keyframes LmxChatBump {
-  0% { color: @ok; transform: translateY(-2px); }
-  100% { color: @ink; transform: none; }
+  0% { color: var(--ok); transform: translateY(-2px); }
+  100% { color: var(--ink); transform: none; }
 }
 
 // --------------------------------------------------------------------- alert
@@ -123,13 +123,13 @@
   &.is-error {
     background: fade(@bad, 12%);
     border: 1px solid fade(@bad, 30%);
-    color: @bad;
+    color: var(--danger);
   }
 
   &.is-warn {
     background: fade(@accent, 12%);
     border: 1px solid fade(@accent, 30%);
-    color: @accent;
+    color: var(--accent);
   }
 }
 
@@ -191,7 +191,7 @@
 
 .LmxChat-empty {
   align-items: center;
-  color: @ink-faint;
+  color: var(--ink-faint);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -204,7 +204,7 @@
   &[hidden] { display: none; }
 
   i, iconify-icon { font-size: 20px; opacity: 0.55; }
-  p { color: @ink-dim; font-size: 12.5px; font-weight: 600; margin: 0; }
+  p { color: var(--ink-dim); font-size: 12.5px; font-weight: 600; margin: 0; }
   span { font-size: 11px; line-height: 1.4; max-width: 210px; }
 }
 
@@ -282,7 +282,7 @@
 }
 
 .LmxChat-who {
-  color: @accent;
+  color: var(--accent);
   flex: 0 1 auto;
   font-size: 12px;
   font-weight: 700;
@@ -295,7 +295,7 @@
 }
 
 .LmxChat-time {
-  color: @ink-faint;
+  color: var(--ink-faint);
   flex: none;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
@@ -305,7 +305,7 @@
 .LmxChat-del {
   background: none;
   border: 0;
-  color: @ink-faint;
+  color: var(--ink-faint);
   cursor: pointer;
   display: none;
   flex: none;
@@ -316,14 +316,14 @@
   padding: 1px 3px;
   transition: opacity 0.12s ease, color 0.12s ease;
 
-  &:hover { color: @bad; }
+  &:hover { color: var(--danger); }
   &:focus-visible { opacity: 1; }
 }
 
 .can-delete .LmxChat-del { display: block; }
 
 .LmxChat-text {
-  color: @ink-dim;
+  color: var(--ink-dim);
   font-size: 12.5px;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -336,7 +336,7 @@
 .LmxChat-msg.is-own {
   .LmxChat-text {
     border-left: 2px solid fade(@accent, 40%);
-    color: @ink;
+    color: var(--ink);
     margin-left: -6px;
     padding-left: 6px;
   }
@@ -347,13 +347,13 @@
 // kept the ordinary colour — the one case where the state has to be obvious.
 .LmxChat-msg.is-failed .LmxChat-text {
   border-left-color: fade(@bad, 55%);
-  color: @bad;
+  color: var(--danger);
   text-decoration: line-through;
   text-decoration-color: fade(@bad, 45%);
 }
 
 .LmxChat-link {
-  color: @accent-2;
+  color: var(--accent-2);
   text-decoration: underline;
   text-decoration-color: fade(@accent-2, 40%);
   text-underline-offset: 2px;
@@ -364,7 +364,7 @@
 .LmxChat-mention {
   background: fade(@accent-2, 14%);
   border-radius: 3px;
-  color: @accent-2;
+  color: var(--accent-2);
   font-weight: 600;
   padding: 0 3px;
 
@@ -373,7 +373,7 @@
 
 .LmxChat-failnote {
   align-items: center;
-  color: @bad;
+  color: var(--danger);
   display: flex;
   flex-wrap: wrap;
   font-size: 10.5px;
@@ -385,7 +385,7 @@
     &:hover { background: fade(@bad, 26%); }
   }
 
-  .LmxChat-drop { background: fade(#fff, 8%); color: @ink-faint; }
+  .LmxChat-drop { background: fade(#fff, 8%); color: var(--ink-faint); }
 }
 
 // ------------------------------------------------------------------ new-mail
@@ -437,14 +437,14 @@
   background: @surface-2;
   border: 1px solid @line;
   border-radius: 7px;
-  color: @ink;
+  color: var(--ink);
   flex: 1 1 auto;
   font-size: 12.5px;
   min-width: 0;
   padding: 7px 9px;
   transition: border-color 0.14s ease, box-shadow 0.14s ease;
 
-  &::placeholder { color: @ink-faint; }
+  &::placeholder { color: var(--ink-faint); }
 
   &:focus {
     border-color: fade(@accent, 55%);
@@ -458,7 +458,7 @@
 
 .LmxChat-remain {
   background: @surface-2;
-  color: @ink-faint;
+  color: var(--ink-faint);
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   padding-left: 3px;
@@ -467,7 +467,7 @@
   right: 47px;
 
   &[hidden] { display: none; }
-  &.is-low { color: @bad; font-weight: 700; }
+  &.is-low { color: var(--danger); font-weight: 700; }
 }
 
 .LmxChat-send {
@@ -491,7 +491,7 @@
 
   &:disabled {
     background: @surface-3;
-    color: @ink-faint;
+    color: var(--ink-faint);
     cursor: default;
     transform: none;
   }
@@ -511,14 +511,14 @@
 
   &[hidden] { display: none; }
 
-  span { color: @ink-faint; font-size: 10.5px; }
+  span { color: var(--ink-faint); font-size: 10.5px; }
 }
 
 .LmxChat-login {
   background: fade(@accent, 14%);
   border: 1px solid fade(@accent, 35%);
   border-radius: 6px;
-  color: @accent;
+  color: var(--accent);
   cursor: pointer;
   font-size: 11.5px;
   font-weight: 700;

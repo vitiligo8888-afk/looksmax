@@ -361,7 +361,10 @@
       sep.style.opacity = '0.4';
       row.appendChild(sep);
       var tn = el('span', null, tier.name);
-      tn.style.color = tier.color;
+      // A custom property, not `color`: an inline color cannot be overridden by
+      // any stylesheet, and the tier palette is pale by design (built for the
+      // black scheme), so it was unreadable on the light one.
+      tn.style.setProperty('--lmx-tier-color', tier.color);
       tn.style.fontWeight = '700';
       row.appendChild(tn);
     }
@@ -507,7 +510,10 @@
         var a = el('a', 'LmxLeader-name lmx-name', e.username);
         a.href = '/u/' + encodeURIComponent(e.username);
         if (e.nameClass) { a.classList.add(e.nameClass); watch(a); }
-        else a.style.color = e.rankColor;
+        // Same reason as the tier chip: hand CSS the hue and let it mix toward
+        // --ink per scheme. As an inline `color: #f0a5d0` this measured 1.91:1
+        // on the light scheme -- a leaderboard of unreadable names.
+        else a.style.setProperty('--lmx-rank-color', e.rankColor);
         li.appendChild(a);
 
         li.appendChild(el('span', 'LmxLeader-score', num(e.score)));

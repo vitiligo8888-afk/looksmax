@@ -70,7 +70,11 @@
 }
 
 .lmx-chip--tier {
-  color: var(--lmx-tier-color, var(--accent, #e6b169));
+  // Mixed toward --ink so the scheme picks the direction. The tier palette
+  // (Catalog.php) is pale by design for the black page; used raw it measured
+  // under 2:1 on the light one. border stays currentColor so the outline
+  // follows the resolved text colour.
+  color: color-mix(in srgb, var(--lmx-tier-color, var(--accent)) 55%, var(--ink));
   border-color: currentColor;
   box-shadow: 0 0 0 1px fade(#000, 30%), inset 0 0 8px -4px currentColor;
 }
@@ -450,6 +454,11 @@
 }
 
 .LmxLeader-name {
+  // The decorator hands us the rank hue as --lmx-rank-color (it used to write
+  // an inline color, which CSS could not touch). Mixed toward --ink so a
+  // leaderboard of pale rank colours stays readable on the light scheme.
+  // A name WITH a cosmetic style sets its own colour and wins on specificity.
+  color: color-mix(in srgb, var(--lmx-rank-color, var(--ink)) 55%, var(--ink));
   flex: 1;
   min-width: 0;
   overflow: hidden;

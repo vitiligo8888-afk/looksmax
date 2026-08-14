@@ -1879,7 +1879,12 @@
       var color = nameColor(u);
       var cls = nameClass(u);
       var target = a.querySelector('.username') || a;
-      if (color) target.style.color = color;
+      // A custom property, not `color`. An inline colour is the one declaration
+      // a stylesheet cannot adapt, and these hues come from the rank/name
+      // catalogue, which is pale by design for the black scheme -- painted raw
+      // they measured as low as 1.63:1 on the light scheme. less/forum.less
+      // mixes --lmx-name-color toward --ink so the scheme picks the direction.
+      if (color) target.style.setProperty('--lmx-name-color', color);
       if (cls) target.classList.add(cls);
       var info = infoOf(u);
       if (info && info.legacyStyleClass) a.setAttribute('data-legacy-style', info.legacyStyleClass);
