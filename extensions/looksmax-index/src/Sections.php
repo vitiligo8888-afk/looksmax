@@ -10,7 +10,7 @@ namespace Local\Index;
  * They are NOT a rename of anything in the imported board. Measured on the live
  * database before this file existed: 47 tags, of which 19 are XenForo forums
  * (`f-*`) and 26 are XenForo prefixes (`p-*`). There is no Peptides tag, no
- * Anabólicos, no Softmaxing and no Peligrosomaxing, and there never was — see
+ * Anabólicos, no Softmaxing and no Hardmaxing, and there never was — see
  * HANDOFF-UI.md §7 for the counts.
  *
  * So the sections are a CURATED VIEW, materialised additively: six NEW tags,
@@ -21,7 +21,7 @@ namespace Local\Index;
  *
  * ── The names are the operator's, verbatim ──────────────────────────────────
  *
- * `Peptides · Anabólicos · Softmaxing · Looksmaxing · Peligrosomaxing ·
+ * `Peptides · Anabólicos · Softmaxing · Looksmaxing · Hardmaxing ·
  * Mejores Guías`, in that order. They are not renamed, re-translated or
  * "improved" here or anywhere downstream. They live in `locale/*.yml` as
  * translation keys because Spanish is the forum's DEFAULT locale and English is
@@ -47,7 +47,7 @@ namespace Local\Index;
  *   anabolicos         25   #ff8b83       6.57             8.08
  *   softmaxing        150   #59dc7f       8.48            10.43
  *   looksmaxing        80   #f8ae00       7.82             9.63
- *   peligrosomaxing   355   #ff89c3       6.81             8.39
+ *   hardmaxing   355   #ff89c3       6.81             8.39
  *   mejores-guias     290   #bea7ff       7.20             8.86
  */
 class Sections
@@ -88,10 +88,14 @@ class Sections
     public const SECTIONS = [
         'mejores_guias' => ['slug' => 'mejores-guias', 'hue' => 290, 'icon' => 'ph:book-open-text'],
         'looksmaxing' => ['slug' => 'looksmaxing', 'hue' => 80, 'icon' => 'ph:sparkle'],
+        // Softmaxing and Hardmaxing are ADJACENT on purpose: they are the two
+        // ends of one axis (without surgery / with it), and the descriptions
+        // are written to be read as a pair. Splitting them across the grid,
+        // which the previous order did, made them look unrelated.
         'softmaxing' => ['slug' => 'softmaxing', 'hue' => 150, 'icon' => 'ph:drop'],
+        'hardmaxing' => ['slug' => 'hardmaxing', 'hue' => 355, 'icon' => 'ph:warning'],
         'peptides' => ['slug' => 'peptides', 'hue' => 195, 'icon' => 'ph:syringe'],
         'anabolicos' => ['slug' => 'anabolicos', 'hue' => 25, 'icon' => 'ph:barbell'],
-        'peligrosomaxing' => ['slug' => 'peligrosomaxing', 'hue' => 355, 'icon' => 'ph:warning'],
     ];
 
     /** i18n namespace. The extension id is `local-looksmax-index`. */

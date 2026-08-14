@@ -65,7 +65,7 @@ local-looksmax-i18n:
     # Three of them are not translated on purpose:
     #   Softmaxing, Looksmaxing  — the subculture's own coinages. They are the
     #     same word in every language it is written in, including Spanish.
-    #   Peligrosomaxing          — coined in Spanish, from `peligroso`. There
+    #   Hardmaxing          — coined in Spanish, from `peligroso`. There
     #     is no established English rendering, and inventing one ("Dangermaxx-
     #     ing") would be exactly the kind of made-up name this operator has
     #     rejected before. It stays as written until somebody says otherwise.
@@ -78,7 +78,7 @@ local-looksmax-i18n:
       anabolics: Anabolics
       softmaxing: Softmaxing
       looksmaxing: Looksmaxing
-      peligrosomaxing: Peligrosomaxing
+      hardmaxing: Hardmaxing
       best_guides: Best Guides
 
     # The announcements block at the top of the front page.

@@ -152,7 +152,7 @@ class SectionsCommand extends AbstractCommand
             'anabolicos' => 'Anabólicos',
             'softmaxing' => 'Softmaxing',
             'looksmaxing' => 'Looksmaxing',
-            'peligrosomaxing' => 'Peligrosomaxing',
+            'hardmaxing' => 'Hardmaxing',
             'mejores_guias' => 'Mejores Guías',
         ][$key] ?? $key;
     }

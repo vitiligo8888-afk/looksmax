@@ -125,9 +125,14 @@ local-looksmax-index:
     # ── Las seis secciones de la portada ────────────────────────────────────
     #
     # Los nombres van tal cual los pidió el operador. Softmaxing, Looksmaxing y
-    # Peligrosomaxing no se traducen: son términos acuñados en la comunidad y
-    # se usan igual en español. `Peptides` viene en inglés en la lista original
-    # y se respeta.
+    # Hardmaxing no se traducen: son términos acuñados en la comunidad y se
+    # usan igual en español. `Peptides` viene en inglés en la lista original y
+    # se respeta.
+    #
+    # Esta sección se llamaba `Peligrosomaxing` hasta el 2026-08-14. Ese nombre
+    # describía el RIESGO, no la práctica; `Hardmaxing` describe la práctica y
+    # hace par con Softmaxing — juntos son un solo eje (con y sin quirófano)
+    # en lugar de dos nombres sueltos.
     #
     # Los acentos viven aquí, en el texto. Los slugs de Sections::SECTIONS son
     # ASCII a propósito (`anabolicos`, `mejores-guias`): un slug es una URL.
@@ -144,9 +149,9 @@ local-looksmax-index:
       looksmaxing:
         title: Looksmaxing
         desc: "Todo junto: cara, cuerpo y todo lo que se mide."
-      peligrosomaxing:
-        title: Peligrosomaxing
-        desc: Lo que puede salir mal. Procedimientos extremos y riesgo real.
+      hardmaxing:
+        title: Hardmaxing
+        desc: Cirugía e implantes. Lo que cambia la estructura — y lo que cuesta.
       mejores_guias:
         title: Mejores Guías
         desc: Las guías a las que la gente vuelve.

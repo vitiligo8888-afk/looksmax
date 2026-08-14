@@ -18,14 +18,14 @@ namespace Local\Index;
  *     definition — `peptid*` for Peptides, `softmax*` for Softmaxing, `steroid|
  *     anabolic|esteroide` for Anabólicos — plus, where the board already has a
  *     matching room, the tag itself (`f-27 Cosmetic Surgery` for
- *     Peligrosomaxing, `p-guide`/`f-9` for Mejores Guías). Nothing beyond that
+ *     Hardmaxing, `p-guide`/`f-9` for Mejores Guías). Nothing beyond that
  *     was assumed.
  *
  *  2. LIFT. Document-level log-odds of every unigram and bigram inside the
  *     anchor set against the rest of the corpus, +0.5 smoothed. This is what
  *     produced terms nobody would have guessed and that carry the section:
  *     `hexarelin`, `dac`, `cjc-1295`, `ghk-cu` (Peptides); `bsso`, `chin wing`,
- *     `orbital box`, `ramieri`, `ccw` (Peligrosomaxing); `mastic gum`,
+ *     `orbital box`, `ramieri`, `ccw` (Hardmaxing); `mastic gum`,
  *     `tongue posture`, `hard mewing` (Softmaxing).
  *
  *  3. SECOND ROUND. The top-lift terms became a new anchor and the pass was
@@ -54,13 +54,13 @@ namespace Local\Index;
  * On the 7,144-discussion snapshot this was derived from, at threshold 4:
  *
  *   Peptides 133 · Anabólicos 155 · Softmaxing 320 · Looksmaxing 2,019 ·
- *   Peligrosomaxing 350 · Mejores Guías 1,035 — 3,343 of 7,144 discussions (47%)
+ *   Hardmaxing 350 · Mejores Guías 1,035 — 3,343 of 7,144 discussions (47%)
  *
  * Recall, against every document mentioning that section's anchor terms
  * ANYWHERE (a lower bound: many of those legitimately belong to a neighbouring
  * section and are counted as misses here):
  *
- *   Softmaxing 70% · Peptides 64% · Anabólicos 70% · Peligrosomaxing 83%
+ *   Softmaxing 70% · Peptides 64% · Anabólicos 70% · Hardmaxing 83%
  *
  * Precision, by reading 25 sampled titles per section with the matched terms
  * printed beside them: 88–92%. The residue is real overlap, not noise — a
@@ -148,7 +148,7 @@ class Lexicon
             // WEAK — corroboration only. Four of these still only reach the threshold together.
             1 => ['chad', 'facial', 'frame', 'jaw', 'mogged', 'mogs'],
         ],
-        'peligrosomaxing' => [
+        'hardmaxing' => [
             // DEFINITIONAL — measured term purity >= 0.85 (see header). One body mention alone clears the threshold.
             4 => ['anesthesia', 'bimax', 'bone smashing', 'botched', 'box osteotomy', 'bsso',
                 'chin implant', 'chin wing', 'filler', 'genio', 'genioplasty', 'infraorbital',
@@ -180,7 +180,7 @@ class Lexicon
      * other sections claim".
      */
     public const TAG_SCORES = [
-        'f-27' => ['peligrosomaxing', 4],
+        'f-27' => ['hardmaxing', 4],
         'f-28' => ['softmaxing', 3],
     ];
 

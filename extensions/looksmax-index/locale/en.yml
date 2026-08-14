@@ -130,10 +130,16 @@ local-looksmax-index:
     # ── The six front-page sections ─────────────────────────────────────────
     #
     # Requested by name and shipped as written. Three are the same word in both
-    # files on purpose: Softmaxing and Looksmaxing are the subculture's own
-    # coinages and are used unchanged in Spanish, and Peligrosomaxing was coined
-    # IN Spanish, from `peligroso` — there is no established English rendering
-    # and inventing one is not this lane's call.
+    # files on purpose: Softmaxing, Looksmaxing and Hardmaxing are the
+    # subculture's own coinages and are used unchanged in Spanish.
+    #
+    # This section was called `Peligrosomaxing` until 2026-08-14 — a Spanish
+    # coinage from `peligroso` that named the RISK rather than the practice.
+    # Renamed on operator instruction ("its basically hardmaxing"), which is
+    # both true to the lexicon (Lexicon.php scores it on bimax, osteotomy,
+    # genioplasty, implants, limb lengthening) and the established opposite of
+    # Softmaxing — so the pair now reads as one axis instead of two unrelated
+    # names.
     #
     # `Peptides` is in English in the requested list even though the Spanish
     # word is `Péptidos`. That is the requester's choice and is left alone.
@@ -154,9 +160,9 @@ local-looksmax-index:
       looksmaxing:
         title: Looksmaxing
         desc: "The whole of it: face, body, and everything that gets measured."
-      peligrosomaxing:
-        title: Peligrosomaxing
-        desc: What can go wrong. Extreme procedures and real risk.
+      hardmaxing:
+        title: Hardmaxing
+        desc: Surgery and implants. What changes the structure — and what it costs.
       mejores_guias:
         title: Best Guides
         desc: The guides people come back to.

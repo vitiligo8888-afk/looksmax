@@ -38,7 +38,7 @@ local-looksmax-i18n:
         guías antes de publicar, y cuenta con que alguien te va a discutir.
 
     # Los seis nombres son del operador y van tal cual están escritos.
-    # Softmaxing, Looksmaxing y Peligrosomaxing no se traducen: son términos
+    # Softmaxing, Looksmaxing y Hardmaxing no se traducen: son términos
     # acuñados en la propia comunidad. `Peptides` está en inglés en la lista
     # original y se respeta.
     sections:
@@ -46,7 +46,7 @@ local-looksmax-i18n:
       anabolics: Anabólicos
       softmaxing: Softmaxing
       looksmaxing: Looksmaxing
-      peligrosomaxing: Peligrosomaxing
+      hardmaxing: Hardmaxing
       best_guides: Mejores Guías
 
     news:
