@@ -13,17 +13,25 @@
 // range() and colour functions on anything that is not a literal colour —
 // `darken(var(--x))` took the forum down at 10:52Z today.
 
-@surface-1: #12161c;
-@surface-2: #1a2029;
-@surface-3: #232b36;
-@line: #2a323d;
-@ink: #e6e9ee;
-@ink-dim: #9aa4b2;
-@ink-faint: #6b7583;
-@accent: #e8c07d;
-@accent-2: #7aa2f7;
-@ok: #9ece6a;
-@bad: #f7768e;
+// SCHEME COMPLIANCE PASS: these mirror looksmax-theme/less/tokens.less's
+// compile-time source palette for the same reason ranks/forum.less's copy
+// does — fade()/lighten() below need a literal, not a var(). They had drifted
+// from the source: tokens.less repainted the whole theme from gold-on-navy to
+// violet-on-true-black (2026-08-13/14) and this file's copy was never
+// refreshed, so the entire chat widget was still rendering the OLD brand
+// regardless of scheme. Values below are copied fresh from the @c-* block at
+// the top of tokens.less; re-copy them again if that palette moves.
+@surface-1: #0e0e0e;
+@surface-2: #161616;
+@surface-3: #212121;
+@line: #2e2e2e;
+@ink: #f0eff4;
+@ink-dim: #b6b4be;
+@ink-faint: #9896a3;
+@accent: #9b7dfb;
+@accent-2: #4ecee5;
+@ok: #6dd88e;
+@bad: #f75d59;
 
 @av: 22px;
 @gut: 8px;
@@ -244,7 +252,12 @@
   .Avatar {
     align-items: center;
     border-radius: 50%;
-    color: #10141a;
+    // was #10141a, a fixed dark ink. Core paints the fallback-initial avatar
+    // on --avatar-bg, which is a LIGHT pastel in dark scheme but flips to a
+    // DARK navy in the light scheme (tokens.less) — a fixed dark ink is
+    // correct on the former and invisible on the latter. --ink-on-light is
+    // the token built for exactly this pairing: it flips with --avatar-bg.
+    color: var(--ink-on-light, #0a0911);
     display: flex;
     font-size: 11px;
     font-weight: 800;
@@ -383,7 +396,11 @@
   border-radius: 999px;
   bottom: 6px;
   box-shadow: 0 6px 16px -8px #000;
-  color: #14181f;
+  // was #14181f, a bare dark ink hardcoded for the OLD gold pill. --accent-ink
+  // is the token tokens.less pairs with --accent for exactly this job (ink
+  // for a filled accent-coloured surface) and is what stays correct if the
+  // background above ever moves off the compile-time @accent literal.
+  color: var(--accent-ink, #030306);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -458,7 +475,8 @@
   background: @accent;
   border: 0;
   border-radius: 7px;
-  color: #14181f;
+  // was #14181f, same stale on-accent ink as .LmxChat-jump above; same fix.
+  color: var(--accent-ink, #030306);
   cursor: pointer;
   display: flex;
   flex: none;

@@ -49,7 +49,10 @@
   vertical-align: 1px;
   white-space: nowrap;
   border: 1px solid currentColor;
-  background: fade(#000, 22%);
+  // was fade(#000, 22%): a bare black tint, routed through the closest
+  // precomputed token instead so the chip backing reads from the same tint
+  // vocabulary as the rest of the theme (25% vs 22% is not perceptible).
+  background: var(--black-a25);
 
   iconify-icon,
   .lmx-chip-icon {
@@ -195,7 +198,14 @@
 // so a points bump reads like the other bumps on the board.
 @keyframes lmx-bump {
   0%   { transform: scale(1); }
-  35%  { transform: scale(1.22); color: #fff8e6; }
+  // was color: #fff8e6 — a near-white flash. .lmx-points' resting colour is
+  // var(--accent, #e6b169), which the theme resolves to violet, and on the
+  // light scheme's near-white surface a near-white flash is invisible, so the
+  // "points went up" cue silently stopped working there. --accent-hi is the
+  // token built for exactly this: an emphasised pop of the accent that is
+  // brighter than resting in dark mode and darker than resting in light mode,
+  // so it reads as a flash against whichever surface is under it.
+  35%  { transform: scale(1.22); color: var(--accent-hi); }
   100% { transform: scale(1); }
 }
 
@@ -403,9 +413,16 @@
   flex: none;
 }
 
-.LmxLeader:nth-child(1) .LmxLeader-pos { color: #e8c07d; }
-.LmxLeader:nth-child(2) .LmxLeader-pos { color: #c3ccd8; }
-.LmxLeader:nth-child(3) .LmxLeader-pos { color: #c98b5e; }
+// Podium colours painted straight onto the card surface — same audit as
+// looksmax-ranks/styles.less's rank ladder. Gold's literal was an exact match
+// for --gold's dark-scheme value, so it now reads the token. Silver's pastel
+// (#c3ccd8, 1.6:1 on white) is replaced with --ink-dim, the scheme-tracked
+// muted-grey token. Bronze has no matching token; kept as the same deepened
+// literal used for rk-bronze in styles.less so the two stay visually the same
+// colour, adjusted from #c98b5e (2.9:1 on white) for light-scheme legibility.
+.LmxLeader:nth-child(1) .LmxLeader-pos { color: var(--gold); }
+.LmxLeader:nth-child(2) .LmxLeader-pos { color: var(--ink-dim); }
+.LmxLeader:nth-child(3) .LmxLeader-pos { color: #b3754a; }
 
 .LmxLeader-avatar {
   width: 22px;

@@ -3,6 +3,7 @@
 namespace Local\UserInfo;
 
 use Flarum\Group\Group;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 
 /**
@@ -82,6 +83,11 @@ class Presenter
 
             // --- identity -----------------------------------------------------
             'title' => ($title !== '' && !$titleIsRank) ? $title : null,
+            // Null unless signatures are enabled AND this account has cleared
+            // the age gate — see self::signature(). Null rather than '' so the
+            // decorator's check is a truthiness test and an empty signature
+            // cannot render an empty bordered block under every post.
+            'signature' => self::signature($profile, $joined),
             'banners' => array_map([RankSource::class, 'banner'], $banners),
             'rank' => $rank,
             // The forum's OWN roles, which are a different axis from both the
@@ -139,6 +145,59 @@ class Presenter
      * not, so neither says anything about the account — printing "Member" on
      * 26,000 profiles is noise that pushes the chip that matters off the line.
      */
+    /**
+     * The signature as it should RENDER, or null.
+     *
+     * Three gates, all read from config rather than hardcoded, and all applied
+     * here rather than in the decorator — the client must never be the thing
+     * that decides whether a signature is allowed to appear, because the client
+     * is the half an abuser controls.
+     *
+     * The age gate is checked against joined_at at READ time, not stamped at
+     * write time, so an account that clears the threshold starts rendering its
+     * existing signature without needing to re-save it.
+     *
+     * A settings failure degrades to "no signature", never to "signature shown
+     * ungated" — this is the fail-closed direction and it is the whole reason
+     * this is not an inline ternary in the return array.
+     */
+    private static function signature(?Profile $profile, ?int $joined): ?string
+    {
+        if (!$profile) {
+            return null;
+        }
+
+        $text = trim((string) $profile->signature);
+
+        if ($text === '') {
+            return null;
+        }
+
+        try {
+            $cfg = Config::all(resolve(SettingsRepositoryInterface::class));
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        if (empty($cfg['sigEnabled'])) {
+            return null;
+        }
+
+        $minDays = (int) ($cfg['sigMinAccountDays'] ?? 0);
+
+        if ($minDays > 0) {
+            // No join date is not "old enough by default".
+            if ($joined === null) {
+                return null;
+            }
+            if (floor((time() - $joined) / 86400) < $minDays) {
+                return null;
+            }
+        }
+
+        return $text;
+    }
+
     private static function groups(User $user): array
     {
         // relationLoaded, not a truthiness check: an unloaded relation would

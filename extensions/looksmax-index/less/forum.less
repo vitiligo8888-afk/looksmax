@@ -417,7 +417,20 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 
 // The rails are the first thing to go: a 232px column beside a 700px screen is
 // not a smaller version of this layout, it is a broken one.
-@media (max-width: 1400px) {
+//
+// BREAKPOINT LOWERED 1400px -> 1180px, 2026-08-14. The old value collapsed the
+// three-column shell on the most common desktop widths there are: 1366 and 1440
+// laptops both landed in the two-column fallback, and 1400 itself matched
+// because max-width is INCLUSIVE — measured on the live page at exactly 1400px,
+// the side rail was rendering full-width at y=2568, below a 4780px page, with
+// 1104px of main content and no rail beside it. That is the "rails are gone and
+// everything is stacked" layout, on a screen with ample room for both.
+//
+// The budget at the new breakpoint: 1180 viewport - ~40 page padding = 1140
+// inner, minus 232 left + 316 side + two 16px gaps = 580, leaving ~560px of
+// content column. That is above the ~500px where the discussion rows start
+// wrapping badly, so the three-column shell is still honest here.
+@media (max-width: 1180px) {
   .LmxIndex-inner {
     grid-template-columns: var(--lmx-rail) minmax(0, 1fr);
     grid-template-areas: 'top top' 'left main' 'side side';
@@ -705,7 +718,14 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 
 .LmxSections-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  // 240, not 300. Inside the three-column shell the main column is ~790px at a
+  // 1400 viewport, and minmax(300px) floored that to TWO tracks — so six equal
+  // sections tiled 2x3 and the three guide leads could not sit as one clean top
+  // row. 240px floors to THREE tracks in that same 790px (3x240=720 < 790), so
+  // the six sections are exactly two rows of three and the featured rule below
+  // can make the whole first row — the guides — the big row, with no ragged
+  // hole. 1fr still lets them grow to fill a wider main, so nothing is cramped.
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--gap);
 }
 
@@ -719,17 +739,143 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   overflow: hidden;
 }
 
+// A FORUM ROW, not a squashed card. This used to hide the description AND the
+// recent threads, which left a row that was just an icon, a name and a number —
+// less information than the card it was an alternative to, and no reason to
+// pick it. A classic forum index row shows exactly what was hidden: what the
+// section is FOR (description), how big it is (count), and what is happening in
+// it right now (last threads). All three are already rendered by
+// SectionsBlock::sectionTile(); this view just has to lay them out.
+//
+// Three columns: icon | identity+description | activity. The recent list moves
+// to its own column on wide screens so it reads as "latest activity" the way a
+// forum's last-post column always has, and stacks under the name on narrow.
 .LmxSections[data-view='list'] .LmxTile {
   border: 0;
   border-bottom: 1px solid var(--line-soft);
   border-radius: 0;
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--gap);
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-areas: 'icon body count' 'recent recent recent';
+  align-items: start;
+  gap: var(--gap-sm) var(--gap);
+  padding: var(--pad) var(--pad-lg);
 
   &:last-child { border-bottom: 0; }
-  .LmxTile-recent, .LmxTile-desc { display: none; }
+
+  // Hover reveals the section's own colour as a left rail, same language the
+  // feed rows use, so the two lists feel like one system.
+  &:hover { background: var(--surface-2); }
+
+  .LmxTile-icon { grid-area: icon; height: 44px; width: 44px; }
+
+  .LmxTile-body {
+    grid-area: body;
+    min-width: 0;
+  }
+
+  .LmxTile-name {
+    font-size: var(--fs-lg);
+    margin-bottom: 2px;
+  }
+
+  // The point of the row. Shown, not hidden — clamped so a long lede cannot
+  // make one row three times the height of its neighbours.
+  .LmxTile-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: var(--fs-sm);
+    margin: 0;
+  }
+
+  .LmxTile-count {
+    grid-area: count;
+    flex-direction: row;
+    gap: 4px;
+    align-items: baseline;
+    white-space: nowrap;
+  }
+
+  // Keep the flex column it already is — display:block here would collapse the
+  // per-row baseline alignment of "title · when · author · replies".
+  .LmxTile-recent {
+    grid-area: recent;
+    margin: 0;
+    padding-left: calc(44px + var(--gap));
+  }
+
+  // Wide: the recent list becomes a real last-activity COLUMN, which is the
+  // layout a forum index has had since forums existed and the reason this view
+  // is worth offering next to the cards.
+  @media (min-width: 900px) {
+    grid-template-columns: 44px minmax(0, 1.1fr) auto minmax(0, 1fr);
+    grid-template-areas: 'icon body count recent';
+    align-items: center;
+
+    .LmxTile-recent {
+      // The rule above draws a top border for the stacked layout; as a real
+      // column it needs the divider on its LEFT instead, or the row gets a
+      // stray horizontal line through the middle of it.
+      border-top: 0;
+      border-left: 1px solid var(--line-soft);
+      padding-top: 0;
+      padding-left: var(--gap-lg);
+    }
+  }
+}
+
+// ---------------------------------------------------------------- featured
+// The first three sections lead the page at double width and a taller card.
+//
+// COUPLED TO Sections::SECTIONS ORDER, not to any slug. SectionsBlock renders
+// that array in order and core puts no slug class on the tile, so nth-child is
+// the hook. Reorder that array and this promotes whatever now sits first —
+// which is the intended behaviour: "the top three are the big ones" is the
+// rule, and the PHP array is the single place that decides which three.
+//
+// CARD VIEW ONLY. In list view the grid is a single column and every tile is a
+// row; a span-2 there would overflow the one available track, and a taller row
+// would just break the scanning rhythm the list view exists for.
+// BIGGER MEANS TALLER HERE, NOT WIDER — and that is a measured decision, not a
+// preference. The grid is `repeat(auto-fill, minmax(300px, 1fr))`, which
+// resolves to THREE tracks in the main column. A `grid-column: span 2` on the
+// first three tiles therefore leaves a one-track hole beside each of them:
+// measured on the live page, the rows came out [Guides | hole],
+// [Looksmaxing | hole], [Softmaxing | Peptides], [Anabólicos | Peligroso |
+// hole]. Ragged, and it pushed half the sections below the fold.
+//
+// There are exactly six sections (Sections::SECTIONS) and three tracks, so
+// leaving every tile one track wide tiles perfectly into two rows — and the
+// top row IS the three guide-led sections. They read as the primary row
+// because they are taller, have larger type and a larger icon, with no holes.
+.LmxSections:not([data-view='list']) .LmxSections-grid > .LmxTile:nth-child(-n + 3) {
+  // Above the ~271px a section tile reaches naturally from its content, so this
+  // is the BINDING height and the featured row is visibly taller than the row
+  // below it — the earlier 190px sat under the natural height and did nothing.
+  min-height: 300px;
+  padding: var(--pad-lg);
+  justify-content: center;
+
+  .LmxTile-name {
+    font-size: var(--fs-2xl);
+    margin-bottom: var(--gap-xs);
+  }
+
+  .LmxTile-desc {
+    font-size: var(--fs-md);
+    -webkit-line-clamp: 3;
+  }
+
+  .LmxTile-icon {
+    height: 60px;
+    width: 60px;
+  }
+
+  .LmxTile-count {
+    font-size: var(--fs-lg);
+  }
 }
 
 // ------------------------------------------------------------------- tiles
@@ -1093,6 +1239,48 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   // it reads as chrome for the list under it instead of a second card.
   background: linear-gradient(180deg, var(--white-a04), transparent);
 }
+
+// The reader's expand control. The feed is COMPACT by default — a few tight
+// rows — and this reveals the rest. Caret points down when compact (there's
+// more below), up when expanded.
+.LmxFeed-collapse {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+
+  iconify-icon {
+    font-size: 15px;
+    transition: transform var(--t-base) var(--ease);
+  }
+
+  &:hover { background: var(--white-a06); color: var(--ink); }
+  &:focus-visible { box-shadow: var(--ring); outline: none; }
+}
+
+// ── COMPACT BY DEFAULT ──────────────────────────────────────────────────────
+// The feed leads the page, so its default must not eat the fold — measured on
+// mobile, the six-row feed pushed every section card below the first screen.
+// Default state shows THREE tight rows with the excerpt suppressed; the whole
+// point of the block (six kinds of activity at a glance) still reads, and the
+// section cards move up into view. Expanding restores the full rows + excerpts.
+.LmxFeed:not(.is-expanded) {
+  .LmxFeed-list > .LmxFeed-item:nth-child(n + 4) { display: none; }
+  .LmxFeed-excerpt { display: none; }
+  .LmxFeed-item { padding-top: var(--pad-sm); padding-bottom: var(--pad-sm); }
+}
+
+// Expanded: caret flips, full rows and excerpts are back (the rules above stop
+// applying because the class is present).
+.LmxFeed.is-expanded .LmxFeed-collapse iconify-icon { transform: rotate(180deg); }
 
 .LmxFeed-tabs {
   display: flex;

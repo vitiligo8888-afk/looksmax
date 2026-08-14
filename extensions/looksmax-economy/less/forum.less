@@ -1,8 +1,15 @@
 // Rank colours, driven by the serializer's rankSlug.
-.username.rank--vip      { color: #e8c07d; font-weight: 700; }
-.username.rank--legend   { color: #bb9af7; font-weight: 700; }
-.username.rank--verified { color: #9ece6a; }
-.username.rank--regular  { color: #7aa2f7; }
+//
+// TOKENS, not literals. These four rules previously hardcoded a gold/violet/
+// green/blue set from the pre-token palette, which meant a username kept its
+// dark-scheme colour on a light page — and usernames appear on every post, every
+// list row and every notification, so it was the widest-reach scheme break on
+// the forum. The tokens below are already contrast-checked against every surface
+// in both schemes by tokens.less. Do not put a hex back here.
+.username.rank--vip      { color: var(--gold); font-weight: 700; }
+.username.rank--legend   { color: var(--accent); font-weight: 700; }
+.username.rank--verified { color: var(--ok); }
+.username.rank--regular  { color: var(--accent-2); }
 
 .RankBadge {
   border: 1px solid currentColor;

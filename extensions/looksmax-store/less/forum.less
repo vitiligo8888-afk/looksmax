@@ -14,6 +14,14 @@
 //     a form, and a form you cannot tab through is broken for a real fraction
 //     of the people using it.
 
+// Legendary cards' top-edge shimmer. background-position only, so it costs the
+// compositor nothing more than the 3px strip it runs in — see .StoreCard
+// below and the prefers-reduced-motion block at the end of this file.
+@keyframes store-card-shimmer {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 100% 0%; }
+}
+
 .StorePage {
   padding: var(--gap-lg) 0 60px;
 
@@ -219,6 +227,11 @@
   gap: 10px;
   padding: var(--pad);
   position: relative;
+  // A stacking context of its own, so the aura pseudo below (z-index:
+  // var(--z-behind), i.e. -1) stays pinned behind THIS card and can never slide
+  // behind a neighbouring card or the page chrome. Same technique as
+  // looksmax-cosmetics' `.LmxCosFrame[data-cf] { isolation: isolate; }`.
+  isolation: isolate;
   transition: transform var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
 
   // The rarity accent is a top edge rather than a wash, so the card fill stays
@@ -233,6 +246,24 @@
     top: 0;
     background: var(--rarity, var(--line-strong));
     opacity: 0.9;
+    z-index: var(--z-raised);
+  }
+
+  // The prestige aura: a soft radial wash of the rarity colour behind the card,
+  // rare and up only — common and uncommon are the everyday inventory and stay
+  // plain. Intensity is carried by ELEMENT opacity, not by a colour function on
+  // --rarity, which is the only way to fade a custom-property colour that
+  // survives this LESS port (see the file header on Definitions::css()).
+  &::after {
+    background: radial-gradient(ellipse 100% 65% at 50% -10%, var(--rarity, transparent), transparent 70%);
+    border-radius: var(--card-radius);
+    content: '';
+    inset: -1px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity var(--t-base) var(--ease);
+    z-index: var(--z-behind);
   }
 
   &.rarity-common { --rarity: #9aa4b2; }
@@ -240,6 +271,31 @@
   &.rarity-rare { --rarity: #7aa2f7; }
   &.rarity-epic { --rarity: #bb9af7; }
   &.rarity-legendary { --rarity: #e8c07d; }
+
+  &.rarity-rare::after { opacity: 0.05; }
+  &.rarity-epic::after { opacity: 0.09; }
+  &.rarity-legendary::after { opacity: 0.14; }
+
+  &.rarity-rare:hover::after { opacity: 0.09; }
+  &.rarity-epic:hover::after { opacity: 0.16; }
+  &.rarity-legendary:hover::after { opacity: 0.24; }
+
+  // Epic and legendary read as heavier claims, not just a colour: the label
+  // under the name carries the weight instead of a second wash on the card.
+  &.rarity-epic .StoreCard-rarity,
+  &.rarity-legendary .StoreCard-rarity {
+    font-weight: 700;
+  }
+
+  // Legendary only: a slow highlight sweeps the top edge instead of sitting
+  // static, so the rarest tier in the shop is the one thing on the card that
+  // moves. transform/background-position only — no layout, no repaint outside
+  // the 3px strip itself.
+  &.rarity-legendary::before {
+    background: linear-gradient(90deg, var(--rarity) 0%, var(--white-a10) 50%, var(--rarity) 100%);
+    background-size: 220% 100%;
+    animation: store-card-shimmer 3.4s ease-in-out infinite;
+  }
 
   &:hover {
     border-color: var(--line-strong);
@@ -855,6 +911,8 @@
 @media (prefers-reduced-motion: reduce) {
   .StoreCard { transition: none; }
   .StoreCard:hover { transform: none; }
+  .StoreCard::after { transition: none; }
+  .StoreCard.rarity-legendary::before { animation: none; }
 }
 
 // ---------------------------------------------------- inventory row detail

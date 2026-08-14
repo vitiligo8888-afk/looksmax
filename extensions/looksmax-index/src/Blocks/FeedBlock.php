@@ -149,6 +149,18 @@ class FeedBlock extends AbstractBlock
 
         return '<section class="LmxFeed" data-block="feed" data-ms="' . $ms . '">'
             . '<header class="LmxFeed-head">'
+            // Expand toggle. The feed is COMPACT by default (three tight rows) so
+            // it does not eat the fold; this reveals the full six rows with
+            // excerpts. aria-expanded starts false to match that default. The
+            // per-device state is persisted by the mount script; the separate
+            // WHETHER-IT-EXISTS-AT-ALL switch is the admin rails setting
+            // (Rails::overrides, enabled:false) — expand is the reader's control,
+            // existence is the operator's.
+            . '<button type="button" class="LmxFeed-collapse" data-lmx-feed-collapse'
+            . ' aria-expanded="false"'
+            . ' aria-label="' . Html::esc($ctx->t('local-looksmax-index.forum.index.feed.collapse')) . '"'
+            . ' title="' . Html::esc($ctx->t('local-looksmax-index.forum.index.feed.collapse')) . '">'
+            . Html::icon('ph:caret-down-bold') . '</button>'
             . '<div class="LmxFeed-tabs" role="tablist"'
             . ' aria-label="' . Html::esc($ctx->t('local-looksmax-index.forum.index.feed.heading')) . '">'
             . $tabs . '</div>'

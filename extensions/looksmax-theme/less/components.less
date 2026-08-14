@@ -629,3 +629,115 @@ input[aria-invalid='true'] {
 @media (prefers-reduced-motion: reduce) {
   .LmxCat:hover .LmxCat-head::after { animation: none; opacity: 0; }
 }
+
+// ------------------------------------------------------------ appearance panel
+// The /settings controls injected by js/dist/forum.js — three independent axes
+// (scheme, density, decor), each a segmented row of buttons.
+//
+// Buttons, not radios, and aria-pressed rather than :checked. The state a user
+// is choosing is immediately visible in the page BEHIND the panel, so these
+// read as toggles that did something, not as a form awaiting submission. The
+// pressed state is therefore styled from [aria-pressed], which is also what a
+// screen reader announces.
+.Settings-appearance {
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  margin-top: var(--gap-lg);
+  padding: var(--pad) var(--pad-lg) var(--pad-lg);
+
+  legend {
+    border: 0;
+    color: var(--ink);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    margin: 0;
+    padding: 0 var(--pad-sm);
+    width: auto;
+  }
+}
+
+.LmxAppearance-axis + .LmxAppearance-axis {
+  border-top: 1px solid var(--line-soft);
+  margin-top: var(--gap-lg);
+  padding-top: var(--gap);
+}
+
+.LmxAppearance-axisHead {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap-sm);
+}
+
+.LmxAppearance-axisName {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.LmxAppearance-axisHelp {
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+}
+
+// Wraps rather than scrolls: three short labels fit a phone at this size, and a
+// horizontally scrolling settings row hides options behind a gesture.
+.LmxAppearance-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+}
+
+.LmxAppearance-option {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: var(--lh-tight);
+  min-width: 104px;
+  padding: var(--pad-sm) var(--pad);
+  text-align: left;
+  transition:
+    background var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--ink);
+  }
+
+  &:focus-visible {
+    box-shadow: var(--ring);
+    outline: none;
+  }
+
+  // The selected option is carried by BORDER and ink, not by an accent fill.
+  // A filled accent here competes with the primary button further down the
+  // settings page, and in the neon scheme a filled --accent is loud enough to
+  // pull the eye away from the setting the user is actually reading.
+  &[aria-pressed='true'] {
+    background: var(--accent-a14);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+}
+
+.LmxAppearance-optionLabel {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.LmxAppearance-optionHint {
+  color: var(--ink-faint);
+  font-size: var(--fs-xs);
+}
+
+.LmxAppearance-note {
+  margin-bottom: 0;
+  margin-top: var(--gap);
+}

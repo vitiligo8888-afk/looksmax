@@ -1,7 +1,10 @@
 // Admin panel gets the same surface treatment so moderators are not thrown
 // between a dark forum and a white dashboard.
-@surface-1: #12161c;
-@line: #2a323d;
-
-.App-content { background: @surface-1; }
-.ExtensionListItem-content { border-color: @line; }
+//
+// Reads the TOKENS, not a private copy of them. The two @variables that used to
+// live here (@surface-1: #12161c, @line: #2a323d) were a stale pre-token
+// palette: they painted the whole dashboard background a fixed navy that could
+// not follow :root[data-scheme], so an admin who chose the light or neon scheme
+// still got a dark dashboard. Removed 2026-08-14.
+.App-content { background: var(--surface-1); }
+.ExtensionListItem-content { border-color: var(--line); }

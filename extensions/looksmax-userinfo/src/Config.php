@@ -77,6 +77,25 @@ class Config
         'dmEnabled' => [true, 'bool'],
         'dmMaxLength' => [8000, 'int'],
         'dmMaxRecipients' => [10, 'int'],
+
+        // --- signatures -----------------------------------------------------
+        // Shown under every post by an author. Off by default: a signature is
+        // the only surface on the forum where one user's content is injected
+        // into thousands of other users' page views, so turning it on should be
+        // a decision rather than an inheritance.
+        'sigEnabled' => [false, 'bool'],
+        // Enforced on WRITE (SignatureController), not on render, so lowering it
+        // later cannot retroactively truncate someone's saved text into
+        // nonsense — existing signatures keep rendering until next edited.
+        'sigMaxLength' => [280, 'int'],
+        // Line count is capped separately from character count. 280 characters
+        // of "\n" is a legal 280-character string that would push every post in
+        // the thread a screen apart.
+        'sigMaxLines' => [4, 'int'],
+        // Minimum account age in days before a signature renders. The reason is
+        // spam: a signature is a free backlink on every post, which is exactly
+        // what a throwaway account wants. 0 disables the gate.
+        'sigMinAccountDays' => [7, 'int'],
     ];
 
     public static function all(SettingsRepositoryInterface $settings): array

@@ -257,3 +257,33 @@ a.TagLabel:focus-visible {
   background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 28%, transparent);
   text-decoration: none;
 }
+
+// ---------------------------------------------------------------- featured
+// The guide and protocol forums lead the index at double width.
+//
+// COUPLED TO TAG `position`. These are the first six tiles because tags 54, 52,
+// 51, 49, 50 and 53 (Mejores Guías, Looksmaxing, Softmaxing, Peptides,
+// Anabólicos, Peligrosomaxing) were given positions 0-5 on 2026-08-14, and core
+// renders TagTiles in position order. Core puts no slug or id on the tile, so
+// nth-child is the only hook available without patching the component — if you
+// reorder the tags, this rule follows the ORDER, not the forums, and will
+// promote whatever now sits first.
+//
+// Matches core's `.TagTiles > li` shape (0,1,1); a bare `.TagTile` would lose.
+.TagTiles > li.TagTile:nth-child(-n + 6) {
+  min-height: 168px;
+
+  // Only worth spanning once the grid actually HAS two columns. Below that the
+  // grid is single-column and a span:2 would overflow the track.
+  @media (min-width: 660px) {
+    grid-column: span 2;
+  }
+
+  .TagTile-name {
+    font-size: var(--fs-xl);
+  }
+
+  .TagTile-description {
+    font-size: var(--fs-md);
+  }
+}

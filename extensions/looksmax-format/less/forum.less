@@ -557,7 +557,17 @@ body.lmxLightbox-open { overflow: hidden; }
   border-radius: @lmx-r-sm;
   background: @lmx-surface-3;
   color: transparent;
+  // was rgba(232,236,242, 0.65) — a hardcoded copy of --ink's dark-scheme
+  // value. This IS the visible content (color is transparent; the shadow
+  // draws the blurred silhouette), so a copy that doesn't track --ink is not
+  // a subtle miss: in the light scheme --ink flips to near-black and a
+  // near-white blur on a near-white pill is not there at all. color-mix() is
+  // not a LESS colour function, so it passes through untouched and CAN take a
+  // var() — same technique looksmax-ranks/forum.less already uses for its
+  // badge glow. Plain rgba() kept first as a fallback for browsers without
+  // color-mix() support.
   text-shadow: 0 0 9px rgba(232,236,242, 0.65);
+  text-shadow: 0 0 9px color-mix(in srgb, var(--ink, #e8ecf2) 65%, transparent);
   cursor: pointer;
   user-select: none;
   transition: color @lmx-t @lmx-ease, text-shadow @lmx-t @lmx-ease, background @lmx-t @lmx-ease;
@@ -597,19 +607,29 @@ body.lmxLightbox-open { overflow: hidden; }
 
   // Colour carries the meaning the community already attaches to each label,
   // matching the prefix tag colours the importer assigns.
-  &--serious    { border-color: fade(#7aa2f7, 55%); color: #a8c3fb; }
-  &--guide      { border-color: fade(#9ece6a, 55%); color: #bfe093; }
-  &--theory     { border-color: fade(#bb9af7, 55%); color: #d3bcfa; }
-  &--discussion { border-color: fade(#8f9bb3, 55%); color: #b3bccd; }
-  &--method     { border-color: fade(#5fd0c5, 55%); color: #95e2da; }
+  //
+  // SCHEME COMPLIANCE PASS: the pill's own background (@lmx-surface-3, above)
+  // already tracks the scheme correctly. These per-variant text colours did
+  // not — they were pastels picked for a dark pill and measured under 2.5:1
+  // against the light scheme's near-white surface-3, in several cases under
+  // 2:1. --motivation, --gtfih and --op already read @lmx-accent /
+  // @lmx-accent-2 (real var() tokens) and were fine as-is. The rest have no
+  // matching token for their specific hue, so they keep a literal, deepened
+  // to clear roughly 3:1 on white without dropping below ~3:1 on black.
+  // --hiqm shared --guide's exact literal before this pass and still does.
+  &--serious    { border-color: fade(#7aa2f7, 55%); color: #3a5fc4; } // was #a8c3fb (1.8:1 on white)
+  &--guide      { border-color: fade(#9ece6a, 55%); color: #2f7d1f; } // was #bfe093 (1.5:1 on white)
+  &--theory     { border-color: fade(#bb9af7, 55%); color: #7440c9; } // was #d3bcfa (1.7:1 on white)
+  &--discussion { border-color: fade(#8f9bb3, 55%); color: #4f5b73; } // was #b3bccd (1.9:1 on white)
+  &--method     { border-color: fade(#5fd0c5, 55%); color: #1a8a7d; } // was #95e2da (1.5:1 on white)
   &--motivation { border-color: rgba(230,177,105, 0.6); color: @lmx-accent; }
-  &--rage       { border-color: fade(#f7768e, 55%); color: #fba3b3; }
-  &--nsfw       { border-color: fade(#e0484d, 65%); color: #f08a8d; background: fade(#e0484d, 10%); }
-  &--fake       { border-color: fade(#e0484d, 45%); color: #ef9b9d; }
+  &--rage       { border-color: fade(#f7768e, 55%); color: #c72f52; } // was #fba3b3 (1.9:1 on white)
+  &--nsfw       { border-color: fade(#e0484d, 65%); color: #b3272c; background: fade(#e0484d, 10%); } // was #f08a8d (2.4:1 on white)
+  &--fake       { border-color: fade(#e0484d, 45%); color: #ad3b3f; } // was #ef9b9d (2.1:1 on white)
   &--op         { border-color: rgba(110,168,254, 0.55); color: @lmx-accent-2; }
   &--gtfih      { border-color: rgba(230,177,105, 0.6); color: @lmx-accent; }
-  &--hiqm       { border-color: fade(#9ece6a, 55%); color: #bfe093; }
-  &--meme       { border-color: fade(#bb9af7, 45%); color: #cbb2f6; }
+  &--hiqm       { border-color: fade(#9ece6a, 55%); color: #2f7d1f; } // was #bfe093, mirrors --guide's fix
+  &--meme       { border-color: fade(#bb9af7, 45%); color: #9450c8; } // was #cbb2f6 (1.9:1 on white)
 }
 
 // --------------------------------------------------------- removed [deleted]

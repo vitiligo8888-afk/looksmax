@@ -158,7 +158,7 @@ class RenderIndex
         return <<<'JS'
 (function () {
   var LS_VIEW = 'lmxIndexView', LS_NEWS = 'lmxNewsSeen', LS_ONB = 'lmxOnboardingDone',
-      LS_FEED = 'lmxFeedTab';
+      LS_FEED = 'lmxFeedTab', LS_FEED_EXPANDED = 'lmxFeedExpanded';
 
   function app() {
     try { return window.flarum && window.flarum.core && window.flarum.core.app; } catch (e) { return null; }
@@ -217,12 +217,25 @@ class RenderIndex
     }
   }
 
+  function applyFeedExpanded(root, expanded) {
+    var feed = root.querySelector('.LmxFeed');
+    if (!feed) return;
+    feed.classList.toggle('is-expanded', !!expanded);
+    var btn = feed.querySelector('[data-lmx-feed-collapse]');
+    if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }
+
   function wire(root) {
     if (root.__lmxWired) return;
     root.__lmxWired = true;
 
     var storedFeed = ls(LS_FEED);
     if (storedFeed) applyFeed(root, storedFeed);
+
+    /* The feed is compact by default; a reader who chose to expand it keeps
+       that across navigations. Only 'true' expands — an absent/again-compacted
+       value leaves the tighter default in place. */
+    if (ls(LS_FEED_EXPANDED) === 'true') applyFeedExpanded(root, true);
 
     var stored = ls(LS_VIEW);
     if (stored === 'cards' || stored === 'list') applyView(root, stored);
@@ -255,6 +268,15 @@ class RenderIndex
     });
 
     root.addEventListener('click', function (e) {
+      var c = e.target.closest && e.target.closest('[data-lmx-feed-collapse]');
+      if (c) {
+        var feed = root.querySelector('.LmxFeed');
+        var nowExpanded = !(feed && feed.classList.contains('is-expanded'));
+        applyFeedExpanded(root, nowExpanded);
+        persist(LS_FEED_EXPANDED, nowExpanded ? 'true' : 'false');
+        return;
+      }
+
       var t = e.target.closest && e.target.closest('[data-lmx-view]');
       if (t) {
         var v = t.getAttribute('data-lmx-view');

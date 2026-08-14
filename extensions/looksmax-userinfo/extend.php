@@ -7,11 +7,13 @@ use Flarum\Extend;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Local\UserInfo\Api\DmController;
+use Local\UserInfo\Api\SignatureController;
 use Local\UserInfo\Api\SummaryController;
 use Local\UserInfo\Config;
 use Local\UserInfo\Console\BackfillCommand;
 use Local\UserInfo\InjectAdminScript;
 use Local\UserInfo\InjectScript;
+use Local\UserInfo\InjectSignature;
 use Local\UserInfo\Presenter;
 use Local\UserInfo\Profile;
 
@@ -60,7 +62,9 @@ use Local\UserInfo\Profile;
 return [
     (new Extend\Frontend('forum'))
         ->css(__DIR__ . '/less/forum.less')
-        ->content(InjectScript::class),
+        ->content(InjectScript::class)
+        // Separate script, separate failure domain. See InjectSignature.
+        ->content(InjectSignature::class),
 
     (new Extend\Frontend('admin'))
         ->css(__DIR__ . '/less/forum.less')
@@ -131,7 +135,13 @@ return [
         ->get('/lmx-dm/threads/{id}', 'lmxdm.thread', DmController::class)
         ->post('/lmx-dm/threads/{id}/messages', 'lmxdm.thread.reply', DmController::class)
         ->post('/lmx-dm/threads/{id}/read', 'lmxdm.thread.read', DmController::class)
-        ->get('/lmx-dm/unread', 'lmxdm.unread', DmController::class),
+        ->get('/lmx-dm/unread', 'lmxdm.unread', DmController::class)
+
+        // ── signatures ─────────────────────────────────────────────────────
+        // Write only. There is no GET: a signature is already on every user
+        // payload the page holds (Presenter::user), so fetching one would be a
+        // request for data the client demonstrably already has.
+        ->post('/lmx-signature', 'lmx.signature.save', SignatureController::class),
 
     (new Extend\Console())
         ->command(BackfillCommand::class),

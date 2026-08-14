@@ -64,6 +64,20 @@ YAML
   rm -f /tmp/install.yml
 fi
 
+# storage/sessions is NOT created by `flarum install`, and Laravel's file
+# session driver does not create it either — InstalledSite.php points the driver
+# at storage/sessions and then fails to write, silently.
+#
+# The failure is vicious because nothing errors: every request gets a BRAND NEW
+# session, so the CSRF token regenerates on every response. Reads keep working
+# (and remember-me keeps users looking logged in), while every write in the
+# forum — posting, marking read, buying from the store, editing a profile —
+# fails 400 csrf_token_mismatch. That was live on this box on 2026-08-14 and was
+# invisible in the logs: a mismatch is a 400, not an exception.
+#
+# Created here rather than by hand because $APP/storage is a docker volume:
+# recreating it silently reintroduces the bug on the next deploy.
+mkdir -p "$APP/storage/sessions"
 chown -R www-data:www-data "$APP/storage" "$APP/public/assets" 2>/dev/null || true
 php flarum cache:clear || true
 

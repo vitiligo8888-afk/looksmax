@@ -1,6 +1,7 @@
 <?php
 
 use Flarum\Extend;
+use Local\Theme\InjectScheme;
 
 /**
  * Theme extension.
@@ -30,13 +31,18 @@ return [
         ->css(__DIR__ . '/less/tags.less')
         ->css(__DIR__ . '/less/content.less')
         ->css(__DIR__ . '/less/discussion.less')
-        ->css(__DIR__ . '/less/motion.less'),
+        ->css(__DIR__ . '/less/motion.less')
+        // Injected as its own <script> in <head>, NOT ->js(). It must run before
+        // first paint to avoid a flash of the default scheme, and it must fail
+        // independently of the extension bundle. See InjectScheme.
+        ->content(InjectScheme::class),
 
     (new Extend\Frontend('admin'))
         ->css(__DIR__ . '/less/admin.less'),
 
     (new Extend\Theme())
         ->addCustomLessVariable('config-primary-color', fn () => '#e8c07d')
-        ->addCustomLessVariable('config-secondary-color', fn () => '#12161c')
+        // Follows the surface ramp to true black (tokens.less, 2026-08-14).
+        ->addCustomLessVariable('config-secondary-color', fn () => '#000000')
         ->addCustomLessVariable('config-dark-mode', fn () => 'true'),
 ];

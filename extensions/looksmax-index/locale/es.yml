@@ -39,6 +39,7 @@ local-looksmax-index:
         unanswered: Sin responder
         guides: Guías
         all: Ver todo
+        collapse: Ver más o menos
         replies: respuestas
         views: visitas
         reactions: reacciones

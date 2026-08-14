@@ -1605,3 +1605,66 @@ html.lmx-dm-open body {
     transition: none;
   }
 }
+
+// ---------------------------------------------------------------- signatures
+// Rendered by js/dist/signature.js immediately after .Post-body.
+//
+// A signature must read as NOT part of the post. On a forum where posts are
+// already dense, the cheapest reliable separator is a rule plus a step down in
+// size and ink — not a card, which would compete with the post itself.
+.LmxSig {
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+  margin-top: var(--gap);
+  padding-top: var(--gap-sm);
+
+  // Hard ceiling in CSS as well as on write. sigMaxLines is enforced by the
+  // controller, but an existing signature saved under a HIGHER old limit would
+  // still render at its old height; this bounds the damage to the thread
+  // layout without truncating anything the user can still see by selecting.
+  max-height: 6em;
+  overflow: hidden;
+
+  a {
+    color: var(--ink-dim);
+    text-decoration: underline;
+  }
+}
+
+// ---- the /settings editor ------------------------------------------------
+.Settings-signature {
+  border: 1px solid var(--line);
+  border-radius: var(--card-radius);
+  margin-top: var(--gap-lg);
+  padding: var(--pad) var(--pad-lg) var(--pad-lg);
+
+  legend {
+    border: 0;
+    color: var(--ink);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    margin: 0;
+    padding: 0 var(--pad-sm);
+    width: auto;
+  }
+
+  textarea {
+    font-family: var(--font-ui);
+    resize: vertical;
+    width: 100%;
+  }
+}
+
+.LmxSig-actions {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  margin-top: var(--gap);
+}
+
+.LmxSig-status {
+  color: var(--ink-faint);
+  font-size: var(--fs-sm);
+}

@@ -62,13 +62,26 @@ class Sections
      * hue      OKLCH hue; the hex is derived, never hand-picked
      * icon     iconify name, bundled in looksmax-icons/js/dist/icons.json
      */
+    /**
+     * THE ARRAY ORDER IS THE RENDER ORDER on the front page.
+     *
+     * SectionsBlock::render() iterates this array directly, so this literal —
+     * not `tags.position` — is what a reader actually sees. Reordering the tags
+     * table does nothing here; that only moves core's own /tags page, which
+     * less/forum.less hides while the LmxIndex is mounted.
+     *
+     * Reordered 2026-08-14 on operator instruction ("guide section, peptides,
+     * mejores guias at the top"): guides lead, then the softer protocol
+     * sections, then the riskier ones. Kept in step with the tag `position`
+     * values set the same day, so the front page and /tags agree.
+     */
     public const SECTIONS = [
+        'mejores_guias' => ['slug' => 'mejores-guias', 'hue' => 290, 'icon' => 'ph:book-open-text-fill'],
+        'looksmaxing' => ['slug' => 'looksmaxing', 'hue' => 80, 'icon' => 'ph:sparkle-fill'],
+        'softmaxing' => ['slug' => 'softmaxing', 'hue' => 150, 'icon' => 'ph:drop-fill'],
         'peptides' => ['slug' => 'peptides', 'hue' => 195, 'icon' => 'ph:syringe-fill'],
         'anabolicos' => ['slug' => 'anabolicos', 'hue' => 25, 'icon' => 'ph:barbell-fill'],
-        'softmaxing' => ['slug' => 'softmaxing', 'hue' => 150, 'icon' => 'ph:drop-fill'],
-        'looksmaxing' => ['slug' => 'looksmaxing', 'hue' => 80, 'icon' => 'ph:sparkle-fill'],
         'peligrosomaxing' => ['slug' => 'peligrosomaxing', 'hue' => 355, 'icon' => 'ph:warning-fill'],
-        'mejores_guias' => ['slug' => 'mejores-guias', 'hue' => 290, 'icon' => 'ph:book-open-text-fill'],
     ];
 
     /** i18n namespace. The extension id is `local-looksmax-index`. */

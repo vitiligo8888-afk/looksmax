@@ -53,6 +53,14 @@
   50%      { opacity: 1; }
 }
 
+// The legendary wardrobe tile's rarity bar. background-position only, same
+// technique and same duration as the store's .rarity-legendary shimmer, so
+// the two extensions' idea of "legendary" moves in the same rhythm.
+@keyframes cos-tile-shimmer {
+  0%, 100% { background-position: 0% 0%; }
+  50%      { background-position: 100% 0%; }
+}
+
 // ============================================================ the frame
 //
 // Drawn on a wrapper AROUND the avatar, never as a border on it. Three reasons,
@@ -362,6 +370,28 @@
   color: inherit;
   font: inherit;
   width: 100%;
+  // Contains the aura pseudo below to this tile only — the same reason
+  // .LmxCosFrame[data-cf] isolates its rotating layers, and the same reason
+  // the store mirrors this rule on .StoreCard for the identical effect.
+  isolation: isolate;
+
+  // The prestige aura the shop already draws behind rare-and-up store cards,
+  // mirrored here so an epic frame or banner reads as equally special in the
+  // wardrobe as it does on the shelf. `::before` is free on this element —
+  // `::after` is spoken for by the equipped dot below — and the colour comes
+  // from --cos-rarity, set per data-rarity a few rules down, never through a
+  // LESS colour function on a custom property.
+  &::before {
+    background: radial-gradient(ellipse 100% 65% at 50% -12%, var(--cos-rarity, transparent), transparent 70%);
+    border-radius: var(--r-lg);
+    content: '';
+    inset: -1px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity var(--t-fast) ease;
+    z-index: var(--z-behind);
+  }
 }
 
 .LmxCosTile:hover {
@@ -411,6 +441,7 @@
   height: 2px;
   border-radius: 0 0 var(--r-xs) var(--r-xs);
   background: var(--cos-rarity, var(--line-strong));
+  z-index: var(--z-raised);
 }
 
 .LmxCosTile[data-rarity='common']    { --cos-rarity: #9aa4b2; }
@@ -418,6 +449,35 @@
 .LmxCosTile[data-rarity='rare']      { --cos-rarity: #7aa2f7; }
 .LmxCosTile[data-rarity='epic']      { --cos-rarity: #bb9af7; }
 .LmxCosTile[data-rarity='legendary'] { --cos-rarity: #e8c07d; }
+
+// The same aura ramp the store draws behind rare-and-up cards
+// (looksmax-store/less/forum.less), rare through legendary, static unless
+// hovered or focused. Common and uncommon stay plain: the wardrobe should not
+// look like everything in it is special.
+.LmxCosTile[data-rarity='rare']::before      { opacity: 0.05; }
+.LmxCosTile[data-rarity='epic']::before      { opacity: 0.09; }
+.LmxCosTile[data-rarity='legendary']::before { opacity: 0.14; }
+
+.LmxCosTile[data-rarity='rare']:hover::before,
+.LmxCosTile[data-rarity='rare']:focus-visible::before      { opacity: 0.09; }
+.LmxCosTile[data-rarity='epic']:hover::before,
+.LmxCosTile[data-rarity='epic']:focus-visible::before      { opacity: 0.16; }
+.LmxCosTile[data-rarity='legendary']:hover::before,
+.LmxCosTile[data-rarity='legendary']:focus-visible::before { opacity: 0.24; }
+
+// Legendary only: the rarity bar sweeps instead of sitting flat, matching the
+// shimmer on a legendary StoreCard's top edge one-for-one so a frame or banner
+// reads exactly as prestigious in the wardrobe as it did on the shelf.
+.LmxCosTile[data-rarity='legendary'] .LmxCosTile-rarity {
+  background: linear-gradient(90deg, var(--cos-rarity) 0%, var(--white-a10) 50%, var(--cos-rarity) 100%);
+  background-size: 220% 100%;
+  animation: cos-tile-shimmer 3.4s ease-in-out infinite;
+}
+
+.LmxCosTile[data-rarity='epic']      .LmxCosTile-name,
+.LmxCosTile[data-rarity='legendary'] .LmxCosTile-name {
+  font-weight: 700;
+}
 
 .LmxCosTile-name {
   font-weight: 600;
@@ -516,5 +576,11 @@
 
   .LmxCosTile {
     transition: none;
+
+    &::before { transition: none; }
+  }
+
+  .LmxCosTile[data-rarity='legendary'] .LmxCosTile-rarity {
+    animation: none;
   }
 }

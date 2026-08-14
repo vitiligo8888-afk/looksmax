@@ -95,24 +95,41 @@
 .lmx-name.ns-rank { color: var(--lmx-rank-color, inherit); }
 
 // The bare rank colouring, applied to every styled name that has no cosmetic.
-.lmx-name.rk-greycel  { color: #7c8695; }
-.lmx-name.rk-iron     { color: #9aa4b2; }
-.lmx-name.rk-bronze   { color: #c98b5e; }
-.lmx-name.rk-silver   { color: #c3ccd8; }
-.lmx-name.rk-gold     { color: #e8c07d; }
-.lmx-name.rk-platinum { color: #8fd3e8; }
-.lmx-name.rk-diamond  { color: #7ee0d3; }
-.lmx-name.rk-master   { color: #a78bfa; font-weight: 700; }
-.lmx-name.rk-luminary { color: #f0a5d0; font-weight: 700; }
-.lmx-name.rk-ascended { color: #ffffff; font-weight: 700; }
+//
+// SCHEME COMPLIANCE PASS: these are all rendered directly on the page/surface
+// background (a post row, a list row), not inside their own backing chip, so
+// every one of them has to hold up on both the true-black default surface and
+// the light scheme's near-white surface. Several were picked assuming a dark
+// page only and measured under 2:1 against white — effectively invisible
+// there. Where the dark-mode value already equalled (or was a near-miss of) an
+// existing token, that rule now reads the token, which makes it track the
+// scheme automatically. Where the tier needs a hue no token carries (there is
+// no "bronze"/"platinum-cyan-vs-accent-2"/"diamond" token), the literal stays
+// but was re-picked to a mid-tone that clears roughly 3:1 on BOTH a black and
+// a white surface, per rank ladder must keep ten distinguishable hues.
+.lmx-name.rk-greycel  { color: #7c8695; } // already mid-tone: 5.7:1 on black, 3.7:1 on white — unchanged
+.lmx-name.rk-iron     { color: #5b7189; } // was #9aa4b2 (1.7:1 on white); deepened, kept distinct from greycel
+.lmx-name.rk-bronze   { color: #b3754a; } // was #c98b5e (2.9:1 on white); deepened, no "bronze" token exists
+.lmx-name.rk-silver   { color: var(--ink-dim); } // was #c3ccd8 (1.6:1 on white, near-invisible); --ink-dim IS scheme-tracked silvery grey
+.lmx-name.rk-gold     { color: var(--gold); } // was #e8c07d — that literal IS --gold's dark-scheme value; now tracks the light-scheme gold too
+.lmx-name.rk-platinum { color: var(--accent-2); } // was #8fd3e8 (1.7:1 on white); same cool-cyan family as --accent-2, now scheme-tracked
+.lmx-name.rk-diamond  { color: #1f8a7d; } // was #7ee0d3 (1.6:1 on white); deepened teal, no "diamond" token
+.lmx-name.rk-master   { color: var(--accent); font-weight: 700; } // was #a78bfa, effectively the house violet already; now literally IS it
+.lmx-name.rk-luminary { color: #b6488f; font-weight: 700; } // was #f0a5d0 (1.9:1 on white); deepened pink, no matching token
+.lmx-name.rk-ascended { color: var(--ink); font-weight: 700; } // was #ffffff (invisible on a white surface); --ink is the scheme's own max-contrast text colour
 
 // =================================================================== solids
-.lmx-name.ns-crimson { color: #f2555f; }
-.lmx-name.ns-azure   { color: #4aa8ff; }
-.lmx-name.ns-emerald { color: #3ddc97; }
-.lmx-name.ns-apricot { color: #ffab6b; }
-.lmx-name.ns-fuchsia { color: #ff5fc8; }
-.lmx-name.ns-slate   { color: #8c98a8; }
+// Same audit as the rank ladder above: these paint straight onto the page
+// background with no backing chip, so each has to read on both a black and a
+// white surface. Two were near-exact matches for an existing token and now
+// read it; the rest keep a literal (no "azure"/"emerald"/"fuchsia"/"slate"
+// token exists) deepened to clear ~3:1 on white without going near-black.
+.lmx-name.ns-crimson { color: var(--danger); } // was #f2555f, a near-match for --danger's dark-scheme value; now scheme-tracked
+.lmx-name.ns-azure   { color: #2a6fc4; } // was #4aa8ff (2.5:1 on white); deepened
+.lmx-name.ns-emerald { color: #189a6c; } // was #3ddc97 (1.8:1 on white); deepened
+.lmx-name.ns-apricot { color: var(--warn); } // was #ffab6b, same warm-orange family as --warn; now scheme-tracked
+.lmx-name.ns-fuchsia { color: #c232a0; } // was #ff5fc8 (2.7:1 on white); deepened
+.lmx-name.ns-slate   { color: #77839c; } // was #8c98a8 (2.9:1 on white); deepened
 
 // ================================================================ gradients
 // Static gradients: colour without motion, which is what most people actually
@@ -212,7 +229,7 @@
 
 // ================================================================ legendary
 .lmx-name.ns-luminary {
-  color: #ffffff;
+  color: var(--ink); // was #ffffff — invisible on the light scheme's white surface; --ink is the scheme's own max-contrast text colour
   font-weight: 700;
   .ns-animate(ns-glow; 4.5s; ease-in-out);
   will-change: text-shadow;

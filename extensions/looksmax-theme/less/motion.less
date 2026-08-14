@@ -15,10 +15,16 @@
 @fast: 120ms;
 @base: 180ms;
 @slow: 260ms;
-@accent: #e8c07d;
-@accent-2: #7aa2f7;
-@surface-2: #1a2029;
-@surface-3: #232b36;
+// DEAD, kept only as a tombstone. These four were a private copy of the
+// PRE-RENAME gold/navy palette — they were never updated when the house colour
+// moved to violet, and never again when the surfaces went true black. Anything
+// painted from them stayed navy on a black page and stayed navy on a LIGHT
+// page, because a compile-time @variable cannot follow :root[data-scheme].
+//
+// Every consumer below now reads the custom property instead. Do not
+// reintroduce a colour @variable in this file: LESS colour maths (fade/darken)
+// is the only legitimate reason for one, and nothing here does colour maths.
+// @accent / @accent-2 / @surface-2 / @surface-3 — removed 2026-08-14.
 
 // ------------------------------------------------------------------ keyframes
 @keyframes rise {
@@ -38,9 +44,9 @@
 }
 
 @keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0 fade(@accent, 45%); }
-  70%  { box-shadow: 0 0 0 8px fade(@accent, 0); }
-  100% { box-shadow: 0 0 0 0 fade(@accent, 0); }
+  0%   { box-shadow: 0 0 0 0 var(--accent-a45); }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 
 @keyframes slide-in-right {
@@ -77,7 +83,7 @@
 // you can see what changed without re-reading the thread
 .PostStream-item--new .Post {
   animation: rise @base @ease-out both;
-  background: linear-gradient(90deg, fade(@accent, 10%), transparent 60%);
+  background: linear-gradient(90deg, var(--accent-a08), transparent 60%);
   transition: background 1.6s ease 0.6s;
 }
 
@@ -98,7 +104,7 @@
 
 .ReactionsBar .Reaction:hover {
   transform: translateY(-1px);
-  background: @surface-3;
+  background: var(--surface-3);
 }
 
 // ------------------------------------------------------------------ buttons
@@ -131,14 +137,14 @@
 }
 
 .Modal-content {
-  border: 1px solid #2a323d;
+  border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.7);
   overflow: hidden;
 }
 
 .Modal-header {
-  border-bottom: 1px solid #2a323d;
+  border-bottom: 1px solid var(--line);
 }
 
 // composer rising from the bottom edge reads as a drawer rather than a jump
@@ -164,7 +170,7 @@
 // the real row height prevents the content jumping when data arrives, which is
 // the actual reason to use one.
 .LoadingIndicator--skeleton .DiscussionListItem {
-  background-image: linear-gradient(90deg, @surface-2 0%, @surface-3 40%, @surface-2 80%);
+  background-image: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 40%, var(--surface-2) 80%);
   background-size: 320px 100%;
   animation: shimmer 1.1s linear infinite;
   color: transparent;
@@ -201,7 +207,7 @@
 
 .PostUser .Avatar:hover {
   transform: scale(1.06);
-  box-shadow: 0 0 0 2px fade(@accent, 40%);
+  box-shadow: 0 0 0 2px var(--accent-a45);
 }
 
 // ------------------------------------------------- accessibility escape hatch

@@ -50,6 +50,7 @@ local-looksmax-index:
         unanswered: Unanswered
         guides: Guides
         all: See all
+        collapse: Show more or less
         replies: replies
         views: views
         reactions: reactions
