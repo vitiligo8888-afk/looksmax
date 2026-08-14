@@ -20,8 +20,8 @@
 @lmx-ink: var(--ink, #e8ecf2);
 @lmx-ink-dim: var(--ink-dim, #98a3b3);
 @lmx-ink-faint: var(--ink-faint, #667186);
-@lmx-accent: var(--accent, #e6b169);
-@lmx-accent-2: var(--accent-2, #6ea8fe);
+@lmx-accent: var(--accent, #273c75);
+@lmx-accent-2: var(--accent-2, #026055);
 @lmx-r-sm: var(--r-sm, 6px);
 @lmx-r-md: var(--r-md, 9px);
 @lmx-r-lg: var(--r-lg, 13px);
@@ -596,17 +596,20 @@ body.lmxLightbox-open { overflow: hidden; }
   white-space: nowrap;
 
   // Colour carries the meaning the community already attaches to each label,
-  // matching the prefix tag colours the importer assigns.
-  &--serious    { border-color: fade(#7aa2f7, 55%); color: #a8c3fb; }
-  &--guide      { border-color: fade(#9ece6a, 55%); color: #bfe093; }
-  &--theory     { border-color: fade(#bb9af7, 55%); color: #d3bcfa; }
-  &--discussion { border-color: fade(#8f9bb3, 55%); color: #b3bccd; }
-  &--method     { border-color: fade(#5fd0c5, 55%); color: #95e2da; }
+  // matching the prefix tag colours the importer assigns. Text colours
+  // DARKENED 2026-08-14 (hue held) for the navy/white rebrand: these were
+  // light tints sized for a near-black chip and measured well under 4.5:1 on
+  // white — every one below now clears it, see the commit that added this note.
+  &--serious    { border-color: fade(#7aa2f7, 55%); color: #4f74c4; }
+  &--guide      { border-color: fade(#9ece6a, 55%); color: #578217; }
+  &--theory     { border-color: fade(#bb9af7, 55%); color: #8463bb; }
+  &--discussion { border-color: fade(#8f9bb3, 55%); color: #69748b; }
+  &--method     { border-color: fade(#5fd0c5, 55%); color: #04837a; }
   &--motivation { border-color: rgba(230,177,105, 0.6); color: @lmx-accent; }
-  &--rage       { border-color: fade(#f7768e, 55%); color: #fba3b3; }
-  &--nsfw       { border-color: fade(#e0484d, 65%); color: #f08a8d; background: fade(#e0484d, 10%); }
-  &--fake       { border-color: fade(#e0484d, 45%); color: #ef9b9d; }
-  &--op         { border-color: rgba(110,168,254, 0.55); color: @lmx-accent-2; }
+  &--rage       { border-color: fade(#f7768e, 55%); color: #c64a65; }
+  &--nsfw       { border-color: fade(#e0484d, 65%); color: #d53d44; background: fade(#e0484d, 10%); }
+  &--fake       { border-color: fade(#e0484d, 45%); color: #d53d44; }
+  &--op         { border-color: rgba(2,96,85, 0.55); color: @lmx-accent-2; }
   &--gtfih      { border-color: rgba(230,177,105, 0.6); color: @lmx-accent; }
   &--hiqm       { border-color: fade(#9ece6a, 55%); color: #bfe093; }
   &--meme       { border-color: fade(#bb9af7, 45%); color: #cbb2f6; }

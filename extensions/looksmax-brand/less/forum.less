@@ -35,9 +35,9 @@
 
 html {
   // Tells the browser to render form controls, scrollbars and the space around
-  // an overscroll in dark. Without it, the native scrollbar on Windows renders
-  // as a bright white channel down the side of a black page.
-  color-scheme: dark;
+  // an overscroll to match the page. Light now, not dark — a light-scheme page
+  // with a dark-scheme scrollbar is the Windows bright-channel bug in reverse.
+  color-scheme: light;
 }
 
 // ------------------------------------------------------------------- header
@@ -102,7 +102,11 @@ html {
     width: 26px;
     height: 26px;
     margin-top: -13px;
-    background: var(--brand-brass-500);
+    // white, not --brand-primary: this bar is the navy --header-bg band, and a
+    // navy mark on a navy bar is invisible. --brand-brass-500 (the token this
+    // read before) had stopped existing entirely when the palette moved off
+    // brass, which made this mark render as nothing on every phone.
+    background: var(--brand-ink-invert);
     -webkit-mask: url('extensions/local-looksmax-brand/mark.svg') center / contain no-repeat;
     mask: url('extensions/local-looksmax-brand/mark.svg') center / contain no-repeat;
     pointer-events: none;
@@ -119,8 +123,8 @@ html {
 // copy, the mark and the rule motif are the identity, not the layout.
 .Hero.WelcomeHero {
   background:
-    radial-gradient(900px 420px at 12% -30%, fade(#e8c07d, 12%), transparent 60%),
-    radial-gradient(700px 380px at 100% 130%, fade(#7aa2f7, 9%), transparent 58%),
+    radial-gradient(900px 420px at 12% -30%, fade(#273c75, 10%), transparent 60%),
+    radial-gradient(700px 380px at 100% 130%, fade(#026055, 8%), transparent 58%),
     var(--brand-bg);
   border-bottom: 1px solid var(--brand-line);
   position: relative;
@@ -146,7 +150,7 @@ html {
     height: 10px;
     background-image: repeating-linear-gradient(
       to right,
-      var(--brand-brass-500) 0 2px,
+      var(--brand-primary) 0 2px,
       transparent 2px 22px
     );
     opacity: .35;
@@ -157,8 +161,8 @@ html {
 // --------------------------------------------------------------- loading
 // The brass mark, drawn once while the app boots and while a page is fetched.
 .LoadingIndicator {
-  --loading-indicator-color: var(--brand-brass-500);
-  color: var(--brand-brass-500);
+  --loading-indicator-color: var(--brand-primary);
+  color: var(--brand-primary);
 }
 
 .Brand-splash {
@@ -174,7 +178,7 @@ html {
     content: '';
     width: 44px;
     height: 44px;
-    background: var(--brand-brass-500);
+    background: var(--brand-primary);
     // the mark itself, as a mask, so it takes the brand colour rather than
     // shipping a second coloured copy of the artwork
     -webkit-mask: url('extensions/local-looksmax-brand/mark.svg') center / contain no-repeat;
@@ -214,7 +218,7 @@ html {
 
 // ------------------------------------------------------------------- details
 ::selection {
-  background: fade(#e8c07d, 28%);
+  background: fade(#273c75, 22%);
   color: var(--brand-ink);
 }
 
@@ -242,7 +246,7 @@ html {
     color: #12161c !important;
     background: #fff !important;
   }
-  a { color: #745929 !important; text-decoration: underline; }
+  a { color: #182a5d !important; text-decoration: underline; }
   a[href^="http"]::after { content: ' (' attr(href) ')'; font-size: .82em; color: #5b6675; }
   .PostStream::before {
     content: '';

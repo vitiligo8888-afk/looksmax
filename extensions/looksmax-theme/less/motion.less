@@ -15,10 +15,14 @@
 @fast: 120ms;
 @base: 180ms;
 @slow: 260ms;
-@accent: #e8c07d;
-@accent-2: #7aa2f7;
-@surface-2: #1a2029;
-@surface-3: #232b36;
+// Kept as local literals rather than @c-* from tokens.less on purpose (this
+// file predates that indirection) but were stale brass/azure values nobody had
+// updated through two rebrands — fixed 2026-08-14 to match the current navy
+// palette rather than left silently wrong a third time.
+@accent: #273c75;
+@accent-2: #026055;
+@surface-2: #f0f3fa;
+@surface-3: #e0e6f3;
 
 // ------------------------------------------------------------------ keyframes
 @keyframes rise {
@@ -131,14 +135,14 @@
 }
 
 .Modal-content {
-  border: 1px solid #2a323d;
+  border: 1px solid #cfd6e7;
   border-radius: 8px;
   box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.7);
   overflow: hidden;
 }
 
 .Modal-header {
-  border-bottom: 1px solid #2a323d;
+  border-bottom: 1px solid #cfd6e7;
 }
 
 // composer rising from the bottom edge reads as a drawer rather than a jump
