@@ -6,6 +6,7 @@ use Flarum\Http\Middleware\SetLocale;
 use Local\I18n\ForumStrings;
 use Local\I18n\Head;
 use Local\I18n\InjectScript;
+use Local\I18n\LastWordProvider;
 use Local\I18n\LocaleResourceGuard;
 use Local\I18n\LocaleSettingsProvider;
 use Local\I18n\NegotiateLocale;
@@ -62,6 +63,13 @@ return [
         ->content(InjectScript::class),
 
     (new Extend\Locales(__DIR__.'/locale')),
+
+    // ...and again, last, so the overrides in locale/es.yml actually win over
+    // flarum-lang/spanish. Extension boot order is the raw `extensions_enabled`
+    // array, not a dependency sort, so the Locales extender above is not enough
+    // on its own. See LastWordProvider for the full explanation.
+    (new Extend\ServiceProvider())
+        ->register(LastWordProvider::class),
 
     // The welcome banner and the meta description are settings, not keys.
     // ForumStrings translates them per request without taking the setting away

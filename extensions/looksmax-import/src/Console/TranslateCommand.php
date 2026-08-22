@@ -166,10 +166,25 @@ class TranslateCommand extends AbstractCommand
                 continue;
             }
 
-            // The backup holds the ORIGINAL PARSED XML, so it is restored to the
-            // column directly — re-parsing it would be parsing already-parsed
-            // output and would corrupt it.
-            $this->db->table('posts')->where('id', $post->id)->update(['content' => $row->original_content]);
+            // The backup holds the original SOURCE, not parsed XML — so it has
+            // to go back through the formatter, exactly like the translation did.
+            //
+            // The comment that used to sit here claimed the opposite ("the
+            // backup holds the ORIGINAL PARSED XML ... re-parsing would corrupt
+            // it") and the code wrote it straight into the column. That is
+            // wrong, and provably so: the backup is filled from `$post->content`
+            // ABOVE, and CommentPost's content ACCESSOR returns unparsed source,
+            // not the raw column. So every backup row is BBCode source.
+            //
+            // Writing source into a column that holds TextFormatter XML makes
+            // the post render as a wall of literal `[b]`/`[size]` markup. It was
+            // found exactly that way: reverting d/801 by hand left it the only
+            // post out of 1.9 million whose content was not XML.
+            //
+            // Assigning through the model runs the mutator, which parses the
+            // source back into XML — the inverse of how the backup was taken.
+            $post->content = $row->original_content;
+            $post->save();
             $discussion->title = $row->original_title;
             $discussion->save();
             $n++;

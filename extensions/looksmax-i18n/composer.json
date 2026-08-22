@@ -15,6 +15,19 @@
         "flarum-extension": {
             "title": "Looksmax i18n",
             "category": "language",
+            "//optional-dependencies": [
+                "Declares that this extension overrides strings from",
+                "flarum-lang/spanish, so the pack cannot be disabled without",
+                "flagging that these overrides go with it.",
+                "NOTE: this does NOT control boot order. Flarum reads the field",
+                "(Extension.php:252) but getEnabledExtensions() walks the raw",
+                "extensions_enabled array, so it does not reorder anything —",
+                "which is why the overrides in locale/es.yml were dead until",
+                "src/LastWordProvider.php was added to re-register them last."
+            ],
+            "optional-dependencies": [
+                "flarum-lang/spanish"
+            ],
             "icon": {
                 "name": "fas fa-language",
                 "backgroundColor": "#161d28",
