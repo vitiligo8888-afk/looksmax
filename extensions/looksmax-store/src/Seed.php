@@ -144,25 +144,71 @@ class Seed
                 'blurb' => 'A month of VIP, the Oceanic gradient and a day of doubled earnings. Sold together for less than the three separately.',
             ],
 
-            // -------------------------------------------------- credit packs
-            // The ONLY mocked thing in this extension. `provider: card` routes
-            // through Payments\MockCardProvider, which approves everything and
-            // records a fake authorisation reference. See Payments\README in
-            // that directory for exactly what swapping in a real processor
-            // takes.
+            // ----------------------------------------------------- oro packs
+            // The money -> paid-currency path. `kind: oro` routes through
+            // Payments\MockCardProvider (approves everything, records a fake
+            // auth reference) until a real processor is connected — the whole
+            // pipeline around it (order, idempotency, grant, refund, audit) is
+            // real now, so connecting Stripe/crypto later is a one-file swap.
+            // `money` is in cents; `amount` is the oro credited. The bigger
+            // packs give more oro per dollar, which is where the margin lives.
             [
-                'sku' => 'credits-10k', 'name' => '10,000 credits', 'category' => 'credits',
-                'kind' => 'credits', 'payload' => ['amount' => 10000, 'money' => 500, 'currency' => 'USD'],
+                'sku' => 'oro-550', 'name' => '550 Oro', 'category' => 'oro',
+                'kind' => 'oro', 'payload' => ['amount' => 550, 'money' => 500, 'currency' => 'USD'],
                 'price' => 0, 'rarity' => 'common', 'icon' => 'ph:coins-fill', 'color' => '#e8c07d', 'sort' => 50,
-                'blurb' => 'Card payment is not live yet. This is a test purchase path and it does not charge anything.',
-                'giftable' => true,
+                'blurb' => 'Un puñado de Oro para empezar. El pago con tarjeta es de prueba por ahora y no cobra nada.',
+                'giftable' => true, 'refund_minutes' => 0,
             ],
             [
-                'sku' => 'credits-50k', 'name' => '50,000 credits', 'category' => 'credits',
-                'kind' => 'credits', 'payload' => ['amount' => 50000, 'money' => 2000, 'currency' => 'USD'],
+                'sku' => 'oro-1200', 'name' => '1,200 Oro', 'category' => 'oro',
+                'kind' => 'oro', 'payload' => ['amount' => 1200, 'money' => 1000, 'currency' => 'USD'],
                 'price' => 0, 'rarity' => 'uncommon', 'icon' => 'ph:coins-fill', 'color' => '#e8c07d', 'sort' => 51,
-                'blurb' => 'Card payment is not live yet. This is a test purchase path and it does not charge anything.',
-                'giftable' => true,
+                'blurb' => '20% más de Oro por dólar. El pago con tarjeta es de prueba por ahora y no cobra nada.',
+                'giftable' => true, 'refund_minutes' => 0,
+            ],
+            [
+                'sku' => 'oro-2600', 'name' => '2,600 Oro', 'category' => 'oro',
+                'kind' => 'oro', 'payload' => ['amount' => 2600, 'money' => 2000, 'currency' => 'USD'],
+                'price' => 0, 'rarity' => 'rare', 'icon' => 'ph:coins-fill', 'color' => '#e8c07d', 'sort' => 52,
+                'blurb' => 'La mejor relación. El pago con tarjeta es de prueba por ahora y no cobra nada.',
+                'giftable' => true, 'refund_minutes' => 0,
+            ],
+            [
+                'sku' => 'oro-7000', 'name' => '7,000 Oro', 'category' => 'oro',
+                'kind' => 'oro', 'payload' => ['amount' => 7000, 'money' => 5000, 'currency' => 'USD'],
+                'price' => 0, 'rarity' => 'legendary', 'icon' => 'ph:coins-fill', 'color' => '#e8c07d', 'sort' => 53,
+                'blurb' => 'Para los que van en serio. El pago con tarjeta es de prueba por ahora y no cobra nada.',
+                'giftable' => true, 'refund_minutes' => 0,
+            ],
+
+            // -------------------------------------------- premium (Oro-priced)
+            // Items spent from the PAID balance. Same grant handlers as their
+            // points cousins — only `currency: oro` changes which balance the
+            // card checks — so nothing about delivery is special-cased. These
+            // are what give Oro somewhere to go; an admin can price any item in
+            // oro from the catalogue screen, this is just the shipped starting
+            // set. `discountable: false` because a membership discount on the
+            // premium currency is a discount on money.
+            [
+                'sku' => 'oro-boost-3x-7d', 'name' => 'Triple earnings, 7 days', 'category' => 'boosts',
+                'kind' => 'boost', 'payload' => ['multiplier' => 3.0, 'hours' => 168],
+                'price' => 1500, 'currency' => 'oro', 'rarity' => 'epic', 'icon' => 'ph:lightning-a-fill', 'color' => '#e8c07d', 'sort' => 5,
+                'blurb' => 'Todo lo que ganas cuenta triple durante una semana. Se apila con tu membresía.',
+                'duration_days' => 7, 'discountable' => false,
+            ],
+            [
+                'sku' => 'oro-highlight-14d', 'name' => 'Highlight a thread, 14 days', 'category' => 'utility',
+                'kind' => 'highlight', 'payload' => ['days' => 14, 'variant' => 'gold'],
+                'price' => 800, 'currency' => 'oro', 'rarity' => 'rare', 'icon' => 'ph:highlighter-fill', 'color' => '#e8c07d', 'sort' => 15,
+                'blurb' => 'Tu hilo con un borde marcado en la lista durante dos semanas. Uno, cuando quieras.',
+                'uses' => 1, 'discountable' => false,
+            ],
+            [
+                'sku' => 'oro-sticky-72h', 'name' => 'Pin a thread, 72 hours', 'category' => 'utility',
+                'kind' => 'sticky', 'payload' => ['hours' => 72],
+                'price' => 1200, 'currency' => 'oro', 'rarity' => 'epic', 'icon' => 'ph:push-pin-fill', 'color' => '#9ece6a', 'sort' => 16,
+                'blurb' => 'Fija uno de tus hilos arriba de su etiqueta durante tres días.',
+                'uses' => 1, 'discountable' => false,
             ],
         ];
     }

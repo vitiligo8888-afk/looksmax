@@ -60,6 +60,10 @@ class Catalogue
 
             if (!isset($existing[$row['sku']])) {
                 $record['price'] = (int) ($row['price'] ?? 0);
+                // Currency is commercial, like price: seeded once, then owned by
+                // the admin screen. A redeploy must not flip an item an admin
+                // re-priced into the other currency.
+                $record['currency'] = $row['currency'] ?? 'points';
                 $record['active'] = true;
                 $record['created_at'] = date('Y-m-d H:i:s');
                 $this->db->table('store_items')->insert($record);
@@ -114,12 +118,20 @@ class Catalogue
         $tier = $this->tierOf($user);
         $lifetime = $user ? (int) ($user->lifetime_points ?? 0) : 0;
         $balance = $user ? (int) ($user->points ?? 0) : 0;
+        $oro = $user ? (int) ($user->oro ?? 0) : 0;
 
         $out = [];
         foreach ($rows as $row) {
             $payload = json_decode((string) $row->payload, true) ?: [];
             $price = $this->priceFor($row, $tier);
             $stockLeft = $row->stock_total === null ? null : max(0, (int) $row->stock_total - (int) $row->stock_sold);
+
+            // A money-in pack (kind 'oro' or legacy 'credits') is bought with
+            // real money; anything else is priced in a forum currency, which is
+            // 'oro' if the item says so and 'points' otherwise.
+            $moneyPack = $row->kind === 'oro' || $row->kind === 'credits';
+            $itemCurrency = $moneyPack ? 'money' : (($row->currency ?? 'points') === 'oro' ? 'oro' : 'points');
+            $affordable = $moneyPack ? true : ($itemCurrency === 'oro' ? $oro >= $price : $balance >= $price);
 
             $out[] = [
                 'sku' => $row->sku,
@@ -134,8 +146,8 @@ class Catalogue
                 'listPrice' => (int) $row->price,
                 'price' => $price,
                 'saving' => (int) $row->price - $price,
-                'currency' => $row->kind === 'credits' ? 'money' : 'points',
-                'money' => $row->kind === 'credits' ? ($payload['money'] ?? null) : null,
+                'currency' => $itemCurrency,
+                'money' => $moneyPack ? ($payload['money'] ?? null) : null,
                 'active' => (bool) $row->active,
                 'giftable' => (bool) $row->giftable,
                 'durationDays' => $row->duration_days === null ? null : (int) $row->duration_days,
@@ -157,7 +169,7 @@ class Catalogue
                 'holders' => (int) ($holders[$row->sku] ?? 0),
                 'owned' => in_array($row->sku, $owned, true),
                 'ownedCount' => (int) ($counts[$row->sku] ?? 0),
-                'affordable' => $row->kind === 'credits' ? true : $balance >= $price,
+                'affordable' => $affordable,
                 'locked' => $this->lockReason($row, $user, $tier, $lifetime, $owned, $counts, $stockLeft),
                 'preview' => $this->preview($row, $payload),
             ];

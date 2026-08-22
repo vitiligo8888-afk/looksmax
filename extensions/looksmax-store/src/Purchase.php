@@ -6,6 +6,7 @@ use Flarum\User\User;
 use Illuminate\Database\ConnectionInterface;
 use Local\Store\Grants\Registry;
 use Local\Store\Payments\MockCardProvider;
+use Local\Store\Payments\OroProvider;
 use Local\Store\Payments\PointsProvider;
 
 /**
@@ -53,7 +54,8 @@ class Purchase
         protected Entitlements $entitlements,
         protected Registry $grants,
         protected PointsProvider $points,
-        protected MockCardProvider $card
+        protected MockCardProvider $card,
+        protected OroProvider $oro
     ) {
     }
 
@@ -119,7 +121,24 @@ class Purchase
             return $this->fail(409, $code, $gift ? str_replace($t->trans('local-looksmax-store.forum.lock.owned'), $t->trans('local-looksmax-store.forum.lock.owned_gift'), $locked) : $locked);
         }
 
-        $provider = ($opts['provider'] ?? null) === 'card' || $item->kind === 'credits' ? $this->card : $this->points;
+        // Which balance pays. Three cases, in order:
+        //   1. A money-in pack (kind 'oro', or the legacy 'credits') is bought
+        //      with real money, so it always routes through the card provider —
+        //      that is the ONLY thing the card provider is for.
+        //   2. An item priced in oro (currency = 'oro', or an explicit
+        //      provider:'oro' from the client) is spent from the paid balance.
+        //   3. Everything else is spent from the earned points balance.
+        // The client's `provider` is only ever a hint that can pick oro over
+        // points for a dual-priced item; it can never turn a points item into a
+        // free card sale, because case 1 is keyed off the server-side kind.
+        if ($item->kind === 'oro' || $item->kind === 'credits') {
+            $provider = $this->card;
+        } elseif (($opts['provider'] ?? null) === 'oro' || ($item->currency ?? 'points') === 'oro') {
+            $provider = $this->oro;
+        } else {
+            $provider = $this->points;
+        }
+
         $price = $provider->key() === 'card'
             ? (int) ((json_decode((string) $item->payload, true) ?: [])['money'] ?? 0)
             : $this->catalogue->priceFor($item, $this->catalogue->tierOf($buyer));
@@ -280,6 +299,12 @@ class Purchase
             'granted' => $result,
             'balance' => (int) $this->db->table('users')->where('id', $buyer->id)->value('points'),
             'recipientBalance' => (int) $this->db->table('users')->where('id', $recipient->id)->value('points'),
+            // Both balances, always, so the client can refresh whichever chip
+            // moved without a second request — an oro purchase changes oro, a
+            // points purchase changes points, and a money->oro pack changes the
+            // recipient's oro.
+            'oroBalance' => (int) $this->db->table('users')->where('id', $buyer->id)->value('oro'),
+            'recipientOroBalance' => (int) $this->db->table('users')->where('id', $recipient->id)->value('oro'),
         ];
     }
 
@@ -372,6 +397,7 @@ class Purchase
             'status' => 200,
             'order' => $this->orderPayload($this->db->table('store_orders')->find($order->id)),
             'balance' => (int) $this->db->table('users')->where('id', $actor->id)->value('points'),
+            'oroBalance' => (int) $this->db->table('users')->where('id', $actor->id)->value('oro'),
         ];
     }
 

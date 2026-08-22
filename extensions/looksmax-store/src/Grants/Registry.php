@@ -25,6 +25,7 @@ class Registry
         'bump' => BenefitGrant::class,
         'rename' => BenefitGrant::class,
         'credits' => CreditsGrant::class,
+        'oro' => OroGrant::class,
         'mystery' => MysteryGrant::class,
         'bundle' => BundleGrant::class,
     ];

@@ -282,9 +282,11 @@ local-looksmax-store:
       not_mock_charge: That charge was not made by the mock provider.
 
     pay:
-      credits_label: Credits
-      card_label: Card (not live)
-      short: "{count, plural, one {You are # credit short.} other {You are # credits short.}}"
+      credits_label: Points
+      oro_label: Oro
+      card_label: Card (test)
+      short: "{count, plural, one {You are # point short.} other {You are # points short.}}"
+      short_oro: "{count, plural, one {You are # Oro short.} other {You are # Oro short.}}"
 
     # Why a card cannot be bought, in one sentence. See i18n-map.json: three of
     # these are also re-derived into an error CODE by Purchase.php, which is

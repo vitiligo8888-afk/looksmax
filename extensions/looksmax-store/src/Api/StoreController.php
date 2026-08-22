@@ -44,6 +44,7 @@ class StoreController implements RequestHandlerInterface
 
         return match ($what) {
             'catalogue' => new JsonResponse($this->catalogueView($actor)),
+            'oro' => new JsonResponse($this->oroView($actor)),
             'orders' => new JsonResponse($this->ordersView($actor, $query)),
             'admin' => $this->adminView($actor, $query),
             default => new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.unknown_view')], 404),
@@ -55,6 +56,12 @@ class StoreController implements RequestHandlerInterface
         $guest = $actor->isGuest();
         $userId = $guest ? 0 : (int) $actor->id;
 
+        // The store now runs on Oro: every spend item is priced in oro and the
+        // balance bar shows the oro balance, so oro items are shown here (no
+        // longer filtered out). The dist JS renders the price number + the
+        // currency unit string, which locale now sets to "Oro"; the server is
+        // authoritative on which balance is charged (Catalogue currency='oro'
+        // routes Purchase to OroProvider).
         $items = $this->catalogue->forUser($guest ? null : $actor);
         $tier = $this->catalogue->tierOf($guest ? null : $actor);
 
@@ -67,7 +74,12 @@ class StoreController implements RequestHandlerInterface
                 'guest' => $guest,
                 'id' => $userId,
                 'username' => $guest ? null : $actor->username,
-                'balance' => $guest ? 0 : (int) $actor->points,
+                // The store spends Oro now, so the balance bar shows the oro
+                // balance (the number the buy dialog checks against). Points
+                // stay the earned/rank currency, surfaced elsewhere.
+                'balance' => $guest ? 0 : (int) ($actor->oro ?? 0),
+                'oro' => $guest ? 0 : (int) ($actor->oro ?? 0),
+                'points' => $guest ? 0 : (int) $actor->points,
                 'lifetime' => $guest ? 0 : (int) $actor->lifetime_points,
                 'tier' => $tier['slug'] ?? 'standard',
                 'tierName' => $tier['name'] ?? resolve('translator')->trans('local-looksmax-store.forum.tier.standard'),
@@ -80,6 +92,30 @@ class StoreController implements RequestHandlerInterface
             ],
             'held' => $held,
             'threads' => $userId ? $this->myThreads($userId) : [],
+        ];
+    }
+
+    /**
+     * The Oro surface: what you can buy WITH money (packs) and what you can buy
+     * with the oro you hold (items), plus both balances. One request paints the
+     * whole paid-currency panel. Prices, ownership and lock reasons are already
+     * computed by forUser(), so this only splits its output in two.
+     */
+    private function oroView(User $actor): array
+    {
+        $guest = $actor->isGuest();
+        $all = $this->catalogue->forUser($guest ? null : $actor);
+
+        return [
+            'packs' => array_values(array_filter($all, fn ($i) => ($i['kind'] ?? '') === 'oro')),
+            'items' => array_values(array_filter($all, fn ($i) => ($i['currency'] ?? 'points') === 'oro')),
+            'me' => [
+                'guest' => $guest,
+                'id' => $guest ? 0 : (int) $actor->id,
+                'username' => $guest ? null : $actor->username,
+                'oro' => $guest ? 0 : (int) ($actor->oro ?? 0),
+                'points' => $guest ? 0 : (int) ($actor->points ?? 0),
+            ],
         ];
     }
 
