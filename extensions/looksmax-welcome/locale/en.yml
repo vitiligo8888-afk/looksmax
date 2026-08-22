@@ -1,0 +1,57 @@
+local-looksmax-welcome:
+
+  forum:
+
+    survey:
+      eyebrow: Welcome to Looksmax
+      title: Why did you join?
+      # {name} is the newly created account's display name.
+      title_named: "Great to have you here, {name}!"
+      sub: Tell us what brought you here. It's optional and takes ten seconds — it helps us show you what actually interests you.
+
+      group:
+        intent: What brings you here?
+        section: Which sections interest you?
+
+      count: "{n, plural, one {{count} selected} other {{count} selected}}"
+      count_zero: Pick as many as you like
+
+      skip: Not now
+      save: Save
+      saving: Saving…
+      error: Couldn't save. Try again.
+
+      done_title: All set!
+      done_sub: We'll use this to show you more relevant content.
+
+      # The six section names are the operator's own words, unchanged from
+      # Spanish — see local-looksmax-index.forum.section.*.title. The six
+      # intents are translated normally.
+      option:
+        section_mejores_guias: Mejores Guías
+        section_looksmaxing: Looksmaxing
+        section_softmaxing: Softmaxing
+        section_hardmaxing: Hardmaxing
+        section_peptides: Peptides
+        section_anabolicos: Anabólicos
+        intent_learn: I'm here to learn
+        intent_rate: I want to be rated
+        intent_guides: I'm here for the guides
+        intent_skin_hair: I want to improve my skin or hair
+        intent_surgery: I'm interested in surgery
+        intent_train: I want to train
+
+    auth:
+      username_hint: This is how others will see you. You can change it later.
+      email_hint: Never shown publicly.
+
+      pw:
+        empty: At least 8 characters
+        weak: Weak
+        fair: Fair
+        good: Good
+        strong: Strong
+
+  admin:
+    settings:
+      enabled: Show the welcome survey to new accounts

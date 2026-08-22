@@ -1,0 +1,15 @@
+{
+  "name": "local/looksmax-welcome",
+  "description": "First-run identity: signup/login polish, a welcoming first session, and the \"why did you join\" survey — stored for personalisation",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": { "flarum/core": "^1.8" },
+  "autoload": { "psr-4": { "Local\\Welcome\\": "src/" } },
+  "extra": {
+    "flarum-extension": {
+      "title": "Looksmax Welcome",
+      "category": "feature",
+      "icon": { "name": "fas fa-door-open", "backgroundColor": "#11151c", "color": "#eaf0ff" }
+    }
+  }
+}

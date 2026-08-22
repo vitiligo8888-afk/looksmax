@@ -1,0 +1,60 @@
+local-looksmax-welcome:
+
+  forum:
+
+    survey:
+      eyebrow: Bienvenido a Looksmax
+      title: ¿Por qué te uniste?
+      # {name} es el nombre para mostrar de la cuenta recién creada.
+      title_named: "¡Qué bueno tenerte aquí, {name}!"
+      sub: Cuéntanos qué te trae por aquí. Es opcional y toma diez segundos — nos ayuda a mostrarte lo que de verdad te interesa.
+
+      group:
+        intent: ¿Qué te trae por aquí?
+        section: ¿Qué secciones te interesan?
+
+      count: "{n, plural, one {{count} seleccionada} other {{count} seleccionadas}}"
+      count_zero: Elige las que quieras
+
+      skip: Ahora no
+      save: Guardar
+      saving: Guardando…
+      error: No se pudo guardar. Intenta de nuevo.
+
+      done_title: ¡Listo!
+      done_sub: Vamos a usar esto para mostrarte contenido más relevante.
+
+      # Las seis secciones son las palabras del operador, tal cual — no se
+      # traducen ni se "mejoran". Coinciden exactamente con
+      # local-looksmax-index.forum.section.*.title.
+      #
+      # Los seis motivos son ejemplos del operador, adaptados a una frase
+      # corta que quepa en una ficha.
+      option:
+        section_mejores_guias: Mejores Guías
+        section_looksmaxing: Looksmaxing
+        section_softmaxing: Softmaxing
+        section_hardmaxing: Hardmaxing
+        section_peptides: Peptides
+        section_anabolicos: Anabólicos
+        intent_learn: Vengo a aprender
+        intent_rate: Quiero que me califiquen
+        intent_guides: Vengo por las guías
+        intent_skin_hair: Quiero mejorar mi piel o mi pelo
+        intent_surgery: Me interesa la cirugía
+        intent_train: Quiero entrenar
+
+    auth:
+      username_hint: Así te verán los demás. Puedes cambiarlo luego.
+      email_hint: Nunca se muestra públicamente.
+
+      pw:
+        empty: Mínimo 8 caracteres
+        weak: Débil
+        fair: Aceptable
+        good: Buena
+        strong: Fuerte
+
+  admin:
+    settings:
+      enabled: Mostrar la encuesta de bienvenida a las cuentas nuevas

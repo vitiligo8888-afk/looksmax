@@ -1,0 +1,489 @@
+// First-run identity — the welcome overlay and the signup/login polish.
+//
+// LESS PORT WARNING (read before touching a colour here): Flarum compiles
+// with wikimedia/less.php. NEVER pass a var() into fade()/darken()/lighten()
+// — it compiles fine locally against a real LESS engine and then 500s the
+// whole forum in production, because the PHP port evaluates colour functions
+// at compile time and a custom property is not a colour to it. Every colour
+// below is a bare var(--token) read, never a function argument. See
+// HANDOFF-UI.md for three separate outages this exact mistake caused on this
+// install before this rule existed.
+//
+// MOTION: transform and opacity carry every animation below. Where a second
+// property changes (box-shadow, background, border-color) it is a PAINT-only
+// property — never top/left/width/height/margin — matching the discipline
+// looksmax-theme/less/motion.less documents and already practises elsewhere
+// on this install (its own `pulse-ring` keyframe animates box-shadow for
+// exactly this reason). The password meter fills via `transform: scaleX()`
+// rather than animating `width`, specifically so its bar never forces layout.
+// Every animation here is also killed by the reduced-motion query at the
+// bottom, scoped to this extension's own classes rather than relying only on
+// the theme's forum-wide rule — this surface is the first thing a new
+// account sees and must degrade correctly even if that global rule changes.
+
+// ---------------------------------------------------------------- keyframes
+
+@keyframes lmx-welcome-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes lmx-welcome-chip-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes lmx-welcome-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes lmx-welcome-check-in {
+  from { opacity: 0; transform: rotate(45deg) scale(0); }
+  to   { opacity: 1; transform: rotate(45deg) scale(1); }
+}
+
+@keyframes lmx-welcome-burst {
+  0%   { opacity: 0; transform: scale(0.5); }
+  60%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lmx-welcome-ring {
+  0%   { opacity: 0.9; box-shadow: 0 0 0 0 var(--ok); }
+  70%  { opacity: 0;   box-shadow: 0 0 0 16px transparent; }
+  100% { opacity: 0;   box-shadow: 0 0 0 16px transparent; }
+}
+
+// ------------------------------------------------------------------ overlay
+
+.LmxWelcome {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gap-lg);
+}
+
+.LmxWelcome-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  backdrop-filter: blur(6px) saturate(0.85);
+  opacity: 0;
+  transition: opacity var(--t-slow) var(--ease);
+}
+
+.LmxWelcome.is-live .LmxWelcome-backdrop {
+  opacity: 1;
+}
+
+.LmxWelcome-card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--e-4);
+  opacity: 0;
+  transform: translateY(18px) scale(0.97);
+  transition: opacity var(--t-lazy) var(--ease), transform var(--t-lazy) var(--ease);
+}
+
+.LmxWelcome.is-live .LmxWelcome-card {
+  opacity: 1;
+  transform: none;
+}
+
+.LmxWelcome-body {
+  position: relative;
+  padding: var(--pad-lg) var(--pad-lg) var(--pad-lg);
+}
+
+.LmxWelcome-close {
+  position: absolute;
+  top: var(--pad);
+  right: var(--pad);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+
+  &:hover { background: var(--white-a06); color: var(--ink); transform: rotate(90deg); }
+  &:active { transform: rotate(90deg) scale(0.9); }
+}
+
+// --------------------------------------------------------------------- head
+
+.LmxWelcome-eyebrow {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  margin-bottom: var(--gap-xs);
+}
+
+.LmxWelcome-title {
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  color: var(--ink);
+  margin: 0 0 var(--gap-xs);
+  padding-right: 30px; // clears the close button
+}
+
+.LmxWelcome-sub {
+  font-size: var(--fs-sm);
+  color: var(--ink-dim);
+  line-height: var(--lh);
+  margin: 0 0 var(--gap);
+}
+
+// ------------------------------------------------------------------ groups
+
+.LmxWelcomeGroup {
+  margin-top: var(--gap-lg);
+}
+
+.LmxWelcomeGroup-title {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin: 0 0 var(--gap-sm);
+}
+
+.LmxWelcomeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--gap-sm);
+}
+
+.LmxWelcomeChip {
+  --chip-color: var(--accent);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: var(--pad-sm) var(--pad);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink-dim);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+              background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    background: var(--surface-3);
+    color: var(--ink);
+  }
+
+  &:active { transform: translateY(0) scale(0.98); }
+
+  &.is-picked {
+    border-color: var(--chip-color);
+    background: var(--accent-a08);
+    color: var(--ink);
+    box-shadow: 0 0 0 1px var(--chip-color) inset;
+  }
+}
+
+.LmxWelcomeChip-icon {
+  flex: none;
+  font-size: 18px;
+  color: var(--chip-color);
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.LmxWelcomeChip:hover .LmxWelcomeChip-icon {
+  transform: scale(1.12);
+}
+
+.LmxWelcomeChip-label {
+  flex: 1;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+}
+
+.LmxWelcomeChip-check {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border-right: 2px solid var(--accent-ink);
+    border-bottom: 2px solid var(--accent-ink);
+    opacity: 0;
+    transform: rotate(45deg) scale(0);
+  }
+}
+
+.LmxWelcomeChip.is-picked .LmxWelcomeChip-check {
+  border-color: var(--chip-color);
+  background: var(--chip-color);
+  animation: lmx-welcome-pop 320ms var(--ease);
+
+  &::after {
+    opacity: 1;
+    animation: lmx-welcome-check-in 220ms var(--ease) 60ms both;
+  }
+}
+
+// Staged entrance, once — gated on `.is-entering` (added for ~650ms right
+// after the overlay mounts, then removed) rather than on `.is-live`, which
+// stays set for the overlay's whole open lifetime. Without this split, every
+// chip click — which does NOT rebuild the DOM (see js/dist/forum.js
+// `refreshFooter()`) — would be safe already, but the survey -> done stage
+// swap DOES create a fresh card, and gating on `.is-live` alone would replay
+// the whole grid's stagger on every stage change.
+.LmxWelcome.is-entering .LmxWelcomeChip {
+  animation: lmx-welcome-chip-in var(--t-slow) var(--ease) both;
+}
+
+.LmxWelcomeGrid > .LmxWelcomeChip:nth-child(1)  { animation-delay: 30ms; }
+.LmxWelcomeGrid > .LmxWelcomeChip:nth-child(2)  { animation-delay: 60ms; }
+.LmxWelcomeGrid > .LmxWelcomeChip:nth-child(3)  { animation-delay: 90ms; }
+.LmxWelcomeGrid > .LmxWelcomeChip:nth-child(4)  { animation-delay: 120ms; }
+.LmxWelcomeGrid > .LmxWelcomeChip:nth-child(5)  { animation-delay: 150ms; }
+.LmxWelcomeGrid > .LmxWelcomeChip:nth-child(6)  { animation-delay: 180ms; }
+
+// ------------------------------------------------------------------- error
+
+.LmxWelcome-error {
+  display: none;
+  margin-top: var(--gap);
+  padding: var(--pad-sm) var(--pad);
+  border-radius: var(--r-sm);
+  background: var(--danger-a14);
+  color: var(--danger);
+  font-size: var(--fs-sm);
+
+  &.is-shown {
+    display: block;
+    animation: lmx-welcome-rise var(--t-base) var(--ease) both;
+  }
+}
+
+// ------------------------------------------------------------------ footer
+
+.LmxWelcome-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+  margin-top: var(--gap-lg);
+  padding-top: var(--pad);
+  border-top: 1px solid var(--line);
+}
+
+.LmxWelcome-count {
+  font-size: var(--fs-xs);
+  color: var(--ink-faint);
+}
+
+.LmxWelcome-actions {
+  display: flex;
+  gap: var(--gap-sm);
+  margin-left: auto;
+}
+
+.LmxWelcome-save:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+// -------------------------------------------------------------------- done
+
+.LmxWelcome-done {
+  text-align: center;
+  padding-top: var(--pad);
+  padding-bottom: var(--pad-sm);
+  animation: lmx-welcome-rise var(--t-lazy) var(--ease) both;
+}
+
+.LmxWelcome-burst {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--gap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    animation: lmx-welcome-ring 900ms var(--ease) both;
+  }
+}
+
+.LmxWelcome-doneIcon {
+  font-size: 56px;
+  color: var(--ok);
+  animation: lmx-welcome-burst 520ms var(--ease) both;
+}
+
+.LmxWelcome-done .LmxWelcome-title,
+.LmxWelcome-done .LmxWelcome-sub {
+  text-align: center;
+}
+
+// ============================================================ auth polish
+// Additive decoration of core's own SignUpModal / LogInModal. Nothing here
+// overrides a component; it styles the small wrapper elements
+// js/dist/forum.js inserts around fields it finds defensively (see
+// `fieldsOf()`), so a marked-up change in core degrades to "no icon" rather
+// than to broken layout.
+
+.LmxAuthField {
+  position: relative;
+  display: block;
+
+  .FormControl,
+  input {
+    padding-left: 38px;
+  }
+}
+
+// Left-align the text of a decorated field.
+//
+// Core centres these: `.Form--centered .FormControl[type=text]` and friends,
+// at Form.less:9-15. That is fine for a bare stock form and wrong the moment
+// this extension puts an icon at the left edge — the icon sat at x=12 while
+// its own placeholder floated in the middle of the field, reading as two
+// unrelated things.
+//
+// The ancestor is named explicitly because core's selector carries an
+// attribute and scores 0,3,0: a plain `.LmxAuthField .FormControl` is 0,2,0
+// and loses outright, which is exactly what the first attempt at this did.
+// Matching the score and coming later in the cascade is what makes it apply.
+//
+// Scoped to fields this extension actually decorated, so any modal it did not
+// touch keeps core's own centred look.
+//
+// padding-left is repeated here rather than left to the block above for the
+// same reason: core's rule sets the `padding` SHORTHAND, so it resets the left
+// inset the icon needs. With only the 0,2,0 rule in play the text ran straight
+// under the glyph.
+.Form--centered .LmxAuthField {
+  .FormControl,
+  input {
+    text-align: left;
+    padding-left: 38px;
+  }
+}
+
+.LmxAuthField-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+.LmxAuthField-hint {
+  font-size: var(--fs-xs);
+  color: var(--ink-faint);
+  margin: 4px 2px 10px;
+  animation: lmx-welcome-rise var(--t-base) var(--ease) both;
+}
+
+// ------------------------------------------------------------- pw strength
+
+.LmxPwMeter {
+  margin: 6px 2px 10px;
+  animation: lmx-welcome-rise var(--t-base) var(--ease) both;
+}
+
+.LmxPwMeter-bar {
+  position: relative;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--danger);
+    transform: scaleX(0.03);
+    transform-origin: left center;
+    transition: transform var(--t-base) var(--ease), background var(--t-base) var(--ease);
+  }
+}
+
+.LmxPwMeter-label {
+  font-size: var(--fs-xs);
+  color: var(--ink-faint);
+  margin-top: 4px;
+}
+
+.LmxPwMeter[data-score='0'] .LmxPwMeter-bar::after { transform: scaleX(0.03); background: var(--danger); }
+.LmxPwMeter[data-score='1'] .LmxPwMeter-bar::after { transform: scaleX(0.32); background: var(--danger); }
+.LmxPwMeter[data-score='2'] .LmxPwMeter-bar::after { transform: scaleX(0.55); background: var(--warn); }
+.LmxPwMeter[data-score='3'] .LmxPwMeter-bar::after { transform: scaleX(0.78); background: var(--ok); }
+.LmxPwMeter[data-score='4'] .LmxPwMeter-bar::after { transform: scaleX(1);    background: var(--ok); }
+
+// ----------------------------------------------------------- small screens
+
+@media (max-width: 480px) {
+  .LmxWelcome-card { max-width: 100%; }
+  .LmxWelcomeGrid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .LmxWelcome-actions { width: 100%; }
+  .LmxWelcome-actions .Button { flex: 1; }
+}
+
+// ------------------------------------------------- accessibility escape hatch
+// Scoped to this extension's own classes, in addition to (not instead of)
+// looksmax-theme's forum-wide reduced-motion rule — this surface is the
+// first thing a brand new account sees and must be correct on its own.
+@media (prefers-reduced-motion: reduce) {
+  .LmxWelcome,
+  .LmxWelcome *,
+  .LmxAuthField-hint,
+  .LmxPwMeter,
+  .LmxPwMeter * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
