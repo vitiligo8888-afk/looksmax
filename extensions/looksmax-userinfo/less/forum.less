@@ -109,6 +109,53 @@
   }
 }
 
+// ── Two cheaper shapes for the rail ─────────────────────────────────────────
+//
+// Measured on /d/30660 (desktop, 1440px): the panel was a CONSTANT
+// ~206-346px regardless of the post beside it. A one-line reply (23px of
+// body) sat inside a 224-346px post box — up to ~320px of it was empty
+// identity furniture, and that shape is the common case in any thread that is
+// mostly short replies, not the exception.
+//
+// `forum.js` (markPost()) stamps both classes on the POST — never the
+// rail itself, so a float-layout rule elsewhere never has to know about
+// them — freshly on every render, from that post's own text length and its
+// immediate predecessor's stamped author id. Never accumulated, never a
+// state that can drift or loop: classList.toggle() with a freshly computed
+// boolean is idempotent no matter how many times it runs.
+//
+//   .has-lmx-author-compact  the post's own text is short enough that the
+//                            full stack is not earned. Stats and the title
+//                            drop; avatar, name, rank and groups stay — the
+//                            "who is this" signal survives, the depth does
+//                            not.
+//   .has-lmx-author-repeat   the post right above it is the SAME author. The
+//                            reader saw the rank and the group chips one post
+//                            ago, so this one drops those too and shrinks the
+//                            avatar again, leaving just enough to say "still
+//                            them".
+.Post.has-lmx-author-compact .LmxStats,
+.Post.has-lmx-author-compact .LmxAuthor-title {
+  display: none;
+}
+
+.Post.has-lmx-author-repeat .LmxStats,
+.Post.has-lmx-author-repeat .LmxAuthor-title,
+.Post.has-lmx-author-repeat .LmxRank,
+.Post.has-lmx-author-repeat .LmxGroups {
+  display: none;
+}
+
+.Post.has-lmx-author-repeat .LmxAvatar--lg {
+  width: 34px;
+  height: 34px;
+
+  .LmxAvatar-img,
+  .Avatar {
+    font-size: 14px;
+  }
+}
+
 // ── The 96px of dead gutter ────────────────────────────────────────────────
 //
 // looksmax-theme reserves a left gutter on every post for core's floated avatar
@@ -138,7 +185,12 @@
   flex-direction: column;
   gap: var(--gap-sm);
   padding: 2px var(--pad-sm) var(--pad-sm) 0;
-  border-right: 1px solid var(--line-soft);
+  // The account's own accent (identity.profileAccent — a VIP+ cosmetic, wired
+  // up here for the first time; see profileAccentOf() in forum.js) tints the
+  // rail's own edge when it is set. `var(--x, fallback)` is plain custom
+  // property substitution, not a colour FUNCTION applied to one — the banned
+  // pattern is fade()/darken()/mix() on a var(), which this is not.
+  border-right: 1px solid var(--lmx-accent, var(--line-soft));
   font-size: var(--fs-sm);
   line-height: var(--lh-tight);
 }
@@ -201,6 +253,14 @@
   line-height: 1.35;
 }
 
+// The rail is 200px and stacked in a column that already costs the reader
+// height on every post — one line here, not two, is part of the same budget
+// that took the panel from a constant ~206-346px down to something that
+// responds to the post beside it.
+.LmxAuthor-title--rail {
+  -webkit-line-clamp: 1;
+}
+
 // ================================================================= avatar
 
 // `line-height: 0` on the wrapper kills the descender gap under the <img>, but
@@ -248,9 +308,19 @@
   }
 }
 
+// Was 76px. Measured contribution to the rail's fixed height: the avatar
+// alone was more than a third of the panel's shortest possible shape. 52px is
+// still 60% bigger than core's own 32px post avatar — still the "large avatar
+// beside the post" the rail exists to give — and it is the single biggest
+// lever on the height budget short of removing rows outright.
 .LmxAvatar--lg {
-  width: 76px;
-  height: 76px;
+  width: 52px;
+  height: 52px;
+
+  .LmxAvatar-img,
+  .Avatar {
+    font-size: 20px;
+  }
 }
 
 .LmxAvatar--card {
@@ -566,6 +636,42 @@
 .LmxStats--wide {
   grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   column-gap: var(--gap);
+}
+
+// ── The rail's own shape: everything on ONE physical line ──────────────────
+//
+// `{slim:true}` in statsNode() already drops `joined`/`reactions` down to just
+// posts + threads; this makes those two sit on one line instead of stacking a
+// row each, which is the difference between ~40px and ~20px of the panel's
+// fixed cost. The label stays in the DOM — a screen reader still gets
+// "Mensajes"/"Temas" — it is only painted out, the same technique
+// looksmax-theme's own `.u-visually-hidden` uses, inlined here rather than
+// depending on a class from another extension's stylesheet.
+.LmxStats--slim {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 12px;
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+}
+
+.LmxStats--slim .LmxStat {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 4px;
+  padding: 0;
+}
+
+.LmxStats--slim .LmxStat dt > span {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 // ============================================================ reaction mix
@@ -1024,6 +1130,7 @@ html.lmx-card-open body {
   font-size: 18px;
 }
 
+.LmxDm-new,
 .LmxDm-back,
 .LmxDm-close {
   display: inline-flex;
@@ -1070,6 +1177,31 @@ html.lmx-card-open body {
   padding: 0;
   overflow-y: auto;
   list-style: none;
+}
+
+// The recipient search ('pick'). Reuses .LmxDm-thread/.LmxDm-threads for the
+// result rows so a picked result looks like the thread it is about to become.
+.LmxDm-pickBar {
+  flex: none;
+  padding: var(--pad-sm) var(--pad);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.LmxDm-pickInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-0);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+
+  &:focus {
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+    outline: 0;
+  }
 }
 
 .LmxDm-thread {
@@ -1352,6 +1484,14 @@ html.lmx-dm-open body {
   }
 }
 
+// The account's own accent, wired up on the profile for the first time (see
+// profileAccentOf() in forum.js): a highlighted top edge on their own
+// Standing card when identity.profileAccent is set, nothing when it is not.
+.LmxProfile-block--standing {
+  border-top-color: var(--lmx-accent, var(--line));
+  border-top-width: 2px;
+}
+
 .LmxProfile-chips {
   display: flex;
   flex-wrap: wrap;
@@ -1508,14 +1648,18 @@ html.lmx-dm-open body {
     width: auto;
     margin-right: 0;
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-columns: 36px minmax(0, 1fr);
     grid-template-areas: 'avatar id' 'stats stats';
     align-items: center;
     gap: var(--gap-sm);
     margin-bottom: var(--gap-sm);
     padding: 0 0 var(--gap-sm);
+    // The accent bar reads as a right-hand rule on the desktop float column;
+    // on the mobile strip the rail sits ABOVE the post, so the same signal
+    // becomes a bottom rule instead of a side one neither part of the layout
+    // touches.
     border-right: 0;
-    border-bottom: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--lmx-accent, var(--line-soft));
     min-height: 0;
   }
 
@@ -1529,12 +1673,12 @@ html.lmx-dm-open body {
   }
 
   .LmxAvatar--lg {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
 
     .LmxAvatar-img,
     .Avatar {
-      font-size: 17px;
+      font-size: 14px;
     }
   }
 
@@ -1594,15 +1738,24 @@ html.lmx-dm-open body {
   }
 }
 
-// A narrow desktop still gets the rail, just a tighter one.
+// A narrow desktop still gets the rail, just a tighter one. Was 64px, bigger
+// than the desktop default above it (76px then) on purpose because the panel
+// was still the vertical-column shape either way. Now that the desktop
+// default is 52px, 64px would read as LARGER on a narrower rail than on a
+// wide one — scaled down to match instead.
 @media (min-width: 768px) and (max-width: 1023px) {
   .Post.has-lmx-author {
     --lmx-author-w: 164px;
   }
 
   .LmxAvatar--lg {
-    width: 64px;
-    height: 64px;
+    width: 46px;
+    height: 46px;
+
+    .LmxAvatar-img,
+    .Avatar {
+      font-size: 18px;
+    }
   }
 }
 
@@ -1691,6 +1844,13 @@ html.lmx-dm-open body {
 // catalogue colour is untouched and keeps inheriting normally.
 [style*='--lmx-name-color'] {
   color: color-mix(in srgb, var(--lmx-name-color) 55%, var(--ink));
+}
+
+// A custom title's colour (identity.titleColor), same treatment as the name
+// and rank hues above it: never an inline `color`, always mixed toward the
+// title's own base ink so the active scheme can still guarantee contrast.
+[style*='--lmx-title-color'] {
+  color: color-mix(in srgb, var(--lmx-title-color) 55%, var(--ink-dim));
 }
 
 // Core's tag link button publishes the tag hue as --color and paints the label

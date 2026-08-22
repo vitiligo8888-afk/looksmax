@@ -198,6 +198,135 @@ SQL;
         return $out;
     }
 
+    /**
+     * The same criterion as one of the bulk methods above, scoped to a single
+     * account with a WHERE instead of a GROUP BY.
+     *
+     * The bulk methods exist for `identity:badges`, which evaluates the whole
+     * population in one pass — fine there, absurd per-user (36,738 queries for
+     * 1,413 accounts across 26 badges). This is the opposite trade for the
+     * opposite caller: Standing::badges() needs "how close is THIS account" for
+     * one profile view, where a handful of cheap scoped queries beats loading
+     * every reaction, post and dwell-second on the board to throw away all but
+     * one row. It is a re-shaping of the same rule, never a re-derivation — any
+     * drift between a bulk check and its scoped twin here is a bug.
+     *
+     * Returns 0 for a check with no scoped implementation (currently 'banner',
+     * which is a string flag rather than a magnitude and is handled by its own
+     * branch in Standing::badges()) rather than throwing, because a badge whose
+     * progress cannot be shown must still render as "locked", not break the page.
+     */
+    public function valueFor(string $check, int $userId): int
+    {
+        switch ($check) {
+            case 'posts':
+                $u = $this->db->table('users')->where('id', $userId)->first(['comment_count', 'legacy_posts']);
+
+                return $u ? max((int) $u->comment_count, (int) $u->legacy_posts) : 0;
+
+            case 'threads':
+                $local = (int) $this->db->table('discussions')
+                    ->where('user_id', $userId)->whereNull('hidden_at')->count();
+                $legacy = (int) ($this->db->table('users')->where('id', $userId)->value('legacy_threads') ?? 0);
+
+                return max($local, $legacy);
+
+            case 'guides':
+                return (int) $this->db->table('guide_meta')
+                    ->join('discussions', 'discussions.id', '=', 'guide_meta.discussion_id')
+                    ->where('guide_meta.status', 'published')
+                    ->where('discussions.user_id', $userId)
+                    ->count();
+
+            case 'sourced':
+                return (int) $this->db->table('guide_claims')
+                    ->join('discussions', 'discussions.id', '=', 'guide_claims.discussion_id')
+                    ->where('discussions.user_id', $userId)
+                    ->where(function ($q) {
+                        $q->whereNotNull('guide_claims.source_url')->orWhereNotNull('guide_claims.source_doi');
+                    })
+                    ->count();
+
+            case 'reactions':
+                $local = (int) $this->db->table('post_likes')
+                    ->join('posts', 'posts.id', '=', 'post_likes.post_id')
+                    ->where('posts.user_id', $userId)
+                    ->count();
+                $legacy = (int) ($this->db->table('users')->where('id', $userId)->value('legacy_reactions') ?? 0);
+
+                return $legacy + $local;
+
+            case 'ratio':
+                $posts = $this->valueFor('posts', $userId);
+                if ($posts < 200) {
+                    return 0; // same floor as the bulk check: not enough posts for a ratio to mean anything
+                }
+
+                return (int) floor($this->valueFor('reactions', $userId) / max(1, $posts));
+
+            case 'readthrough':
+                $v = $this->db->table('analytics_events AS a')
+                    ->join('discussions AS d', 'd.id', '=', 'a.discussion_id')
+                    ->where('a.type', 'discussion.dwell')
+                    ->where('d.user_id', $userId)
+                    ->whereRaw("CAST(JSON_VALUE(a.props, '$.read_pct') AS UNSIGNED) >= 85")
+                    ->selectRaw('COUNT(DISTINCT a.session, a.discussion_id) c')
+                    ->value('c');
+
+                return (int) ($v ?? 0);
+
+            case 'dwell':
+                $v = $this->db->table('analytics_events AS a')
+                    ->join('discussions AS d', 'd.id', '=', 'a.discussion_id')
+                    ->where('a.type', 'discussion.dwell')
+                    ->where('d.user_id', $userId)
+                    ->selectRaw("FLOOR(SUM(CAST(JSON_VALUE(a.props, '$.dwell_ms') AS UNSIGNED)) / 1000) c")
+                    ->value('c');
+
+                return (int) ($v ?? 0);
+
+            case 'tenure':
+                $v = $this->db->table('users')->where('id', $userId)
+                    ->selectRaw('DATEDIFF(NOW(), joined_at) d')->value('d');
+
+                return max(0, (int) ($v ?? 0));
+
+            case 'nightowl':
+                return (int) $this->db->table('posts')
+                    ->where('user_id', $userId)
+                    ->whereRaw('HOUR(created_at) BETWEEN 2 AND 4')
+                    ->whereNull('hidden_at')
+                    ->count();
+
+            case 'necro':
+                $sql = <<<'SQL'
+SELECT COUNT(*) c
+FROM posts p
+JOIN posts prev
+  ON prev.discussion_id = p.discussion_id
+ AND prev.number = (
+       SELECT MAX(p2.number) FROM posts p2
+       WHERE p2.discussion_id = p.discussion_id AND p2.number < p.number
+     )
+WHERE p.user_id = ?
+  AND p.hidden_at IS NULL
+  AND DATEDIFF(p.created_at, prev.created_at) >= 180
+SQL;
+                $rows = $this->db->select($sql, [$userId]);
+
+                return (int) ($rows[0]->c ?? 0);
+
+            case 'imported':
+                return $this->db->table('users')->where('id', $userId)->whereNotNull('imported_id')->exists() ? 1 : 0;
+
+            case 'legacy':
+                return (int) ($this->db->table('users')->where('id', $userId)->value('legacy_reactions') ?? 0);
+
+            default:
+                return 0;
+        }
+    }
+
     /** Accounts that existed on the source board before the migration. */
     public function imported(): array
     {

@@ -91,6 +91,10 @@ local-looksmax-userinfo:
       no_messages: Sin mensajes
       just_you: Solo tú
       compose_to: "Nuevo mensaje a {name}"
+      new_message: Nuevo mensaje
+      search_placeholder: Buscar una persona…
+      search_hint: Escribe al menos 2 letras para buscar
+      search_empty: Nadie coincide con esa búsqueda
       to: "Para {name}"
       body_placeholder: Escribe tu mensaje…
       reply_placeholder: Responde…

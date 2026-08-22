@@ -390,6 +390,38 @@
 .LmxTrophy.bt-platinum { --lmx-badge-color: #8fd3e8; }
 .LmxTrophy.bt-mythic   { --lmx-badge-color: #f0a5d0; }
 
+// An earned trophy is clickable (pins it to the showcase, js/dist/forum.js
+// togglePin()); a locked one carries a progress bar instead and is not.
+.LmxTrophy[role="button"] { cursor: pointer; }
+.LmxTrophy.is-pinned {
+  border-color: var(--gold-a35, rgba(232, 192, 125, 0.35));
+  box-shadow: 0 0 0 1px var(--gold-a18, rgba(232, 192, 125, 0.18));
+}
+.LmxTrophy-progress { width: 100%; margin-top: 2px; }
+
+// ---------------------------------------------------- achievements panel
+// Injected into the core /settings page (js/dist/forum.js mountAchievements),
+// same placement rule looksmax-cosmetics' wardrobe panel already uses.
+.LmxAchievements { padding: var(--pad-lg, 16px) 0; }
+.LmxAchievements-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm, 6px);
+  margin-bottom: var(--gap, 10px);
+
+  iconify-icon { font-size: 20px; color: var(--gold, #e8c07d); }
+  h2 { margin: 0; font-size: var(--fs-xl, 18px); }
+}
+.LmxAchievements-sub {
+  font-size: var(--fs-sm, 12.5px);
+  color: var(--ink-dim, #aab5c6);
+  margin: var(--gap, 10px) 0;
+}
+.LmxAchievements-empty {
+  font-size: var(--fs-sm, 12.5px);
+  color: var(--ink-faint, #8f9bad);
+}
+
 // ------------------------------------------------------------- leaderboard
 .LmxLeaders {
   list-style: none;

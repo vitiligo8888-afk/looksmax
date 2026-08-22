@@ -27,6 +27,18 @@ local-looksmax-ranks:
       rank_unknown: Greycel
       stat_empty: "—"
 
+    achievements:
+      title: Achievements
+      guest: Sign in to see your achievements.
+      points: Points
+      lifetime: Lifetime
+      badges: Badges
+      to_next: "{count} to the next rank"
+      next_badge: "{count} to go for “{badge}”"
+      owned: Earned
+      rarity: "{pct}% of members"
+      hint: "{count, plural, one {Tap an earned badge to pin it next to your name (you have # slot).} other {Tap an earned badge to pin it next to your name (you have # slots).}}"
+
     points:
       title: Your balance — spend it in the store
 

@@ -178,21 +178,147 @@ class Standing
         return $out;
     }
 
+    /**
+     * Every badge, for the achievements screen — including, for anything not
+     * yet earned, how close the account actually is.
+     *
+     * Before this existed, `progress` was only ever the value that satisfied a
+     * badge (identity_badges.progress, written once at award time); a LOCKED
+     * badge always read 0, which is a trophy case that shows what you have and
+     * says nothing about what you are working toward. `Badges\Engine::valueFor()`
+     * fills that in with one small scoped query per measurable locked badge —
+     * fine here because this is a "your own achievements page" call, not
+     * something serialized across a listing of fifty users (see IdentityController
+     * ::me(), the only caller). The five-minute widget poll uses
+     * nearestMeasurableBadge() below instead, which is deliberately cheaper.
+     *
+     * `progressPct` is capped at 99 for anything not owned, even if the raw
+     * value has already crossed the threshold — a badge is "not yet earned"
+     * until `identity:badges` (or the live check that feeds it) actually writes
+     * the row, and a bar reading 100% while the lock icon is still on it is a
+     * worse bug than one reading 99%.
+     */
     public function badges(int $userId): array
     {
         $rows = $this->db->table('identity_badges')->where('user_id', $userId)
             ->get(['badge', 'awarded_at', 'progress', 'showcased', 'slot'])->keyBy('badge');
 
+        /** @var \Local\Ranks\Badges\Engine|null $engine */
+        $engine = null;
+        $unmeasurable = ['banner', 'imported', 'legacy'];
+
         $out = [];
         foreach (Catalog::badges() as $b) {
             $row = $rows[$b['slug']] ?? null;
+            $owned = (bool) $row;
+            $target = max(1, (int) $b['arg']);
+
+            $progress = (int) ($row->progress ?? 0);
+            if (!$owned && !in_array($b['check'], $unmeasurable, true)) {
+                $engine ??= resolve(\Local\Ranks\Badges\Engine::class);
+                try {
+                    $progress = $engine->valueFor((string) $b['check'], $userId);
+                } catch (\Throwable $e) {
+                    $progress = 0; // a broken check must still render a locked badge, just with no bar
+                }
+            }
+
             $out[] = $b + [
-                'owned' => (bool) $row,
+                'owned' => $owned,
                 'awardedAt' => $row->awarded_at ?? null,
-                'progress' => (int) ($row->progress ?? 0),
+                'progress' => $progress,
+                'target' => $target,
+                'progressPct' => $owned ? 100 : (int) min(99, round(100 * min(1, $progress / $target))),
                 'showcased' => (bool) ($row->showcased ?? false),
                 'rarity' => $this->badgeRarity($b['slug']),
             ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * A cheap approximation of "closest locked badge", for surfaces that poll
+     * often — the economy widget refreshes every five minutes for every
+     * signed-in member (looksmax-economy/js/dist/forum.js). badges() above is
+     * correct but costs one query per measurable locked badge (up to ~20 for a
+     * fresh account); fine for a page a member opens on demand, wrong for a
+     * background poll multiplied across the whole online population.
+     *
+     * Restricted to the badges reconstructable from the `users` row plus one
+     * cheap join — posts, threads, reactions, tenure — which happens to cover
+     * most of the ladder members actually chase (Hundred/Thousand/Ten Thousand,
+     * Conversationalist/Agenda Setter, Well Received/Crowd Favourite/Consensus,
+     * One Year/Three Years). Guides, sourced claims, read-through, dwell time
+     * and necro-posting stay dashboard-only (badges()) — rarer wins, and not
+     * worth a fourth and fifth query on every poll for every member.
+     *
+     * @return array{slug:string,name:string,icon:string,tier:string,progress:int,target:int,remaining:int,progressPct:int}|null
+     */
+    public function nearestMeasurableBadge(int $userId): ?array
+    {
+        $row = $this->db->table('users')->where('id', $userId)
+            ->first(['comment_count', 'legacy_posts', 'legacy_threads', 'legacy_reactions', 'joined_at']);
+        if (!$row) {
+            return null;
+        }
+
+        $owned = $this->db->table('identity_badges')->where('user_id', $userId)->pluck('badge')->all();
+        $ownedSet = array_flip($owned);
+
+        $reactionsLocal = (int) $this->db->table('post_likes')
+            ->join('posts', 'posts.id', '=', 'post_likes.post_id')
+            ->where('posts.user_id', $userId)->count();
+
+        $values = [
+            'posts' => max((int) $row->comment_count, (int) $row->legacy_posts),
+            'threads' => (int) $row->legacy_threads,
+            'reactions' => (int) $row->legacy_reactions + $reactionsLocal,
+            'tenure' => $row->joined_at
+                ? max(0, (int) floor((time() - strtotime((string) $row->joined_at)) / 86400))
+                : 0,
+        ];
+
+        $best = null;
+        foreach (Catalog::BADGES as $b) {
+            if (isset($ownedSet[$b['slug']]) || !isset($values[$b['check']])) {
+                continue;
+            }
+
+            $target = max(1, (int) $b['arg']);
+            $value = $values[$b['check']];
+            $pct = (int) min(99, round(100 * min(1, $value / $target)));
+
+            if ($best === null || $pct > $best['progressPct']) {
+                $localized = Catalog::badge($b['slug']) ?? $b;
+                $best = [
+                    'slug' => $b['slug'],
+                    'name' => $localized['name'],
+                    'icon' => $b['icon'],
+                    'tier' => $b['tier'],
+                    'progress' => $value,
+                    'target' => $target,
+                    'remaining' => max(0, $target - $value),
+                    'progressPct' => $pct,
+                ];
+            }
+        }
+
+        return $best;
+    }
+
+    /** The most recently earned badges, newest first — feeds the widget's "new achievement" celebration. */
+    public function recentBadges(int $userId, int $limit = 3): array
+    {
+        $rows = $this->db->table('identity_badges')->where('user_id', $userId)
+            ->orderByDesc('awarded_at')->limit($limit)->get(['badge', 'awarded_at']);
+
+        $out = [];
+        foreach ($rows as $r) {
+            $b = Catalog::badge((string) $r->badge);
+            if ($b) {
+                $out[] = ['slug' => $b['slug'], 'name' => $b['name'], 'icon' => $b['icon'], 'tier' => $b['tier'], 'awardedAt' => (string) $r->awarded_at];
+            }
         }
 
         return $out;

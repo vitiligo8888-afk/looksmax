@@ -314,6 +314,45 @@
     return id && id.frameClass ? id.frameClass : null;
   }
 
+  /*
+   * `identity.profileAccent` and `identity.customTitle`/`.titleColor` are
+   * local/looksmax-ranks cosmetics — a VIP+ benefit ("Profile banner and
+   * accent colour" in its own tier catalogue, Catalog.php) that is stored,
+   * has a write endpoint (POST /api/identity/accent), and nothing on the
+   * forum renders. They ride on the SAME `identity` attribute this file
+   * already reads for rankColor/nameClass/frameClass, so wiring them up here
+   * is reading a field that was already on the payload, not a new dependency.
+   */
+  function profileAccentOf(user) {
+    var id = identityOf(user);
+    return id && id.profileAccent ? id.profileAccent : null;
+  }
+
+  /*
+   * The title line, wherever it renders (rail / hover card / profile).
+   *
+   * A custom title (paid, chosen deliberately) takes priority over the
+   * carried-over legacy one (scraped, not chosen) when both exist — printing
+   * both would be two captions under one name. The colour is never applied as
+   * `color` directly: it is data from a user, not the stylesheet, and an
+   * inline `color` is the one declaration less/forum.less cannot adapt to the
+   * light and neon schemes. `--lmx-title-color` is mixed toward --ink-dim by
+   * the stylesheet instead, same pattern as --lmx-name-color/--lmx-rank-color.
+   */
+  function titleNode(user, info, cls) {
+    var id = identityOf(user);
+    var custom = id && id.customTitle ? id.customTitle : null;
+    var text = custom || (info && info.title ? info.title : null);
+    if (!text) return null;
+    var color = custom && id.titleColor ? id.titleColor : null;
+
+    return m(
+      'div.LmxAuthor-title' + (cls ? '.' + cls : ''),
+      { title: text, style: color ? { '--lmx-title-color': color } : undefined },
+      text
+    );
+  }
+
   function can(info, what) {
     return !!(info && info.can && info.can[what]);
   }
@@ -484,14 +523,25 @@
    * the card said 6 posts where the profile said 295 for the same account
    * (user 3015, measured 2026-08-13). One source, checked by a command.
    */
+  /*
+   * `opts.slim` is the rail's own shape: the operator measured the rail at a
+   * CONSTANT ~206-346px regardless of the post beside it — a one-line reply
+   * (23px of body) sat in a 224px+ post box, most of it empty. `joined` and
+   * `reactions` are exactly the two figures a reader can get from one hover,
+   * so slim drops them and keeps only the two "how active are they HERE"
+   * numbers, which is what render.less then lays on a single physical line
+   * instead of stacking every field its own row.
+   */
   function statsNode(info, opts) {
     if (!info) return null;
     opts = opts || {};
     var rows = [];
 
-    var joined = FIELD.joined ? monthYear(info.joinedAt) : null;
-    if (joined) {
-      rows.push(stat(t('stat.joined'), joined, fullDate(info.joinedAt), 'ph:calendar-blank-fill'));
+    if (!opts.slim) {
+      var joined = FIELD.joined ? monthYear(info.joinedAt) : null;
+      if (joined) {
+        rows.push(stat(t('stat.joined'), joined, fullDate(info.joinedAt), 'ph:calendar-blank-fill'));
+      }
     }
     if (FIELD.posts) {
       rows.push(stat(
@@ -513,7 +563,7 @@
     // Only when it exists. A reaction score of 0 on an account with 400 posts
     // would read as "nobody liked any of this", which is not what we measured —
     // we measured that we have no reaction data for it.
-    if (FIELD.reactions && info.reactions > 0) {
+    if (!opts.slim && FIELD.reactions && info.reactions > 0) {
       rows.push(stat(
         t('stat.reactions'),
         compact(info.reactions),
@@ -537,7 +587,13 @@
 
     if (!rows.length) return null;
 
-    return m('dl.LmxStats' + (opts.wide ? '.LmxStats--wide' : '') + (opts.row ? '.LmxStats--row' : ''), rows);
+    return m(
+      'dl.LmxStats' +
+        (opts.wide ? '.LmxStats--wide' : '') +
+        (opts.row ? '.LmxStats--row' : '') +
+        (opts.slim ? '.LmxStats--slim' : ''),
+      rows
+    );
   }
 
   function stat(label, value, title, icon) {
@@ -636,27 +692,81 @@
   /* ========================================================== author panel */
 
   /**
+   * How much plain text a post actually contains, stripped of markup.
+   *
+   * Used only to decide how much rail a post has earned — never rendered,
+   * never trusted as a display value, so no locale or escaping concerns.
+   * `post.contentHtml()` is what CommentPost is about to render into
+   * `.Post-body`, so this asks the same question the layout is about to
+   * answer, synchronously, before either one paints.
+   */
+  function plainTextLen(post) {
+    try {
+      var html = post.contentHtml ? post.contentHtml() : '';
+      if (!html) return 0;
+      return String(html)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&[a-z#0-9]+;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim().length;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Roughly one to two lines at rail-adjacent body widths. Not a layout
+  // measurement — a cheap proxy that only has to be right often enough that
+  // the rail stops being taller than the post it sits beside.
+  var SHORT_POST_CHARS = 140;
+
+  /**
    * The rail beside a post.
    *
    * Returned as a Mithril vnode appended to CommentPost's `contentItems`
    * ItemList, NOT injected into the DOM. An injected node inside a Mithril
    * subtree gets index-shifted out of existence on the next diff; a vnode is
    * diffed with everything else and updates when the user model does.
+   *
+   * ── Why the rail used to be taller than the post ────────────────────────────
+   * Measured on /d/30660 (desktop, 1440px): the panel was a CONSTANT
+   * ~206-346px depending only on how many fields an account had, never on the
+   * post. A one-line reply (23px of body) sat inside a 224-346px post box —
+   * up to 320px of it empty identity furniture, and that shape is the common
+   * case, not the exception, in any thread that is mostly short replies.
+   *
+   * Three independent cuts fix it without losing "who is this":
+   *   1. `joined`, `reactions`, the reaction mix and the legacy line move OUT
+   *      of the always-on rail. They are exactly what a hover or a tap already
+   *      shows — every one of them is still on the card and the profile — so
+   *      nothing here is a field the reader has lost, only one they now get
+   *      one interaction later instead of on every single post.
+   *   2. the surviving stats (posts, threads) render on ONE line
+   *      (`{slim:true}`) instead of stacking a row each.
+   *   3. two classes on the POST, decided fresh on every render, cheapen it
+   *      further where the post itself does not justify the full stack:
+   *      `.has-lmx-author-compact` for a short post, `.has-lmx-author-repeat`
+   *      when the post right above it is the same author (the reader already
+   *      saw the rank and the count one post ago). See less/forum.less.
    */
   function authorPanel(post) {
     var user = null;
     try { user = post.user(); } catch (e) { user = null; }
 
     var info = infoOf(user);
+    var uid = user ? String(user.id()) : '';
+    var textLen = plainTextLen(post);
+    var short = textLen > 0 && textLen <= SHORT_POST_CHARS;
+    var accent = profileAccentOf(user);
 
     return m(
       'aside.LmxAuthor',
       {
-        // The layout hook has to land on the <article>, and it is applied here
-        // rather than by extending Post.classes so it lands on exactly the
-        // posts that actually got a panel.
-        oncreate: function (vnode) { markPost(vnode.dom); },
-        onupdate: function (vnode) { markPost(vnode.dom); },
+        style: accent ? { '--lmx-accent': accent } : undefined,
+        // The layout hooks have to land on the <article>, and they are applied
+        // here rather than by extending Post.classes so they land on exactly
+        // the posts that actually got a panel.
+        oncreate: function (vnode) { markPost(vnode.dom, uid, short); },
+        onupdate: function (vnode) { markPost(vnode.dom, uid, short); },
       },
       [
         m('div.LmxAuthor-id', [
@@ -671,23 +781,39 @@
             nameNode(user, info),
             rankChip(info),
             groupNodes(info),
-            info && info.title ? m('div.LmxAuthor-title', { title: info.title }, info.title) : null,
+            titleNode(user, info, 'LmxAuthor-title--rail'),
             suspendedChip(info),
             bannerNodes(info),
           ]),
         ]),
-        statsNode(info, { row: true }),
-        mixNode(info),
-        legacyNode(info),
-        presenceNode(info),
+        statsNode(info, { row: true, slim: true }),
       ]
     );
   }
 
-  function markPost(el) {
+  /**
+   * Stamp the layout hooks on the post's own `<article>`.
+   *
+   * `has-lmx-author-repeat` is decided by READING the previous post's own
+   * stamped author id — never by writing to it — so two of these firing
+   * back-to-back cannot loop: each call only ever mutates the ONE article the
+   * vnode it was called from belongs to, which is the node it was inserted
+   * into, per the rule that took the tab down once before.
+   */
+  function markPost(el, uid, isShort) {
     try {
       var art = el && el.closest ? el.closest('article.Post') : null;
-      if (art && !art.classList.contains('has-lmx-author')) art.classList.add('has-lmx-author');
+      if (!art) return;
+      if (!art.classList.contains('has-lmx-author')) art.classList.add('has-lmx-author');
+
+      art.classList.toggle('has-lmx-author-compact', !!isShort);
+
+      var prev = art.previousElementSibling;
+      while (prev && !prev.classList.contains('Post')) prev = prev.previousElementSibling;
+      var prevId = prev ? prev.getAttribute('data-lmx-author-id') : null;
+
+      if (uid) art.setAttribute('data-lmx-author-id', uid);
+      art.classList.toggle('has-lmx-author-repeat', !!(uid && prevId && prevId === uid));
     } catch (e) {}
   }
 
@@ -980,13 +1106,16 @@
 
   function cardView(user, anchor) {
     var info = infoOf(user);
-    var color = nameColor(user);
+    // The account's own chosen accent (a VIP+ cosmetic) wins over the
+    // automatic rank hue when it is set — it is the one piece of this card the
+    // account actually picked, rather than earned or was assigned.
+    var wash = profileAccentOf(user) || nameColor(user);
 
     return m('div.LmxHoverCard', { 'data-mode': openMode }, [
-      // A wash in the account's own rank colour. It is the only decoration on
-      // the card and it is data, not styling: two accounts with the same rank
-      // look the same, and one without a rank has no wash at all.
-      color ? m('div.LmxHoverCard-wash', { style: { background: color } }) : null,
+      // A wash in the account's own accent, or failing that its rank colour.
+      // It is the only decoration on the card and it is data, not styling:
+      // two accounts with the same rank/no accent look the same.
+      wash ? m('div.LmxHoverCard-wash', { style: { background: wash } }) : null,
 
       m('button.LmxHoverCard-close', {
         type: 'button',
@@ -1005,7 +1134,7 @@
             suspendedChip(info),
           ]),
           m('div.LmxHoverCard-chips', [rankChip(info), groupNodes(info)]),
-          info && info.title && FIELD.title ? m('div.LmxAuthor-title', { title: info.title }, info.title) : null,
+          FIELD.title ? titleNode(user, info) : null,
           presenceNode(info),
         ]),
       ]),
@@ -1302,7 +1431,7 @@
   var DM = {
     host: null,
     open: false,
-    view: 'list',    // 'list' | 'thread' | 'compose'
+    view: 'list',    // 'list' | 'thread' | 'compose' | 'pick'
     threads: null,
     thread: null,
     messages: [],
@@ -1311,6 +1440,13 @@
     busy: false,
     error: null,
     unread: 0,
+    // The recipient search ('pick'), the one entry point this surface was
+    // missing: every other way into the inbox starts from someone's card
+    // ("Message" there), so there was no way to start a conversation from
+    // the inbox itself without already being on that person's profile.
+    pickQuery: '',
+    pickResults: null,
+    pickBusy: false,
   };
 
   function dmUrl(path) {
@@ -1358,6 +1494,57 @@
       var ta = DM.host && DM.host.querySelector('.LmxDm-input');
       if (ta) ta.focus();
     }, 60);
+  }
+
+  /**
+   * The recipient search. Opened from the inbox's own header, not only from a
+   * user's card — the "Message" action on the card is a shortcut into this
+   * same compose step, not the only door.
+   */
+  function openPicker() {
+    DM.view = 'pick';
+    DM.pickQuery = '';
+    DM.pickResults = null;
+    DM.error = null;
+    dmRedraw();
+    setTimeout(function () {
+      var inp = DM.host && DM.host.querySelector('.LmxDm-pickInput');
+      if (inp) inp.focus();
+    }, 60);
+  }
+
+  var pickTimer = null;
+
+  /** Debounced so every keystroke is not a request. */
+  function searchUsers(q) {
+    DM.pickQuery = q;
+    clearTimeout(pickTimer);
+    q = String(q || '').trim();
+    if (q.length < 2) {
+      DM.pickResults = null;
+      DM.pickBusy = false;
+      dmRedraw();
+      return;
+    }
+    pickTimer = setTimeout(function () {
+      DM.pickBusy = true;
+      dmRedraw();
+      app.store
+        .find('users', { filter: { q: q }, page: { limit: 8 } })
+        .then(function (res) {
+          if (DM.view !== 'pick') return; // the panel moved on while this was in flight
+          var mine = me();
+          var myId = mine ? Number(mine.id()) : -1;
+          DM.pickResults = (res || []).filter(function (u) { return Number(u.id()) !== myId; });
+          DM.pickBusy = false;
+          dmRedraw();
+        })
+        .catch(function () {
+          DM.pickBusy = false;
+          DM.pickResults = [];
+          dmRedraw();
+        });
+    }, 260);
   }
 
   function loadThreads() {
@@ -1472,18 +1659,60 @@
             : m('iconify-icon.LmxDm-headIcon', { icon: 'ph:envelope-simple-fill' }),
           m('h3', DM.view === 'compose'
             ? t('dm.compose_to', { name: DM.to ? DM.to.displayName() : '' })
+            : DM.view === 'pick'
+            ? t('dm.new_message')
             : DM.view === 'thread' && DM.thread
             ? threadTitle(DM.thread)
             : t('dm.title')),
+          // Starting a conversation used to require already being on someone's
+          // card — this is the inbox's own way in, next to the close button.
+          DM.view === 'list'
+            ? m('button.LmxDm-new', { type: 'button', onclick: openPicker, title: t('dm.new_message'), 'aria-label': t('dm.new_message') },
+                m('iconify-icon', { icon: 'ph:plus-bold' }))
+            : null,
           m('button.LmxDm-close', { type: 'button', onclick: closeDm, 'aria-label': t('dm.close') },
             m('iconify-icon', { icon: 'ph:x-bold' })),
         ]),
 
         DM.error ? m('div.LmxDm-error', DM.error) : null,
 
-        DM.view === 'list' ? dmList() : DM.view === 'thread' ? dmThread() : dmCompose(),
+        DM.view === 'list' ? dmList()
+          : DM.view === 'pick' ? dmPicker()
+          : DM.view === 'thread' ? dmThread()
+          : dmCompose(),
       ]),
     ]);
+  }
+
+  function dmPicker() {
+    var q = String(DM.pickQuery || '').trim();
+
+    return [
+      m('div.LmxDm-pickBar', [
+        m('input.LmxDm-pickInput', {
+          type: 'text',
+          placeholder: t('dm.search_placeholder'),
+          value: DM.pickQuery,
+          oninput: function (e) { searchUsers(e.target.value); },
+        }),
+      ]),
+      DM.pickBusy
+        ? m('div.LmxDm-empty', t('dm.loading'))
+        : q.length < 2
+        ? m('div.LmxDm-empty', t('dm.search_hint'))
+        : !DM.pickResults || !DM.pickResults.length
+        ? m('div.LmxDm-empty', t('dm.search_empty'))
+        : m('ul.LmxDm-threads', DM.pickResults.map(function (u) {
+            return m('li', { key: u.id() }, m(
+              'button.LmxDm-thread',
+              { type: 'button', onclick: function () { openCompose(u); } },
+              [
+                avatarNode(u, 'LmxAvatar--sm'),
+                m('span.LmxDm-threadText', m('span.LmxDm-threadTop', m('span.LmxDm-threadName', u.displayName()))),
+              ]
+            ));
+          })),
+    ];
   }
 
   function dmList() {
@@ -1677,20 +1906,33 @@
 
     var s = summaryOf(user.id());
     var blocks = [];
+    var accent = profileAccentOf(user);
 
+    /*
+     * Rank, groups and title are NOT repeated here. They already render once,
+     * above the fold, in the profile hero (UserPage -> UserCard's infoItems,
+     * wired in wire()) — this is the same data from the same functions. The
+     * previous version rendered them a second time in this card and the
+     * duplication was visible on /u/admin: "LUMBRERA" and the "Admin"/"Elite"
+     * chips appeared once in the row under the name and again here, one
+     * scroll down, for no second fact. Banners are the one exception: the
+     * hero's infoItems never added them, so this is their only home.
+     */
     blocks.push(
-      m('section.LmxProfile-block', [
-        m('h4', t('profile.standing')),
-        m('div.LmxProfile-chips', [
-          rankChip(info),
-          groupNodes(info),
-          bannerNodes(info),
-          info.title ? m('span.LmxAuthor-title', info.title) : null,
-        ]),
-        statsNode(info, { wide: true }),
-        mixNode(info),
-        legacyNode(info),
-      ])
+      m(
+        'section.LmxProfile-block.LmxProfile-block--standing',
+        { style: accent ? { '--lmx-accent': accent } : undefined },
+        [
+          m('h4', t('profile.standing')),
+          (function () {
+            var banners = bannerNodes(info);
+            return banners ? m('div.LmxProfile-chips', [banners]) : null;
+          })(),
+          statsNode(info, { wide: true }),
+          mixNode(info),
+          legacyNode(info),
+        ]
+      )
     );
 
     if (s && s.topTags && s.topTags.length) {
@@ -1799,14 +2041,20 @@
           var info = infoOf(user);
           if (!info) return;
 
+          // The hero: rank, groups and title, unconditionally. This is the
+          // ONLY place they render on a profile page — see the note in
+          // profileBlocks() for why the sidebar's Standing card does not
+          // repeat them.
           if (info.rank && info.rank.name) items.add('lmxRank', m('li.LmxCardInfo', rankChip(info)), 95);
           if (info.groups && info.groups.length) items.add('lmxGroups', m('li.LmxCardInfo', groupNodes(info)), 94);
-          if (info.title) items.add('lmxTitle', m('li.LmxCardInfo', m('span.LmxAuthor-title', info.title)), 93);
+          var title = titleNode(user, info);
+          if (title) items.add('lmxTitle', m('li.LmxCardInfo', title), 93);
 
           /*
            * The hero gets ONLY what the sidebar's Standing card cannot carry,
-           * which on a profile page is nothing — both render from the same
-           * statsNode, and side by side they said the same six numbers twice.
+           * which on a profile page is nothing for the counts — both render
+           * from the same statsNode, and side by side they said the same six
+           * numbers twice.
            *
            * Decided from the ROUTE, not the DOM: infoItems runs during view,
            * before this component has an element to inspect, so this.element is

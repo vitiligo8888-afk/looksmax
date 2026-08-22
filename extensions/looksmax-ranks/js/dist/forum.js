@@ -141,7 +141,17 @@
   function loadMe() {
     return fetch(API + '/me', { credentials: 'same-origin' })
       .then(function (r) { return r.json(); })
-      .then(function (d) { ME = d; window.lmxIdentityMe = d; return d; })
+      .then(function (d) {
+        ME = d;
+        window.lmxIdentityMe = d;
+        // Repaint the achievements panel with fresh data if it is already on
+        // screen — mountAchievements() itself only ever renders once (see its
+        // own guard), so a badge earned by the nightly `identity:badges` run,
+        // or a points change, would otherwise sit stale until a full reload.
+        var panel = document.querySelector('.LmxAchievements');
+        if (panel) renderAchievements(panel);
+        return d;
+      })
       .catch(function () {});
   }
 
@@ -225,11 +235,28 @@
     }
 
     if (opts && opts.badges && s.b > 0) {
-      var bc = el('span', 'lmx-chip lmx-chip--badges');
-      bc.appendChild(icon('ph:seal-check-fill'));
-      bc.appendChild(el('span', null, String(s.b)));
-      bc.title = t('forum.hover.badges_title', { count: s.b }, s.b + ' badge' + (s.b === 1 ? '' : 's'));
-      wrap.appendChild(bc);
+      // Actual showcased trophies when the account pinned any (up to three —
+      // /identity/names caps it there, see IdentityController::names()) —
+      // this is the `.lmx-badges`/`.lmx-badge` mark that already had CSS
+      // (less/forum.less "badge marks") and nothing building it until now.
+      // Falls back to the plain count chip for an account that has badges but
+      // has not opened the achievements panel to pin any yet.
+      if (s.sb && s.sb.length) {
+        var marks = el('span', 'lmx-badges');
+        s.sb.forEach(function (b) {
+          var m = el('span', 'lmx-badge bt-' + (b.t || 'bronze'));
+          m.appendChild(icon(b.i || 'ph:seal-check-fill'));
+          m.title = b.n || '';
+          marks.appendChild(m);
+        });
+        wrap.appendChild(marks);
+      } else {
+        var bc = el('span', 'lmx-chip lmx-chip--badges');
+        bc.appendChild(icon('ph:seal-check-fill'));
+        bc.appendChild(el('span', null, String(s.b)));
+        bc.title = t('forum.hover.badges_title', { count: s.b }, s.b + ' badge' + (s.b === 1 ? '' : 's'));
+        wrap.appendChild(bc);
+      }
     }
 
     return wrap.childNodes.length ? wrap : null;
@@ -534,6 +561,167 @@
       .catch(function () {});
   }
 
+  // ------------------------------------------------------- achievements panel
+  //
+  // Lights up two component families that already had CSS and nothing
+  // building them (less/forum.less ".LmxStanding" and ".LmxTrophies" /
+  // ".LmxTrophy" — grep the stylesheet, then grep this file before this pass:
+  // zero matches). ME (window.lmxIdentityMe, from loadMe()) already carries
+  // everything needed: `standing` for the summary card, `badges` for the
+  // grid — including, since this pass, LIVE PROGRESS for anything not yet
+  // owned (Standing::badges()), not just a count of what is.
+  //
+  // Injected into the core /settings page, same placement rule
+  // looksmax-cosmetics' wardrobe panel already uses and for the same reason:
+  // it is where an operator asked personalisation screens to live, and it
+  // already exists, so this decorates it rather than adding a client route.
+
+  var pinBusy = false;
+
+  function tierShowcaseCap(slug) {
+    var tier = TIERS[slug];
+    return tier && tier.showcase ? tier.showcase : 3;
+  }
+
+  function standingCard() {
+    var s = ME.standing || {};
+    var card = el('div', 'LmxStanding');
+
+    var head = el('div', 'LmxStanding-head');
+    head.appendChild(icon(s.rankIcon || 'ph:circle-dashed-bold'));
+    var names = el('div');
+    names.appendChild(el('div', 'LmxStanding-name', ME.username || ''));
+    var rankLine = el('div', 'LmxStanding-rank');
+    rankLine.style.setProperty('--lmx-rank-color', s.rankColor || '#9aa4b2');
+    rankLine.appendChild(el('span', null, s.rankName || ''));
+    names.appendChild(rankLine);
+    head.appendChild(names);
+    card.appendChild(head);
+
+    if (s.nextRank) {
+      var next = el('div', 'LmxStanding-next');
+      next.appendChild(el('span', null, t('forum.achievements.to_next', { count: num(s.toNextRank || 0) }, num(s.toNextRank || 0) + ' to go')));
+      next.appendChild(el('span', null, s.nextRank.name || ''));
+      card.appendChild(next);
+      var bar = el('div', 'lmx-progress');
+      bar.style.setProperty('--lmx-pct', clampPct(s.rankProgress) + '%');
+      bar.style.setProperty('--lmx-rank-color', s.rankColor || '#9aa4b2');
+      bar.style.setProperty('--lmx-next-color', s.nextRank.color || s.rankColor || '#9aa4b2');
+      card.appendChild(bar);
+    }
+
+    var meta = el('dl', 'LmxStanding-meta');
+    [
+      [t('forum.achievements.points', null, 'Points'), num(s.points || 0)],
+      [t('forum.achievements.lifetime', null, 'Lifetime'), num(s.lifetimePoints || 0)],
+      [t('forum.achievements.badges', null, 'Badges'), num(s.badgeCount || 0)],
+    ].forEach(function (pair) {
+      var row = el('div');
+      row.appendChild(el('dt', null, pair[0]));
+      row.appendChild(el('dd', null, pair[1]));
+      meta.appendChild(row);
+    });
+    card.appendChild(meta);
+
+    if (ME.nearestBadge) {
+      var nb = el('div', 'LmxStanding-next');
+      nb.appendChild(el('span', null, t('forum.achievements.next_badge', { count: num(ME.nearestBadge.remaining), badge: ME.nearestBadge.name }, num(ME.nearestBadge.remaining) + ' to go for ' + ME.nearestBadge.name)));
+      card.appendChild(nb);
+    }
+
+    return card;
+  }
+
+  function clampPct(n) {
+    n = Math.round(Number(n) || 0);
+    return Math.max(0, Math.min(100, n));
+  }
+
+  function trophyTile(b) {
+    var tile = el('div', 'LmxTrophy bt-' + (b.tier || 'bronze') + (b.owned ? '' : ' is-locked'));
+    tile.appendChild(icon(b.icon || 'ph:seal-check-fill'));
+    tile.appendChild(el('div', 'LmxTrophy-name', b.name));
+
+    if (b.owned) {
+      tile.appendChild(el('div', 'LmxTrophy-rarity',
+        b.rarity != null ? t('forum.achievements.rarity', { pct: b.rarity }, b.rarity + '% of members') : t('forum.achievements.owned', null, 'Earned')));
+      if (b.showcased) tile.classList.add('is-pinned');
+      tile.title = b.blurb || '';
+      tile.setAttribute('role', 'button');
+      tile.setAttribute('tabindex', '0');
+      tile.addEventListener('click', function () { togglePin(b.slug); });
+    } else {
+      var track = el('div', 'lmx-progress LmxTrophy-progress');
+      track.style.setProperty('--lmx-pct', clampPct(b.progressPct) + '%');
+      tile.appendChild(track);
+      tile.appendChild(el('div', 'LmxTrophy-rarity', num(b.progress || 0) + ' / ' + num(b.target || 0)));
+      tile.title = b.blurb || '';
+    }
+
+    return tile;
+  }
+
+  function togglePin(slug) {
+    if (pinBusy || !ME || !ME.badges) return;
+
+    var current = ME.badges.filter(function (b) { return b.showcased; }).map(function (b) { return b.slug; });
+    var idx = current.indexOf(slug);
+    var cap = tierShowcaseCap(ME.standing ? ME.standing.tierSlug : 'standard');
+
+    if (idx >= 0) {
+      current.splice(idx, 1);
+    } else {
+      if (current.length >= cap) return; // full trophy case — the tile's own state just does not change
+      current.push(slug);
+    }
+
+    pinBusy = true;
+    window.lmxIdentityPost('showcase', { badges: current }).then(function () {
+      pinBusy = false;
+      return loadMe();
+    }).then(function () {
+      var panel = document.querySelector('.LmxAchievements');
+      if (panel) renderAchievements(panel);
+    }).catch(function () { pinBusy = false; });
+  }
+
+  function renderAchievements(panel) {
+    panel.innerHTML = '';
+
+    var head = el('div', 'LmxAchievements-head');
+    head.appendChild(icon('game-icons:laurel-crown'));
+    head.appendChild(el('h2', null, t('forum.achievements.title', null, 'Achievements')));
+    panel.appendChild(head);
+
+    if (!ME || ME.guest) {
+      panel.appendChild(el('p', 'LmxAchievements-empty', t('forum.achievements.guest', null, 'Sign in to see your achievements.')));
+      return;
+    }
+
+    panel.appendChild(standingCard());
+
+    var sub = el('p', 'LmxAchievements-sub', t('forum.achievements.hint',
+      { count: tierShowcaseCap(ME.standing ? ME.standing.tierSlug : 'standard') },
+      'Click an earned badge to pin it to your name (up to your tier\'s limit).'));
+    panel.appendChild(sub);
+
+    var grid = el('div', 'LmxTrophies');
+    (ME.badges || []).forEach(function (b) { grid.appendChild(trophyTile(b)); });
+    panel.appendChild(grid);
+  }
+
+  function mountAchievements() {
+    var page = document.querySelector('.SettingsPage');
+    if (!page) return;
+
+    var container = page.querySelector('.container') || page;
+    if (container.querySelector('.LmxAchievements')) return; // rendered already; loadMe()'s refresh repaints it
+
+    var panel = el('div', 'LmxAchievements');
+    container.appendChild(panel);
+    renderAchievements(panel);
+  }
+
   // --------------------------------------------------------------- runtime
 
   function tick() {
@@ -541,6 +729,7 @@
       decorate();
       mountPoints();
       mountLeaders();
+      mountAchievements();
     } catch (e) {
       // never let a decoration failure take a page down; report once
       if (!tick._warned) { tick._warned = true; console.warn('identity:', e); }
@@ -564,6 +753,10 @@
     }
     setInterval(tick, 1500);
     setInterval(function () { lastFetch = 0; load(); }, 120000);
+    // Own data (points, streak-fed rank, badges) moves slower than the crowd
+    // map and is worth a lighter poll — same five-minute cadence as the
+    // economy widget, which this panel's numbers should never drift far from.
+    setInterval(loadMe, 5 * 60 * 1000);
     window.addEventListener('popstate', function () { setTimeout(tick, 120); });
   }
 

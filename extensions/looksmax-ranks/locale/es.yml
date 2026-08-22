@@ -47,6 +47,18 @@ local-looksmax-ranks:
       rank_unknown: Greycel
       stat_empty: "—"
 
+    achievements:
+      title: Logros
+      guest: Inicia sesión para ver tus logros.
+      points: Puntos
+      lifetime: De por vida
+      badges: Insignias
+      to_next: "{count} para el siguiente rango"
+      next_badge: "Te faltan {count} para «{badge}»"
+      owned: Ganada
+      rarity: "{pct}% de los miembros"
+      hint: "{count, plural, one {Toca una insignia ganada para fijarla junto a tu nombre (tienes # espacio).} other {Toca una insignia ganada para fijarla junto a tu nombre (tienes # espacios).}}"
+
     points:
       title: "Tu saldo: gástalo en la tienda"
 

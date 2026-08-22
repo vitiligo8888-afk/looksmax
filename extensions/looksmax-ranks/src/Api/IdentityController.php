@@ -69,6 +69,7 @@ class IdentityController implements RequestHandlerInterface
             'standing' => $payload,
             'owned' => $owned,
             'badges' => $this->standing->badges((int) $actor->id),
+            'nearestBadge' => $this->standing->nearestMeasurableBadge((int) $actor->id),
             'history' => $this->ledger->history((int) $actor->id, 25),
             'ladder' => $this->ladder(),
         ];
@@ -182,7 +183,11 @@ class IdentityController implements RequestHandlerInterface
      * Only users who actually have non-default styling are included, which on
      * the current population is a few hundred rows rather than 1,413, and the
      * response is cacheable for a minute because standing does not move faster
-     * than that.
+     * than that. `badge_count > 0` was added to that filter for the trophy
+     * marks below — an account with nothing but badges (no rank above
+     * Greycel, no bought style) used to be invisible to this endpoint
+     * entirely, which meant the showcase it pinned on /settings could never
+     * actually render next to its name anywhere.
      */
     private function names(): ResponseInterface
     {
@@ -191,11 +196,32 @@ class IdentityController implements RequestHandlerInterface
                 $q->whereNotNull('name_style')
                   ->orWhereNotNull('custom_title')
                   ->orWhereNotNull('avatar_frame')
+                  ->orWhere('badge_count', '>', 0)
                   ->orWhere(function ($q2) {
                       $q2->whereNotNull('rank_slug')->where('rank_slug', '!=', 'greycel');
                   });
             })
-            ->get(['username', 'rank_slug', 'tier_slug', 'tier_expires_at', 'name_style', 'avatar_frame', 'custom_title', 'title_color', 'badge_count']);
+            ->get(['id', 'username', 'rank_slug', 'tier_slug', 'tier_expires_at', 'name_style', 'avatar_frame', 'custom_title', 'title_color', 'badge_count']);
+
+        // Showcased badges for every account this response mentions, in one
+        // query rather than one per row — same shape as
+        // Ownership::entitlements() in looksmax-cosmetics.
+        $ids = $rows->pluck('id')->all();
+        $showcase = [];
+        if ($ids) {
+            foreach ($this->db->table('identity_badges')
+                ->whereIn('user_id', $ids)->where('showcased', 1)
+                ->orderBy('user_id')->orderBy('slot')
+                ->get(['user_id', 'badge']) as $r) {
+                if (count($showcase[$r->user_id] ?? []) >= 3) {
+                    continue; // the inline mark caps at three; see less/forum.less .lmx-badges
+                }
+                $b = Catalog::badge((string) $r->badge);
+                if ($b) {
+                    $showcase[$r->user_id][] = ['n' => $b['name'], 'i' => $b['icon'], 't' => $b['tier']];
+                }
+            }
+        }
 
         $now = time();
         $map = [];
@@ -224,6 +250,7 @@ class IdentityController implements RequestHandlerInterface
                 'ti' => $u->custom_title,
                 'tc' => $u->title_color,
                 'b' => (int) $u->badge_count,
+                'sb' => $showcase[$u->id] ?? [],
             ];
         }
 
