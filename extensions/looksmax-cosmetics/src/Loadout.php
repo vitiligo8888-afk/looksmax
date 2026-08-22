@@ -41,7 +41,8 @@ class Loadout
     public function __construct(
         protected ConnectionInterface $db,
         protected Definitions $defs,
-        protected Ownership $ownership
+        protected Ownership $ownership,
+        protected BannerUploads $bannerUploads
     ) {
     }
 
@@ -55,6 +56,24 @@ class Loadout
         }
 
         $slug = ($slug === null || $slug === '' || $slug === 'none') ? null : $slug;
+
+        // A custom upload is not a catalogue row — see BannerUploads.php and
+        // migrations/2026_08_15_000000_create_banner_uploads.php. Uploading
+        // already equips it (Api/BannerActionController::upload()); this
+        // branch is what lets someone switch to a generated banner and back
+        // to their own upload through the ordinary wardrobe equip action,
+        // without a second, special endpoint for "wear the one I already have".
+        if ($kind === 'banner' && $slug === 'custom') {
+            $row = $this->bannerUploads->row((int) $user->id);
+            if (!$row || $row->status !== 'active') {
+                return 'error.banner_not_uploaded';
+            }
+
+            $this->write((int) $user->id, $kind, $slug);
+            Ownership::flush();
+
+            return null;
+        }
 
         if ($slug !== null) {
             $def = $this->defs->find($kind, $slug);

@@ -58,6 +58,41 @@ local-looksmax-cosmetics:
       no_such_item: No such cosmetic.
       not_owned: You do not own that cosmetic.
       failed: Could not save. Try again.
+      not_allowed: You do not have permission to do that.
+      banner_not_eligible: You need VIP membership or above to upload your own banner.
+      banner_banned: Upload access was removed after repeated rejections.
+      banner_too_large: The image is too large (8 MB max).
+      banner_too_small: The image is too small.
+      banner_not_an_image: That file is not a valid image.
+      banner_bad_format: Only JPG, PNG or WEBP images are accepted.
+      banner_failed: Could not process the image. Try again.
+      banner_not_uploaded: You have not uploaded a banner yet.
+      banner_no_target: Missing whose banner this is about.
+
+    # Custom banner — uploaded by VIP+ members. See src/BannerUploads.php for
+    # the validation and moderation rules.
+    custom_banner:
+      title: Your banner
+      hint: "Upload an image (JPG, PNG or WEBP, up to 8 MB). It is centre-cropped to 1600×400 and saved with no hidden data."
+      locked: Upload your own banner once you reach VIP.
+      banned: This privilege was removed after repeated rejections.
+      upload: Upload banner
+      uploading: Uploading…
+      remove: Remove banner
+      removing: Removing…
+      rejected: "Your previous banner was rejected. Reason: {reason}"
+      wear: Wear this banner
+      report: Report this banner
+      reporting: Reporting…
+      reported: Reported. Thank you.
+
+    moderation:
+      title: Banner moderation
+      empty: No active banners to review.
+      reports: "{count, plural, one {# report} other {# reports}}"
+      rejections: "{count, plural, one {# previous rejection} other {# previous rejections}}"
+      reject: Reject
+      rejecting: Rejecting…
 
   lib:
 

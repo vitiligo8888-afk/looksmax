@@ -79,6 +79,16 @@
     return (r['forum/app'] && r['forum/app'].default) || window.app || null;
   }
 
+  function sessionUserId() {
+    try {
+      var a = app();
+      var me = a && a.session && a.session.user;
+      return me ? me.id() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -163,11 +173,26 @@
       var cos = attrs.cosmetics;
       if (!cos) continue;
 
+      // A shallow clone with the numeric id attached, rather than mutating
+      // the store's own attribute object — this is Mithril-owned state and
+      // touching it directly is asking for a diffing bug somewhere else on
+      // the page. The id is what the "report this banner" control needs
+      // (Api/BannerActionController::report() takes a userId, not a
+      // username) and only ever exists when a surface loaded the full user
+      // resource — the /map fallback below has no id, and the report button
+      // simply does not render there; see decorateBanner()'s own guard.
+      var withId = cos;
+      if (!cos.__uid) {
+        withId = {};
+        for (var ck in cos) { if (cos.hasOwnProperty(ck)) withId[ck] = cos[ck]; }
+        withId.__uid = u.data.id;
+      }
+
       var keys = [attrs.username, attrs.displayName, attrs.slug];
       for (var k = 0; k < keys.length; k++) {
         if (keys[k]) {
           if (!INDEX[keys[k]]) TRACE.fromStore++;
-          INDEX[keys[k]] = cos;
+          INDEX[keys[k]] = withId;
         }
       }
     }
@@ -370,10 +395,55 @@
       card.setAttribute('data-lmxcb', '1');
       if (!cos || !cos.banner) continue;
 
+      // A custom upload has no DEFS.banner entry — it is not a catalogue row,
+      // see src/BannerUploads.php — so it is rendered as a plain background
+      // image instead of the custom-property recipe every generated plate
+      // uses. This deliberately touches NONE of the LESS render pipeline:
+      // .LmxCosBanner.is-custom below is two plain declarations, no color
+      // function, nothing that can join the class of bug that has taken this
+      // forum's CSS down before.
+      if (cos.banner === 'custom') {
+        if (!cos.bannerUrl) continue;
+        var customPlate = card.querySelector('.LmxCosBanner') || el('div', 'LmxCosBanner');
+        customPlate.className = 'LmxCosBanner is-custom';
+        customPlate.removeAttribute('data-cb');
+        customPlate.removeAttribute('data-cb-pattern');
+        customPlate.style.backgroundImage = 'url("' + cos.bannerUrl.replace(/"/g, '%22') + '")';
+        if (!customPlate.parentNode) card.insertBefore(customPlate, card.firstChild);
+
+        // A report control on someone ELSE's custom banner — the one
+        // human-in-the-loop path for an abusive image that does not require
+        // finding the admin/mod moderation panel first. See
+        // src/BannerUploads.php's report()/moderate() for what this feeds.
+        // `__uid` only exists when this page loaded the full user resource
+        // (harvest(), not the /map fallback) — silently omitted otherwise
+        // rather than reporting the wrong account.
+        var myId = sessionUserId();
+        if (cos.__uid && myId && String(cos.__uid) !== String(myId) && !customPlate.querySelector('.LmxCosBannerReport')) {
+          var flag = el('button', 'LmxCosBannerReport');
+          flag.type = 'button';
+          flag.appendChild(icon('ph:flag-fill'));
+          flag.title = t('forum.custom_banner.report', null, 'Reportar esta portada');
+          flag.addEventListener('click', function (uid, btn) {
+            return function (ev) {
+              ev.preventDefault();
+              ev.stopPropagation();
+              reportBanner(uid);
+              btn.disabled = true;
+              btn.title = t('forum.custom_banner.reported', null, 'Reportado. Gracias.');
+            };
+          }(cos.__uid, flag));
+          customPlate.appendChild(flag);
+        }
+
+        continue;
+      }
+
       var d = (DEFS.banner || {})[cos.banner];
       if (!d) continue;
 
       var plate = card.querySelector('.LmxCosBanner') || el('div', 'LmxCosBanner');
+      plate.className = 'LmxCosBanner';
       plate.setAttribute('data-cb', cos.banner);
       plate.setAttribute('data-cb-pattern', d.p || 'none');
       var css = d.c || {};
@@ -443,6 +513,15 @@
     preview: { frame: undefined, banner: undefined }, // undefined = show equipped
     busy: false,
     tab: 'frame',
+    // Custom banner upload (VIP+) — see src/BannerUploads.php.
+    custom: null,        // {eligible, upload} from /api/cosmetics/banner/me
+    customBusy: false,
+    customError: null,
+    // Moderation queue — only ever populated if the fetch succeeds, which
+    // only happens for an admin/mod (BannerController::queue() 403s
+    // everyone else). A member who is not staff never even attempts this.
+    modQueue: null,
+    modBusy: null,
   };
 
   function previewOf(kind) {
@@ -472,6 +551,32 @@
         W.error = String(e);
         render();
       });
+
+    loadCustomBanner();
+    loadModQueue();
+  }
+
+  /** Eligibility + the member's own upload state. Silent on failure — the wardrobe still works without it. */
+  function loadCustomBanner() {
+    fetch(API + '/banner/me', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { W.custom = d; render(); })
+      .catch(function () {});
+  }
+
+  /**
+   * Only ever populated for an admin/mod — BannerController::queue() answers
+   * 403 to everyone else, which this treats the same as "nothing to show"
+   * rather than surfacing an error a regular member would have no reason to
+   * see on a page they are allowed to be on.
+   */
+  function loadModQueue() {
+    fetch(API + '/banner/queue', { credentials: 'same-origin' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (d && d.queue) { W.modQueue = d.queue; render(); }
+      })
+      .catch(function () {});
   }
 
   function save() {
@@ -691,7 +796,10 @@
 
     var bslug = previewOf('banner');
     var plate = el('div', 'LmxCosMirror-plate');
-    if (bslug) {
+    if (bslug === 'custom' && W.custom && W.custom.upload && W.custom.upload.url) {
+      plate.classList.add('is-custom');
+      plate.style.backgroundImage = 'url("' + W.custom.upload.url.replace(/"/g, '%22') + '")';
+    } else if (bslug) {
       var db = (DEFS.banner || {})[bslug];
       if (db) {
         for (var k in (db.c || {})) plate.style.setProperty(k, db.c[k]);
@@ -783,6 +891,222 @@
     decorate();
   }
 
+  // -------------------------------------------------- custom banner (VIP+)
+  // See src/BannerUploads.php for the validate/re-render/moderate pipeline
+  // this is a thin client for. Raw fetch + csrf(), same idiom as save()
+  // above and the rest of this file — no app.request() dependency here.
+
+  function uploadCustomBanner(file) {
+    if (W.customBusy || !file) return;
+    W.customBusy = true;
+    W.customError = null;
+    render();
+
+    var fd = new FormData();
+    fd.append('banner', file);
+    var headers = {};
+    var tok = csrf();
+    if (tok) headers['X-CSRF-Token'] = tok;
+
+    fetch(API + '/banner/upload', { method: 'POST', headers: headers, credentials: 'same-origin', body: fd })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+      .then(function (res) {
+        W.customBusy = false;
+        if (!res.ok) {
+          W.customError = res.body && res.body.error ? res.body.error : t('forum.error.failed', null, 'No se pudo guardar. Inténtalo otra vez.');
+          render();
+          return;
+        }
+        // A fresh upload equips itself server-side — reload both so the
+        // wardrobe's preview/equipped state and the repainted avatar/banner
+        // on the page agree with what the server now holds.
+        W.loaded = false;
+        W.preview.banner = undefined;
+        load();
+        refreshDecoration();
+      })
+      .catch(function () {
+        W.customBusy = false;
+        W.customError = t('forum.error.failed', null, 'No se pudo guardar. Inténtalo otra vez.');
+        render();
+      });
+  }
+
+  function removeCustomBanner() {
+    if (W.customBusy) return;
+    W.customBusy = true;
+    render();
+
+    var headers = {};
+    var tok = csrf();
+    if (tok) headers['X-CSRF-Token'] = tok;
+
+    fetch(API + '/banner/remove', { method: 'POST', headers: headers, credentials: 'same-origin' })
+      .then(function () {
+        W.customBusy = false;
+        W.loaded = false;
+        W.preview.banner = undefined;
+        load();
+        refreshDecoration();
+      })
+      .catch(function () { W.customBusy = false; render(); });
+  }
+
+  var reported = {};
+  function reportBanner(userId) {
+    if (reported[userId]) return;
+    var headers = { 'Content-Type': 'application/json' };
+    var tok = csrf();
+    if (tok) headers['X-CSRF-Token'] = tok;
+
+    fetch(API + '/banner/report', {
+      method: 'POST', headers: headers, credentials: 'same-origin',
+      body: JSON.stringify({ userId: userId }),
+    }).then(function () {
+      reported[userId] = true;
+      render();
+    }).catch(function () {});
+  }
+
+  function moderateReject(userId) {
+    if (!W.modQueue) return;
+    var headers = { 'Content-Type': 'application/json' };
+    var tok = csrf();
+    if (tok) headers['X-CSRF-Token'] = tok;
+
+    fetch(API + '/banner/moderate', {
+      method: 'POST', headers: headers, credentials: 'same-origin',
+      body: JSON.stringify({ userId: userId }),
+    }).then(function () {
+      W.modQueue = W.modQueue.filter(function (q) { return q.userId !== userId; });
+      render();
+    }).catch(function () {});
+  }
+
+  /** Repaint every avatar/banner already on the page with the server's fresh truth. */
+  function refreshDecoration() {
+    INDEX = Object.create(null);
+    var stale = document.querySelectorAll('[data-lmxcos]');
+    for (var i = 0; i < stale.length; i++) stale[i].removeAttribute('data-lmxcos');
+    var banners = document.querySelectorAll('[data-lmxcb]');
+    for (var j = 0; j < banners.length; j++) banners[j].removeAttribute('data-lmxcb');
+    mapFetched = 0;
+    decorate();
+  }
+
+  function customBannerBlock() {
+    var wrap = el('div', 'LmxCosCustomBanner');
+    wrap.appendChild(el('h3', 'LmxCosSection-title', t('forum.custom_banner.title', null, 'Tu portada')));
+
+    var c = W.custom;
+    if (!c) {
+      return wrap; // still loading — say nothing rather than a wrong "locked" flash
+    }
+
+    if (!c.eligible) {
+      var lockedText = c.banned
+        ? t('forum.custom_banner.banned', null, 'Se te retiró este privilegio por rechazos repetidos.')
+        : t('forum.custom_banner.locked', null, 'Sube tu propia portada al llegar a VIP.');
+      wrap.appendChild(el('p', 'LmxCosNote', lockedText));
+      return wrap;
+    }
+
+    wrap.appendChild(el('p', 'LmxCosNote', t('forum.custom_banner.hint', null,
+      'Sube una imagen (JPG, PNG o WEBP, hasta 8 MB). Se recorta al centro a 1600×400 y se guarda sin datos ocultos.')));
+
+    if (c.upload && c.upload.status === 'rejected') {
+      wrap.appendChild(el('p', 'LmxCosError',
+        t('forum.custom_banner.rejected', { reason: c.upload.moderationReason || '—' },
+          'Tu portada anterior fue rechazada. Motivo: ' + (c.upload.moderationReason || '—'))));
+    }
+
+    if (W.customError) {
+      wrap.appendChild(el('div', 'LmxCosError', W.customError));
+    }
+
+    if (c.upload && c.upload.status === 'active' && c.upload.url) {
+      var preview = el('div', 'LmxCosCustomPreview');
+      preview.style.backgroundImage = 'url("' + c.upload.url.replace(/"/g, '%22') + '")';
+      wrap.appendChild(preview);
+
+      var actions = el('div', 'LmxCosCustomActions');
+
+      if (previewOf('banner') !== 'custom') {
+        var wear = el('button', 'Button');
+        wear.type = 'button';
+        wear.textContent = t('forum.custom_banner.wear', null, 'Usar esta portada');
+        wear.addEventListener('click', function () {
+          W.preview.banner = 'custom';
+          render();
+          repaintPreviewOnly();
+        });
+        actions.appendChild(wear);
+      }
+
+      var remove = el('button', 'Button Button--danger');
+      remove.type = 'button';
+      remove.disabled = W.customBusy;
+      remove.textContent = W.customBusy ? t('forum.custom_banner.removing', null, 'Quitando…') : t('forum.custom_banner.remove', null, 'Quitar portada');
+      remove.addEventListener('click', removeCustomBanner);
+      actions.appendChild(remove);
+
+      wrap.appendChild(actions);
+    }
+
+    var input = el('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.className = 'LmxCosFileInput';
+    input.disabled = W.customBusy;
+    input.addEventListener('change', function () {
+      if (input.files && input.files[0]) uploadCustomBanner(input.files[0]);
+      input.value = '';
+    });
+    wrap.appendChild(input);
+
+    return wrap;
+  }
+
+  function moderationBlock() {
+    if (!W.modQueue) return null; // not staff, or not fetched yet — see loadModQueue()
+
+    var wrap = el('div', 'LmxCosModeration');
+    wrap.appendChild(el('h3', 'LmxCosSection-title', t('forum.moderation.title', null, 'Moderación de portadas')));
+
+    if (!W.modQueue.length) {
+      wrap.appendChild(el('p', 'LmxCosNote', t('forum.moderation.empty', null, 'No hay portadas activas para revisar.')));
+      return wrap;
+    }
+
+    var list = el('div', 'LmxCosModList');
+    W.modQueue.forEach(function (q) {
+      var row = el('div', 'LmxCosModRow');
+
+      var plate = el('div', 'LmxCosModPlate');
+      plate.style.backgroundImage = 'url("' + q.url.replace(/"/g, '%22') + '")';
+      row.appendChild(plate);
+
+      var meta = el('div', 'LmxCosModMeta');
+      meta.appendChild(el('div', 'LmxCosModName', q.username));
+      var stats = el('div', 'LmxCosModStats');
+      if (q.reportCount > 0) stats.appendChild(el('span', 'LmxCosModBadge', t('forum.moderation.reports', { count: q.reportCount }, q.reportCount + ' reportes')));
+      if (q.rejectCount > 0) stats.appendChild(el('span', 'LmxCosModBadge', t('forum.moderation.rejections', { count: q.rejectCount }, q.rejectCount + ' rechazos previos')));
+      meta.appendChild(stats);
+      row.appendChild(meta);
+
+      var reject = el('button', 'Button Button--danger');
+      reject.type = 'button';
+      reject.textContent = t('forum.moderation.reject', null, 'Rechazar');
+      reject.addEventListener('click', function () { moderateReject(q.userId); });
+      row.appendChild(reject);
+
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+
+    return wrap;
+  }
+
   function render() {
     var host = document.querySelector('.LmxCosPanel');
     if (!host) return;
@@ -813,8 +1137,12 @@
     host.appendChild(mirror());
     host.appendChild(section('frame'));
     host.appendChild(section('banner'));
+    host.appendChild(customBannerBlock());
     host.appendChild(el('p', 'LmxCosNote',
       t('forum.note', null, 'Los marcos animados se detienen solos cuando no están en pantalla y se apagan si tu sistema pide menos movimiento.')));
+
+    var mod = moderationBlock();
+    if (mod) host.appendChild(mod);
   }
 
   /**

@@ -56,8 +56,11 @@ class Ownership
     private static ?array $loadout = null;        // user_id => object|null
     private static ?int $loadoutRows = null;
 
-    public function __construct(protected ConnectionInterface $db, protected Definitions $defs)
-    {
+    public function __construct(
+        protected ConnectionInterface $db,
+        protected Definitions $defs,
+        protected BannerUploads $bannerUploads
+    ) {
     }
 
     /** @return string[] every tier at or above $tier */
@@ -211,6 +214,22 @@ class Ownership
             if ($slug === null) {
                 continue;
             }
+
+            // A custom upload is not a catalogue row — see BannerUploads.php.
+            // The loadout row is trusted here (no re-check against the tier
+            // gate or the ban flag): moderate() and BannerUploads::remove()
+            // BOTH clear this same loadout column in the same write that
+            // takes the file away, so 'custom' surviving to here already
+            // means an active, undeleted upload exists. bannerUrl rides
+            // alongside the slug because 'custom' has no DEFS.banner entry on
+            // the client for the decorator to resolve a URL from — see
+            // js/dist/forum.js decorateBanner()'s handling of this key.
+            if ($kind === 'banner' && $slug === 'custom') {
+                $out[$kind] = 'custom';
+                $out['bannerUrl'] = $this->bannerUploads->urlFor($userId); // no query — see urlFor()'s docblock
+                continue;
+            }
+
             $def = $this->defs->find($kind, $slug);
             if ($def === null) {
                 continue;

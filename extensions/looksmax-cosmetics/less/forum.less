@@ -595,10 +595,14 @@
 
 // ============================================================ banner
 //
-// A generated plate, not an uploaded image: this forum has no moderation
-// surface for a full-width picture behind somebody's name, and a gradient
-// cannot be a shock image or a tracking pixel.
-
+// A generated plate by default: no storage, no moderation queue, cannot be a
+// shock image. VIP+ members may additionally upload their own (see
+// src/BannerUploads.php for the validate/re-render/moderate pipeline that
+// exists specifically because the generated plates did not need one) —
+// `.is-custom` below is that banner's ONLY styling difference from a
+// generated plate, and it is two plain declarations: no gradient, no color
+// function, nothing that can join the class of LESS bug that has taken this
+// forum's CSS down before.
 .LmxCosBanner {
   position: relative;
   height: 132px;
@@ -609,6 +613,40 @@
   z-index: var(--z-base);
   pointer-events: none;
 }
+
+.LmxCosBanner.is-custom {
+  background-size: cover;
+  background-position: center;
+}
+// A custom banner is already a photograph — the legibility fade still
+// applies (shared ::after below) but the pattern/tint ::before layer would
+// only muddy a real image, so it is switched off here.
+.LmxCosBanner.is-custom::before { display: none; }
+
+// The one-click "report this banner" control on somebody ELSE's custom
+// banner — see js/dist/forum.js decorateBanner(). pointer-events is re-armed
+// here specifically because .LmxCosBanner itself is pointer-events: none.
+.LmxCosBannerReport {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: var(--z-raised);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--white-a10);
+  background: var(--black-a40);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity var(--t-fast, 110ms) var(--ease, ease);
+}
+.LmxCosBannerReport:hover { opacity: 1; }
+.LmxCosBannerReport:disabled { opacity: 0.3; cursor: default; }
 
 // The pattern layer and the legibility fade are separate, so the fade is never
 // tinted by the pattern. The pattern rules are shared with the wardrobe tile so
@@ -713,6 +751,12 @@
   background: var(--cb-fill, transparent);
   opacity: 0.45;
   pointer-events: none;
+}
+
+.LmxCosMirror-plate.is-custom {
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
 }
 
 .LmxCosMirror-avatar,
@@ -978,12 +1022,90 @@
   margin-top: 10px;
 }
 
+// ==================================================== custom banner (VIP+)
+// See src/BannerUploads.php. Deliberately plain: a file input styled by the
+// browser, a background-image preview, no color function anywhere in this
+// block.
+.LmxCosCustomBanner {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.LmxCosCustomPreview {
+  height: 110px;
+  border-radius: var(--r-lg);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-2);
+  margin-bottom: var(--gap, 10px);
+}
+
+.LmxCosCustomActions {
+  display: flex;
+  gap: var(--gap, 10px);
+  margin-bottom: var(--gap, 10px);
+}
+
+.LmxCosFileInput {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+
+// ==================================================== moderation queue
+// Only ever rendered for an admin/mod — see loadModQueue() in js/dist/
+// forum.js, which never even shows this block for anyone the API 403s.
+.LmxCosModeration {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.LmxCosModList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap, 10px);
+}
+
+.LmxCosModRow {
+  display: flex;
+  align-items: center;
+  gap: var(--gap, 10px);
+  padding: var(--pad, 9px);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+}
+
+.LmxCosModPlate {
+  width: 96px;
+  height: 32px;
+  flex: none;
+  border-radius: var(--r-sm);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--surface-2);
+}
+
+.LmxCosModMeta { flex: 1; min-width: 0; }
+.LmxCosModName { font-weight: 500; color: var(--ink); }
+.LmxCosModStats { display: flex; gap: var(--gap-sm, 5px); margin-top: 2px; }
+.LmxCosModBadge {
+  font-size: 11px;
+  color: var(--ink-dim);
+  background: var(--danger-a14);
+  border-radius: var(--r-sm);
+  padding: 1px 6px;
+}
+
 @media (max-width: 767px) {
   .LmxCosPage { padding: 16px 0 48px; }
   .LmxCosGrid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; }
   .LmxCosMirror { flex-wrap: wrap; gap: 12px; }
   .LmxCosMirror-actions { margin-left: 0; width: 100%; }
   .LmxCosMirror-actions .Button { flex: 1; }
+  .LmxCosModRow { flex-wrap: wrap; }
 }
 
 // ============================================================ motion off

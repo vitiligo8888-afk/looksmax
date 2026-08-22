@@ -76,6 +76,41 @@ local-looksmax-cosmetics:
       no_such_item: Ese cosmético no existe.
       not_owned: No tienes ese cosmético.
       failed: No se pudo guardar. Inténtalo otra vez.
+      not_allowed: No tienes permiso para hacer eso.
+      banner_not_eligible: Necesitas membresía VIP o superior para subir tu propia portada.
+      banner_banned: Se te retiró el acceso a subir portadas después de varios rechazos.
+      banner_too_large: La imagen es demasiado grande (máximo 8 MB).
+      banner_too_small: La imagen es demasiado pequeña.
+      banner_not_an_image: Ese archivo no es una imagen válida.
+      banner_bad_format: Solo se aceptan imágenes JPG, PNG o WEBP.
+      banner_failed: No se pudo procesar la imagen. Inténtalo otra vez.
+      banner_not_uploaded: Todavía no has subido una portada propia.
+      banner_no_target: Falta indicar de quién es la portada.
+
+    # Portada personalizada — subida por quien tiene membresía VIP o superior.
+    # Ver src/BannerUploads.php para las reglas de validación y moderación.
+    custom_banner:
+      title: Tu portada
+      hint: "Sube una imagen (JPG, PNG o WEBP, hasta 8 MB). Se recorta al centro a 1600×400 y se guarda sin datos ocultos."
+      locked: Sube tu propia portada al llegar a VIP.
+      banned: Se te retiró este privilegio por rechazos repetidos.
+      upload: Subir portada
+      uploading: Subiendo…
+      remove: Quitar portada
+      removing: Quitando…
+      rejected: "Tu portada anterior fue rechazada. Motivo: {reason}"
+      wear: Usar esta portada
+      report: Reportar esta portada
+      reporting: Reportando…
+      reported: Reportado. Gracias.
+
+    moderation:
+      title: Moderación de portadas
+      empty: No hay portadas activas para revisar.
+      reports: "{count, plural, one {# reporte} other {# reportes}}"
+      rejections: "{count, plural, one {# rechazo previo} other {# rechazos previos}}"
+      reject: Rechazar
+      rejecting: Rechazando…
 
   ##
   # El catálogo. La clave es el `slug`, que nunca cambia; el nombre visible sí.

@@ -3,6 +3,8 @@
 use Flarum\Api\Serializer\BasicUserSerializer;
 use Flarum\Extend;
 use Flarum\User\User;
+use Local\Cosmetics\Api\BannerActionController;
+use Local\Cosmetics\Api\BannerController;
 use Local\Cosmetics\Api\CosmeticsActionController;
 use Local\Cosmetics\Api\CosmeticsController;
 use Local\Cosmetics\Console;
@@ -102,7 +104,14 @@ return [
 
     (new Extend\Routes('api'))
         ->get('/cosmetics/{what:[a-z]+}', 'cosmetics.read', CosmeticsController::class)
-        ->post('/cosmetics/{action:[a-z]+}', 'cosmetics.write', CosmeticsActionController::class),
+        ->post('/cosmetics/{action:[a-z]+}', 'cosmetics.write', CosmeticsActionController::class)
+        // Custom banner upload — a separate two-segment path so it cannot
+        // collide with the single-segment {what}/{action} routes above. See
+        // src/BannerUploads.php for the validation/moderation pipeline this
+        // fronts and src/Api/BannerController.php's docblock for the two
+        // views (`me`, `queue`).
+        ->get('/cosmetics/banner/{what:[a-z]+}', 'cosmetics.banner.read', BannerController::class)
+        ->post('/cosmetics/banner/{action:[a-z]+}', 'cosmetics.banner.write', BannerActionController::class),
 
     (new Extend\Console())
         ->command(Console\SyncCommand::class),
