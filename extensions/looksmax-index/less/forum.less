@@ -10,11 +10,15 @@
 // aborts compilation, forum.css is never written, and every page serves the
 // compiler's stack trace. Everything outside a fade() reads the live token with
 // the literal as a fallback, so a scheme switch moves the whole index.
-@surface-0: #0a0911;
-@surface-1: #171429;
-@surface-2: #1f1b30;
-@surface-3: #2b2542;
-@line: #443a66;
+// 2026-08-14: the surface ramp below was still the VIOLET one while the ink and
+// accent half of this same block had already been resynced — so the front page
+// drew true-black-scheme text on dark-violet cards. Copied from the @c-* block
+// at looksmax-theme/less/tokens.less:57-83.
+@surface-0: #070707;
+@surface-1: #0e0e0e;
+@surface-2: #161616;
+@surface-3: #212121;
+@line: #141414;
 @ink: #f0eff4;
 @ink-dim: #b6b4be;
 @ink-faint: #9896a3;
@@ -43,7 +47,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 .LmxCat {
   background: var(--surface-1, #171429);
   border: 1px solid var(--line, #443a66);
-  border-radius: 10px;
+  border-radius: 0;
   margin-bottom: 16px;
   overflow: hidden;
 }
@@ -140,34 +144,45 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   }
 }
 
+// The forum-browse row icon. Restyled to match the operator's reference
+// (elysianfields.se) and to match the section-card tiles above: a rounded
+// square with a low-alpha cyan WASH and a bright cyan glyph, rather than the
+// solid, brightly-filled per-forum swatch this used to be.
+//
+// This used to fill the tile with the forum's own imported hue (--tag, one of
+// 47) behind a dark glyph. That is two things the reference is not: a saturated
+// fill, and a different colour on every row. The reference — and the front-page
+// tiles now — carry ONE quiet tinted tile with a bright line glyph, and the
+// operator's standing direction is that the imported category colours give way
+// to the house palette. Cyan (--accent-2) is that palette's secondary and is
+// the reference's own tile colour, so no colour is imported to get this look.
+// CALMED 2026-08-15 with the section tiles: neutral charcoal at rest, cyan on
+// hover only. Same reasoning as .LmxTile-icon.
 .LmxForum-icon {
   align-items: center;
-  // Two layers: a top-left sheen so the tile is a lit object rather than a flat
-  // swatch, over the forum's own colour. The palette holds every hue at one
-  // lightness (see src/Palette.php), which is what lets a single dark ink work
-  // on all 47 of them — measured worst case 6.45:1.
-  background: linear-gradient(145deg, fade(#fff, 22%), fade(#fff, 0%) 62%), var(--tag, var(--accent, #eaf0ff));
-  border-radius: 10px;
-  box-shadow:
-    0 1px 0 fade(#fff, 22%) inset,
-    0 6px 16px -8px var(--tag, var(--accent, #eaf0ff));
-  color: var(--ink-on-light, #10151d);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--ink-dim);
   display: flex;
-  height: 38px;
+  height: 40px;
   justify-content: center;
-  transition: transform var(--t-base, 170ms) var(--ease, ease),
-              box-shadow var(--t-base, 170ms) var(--ease, ease);
-  width: 38px;
+  transition: background var(--t-base, 170ms) var(--ease, ease),
+              border-color var(--t-base, 170ms) var(--ease, ease),
+              color var(--t-base, 170ms) var(--ease, ease);
+  width: 40px;
 
-  i, iconify-icon { color: var(--ink-on-light, #10151d); font-size: 18px; }
+  i, iconify-icon { color: var(--ink-dim); font-size: 20px; transition: color var(--t-base, 170ms) var(--ease, ease); }
 
   &:hover,
   &:focus-visible {
-    box-shadow:
-      0 1px 0 fade(#fff, 28%) inset,
-      0 10px 22px -8px var(--tag, var(--accent, #eaf0ff));
-    transform: translateY(-1px) scale(1.04);
+    background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+    border-color: color-mix(in srgb, var(--accent-2) 30%, transparent);
+    color: var(--accent-2);
   }
+  &:hover i, &:hover iconify-icon,
+  &:focus-visible i, &:focus-visible iconify-icon { color: var(--accent-2); }
 }
 
 // One name for "this row's colour", so every rule below reads the same thing
@@ -241,7 +256,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 .LmxCard {
   background: var(--surface-1, #171429);
   border: 1px solid var(--line, #443a66);
-  border-radius: 10px;
+  border-radius: 0;
   padding: 13px 15px;
 
   h3 {
@@ -304,7 +319,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   div {
     background: var(--surface-2, #1f1b30);
     border: 1px solid var(--line, #443a66);
-    border-radius: 6px;
+    border-radius: 0;
     padding: 7px 9px;
   }
 
@@ -340,7 +355,7 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 .LmxAd-slot {
   align-items: center;
   background: repeating-linear-gradient(45deg, var(--surface-2, #1f1b30), var(--surface-2, #1f1b30) 8px, var(--surface-1, #171429) 8px, var(--surface-1, #171429) 16px);
-  border-radius: 6px;
+  border-radius: 0;
   color: var(--ink-faint, #9896a3);
   display: flex;
   font-size: 11px;
@@ -724,7 +739,10 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 .LmxSections-title {
   margin: 0;
   color: var(--ink);
-  font-size: var(--fs-xl);
+  // 700 -> 600 on 2026-08-15 (operator: "less futuristic / more casual"). At
+  // 700 the big section heading read like a product landing page; 600 keeps it
+  // clearly a heading but with the quieter weight a normal board uses.
+  font-size: var(--fs-2xl);
   font-weight: 600;
 }
 
@@ -926,17 +944,20 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
   // breathing room: the whole set has to be scannable in one screen while the
   // section still reads as the page's primary object.
   gap: 5px;
-  padding: var(--pad-sm) var(--pad);
+  padding: var(--pad) var(--pad-lg);
+  // FLAT as of 2026-08-16 (operator: "less tech / plain forum"). Was a rounded,
+  // elevated card that lifted and cast a shadow on hover — the "designed app"
+  // object. Now it is a plain block: a small radius, a hairline, no shadow, and
+  // a hover that only shifts the fill a step. Reads like a board section, not a
+  // product card.
   border: 1px solid var(--line);
-  border-radius: var(--card-radius);
+  border-radius: var(--r-sm);
   background: var(--surface-1);
-  transition: border-color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease),
-              box-shadow var(--t-fast) var(--ease);
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
 
   &:hover {
-    border-color: color-mix(in srgb, var(--tile) 55%, transparent);
-    transform: translateY(-2px);
-    box-shadow: var(--e-2);
+    border-color: var(--line-strong);
+    background: var(--surface-2);
   }
 }
 
@@ -953,28 +974,48 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 // rather than the section hue, because in the reference the icon is a quiet
 // wayfinding mark and the NAME is what carries the section's identity. The hue
 // is not lost: --tile still drives the tile's left edge and its hover state.
+// ICON-IN-TILE, matching the operator's reference (elysianfields.se): every
+// forum on that index carries its glyph inside a rounded-square tinted tile,
+// not sitting bare on the row. This block previously did the opposite — bare
+// line art on the row — for an EARLIER reference. The current /goal replaces
+// that reference with elysianfields.se and asks to "make the logos of the
+// forums more like that", which is the tile. So the tile comes back.
+//
+// KEEP OUR COLOURS: the reference tiles are cyan. Cyan is already this site's
+// secondary (--accent-2 #4ecee5, the link colour), so a cyan tile is both the
+// reference look AND our own palette — no colour is imported. The fill is a
+// low-alpha cyan wash, the glyph is full cyan, and the whole thing sits on the
+// true-black card exactly as the reference sits its tiles on its dark rows.
 .LmxTile-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 40px;
+  height: 40px;
   flex: none;
-  background: none;
+  border-radius: var(--r-md);
+  // CALMED 2026-08-15 (operator: "less futuristic"). A resting cyan-washed tile
+  // with a full-cyan glyph was the page's strongest "app/tech" signature. At
+  // rest the tile is now neutral charcoal with a muted glyph — a normal forum
+  // category marker — and the cyan is held back for hover, where it still marks
+  // the tile as interactive. Colour is kept, just no longer glowing by default.
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   box-shadow: none;
   color: var(--ink-dim);
-  transition: color var(--t-fast) var(--ease);
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
 
-  // 34px -> 24px with the compaction pass. Line art at this size still reads
-  // as a distinct mark because it has no tile competing with it.
-  iconify-icon { font-size: 24px; }
+  iconify-icon { font-size: 22px; }
 }
 
-// On hover the section's own colour comes back, so the hue still does work --
-// it just does it on demand instead of shouting on every row at rest.
+// On hover the tile picks up the cyan — the interactive signal, now earned on
+// interaction rather than shown at rest.
 .LmxTile:hover .LmxTile-icon,
 .LmxTile:focus-within .LmxTile-icon {
-  color: var(--tile, var(--accent));
+  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent-2) 30%, transparent);
+  color: var(--accent-2);
 }
 
 .LmxTile-name {
@@ -1672,3 +1713,10 @@ body.lmx-index-on .TagsPage-content > ul.TagTiles {
 .LmxIndex ol {
   list-style: none;
 }
+
+// ---------------------------------------------------------------- declutter
+// Operator 2026-08-16: the front page should read like a plain board, not a
+// dashboard. The leaderboard is a pure gamification widget injected into the
+// side rail by looksmax-ranks; hide it HERE only (the ranks feature itself,
+// the chips and any dedicated page, is untouched).
+.LmxIndex-side .LmxCard--leaders { display: none; }

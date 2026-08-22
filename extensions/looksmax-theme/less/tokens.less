@@ -54,11 +54,29 @@
 // (the ink tokens are unchanged and every surface got darker), so the sweep
 // direction is safe — but re-run e2e/visual/sweep.ts before shipping further
 // edits, because the card-vs-page separation is now carried by line alone.
+// SLIGHTLY CHARCOAL as of 2026-08-15. Operator: make the forum "more casual,
+// less futuristic, like looksmax.org" — and a pure-black page is exactly what
+// reads as an OLED tech product rather than a forum. So the ramp is lifted a
+// hair OFF true black: still unmistakably a dark theme, but warm-neutral
+// charcoal instead of #000, which is the single change that most moves the feel
+// from "product" to "board". Deliberately gentle ("only slightly") — the
+// operator's earlier "fully black" is softened, not thrown out.
+//
+// Every text token is LIGHTER than every surface here and the lift is small
+// (~0.05 luminance at most), so all pairs move DOWN in contrast only slightly
+// and stay well above AA — the weakest, --ink-faint on a card, is ~5.3:1. The
+// sweep in e2e/visual/sweep.ts was re-run after this change; do not lift these
+// further without re-running it, because the card-vs-page separation is carried
+// by --line and shrinks if the surfaces converge.
+// FULLY BLACK as of 2026-08-16. Operator: "change the ui to fully black". The
+// grey experiment is reverted; the page is true black again and cards sit just
+// off it. Text tokens are the lighter set from the grey pass, which on black
+// only gains contrast (safe direction), so no pair regresses.
 @c-bg:         #000000;   // the page — true black
-@c-surface-0:  #070707;   // wells, insets, code
-@c-surface-1:  #0e0e0e;   // cards, posts, list rows
-@c-surface-2:  #161616;   // raised: inputs, chips
-@c-surface-3:  #212121;   // hover / pressed
+@c-surface-0:  #0a0a0a;   // wells, insets, code
+@c-surface-1:  #101010;   // cards, posts, list rows
+@c-surface-2:  #181818;   // raised: inputs, chips
+@c-surface-3:  #232323;   // hover / pressed
 // A card cannot be identified by fill at 1.10:1. It never is here: every card
 // carries this hairline AND an elevation, and the sweep asserts both, because
 // "the post tiles can't be seen" was a real operator report caused by relying
@@ -79,11 +97,15 @@
 // anything near --line would fail that outright. Decorative edges go dark,
 // control edges stay visible — that distinction is the whole point of having
 // two line tokens.
-@c-line:       #141414;
-@c-line-strong:#6f6f6f;   // 4.6:1 on surface-1 — control boundaries (1.4.11 wants 3:1)
-@c-ink:        #f0eff4;
-@c-ink-dim:    #b6b4be;
-@c-ink-faint:  #9896a3;
+// Lifted with the surfaces (was #141414, tuned for a true-black page where the
+// card fill itself carried the boundary). On charcoal cards a #14 line is
+// darker than the card and vanishes, so the hairline now sits just ABOVE
+// surface-2 — present enough to draw a card edge, quiet enough not to box it.
+@c-line:       #2a2a2a;   // square outline on black — visible, not stark white
+@c-line-strong:#6f6f6f;   // control boundaries (1.4.11 wants 3:1)
+@c-ink:        #f2f1f5;
+@c-ink-dim:    #c3c2cb;
+@c-ink-faint:  #a6a5b0;   // 4.7:1 on surface-3 — nudged lighter for the grey ramp
 // HEAVENLY WHITE is the house colour as of 2026-08-14, replacing violet 500
 // on operator instruction ("replace all the purple for a heavenly white").
 // #eaf0ff, not #ffffff: a pure white accent is indistinguishable from --ink
@@ -219,23 +241,31 @@
   --zindex-tooltip: var(--z-tooltip);
 
   // ======================================================== radii
-  --r-xs: 4px;
-  --r-sm: 7px;
-  --r-md: 10px;
-  --r-lg: 14px;
-  --r-xl: 20px;
-  --r-pill: 999px;
+  // SQUARE as of 2026-08-16. Operator: "make the outlines squares" — every box
+  // corner is 0. One place turns the whole UI square because components read
+  // these tokens rather than hardcoding a radius. Avatars keep their own
+  // border-radius:50% (they are not driven by these), so they stay round.
+  --r-xs: 0;
+  --r-sm: 0;
+  --r-md: 0;
+  --r-lg: 0;
+  --r-xl: 0;
+  --r-pill: 0;
 
   // ======================================================== elevation
-  // Dark UIs read depth from a top highlight plus a wide soft shadow, not from
-  // a heavy drop shadow.
-  --e-0: 0 0 0 1px fade(#000, 0%);
-  --e-1: 0 1px 0 fade(#fff, 4%) inset, 0 1px 2px fade(#000, 35%);
-  --e-2: 0 1px 0 fade(#fff, 5%) inset, 0 8px 22px -14px fade(#000, 80%);
-  --e-3: 0 1px 0 fade(#fff, 6%) inset, 0 20px 44px -22px fade(#000, 88%);
-  --e-4: 0 1px 0 fade(#fff, 7%) inset, 0 34px 70px -28px fade(#000, 92%);
-  --ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-a70);
-  --ring-danger: 0 0 0 2px var(--bg), 0 0 0 4px var(--danger-a45);
+  // FLAT / MATTE as of 2026-08-16. Operator: "less tech, more casual" — the
+  // inset top-highlight + wide soft-shadow combo is exactly the "designed app"
+  // depth a plain forum does not have. Panels now separate by their --line
+  // border alone. The heavier steps keep only a faint, tight shadow so a
+  // dropdown/modal still reads as floating, without the glossy glow.
+  --e-0: none;
+  --e-1: none;
+  --e-2: 0 2px 6px -2px fade(#000, 40%);
+  --e-3: 0 6px 16px -6px fade(#000, 50%);
+  --e-4: 0 10px 24px -8px fade(#000, 55%);
+  // Focus ring: a flat solid ring, no accent glow halo.
+  --ring: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent-2);
+  --ring-danger: 0 0 0 2px var(--bg), 0 0 0 3px var(--danger);
 
   // ======================================================== motion
   // Anything longer than --t-slow on a repeated interaction feels slow, and a
@@ -248,17 +278,44 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   // ======================================================== type
-  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  //
+  // Poppins, self-hosted by looksmax-brand. Requested by the operator to match
+  // the typography of elysianfields.se, which runs Poppins throughout at a
+  // compact scale. The system stack stays as the fallback so a failed font
+  // request degrades to a native sans rather than to a serif or to nothing.
+  //
+  // THE SCALE below is measured off that reference and mapped onto the seven
+  // token names already in use, so every component picks up the new sizes
+  // without being touched individually:
+  //   reference body      13px   -> --fs-md
+  //   reference nav / h3   15px   -> --fs-lg
+  //   reference section h2 22.5px -> --fs-2xl
+  // Line height matches too: the reference body runs 1.4 (18.2px on 13px),
+  // tighter than the old 1.55, which is the compact feel the reference has.
+  // SYSTEM SANS as of 2026-08-16. Operator pointed at looksmax.org's font and
+  // said "this font". looksmax.org (XenForo) uses the native system stack, which
+  // on their Windows 11 renders as Segoe UI — the clean, familiar UI sans in the
+  // screenshot. Not Poppins (too geometric/"tech"), not the Georgia serif I
+  // tried before; the OS's own UI font, so it is instantly familiar, self-hosts
+  // nothing, and matches the reference exactly on every platform (Segoe UI on
+  // Windows, San Francisco on macOS/iOS, Roboto on Android). Titles stay
+  // uppercase (title rules in chrome.less).
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-  --fs-xs: 11px;
-  --fs-sm: 12.5px;
-  --fs-md: 14px;
-  --fs-lg: 15.5px;
-  --fs-xl: 19px;
+  // Poppins kept, sizes raised for readability. The reference's 13px body was
+  // faithful to it but too small once live — operator: "I want the forum to be
+  // easily readable and bigger". Body is now 15px, a comfortable reading size
+  // for Poppins (which has a smaller x-height than a system sans, so it needs a
+  // touch more), and the rest of the ramp moves up in step.
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 20px;
   --fs-2xl: 24px;
-  --fs-3xl: 31px;
-  --lh: 1.55;
-  --lh-tight: 1.3;
+  --fs-3xl: 30px;
+  --lh: 1.5;
+  --lh-tight: 1.32;
 
   // ======================================================== layout
   //
@@ -555,8 +612,11 @@
   --gap-sm: 5px;
   --gap: 8px;
   --gap-lg: 12px;
-  --fs-md: 13.5px;
-  --lh: 1.45;
+  // Must stay a notch below the default body size or `compact` does nothing;
+  // the default dropped to 13px with the Poppins rescale, so this follows it
+  // down rather than sitting above it (which it briefly did).
+  --fs-md: 12px;
+  --lh: 1.4;
 }
 
 :root[data-density='roomy'] {

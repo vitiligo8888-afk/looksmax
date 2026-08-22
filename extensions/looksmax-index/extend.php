@@ -5,6 +5,12 @@ use Local\Index\Console\PaletteCommand;
 use Local\Index\Console\SectionsCommand;
 use Local\Index\Console\TagColourCommand;
 use Local\Index\RenderIndex;
+// Fully qualified, not `Api\FragmentController::class`. This file declares no
+// namespace, so a partially-qualified ::class resolves to the literal string
+// "Api\FragmentController" and the route 500s from the container at dispatch
+// time — a live bug found in flarum-analytics, where both API routes had been
+// broken this way since the extension was written and nothing said so.
+use Local\Index\Api\FragmentController;
 
 /**
  * A purpose-built forum front page.
@@ -30,6 +36,11 @@ return [
     (new Extend\Frontend('forum'))
         ->css(__DIR__ . '/less/forum.less')
         ->content(RenderIndex::class),
+
+    // Serves the same front-page markup to a client-side navigation, which no
+    // longer carries the template in its document. See FragmentController.
+    (new Extend\Routes('api'))
+        ->get('/lmx-index/fragment', 'lmx-index.fragment', FragmentController::class),
 
     /*
      * The layout switch, persisted per user.

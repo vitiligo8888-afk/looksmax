@@ -53,7 +53,20 @@
 // ============================================================ wordmark
 .Header-title {
   margin: 0;
-  min-width: 0;
+  // NEVER shrink or clip the wordmark. `min-width: 0` here let the logo lane
+  // collapse whenever the header got crowded — logged in, the nav plus the
+  // avatar/name/credits cluster ate the row, the logo lane shrank, and the
+  // lockup image clipped to "Look" with the search sitting right against it.
+  // The logo owns its width; the nav (Header-primary, below) gives up slack.
+  flex: 0 0 auto;
+  min-width: auto;
+}
+
+// The lockup is an <img>; keep it at natural size so a squeezed row can never
+// clip it. Whatever has to give in a tight header, it is not the logo.
+.Header-logo {
+  flex: none;
+  max-width: none;
 }
 
 .Header-title a,
@@ -75,7 +88,7 @@
 .Header-title a::before,
 .Header-title #home-link::before {
   background: conic-gradient(from 140deg, var(--accent), #c2924b 34%, var(--accent-2) 62%, var(--purple) 82%, var(--accent));
-  border-radius: 7px;
+  border-radius: 0;
   box-shadow: 0 3px 14px -4px var(--accent-a45);
   content: '';
   flex: 0 0 auto;
@@ -225,7 +238,9 @@
 .Search-input input:focus {
   background: var(--surface-1);
   border-color: var(--accent-2-a55);
-  box-shadow: 0 0 0 3px var(--accent-2-a10);
+  // no cyan glow ring — the border alone marks focus. The 3px accent halo read
+  // as the "neon/tech" surface the operator asked to calm down.
+  box-shadow: none;
   outline: none;
   width: 300px;
 }
@@ -234,6 +249,10 @@
 // focused without depending on the icon extension having replaced a glyph
 .Search {
   --lmx-magnifier: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 256 256%22%3E%3Cpath fill=%22currentColor%22 d=%22M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68%22/%3E%3C/svg%3E");
+  // Same glyph with a fixed ink-faint fill, for the tablet band where the field
+  // draws its own icon as a background-image (a data-URI background cannot take
+  // currentColor, so the colour is baked in). #9896a3 == @c-ink-faint.
+  --lmx-mag-grey: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 256 256%22%3E%3Cpath fill=%22%239896a3%22 d=%22M232.49 215.51L185 168a92.12 92.12 0 1 0-17 17l47.53 47.54a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68a68.07 68.07 0 0 1-68-68%22/%3E%3C/svg%3E");
 }
 
 .Search-input::before {
@@ -363,9 +382,74 @@
 .Footer a:hover { color: var(--accent); }
 
 // ============================================================ responsive
-@media (max-width: 991.98px) {
-  .Search-input input { width: 170px; }
-  .Search-input input:focus { width: 210px; }
+// The tablet band (768–991) is the ONLY width where the header search covered
+// the wordmark, and it did it on FOCUS, not at rest. At these widths the field
+// collapses to an icon on the right, and our old `:focus { width: 210px }` grew
+// it back IN FLOW — the flex row pushed the growing field leftward until it sat
+// directly on top of the logo (measured: field left 102px, logo right 232px, a
+// 130px overlap). Verified in real headless Chromium at 768/900/1000.
+//
+// The fix stops expanding in flow. At rest the field is a 40px magnifier
+// affordance parked in the right cluster (its own background icon, so nothing
+// re-anchors — the CSS ::before magnifier is turned off in this band precisely
+// because with every ancestor un-positioned it re-anchored to the container and
+// left a stray glyph beside the logo). On focus the field is lifted OUT of the
+// row and dropped as a full-width bar UNDER the header, with the results panel
+// beneath it — so it is on a different row from the logo and cannot cover it at
+// any width. The container is the positioning anchor because it is the only box
+// in the chain that never collapses when the field goes absolute.
+@media (min-width: 768px) and (max-width: 1099.98px) {
+  .App-header .container { position: relative; }
+  .Header-secondary .item-search,
+  .Header-secondary .Search,
+  .Header-secondary .Search-input { position: static; }
+
+  // the ::before magnifier re-anchors to .container here (all ancestors static)
+  // and would print a second glyph next to the wordmark — off, replaced by the
+  // field's own background icon which moves with the field.
+  .Header-secondary .Search-input::before { display: none; }
+
+  // rest: magnifier-only. color:transparent so the placeholder cannot spill its
+  // text over the language / register controls sitting next to it.
+  .Header-secondary .Search .Search-input input,
+  .Header-secondary .Search .FormControl {
+    background: transparent var(--lmx-mag-grey) no-repeat center / 16px;
+    border-color: transparent;
+    color: transparent;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+  }
+  .Header-secondary .Search .Search-input input::placeholder { color: transparent; }
+
+  // focus: a full-width bar dropped below the header row.
+  .Header-secondary .Search .Search-input input:focus,
+  .Header-secondary .Search .FormControl:focus {
+    background: var(--surface-1) var(--lmx-mag-grey) no-repeat left 14px center / 16px;
+    border: 1px solid var(--accent-2-a55);
+    box-shadow: var(--e-3);
+    color: var(--ink);
+    cursor: text;
+    height: 40px;
+    left: 0;
+    padding: 0 14px 0 40px;
+    position: absolute;
+    right: 0;
+    top: ~"calc(100% + 8px)";
+    width: auto;
+    z-index: var(--z-dropdown);
+  }
+  .Header-secondary .Search .Search-input input:focus::placeholder { color: var(--ink-faint); }
+
+  // results panel: full width, directly under the dropped-down field.
+  .Header-secondary .Search .Search-results {
+    left: 0;
+    margin: 0;
+    position: absolute;
+    right: 0;
+    top: ~"calc(100% + 56px)";
+    width: auto;
+  }
 }
 
 @media (max-width: 767.98px) {
@@ -509,4 +593,29 @@
   }
 
   .Header-secondary .Header-controls { gap: 2px; }
+}
+
+// ============================================================ classic titles
+// Operator 2026-08-16: "todo en mayúsculas de títulos". Titles are set
+// uppercase to pair with the classic serif (--font-ui). Scoped to TITLE
+// elements — thread titles, section/category headers, page heros, card and
+// forum names — NOT post body text or headings a user wrote inside a post,
+// which stay exactly as typed. A little tracking so uppercase serif does not
+// crowd.
+.DiscussionListItem-title,
+.DiscussionHero .item-title h1,
+.DiscussionHero-title,
+h1.DiscussionHero-title,
+.Hero-title,
+.IndexPage-title,
+.item-title > h1,
+.LmxSections-title,
+.LmxTile-name,
+.LmxForum-name,
+.LmxNews-title,
+.LmxNewsItem-title,
+.LmxChat-head,
+.LmxCard-title {
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
 }

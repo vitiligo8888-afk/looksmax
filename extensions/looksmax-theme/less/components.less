@@ -143,8 +143,46 @@
   box-shadow: none;
 }
 
-// tag-coloured buttons take their fill from the tag; keep the ink readable
-.Button.Button--tagColored { color: var(--ink); }
+// Core's flarum/tags "new discussion" button (the primary CTA at the top of
+// the left rail on every /t/<tag> page) carries both `.Button--primary` and
+// `.Button--tagColored`. MEASURED LIVE, 2026-08-14 on /t/mejores-guias AND
+// /t/peptides: the button renders with the correct pale `.Button--primary`
+// fill but near-invisible text — under 1.3:1, i.e. the forum's single most
+// prominent call to action ("Crear discusión") with a functionally invisible
+// label, on every tag page tried, regardless of that tag's own colour.
+//
+// Root cause is a cascade tie, not the tag's hue: `.Button.Button--primary`
+// sets `color: var(--accent-ink)` (dark, correct on its pale fill) and this
+// rule set `color: var(--ink)` (light) at the SAME specificity, (0,2,0). Same
+// specificity means source order decides, and this rule sat later in the
+// file — so the light colour always won, on every tag, which is why the bug
+// never varied with the tag being viewed. The un-fixed version also trusted
+// core to paint a legible fill at all: flarum/tags is free to fill this
+// button from the tag's raw colour (`background-color`, possibly inline),
+// same as the chips above, so the fill is repainted here too rather than left
+// to chance. `background-image` (not the `background` shorthand) is what
+// makes that safe regardless of *how* core sets its colour: an inline
+// `background-color` always beats a stylesheet rule on that same longhand,
+// but it is a different property from `background-image`, so our opaque
+// gradient paints over it unconditionally and without needing `!important`.
+.Button.Button--tagColored {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 84%, #fff), var(--accent));
+  border-color: color-mix(in srgb, var(--accent) 62%, #000);
+  // the tag keeps an identity, just not as a fill a label has to sit on
+  box-shadow: var(--e-1), 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 45%, transparent);
+  color: var(--accent-ink);
+}
+
+.Button.Button--tagColored:hover {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--accent) 72%, #fff), color-mix(in srgb, var(--accent) 90%, #fff));
+  color: var(--accent-ink);
+}
+
+.Button.Button--tagColored:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+  color: var(--accent-ink);
+}
 
 // loading: the label dims and a spinner takes its place WITHOUT resizing the
 // button, so a busy control never shifts the layout around it
@@ -198,7 +236,19 @@ input[type='search'],
 select,
 textarea {
   background: var(--surface-2);
-  border: 1px solid var(--line);
+  // --line-strong, NOT --line.
+  //
+  // A text input is an interactive control, and WCAG 1.4.11 wants its boundary
+  // at 3:1 against the adjacent surface. This rule used to say var(--line),
+  // which the fully-dark pass took down to #141414 — measured against this
+  // element's own #161616 fill that is 1.02:1, i.e. no visible field at all.
+  // The sign-up form rendered as three floating placeholders with no boxes.
+  //
+  // The :hover rule 20 lines below already used --line-strong, so the resting
+  // state was simply missed when the decorative hairline was darkened. That is
+  // exactly the split tokens.less:75-81 describes: decorative edges go dark,
+  // CONTROL edges stay visible.
+  border: 1px solid var(--line-strong);
   border-radius: var(--r-sm);
   color: var(--ink);
   font-family: inherit;

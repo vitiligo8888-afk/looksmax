@@ -226,14 +226,31 @@
 // `--tag-bg: #7aa2f7` rendered as rgb(240,239,244) text on rgb(240,239,244)
 // fill — 2.2:1, i.e. an invisible chip. Chaining the class here makes ours
 // (0,3,0) and wins without reaching for !important.
+// RESTRAINT PASS, 2026-08-14. The 72/18/38 mix (below, for a while) cleared
+// AA on every one of the 47 imported hues, but clearing AA was the only bar
+// it was measured against — looked at as a SET, on a real index row with six
+// different tags in a line, it read as a bag of unrelated stickers rather
+// than one system: a saturated import hue only needed to lose 28% of itself
+// to --ink before it was "readable", so a bright green and a hot pink sat
+// at nearly full chroma next to a muted navy that had nowhere near as far to
+// travel, and the row's loudness varied by tag rather than by anything that
+// mattered.
+//
+// Pulling the label to 58% tag / 42% ink (was 72/28) and quieting the fill
+// and edge to match moves every hue further along the SAME ramp toward the
+// scheme's own text colour, so the set reads as one restrained system with
+// colour as a quiet identifier instead of 47 independent volumes — and
+// because --ink is the higher-contrast end of every one of these mixes on a
+// dark surface, giving it more weight can only raise contrast, never lower
+// it. Still, re-run e2e/visual/sweep.ts before shipping further edits here.
 .TagLabel.colored,
 .TagLabel.colored.text-contrast--dark,
 .TagLabel.colored.text-contrast--light,
 .TagLabel--colored,
 .TagLabel--colored.text-contrast--dark,
 .TagLabel--colored.text-contrast--light {
-  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 18%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 38%, transparent);
+  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 28%, transparent);
   // The tag hue, lifted toward the scheme's TEXT colour until it is readable.
   // Doing this in one place is what makes an arbitrary imported palette safe.
   //
@@ -241,7 +258,7 @@
   // exactly wrong on the light one, where it washes an already-pale imported
   // hue into the page. --ink is light on dark schemes and near-black on the
   // light scheme, so one rule stays legible in all three.
-  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 72%, var(--ink));
+  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 58%, var(--ink));
 }
 
 // core sets these on the chip and on its children; both have to be neutralised
@@ -263,7 +280,7 @@
 .TagLabel.text-contrast--dark .TagLabel-text,
 .TagLabel.text-contrast--light .TagLabel-name,
 .TagLabel.text-contrast--dark .TagLabel-name {
-  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 72%, var(--ink));
+  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 58%, var(--ink));
 }
 
 // An uncoloured chip has no hue to mix, so its children follow the chip's own
@@ -289,7 +306,9 @@
 
 a.TagLabel:hover,
 a.TagLabel:focus-visible {
-  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 28%, transparent);
+  // scaled down with the resting fill above (was 28%, resting was 18%): the
+  // same +10pt step on hover, just off the new quieter baseline
+  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 22%, transparent);
   text-decoration: none;
 }
 

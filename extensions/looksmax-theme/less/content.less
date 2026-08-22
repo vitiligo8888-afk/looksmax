@@ -49,6 +49,31 @@
 .Post-body li { margin: 0.25em 0; }
 .Post-body li::marker { color: var(--accent-a70); }
 
+// ============================================================ <br> runs
+// The source board has no automatic paragraph spacing, so imported posts use
+// runs of 3-6 consecutive <br> as a hand-authored section gap. Left alone that
+// is not a rhythm, it is a runaway: measured on
+// /d/292-socialmaxxing-extremely-high-effort, the first post carries 4,670
+// <br> tags and a single decorative letter-by-letter heading — one glyph per
+// line, 4-5 <br> between each — spans over 100,000px on its own, out of a
+// 143,456px total page height. This is a content pattern across the imported
+// corpus, not one outlier post.
+//
+// Fixed here rather than in the markup (which the content lane owns, per the
+// scope note above) because it is a pure rendering collapse: the DOM keeps
+// every <br>, so this is safe to loosen or remove later without touching a
+// single post. `br + br` matches any <br> immediately preceded by another
+// <br> — the 2nd, 3rd, 4th... of a run — so chaining it three deep hides the
+// 3rd position and every one after it (the sibling combinator walks real DOM
+// adjacency, not visibility, so a hidden <br> still counts as "a <br> before
+// it" for the next selector). A run of any length therefore collapses to
+// exactly two visible <br> — one blank line, the same gap a normal paragraph
+// break already reads as — while a single <br> (a mid-sentence line break)
+// and a deliberate double <br> (one blank line) are untouched.
+.Post-body br + br + br {
+  display: none;
+}
+
 .Post-body hr {
   background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
   border: 0;
@@ -417,7 +442,7 @@ span.spoiler {
 
 .Post-body mark {
   background: var(--accent-a28);
-  border-radius: 3px;
+  border-radius: 0;
   color: var(--ink);
   padding: 0 3px;
 }

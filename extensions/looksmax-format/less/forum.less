@@ -224,7 +224,10 @@
 }
 
 .lmxUnfurl-title {
-  font-weight: 650;
+  // 600, not 650 — the repo-wide cap (the operator asked for "nada de bold
+  // characters al menos que el usuario lo pida") is 500/600 everywhere else;
+  // this was the one place still a half-step over it.
+  font-weight: 600;
   font-size: var(--fs-md, 14px);
   line-height: 1.35;
   color: @lmx-ink;
@@ -482,7 +485,7 @@ body.lmxLightbox-open { overflow: hidden; }
   th {
     background: @lmx-surface-3;
     color: @lmx-ink;
-    font-weight: 650;
+    font-weight: 600; // was 650, a half-step over the repo-wide 500/600 cap
     white-space: nowrap;
   }
 

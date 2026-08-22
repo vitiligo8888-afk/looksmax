@@ -57,14 +57,44 @@ class RenderIndex
     ) {
     }
 
+    /**
+     * The paths whose FIRST PAINT needs the template already in the document.
+     *
+     * Must stay in step with isIndex() in mountScript(). Measured cost of not
+     * having this guard: composing the index runs several DB queries and emits
+     * a ~66KB <template> into <head> of EVERY page — every discussion, profile,
+     * store and search view — where nothing ever reads it. On a board whose
+     * traffic is overwhelmingly discussion pages, that was the majority of the
+     * work this extension did.
+     */
+    private function mounts(ServerRequestInterface $request): bool
+    {
+        $path = $request->getUri()->getPath();
+
+        return $path === '/' || $path === '' || rtrim($path, '/') === '/tags';
+    }
+
     public function __invoke(Document $document, ServerRequestInterface $request): void
     {
+        // The mount script goes out on EVERY page, and deliberately so: Flarum
+        // is an SPA, so a reader who lands on a discussion and then clicks the
+        // logo reaches the front page without a document request. The script is
+        // what notices that and renders. Gating it to index paths too would
+        // leave the front page blank on every client-side navigation into it —
+        // which is exactly how the template used to be everywhere, and why.
+        $document->head[] = '<script data-lmx-index>' . $this->mountScript() . '</script>';
+
+        if (! $this->mounts($request)) {
+            // Not an index path. The script above will fetch the fragment from
+            // /api/lmx-index/fragment if the reader navigates here client-side.
+            return;
+        }
+
         try {
             $actor = $request->getAttribute('actor');
             $actor = $actor instanceof User ? $actor : new Guest();
 
-            $ctx = new Context($this->db, $this->settings, $this->translator, $actor, $this->view($actor));
-            $html = $this->compose($ctx);
+            $html = $this->fragment($actor);
         } catch (\Throwable $e) {
             // The front door renders even when a block is broken. Not defensive
             // programming for its own sake: this extension's predecessor took
@@ -78,7 +108,20 @@ class RenderIndex
         }
 
         $document->head[] = '<template id="lmx-index-template">' . $html . '</template>';
-        $document->head[] = '<script data-lmx-index>' . $this->mountScript() . '</script>';
+    }
+
+    /**
+     * Build the front-page markup for one actor.
+     *
+     * Public because FragmentController serves the identical HTML to a
+     * client-side navigation. One builder, so the SPA route and the
+     * server-rendered route can never drift apart.
+     */
+    public function fragment(User $actor): string
+    {
+        $ctx = new Context($this->db, $this->settings, $this->translator, $actor, $this->view($actor));
+
+        return $this->compose($ctx);
     }
 
     /**
@@ -387,10 +430,41 @@ class RenderIndex
     }
     if (existing && existing.isConnected) return;
     var n = node();
-    if (!n) return;
+    if (!n) { fetchFragment(); return; }
     host.parentNode.insertBefore(n, host);
     document.body.classList.add('lmx-index-on');
     wire(n);
+  }
+
+  /* The template is only in the document on paths that paint the index. Reaching
+     the front page by CLIENT-SIDE navigation (clicking the logo from a thread)
+     therefore arrives with no template, and this fetches the identical markup
+     from the same server-side builder.
+
+     Runs at most once per page load, success or failure: a forum that has the
+     index disabled, or a request that fails, must not turn every subsequent
+     mutation into another request. */
+  var FETCH_DONE = false;
+  function fetchFragment() {
+    if (FETCH_DONE) return;
+    FETCH_DONE = true;
+
+    fetch('/api/lmx-index/fragment', {
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j || !j.html) return;
+        /* Parsed into a <template>, so the markup is inert until cloned — the
+           same handling the inlined path gets. The HTML is this forum's own
+           server output fetched same-origin, not user input. */
+        var t = document.createElement('template');
+        t.innerHTML = j.html;
+        TPL = t.content;
+        try { mount(); } catch (e) {}
+      })
+      .catch(function () {});
   }
 
   function tick() { try { mount(); } catch (e) {} }
