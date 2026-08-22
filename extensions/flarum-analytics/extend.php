@@ -25,6 +25,15 @@ use Flarum\Discussion\Discussion;
 use Flarum\Database\AbstractModel;
 use Local\Analytics\Models\Event;
 use Local\Analytics\Listeners;
+// Without this, `Api\IngestController::class` below evaluates to the LITERAL
+// string "Api\IngestController" — ::class is resolved at compile time against
+// the importing file's namespace, and this file has none. Both API routes
+// therefore resolved to a class that does not exist and threw
+// ReflectionException from the container at DISPATCH time, not at boot, so the
+// forum started clean and the routes simply 500'd. The POST route looked
+// healthy while broken because it 400s on the CSRF check first, before the
+// container is ever asked for the controller.
+use Local\Analytics\Api;
 use Local\Analytics\Console\FlushCommand;
 use Local\Analytics\Console\RecomputeRankCommand;
 

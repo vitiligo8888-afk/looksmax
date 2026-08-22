@@ -41,11 +41,25 @@ class ReactorsController implements RequestHandlerInterface
         $actor = RequestUtil::getActor($request);
         $postId = (int) Arr::get($request->getQueryParams(), 'id');
 
-        $post = Post::query()->find($postId);
+        // Visibility via the SCOPE, not assertCan('view', $post->discussion).
+        //
+        // THIS was the live bug behind "reactions don't work": Flarum 1.8
+        // registers no `view` ability for a Discussion, so `can('view', $d)`
+        // matched no policy and fell through to the isAdmin() default. Every
+        // non-administrator who clicked to see who had reacted got a 403 and a
+        // "no tienes permiso" toast, on every post on the forum. Observed in
+        // the access log before the fix:
+        //
+        //   GET /api/lmx/posts/9778/reactors -> 403   (Firefox, real reader)
+        //   GET /api/lmx/posts/8514/reactors -> 403
+        //
+        // whereVisibleTo is the scope the thread list itself uses, so this
+        // cannot disagree with what the reader can already see. Same trap, and
+        // the same fix, as looksmax-userinfo SummaryController.php:43-58.
+        $post = Post::query()->whereVisibleTo($actor)->find($postId);
         if (!$post) {
             return new JsonResponse(['error' => 'post-not-found'], 404);
         }
-        $actor->assertCan('view', $post->discussion);
 
         $rows = \Local\Reactions\PostReaction::query()
             ->where('post_id', $postId)

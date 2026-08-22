@@ -39,11 +39,27 @@ class DiscussionReactionsController implements RequestHandlerInterface
         $id = (int) Arr::get($q, 'id');
         $slug = Arr::get($q, 'slug');
 
-        $discussion = Discussion::query()->find($id);
+        // Visibility via the SCOPE, not assertCan('view', $discussion).
+        //
+        // Flarum 1.8 registers no `view` ability for a Discussion — thread
+        // visibility is a query scope, not a policy. So `can('view', $d)`
+        // matched no policy, fell through to the isAdmin() default, and this
+        // endpoint returned 403 to every non-administrator on the forum while
+        // the very same thread rendered fine for them. Measured before the fix:
+        //
+        //   whereVisibleTo($user)->find(334)  -> found
+        //   $user->can('view', $discussion)   -> false   (admin: true)
+        //
+        // looksmax-userinfo/src/Api/SummaryController.php:43-58 hit the
+        // identical trap on User and documents it; this is the same bug on
+        // Discussion.
+        //
+        // 404 rather than 403 when it is not visible: whether a thread exists
+        // is itself information.
+        $discussion = Discussion::query()->whereVisibleTo($actor)->find($id);
         if (!$discussion) {
             return new JsonResponse(['error' => 'discussion-not-found'], 404);
         }
-        $actor->assertCan('view', $discussion);
 
         $totals = $this->db->table('post_reactions as pr')
             ->join('posts as p', 'p.id', '=', 'pr.post_id')
