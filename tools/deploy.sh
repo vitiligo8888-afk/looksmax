@@ -54,7 +54,7 @@ APP=/srv/looksmax/app
 STAGE=/tmp/deploy-stage-$TS
 ROLLBACK=/tmp/deploy-rollback-$TS
 EXTS="${EXTS[*]}"
-PROBES="/ /all /t/mejores-guias /d/30660-lip-lift-results-2-weeks-post-op-pictures-included /store"
+PROBES="/ /all /t/mejores-guias /t/peptides /store"
 
 probe_all() {
   local bad=""
@@ -104,8 +104,31 @@ fi
 
 echo "==> migrate + rebuild"
 docker exec flarum-app php flarum migrate 2>&1 | grep -viE 'nothing to migrate|^migrating extension' | tail -3
+# Republish extension assets/ into public/assets. cache:clear does NOT do this,
+# so a new file under an extension's assets/ (a font, an icon) is copied into
+# the live tree by the swap above but never lands where the web server serves
+# it — measured: eight new Poppins woff2 files sat in the extension yet every
+# request for them 404'd until this ran. Cheap and idempotent.
+docker exec flarum-app php flarum assets:publish >/dev/null 2>&1
 docker exec flarum-app php flarum cache:clear >/dev/null 2>&1
 sleep 2
+
+# GIVE THE LOG BACK TO www-data.
+#
+# Every docker exec above runs as ROOT, and Monolog creates that day's
+# flarum-YYYY-MM-DD.log owned by whoever writes to it first. php-fpm workers are
+# www-data, so once a root CLI run has created the day's file (mode 0644), the
+# WEB process can no longer append to it and silently drops every error for the
+# rest of the day.
+#
+# That is the real reason "500 with an empty body and nothing in any log" kept
+# recurring here: the log was not empty because nothing was wrong, it was empty
+# because the writer had no permission. Measured directly — a route throwing
+# ReflectionException on every request produced zero log lines until the file
+# was chowned back.
+#
+# Cheap to do, and it makes the next incident diagnosable instead of a bisect.
+docker exec flarum-app chown -R www-data:www-data /flarum/app/storage/logs 2>/dev/null
 
 # BUST THE CDN, or the deploy is invisible.
 #
