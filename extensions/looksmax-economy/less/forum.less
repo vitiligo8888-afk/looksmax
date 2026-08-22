@@ -53,6 +53,24 @@
 .lmx-econ-toggle:hover { background: var(--surface-3); transform: translateY(-1px); }
 .lmx-econ-toggle-count { font-weight: 500; font-size: var(--fs-md); }
 
+// A small unread-style bubble on the collapsed toggle when a quest is ready
+// to claim — the one hint a member gets that the panel has something in it
+// without opening it, same idea as a notification dot.
+.lmx-econ-toggle-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: var(--r-pill);
+  background: var(--ok);
+  color: var(--ink-on-accent);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 15px;
+}
+
 .lmx-econ-flame { font-size: 15px; filter: grayscale(1); opacity: 0.55; }
 .lmx-econ-flame.is-lit { filter: none; opacity: 1; }
 
@@ -61,7 +79,9 @@
   position: absolute;
   right: 0;
   bottom: ~"calc(100% + 8px)";
-  width: 260px;
+  width: 280px;
+  max-height: 80vh;
+  overflow-y: auto;
   background: var(--surface-1);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
@@ -88,6 +108,67 @@
 .lmx-econ-goal-fill { height: 100%; background: var(--accent); border-radius: var(--r-pill); transition: width var(--t-slow) var(--ease); }
 .lmx-econ-goal-fill.is-full { background: var(--ok); }
 
+// "You are 1,204 reactions from Consensus" — SummaryController's `nextBadge`,
+// rendered right under the rank bar since both are "distance to the next
+// thing" numbers.
+.lmx-econ-next-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  margin-top: var(--gap-sm);
+  font-size: var(--fs-xs);
+  color: var(--ink-dim);
+}
+.lmx-econ-next-badge iconify-icon { color: var(--gold); font-size: 13px; }
+
+// ── quests ──────────────────────────────────────────────────────────────
+.lmx-econ-quests { display: flex; flex-direction: column; gap: var(--gap); }
+.lmx-econ-quest-group-title {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin-bottom: var(--gap-xs);
+}
+.lmx-econ-quest-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 4px 0;
+}
+.lmx-econ-quest-row.is-claimed { opacity: 0.6; }
+.lmx-econ-quest-icon { font-size: 15px; color: var(--accent-2); flex: none; }
+.lmx-econ-quest-body { flex: 1; min-width: 0; }
+.lmx-econ-quest-name {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.lmx-econ-quest-reward { color: var(--ok); font-weight: 500; }
+.lmx-econ-quest-track { margin-top: 2px; }
+.lmx-econ-quest-state {
+  flex: none;
+  font-size: var(--fs-xs);
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.lmx-econ-quest-state.is-claimed { color: var(--ok); }
+.lmx-econ-quest-claim {
+  flex: none;
+  border: 1px solid var(--accent-a45);
+  background: var(--accent-a14);
+  color: var(--ink);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease);
+}
+.lmx-econ-quest-claim:hover { background: var(--accent-a28); }
+
 .lmx-econ-toast {
   position: fixed;
   right: var(--gap-lg);
@@ -107,7 +188,44 @@
 }
 .lmx-econ-toast.is-shown { opacity: 1; transform: translateY(0); }
 
+// Kind variants: the streak toast keeps the original gold; rank, quest and
+// achievement each get a distinct treatment so a member can tell which kind
+// of thing just happened at a glance, without reading the copy first.
+.lmx-econ-toast--rank { background: var(--accent); color: var(--accent-ink); }
+.lmx-econ-toast--quest { background: var(--ok); color: var(--ink-on-accent); }
+.lmx-econ-toast--achievement { background: var(--surface-1); color: var(--ink); border: 1px solid var(--gold-a35); box-shadow: var(--e-3), 0 0 0 1px var(--gold-a18); }
+
+// A handful of CSS dots for a rank-up burst — never a canvas, never a
+// library, and never even constructed when prefers-reduced-motion is set
+// (see forum.js's celebrate()/spark()). The hard stop below is the second
+// layer: if the OS setting changes mid-session without a reload, any node
+// that did get created simply does not animate.
+.lmx-econ-spark { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.lmx-econ-spark i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--accent-hi);
+  opacity: 0;
+  animation: lmx-econ-spark-fly 900ms var(--ease-in-out) forwards;
+  animation-delay: ~"calc(var(--i) * 35ms)";
+}
+@keyframes lmx-econ-spark-fly {
+  0%   { opacity: 1; transform: translate(-50%, -50%) rotate(~"calc(var(--i) * 45deg)") translateY(0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(~"calc(var(--i) * 45deg)") translateY(-34px) scale(0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lmx-econ-toast, .lmx-econ-goal-fill, .lmx-econ-toggle {
+    transition: none !important;
+  }
+  .lmx-econ-spark { display: none; }
+}
+
 @media (max-width: 767px) {
   .lmx-econ-widget { right: var(--gap-sm); bottom: var(--gap-sm); }
-  .lmx-econ-panel { width: 220px; }
+  .lmx-econ-panel { width: 240px; }
 }

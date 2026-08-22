@@ -115,6 +115,80 @@ class Config
         'post.minMultiplier'        => [0.25, 'float'],
         'post.maxMultiplier'        => [2.0, 'float'],
         'post.multiplierDivisor'    => [400, 'int'],
+
+        // --- quests -----------------------------------------------------------
+        // See src/Quests.php for the full design. Which quests EXIST is code
+        // (Quests::DEFS), same as which award reasons exist — but every target
+        // and every reward is a setting, same pattern as award.* and cap.*
+        // above, so a content push can retune "post 3 times" without a deploy.
+        // `quest.enabled` is the kill switch: false hides the whole feature
+        // (State::state() returns an empty list) without touching any other
+        // award path.
+        'quest.enabled'                    => [true, 'bool'],
+        'quest.daily.post3.target'         => [3, 'int'],
+        'quest.daily.post3.reward'         => [8, 'int'],
+        'quest.daily.give3.target'         => [3, 'int'],
+        'quest.daily.give3.reward'         => [5, 'int'],
+        'quest.daily.received1.target'     => [1, 'int'],
+        'quest.daily.received1.reward'     => [5, 'int'],
+        'quest.daily.streak.target'        => [1, 'int'],
+        'quest.daily.streak.reward'        => [6, 'int'],
+        'quest.weekly.post15.target'       => [15, 'int'],
+        'quest.weekly.post15.reward'       => [30, 'int'],
+        'quest.weekly.thread1.target'      => [1, 'int'],
+        'quest.weekly.thread1.reward'      => [20, 'int'],
+        'quest.weekly.reactions25.target'  => [25, 'int'],
+        'quest.weekly.reactions25.reward'  => [35, 'int'],
+        'quest.weekly.streak7.target'      => [7, 'int'],
+        'quest.weekly.streak7.reward'      => [40, 'int'],
+
+        // --- early-adopter boost ---------------------------------------------
+        // A launch-window earn multiplier that stacks on top of the membership
+        // tier and any store boost (applied together in Ledger::tierModifiers()),
+        // to reward the founding cohort while a young forum is still cold. It is
+        // a no-op by default: `multiplier` 1.0 changes nothing, so shipping this
+        // code alters not one award until an operator opens the setting — same
+        // promise the rest of this file makes. It is gated two ways so it can
+        // never run forever: an account qualifies only if it registered on or
+        // before `until` (empty string = feature off, nobody qualifies), and —
+        // when `windowDays` > 0 — only during its first N days after joining
+        // (0 = no per-account time limit, the founding cohort keeps it).
+        'earlyAdopter.multiplier'   => [1.0, 'float'],
+        'earlyAdopter.until'        => ['', 'raw'],
+        'earlyAdopter.windowDays'   => [30, 'int'],
+
+        // --- founding member -------------------------------------------------
+        // A one-time status program: the first `cap` accounts to register on or
+        // before `until` are put in the Fundador group (`groupId`, a native
+        // Flarum group so the badge needs no code) and paid a one-off `bonus`
+        // as spendable credit that does NOT count toward rank. Off by default —
+        // `enabled` false and `until` empty both stop it — because on a board
+        // whose 30k accounts were imported from 2018 onward, "founder" means the
+        // relaunch cohort, so the operator, not a join-date guess, sets the
+        // window. See Listeners/FoundingMember.php. `count` below is not read as
+        // a cap source (the listener counts live group members, which is
+        // race-free and self-correcting); it exists only so the front page can
+        // show "312 / 500 fundadores" without a query.
+        'founding.enabled'          => [false, 'bool'],
+        'founding.until'            => ['', 'raw'],
+        'founding.cap'              => [500, 'int'],
+        'founding.bonus'            => [100, 'int'],
+        'founding.groupId'          => [0, 'int'],
+
+        // --- referral loop ---------------------------------------------------
+        // A member shares looksmax.lat/?ref=<their user id>; the ref rides a
+        // cookie (InjectRefCapture) until the referee registers, at which point
+        // the edge is recorded (lmx_referrals) and BOTH sides are paid. Off by
+        // default (`enabled` false), so the migration can ship without the
+        // program running. Two payouts, both countsForRank:false so a referral
+        // ring cannot inflate rank: `joinBonus` immediately on signup, and the
+        // larger `qualifyBonus` only once the referee posts `qualifyPosts`
+        // times — the throwaway-account gate. Paid once each per referee via
+        // the ledger's unique-ref idempotency (refs refj:/refq:<refereeId>).
+        'referral.enabled'          => [false, 'bool'],
+        'referral.joinBonus'        => [15, 'int'],
+        'referral.qualifyBonus'     => [50, 'int'],
+        'referral.qualifyPosts'     => [3, 'int'],
     ];
 
     public static function all(SettingsRepositoryInterface $settings): array

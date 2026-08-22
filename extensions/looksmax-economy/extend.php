@@ -5,19 +5,30 @@ use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Serializer\UserSerializer;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
+use Local\Economy\Api\QuestsActionController;
+use Local\Economy\Api\QuestsController;
 use Local\Economy\Api\SummaryController;
 use Local\Economy\Config;
 use Local\Economy\InjectAdminScript;
+use Local\Economy\InjectInviteWidget;
+use Local\Economy\InjectRefCapture;
 use Local\Economy\InjectScript;
 use Local\Economy\Ledger;
 use Local\Economy\Listeners;
+use Illuminate\Database\ConnectionInterface;
 
 return [
     (new Extend\Frontend('forum'))
         ->css(__DIR__ . '/less/forum.less')
         // The streak/progress widget. See InjectScript.php for why it ships
         // as its own <script> rather than inside the shared bundle.
-        ->content(InjectScript::class),
+        ->content(InjectScript::class)
+        // Referral ?ref capture — a few guarded bytes, emitted only when the
+        // program is on. See InjectRefCapture.php.
+        ->content(InjectRefCapture::class)
+        // The dismissible "Invita y gana" card for logged-in members; also
+        // emitted only when referral is on. See InjectInviteWidget.php.
+        ->content(InjectInviteWidget::class),
 
     // The settings screen. Every control here writes an `economy.*` setting
     // that Config.php reads — the direct fix for "every award amount, daily
@@ -63,6 +74,13 @@ return [
     // construction at all — see Ledger.php's comments on ladder()/progressFor().
     (new Extend\ApiSerializer(UserSerializer::class))
         ->attributes(function (UserSerializer $serializer, User $user, array $attributes) {
+            // Oro (the paid balance) is emitted on every user payload regardless
+            // of whether looksmax-ranks' richer `identity` attribute has already
+            // run — the header's oro chip reads it the same way the theme reads
+            // `points` for username colouring, so it must not sit behind the
+            // identity short-circuit below.
+            $attributes['oro'] = (int) ($user->oro ?? 0);
+
             if (isset($attributes['identity'])) {
                 return $attributes;
             }
@@ -106,13 +124,64 @@ return [
             return $attributes;
         }),
 
+    // Referral panel data — the actor's OWN invite code and tallies, so a
+    // profile/settings surface can render "share looksmax.lat/?ref=<code>,
+    // N joined, M qualified" with no extra request. Actor-scoped for the same
+    // reason looksmax-welcome's survey answers are: private, self-only, and
+    // registered on UserSerializer (not Basic) so the two queries run at most
+    // once per page — the viewer's own row — never per post author. Both
+    // queries are guarded; a throw degrades to no panel, never a 500.
+    (new Extend\ApiSerializer(UserSerializer::class))
+        ->attributes(function (UserSerializer $serializer, User $user, array $attributes) {
+            $actor = $serializer->getActor();
+            if (!$actor || $actor->isGuest() || (int) $actor->id !== (int) $user->id) {
+                return $attributes;
+            }
+
+            /** @var SettingsRepositoryInterface $settings */
+            $settings = resolve(SettingsRepositoryInterface::class);
+            if (! (bool) Config::get($settings, 'referral.enabled')) {
+                return $attributes;
+            }
+
+            try {
+                /** @var ConnectionInterface $db */
+                $db = resolve(ConnectionInterface::class);
+                $attributes['lmxReferral'] = [
+                    'code' => (int) $user->id,
+                    'joined' => (int) $db->table('lmx_referrals')->where('referrer_id', $user->id)->count(),
+                    'qualified' => (int) $db->table('lmx_referrals')->where('referrer_id', $user->id)->whereNotNull('qualified_at')->count(),
+                ];
+            } catch (\Throwable $e) {
+                $attributes['lmxReferral'] = null;
+            }
+
+            return $attributes;
+        }),
+
     (new Extend\Routes('api'))
-        ->get('/economy/summary', 'economy.summary', SummaryController::class),
+        ->get('/economy/summary', 'economy.summary', SummaryController::class)
+        // Daily/weekly quests — see src/Quests.php. Read/write split, same
+        // shape as looksmax-cosmetics' equip endpoint and looksmax-ranks'
+        // identity endpoints.
+        ->get('/economy/quests', 'economy.quests', QuestsController::class)
+        ->post('/economy/quests/claim', 'economy.quests.claim', QuestsActionController::class),
 
     (new Extend\Event())
         ->listen(\Flarum\Post\Event\Posted::class, Listeners\AwardPost::class)
         ->listen(\Flarum\Discussion\Event\Started::class, Listeners\AwardDiscussion::class)
         ->listen(\Flarum\Post\Event\Deleted::class, Listeners\RevokePost::class)
+
+        // Founding Member: the relaunch's first N registrants get the Fundador
+        // group + a one-off bonus. No-op until an operator opens the window —
+        // see Listeners/FoundingMember.php and Config's founding.* keys.
+        ->listen(\Flarum\User\Event\Registered::class, Listeners\FoundingMember::class)
+
+        // Referral loop: record who brought a new account in and pay the join
+        // bonus (ReferralCapture), then pay the qualify bonus once the referee
+        // is demonstrably real (ReferralQualify). Both no-op until enabled.
+        ->listen(\Flarum\User\Event\Registered::class, Listeners\ReferralCapture::class)
+        ->listen(\Flarum\Post\Event\Posted::class, Listeners\ReferralQualify::class)
 
         // The farming-bug fix: reverse what RevokePost never covered. See
         // both listeners' own headers for the exact exploit each one closes.

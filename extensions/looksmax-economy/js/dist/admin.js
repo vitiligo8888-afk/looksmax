@@ -91,6 +91,25 @@
       reg(d, 'post.maxMultiplier', 'text', 'post_max_multiplier', 2.0);
       reg(d, 'post.multiplierDivisor', 'number', 'post_multiplier_divisor', 400);
 
+      // --- quests, see src/Quests.php --------------------------------------
+      reg(d, 'quest.enabled', 'boolean', 'quest_enabled', true);
+      reg(d, 'quest.daily.post3.target', 'number', 'quest_daily_post3_target', 3);
+      reg(d, 'quest.daily.post3.reward', 'number', 'quest_daily_post3_reward', 8);
+      reg(d, 'quest.daily.give3.target', 'number', 'quest_daily_give3_target', 3);
+      reg(d, 'quest.daily.give3.reward', 'number', 'quest_daily_give3_reward', 5);
+      reg(d, 'quest.daily.received1.target', 'number', 'quest_daily_received1_target', 1);
+      reg(d, 'quest.daily.received1.reward', 'number', 'quest_daily_received1_reward', 5);
+      reg(d, 'quest.daily.streak.target', 'number', 'quest_daily_streak_target', 1);
+      reg(d, 'quest.daily.streak.reward', 'number', 'quest_daily_streak_reward', 6);
+      reg(d, 'quest.weekly.post15.target', 'number', 'quest_weekly_post15_target', 15);
+      reg(d, 'quest.weekly.post15.reward', 'number', 'quest_weekly_post15_reward', 30);
+      reg(d, 'quest.weekly.thread1.target', 'number', 'quest_weekly_thread1_target', 1);
+      reg(d, 'quest.weekly.thread1.reward', 'number', 'quest_weekly_thread1_reward', 20);
+      reg(d, 'quest.weekly.reactions25.target', 'number', 'quest_weekly_reactions25_target', 25);
+      reg(d, 'quest.weekly.reactions25.reward', 'number', 'quest_weekly_reactions25_reward', 35);
+      reg(d, 'quest.weekly.streak7.target', 'number', 'quest_weekly_streak7_target', 7);
+      reg(d, 'quest.weekly.streak7.reward', 'number', 'quest_weekly_streak7_reward', 40);
+
       window.__lmxEconomyAdmin = { bound: true, at: Date.now() };
     } catch (e) {
       if (window.console) console.warn('economy admin: registration failed', e);

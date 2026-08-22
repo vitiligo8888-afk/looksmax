@@ -49,6 +49,9 @@ local-looksmax-economy:
         purchase: Compra de membresía
       rank:
         milestone: Bono por subir de rango
+      quest:
+        daily: Reto diario
+        weekly: Reto semanal
 
     reason_unknown: Ajuste
 
@@ -82,6 +85,23 @@ local-looksmax-economy:
       post_min_multiplier: "Ponderación de esfuerzo: multiplicador mínimo"
       post_max_multiplier: "Ponderación de esfuerzo: multiplicador máximo"
       post_multiplier_divisor: "Ponderación de esfuerzo: caracteres por 1.0x"
+      quest_enabled: "Retos: activar el sistema de retos diarios y semanales"
+      quest_daily_post3_target: "Reto diario «Publica 3 veces»: cantidad requerida"
+      quest_daily_post3_reward: "Reto diario «Publica 3 veces»: recompensa (puntos)"
+      quest_daily_give3_target: "Reto diario «Da 3 reacciones»: cantidad requerida"
+      quest_daily_give3_reward: "Reto diario «Da 3 reacciones»: recompensa (puntos)"
+      quest_daily_received1_target: "Reto diario «Recibe una reacción»: cantidad requerida"
+      quest_daily_received1_reward: "Reto diario «Recibe una reacción»: recompensa (puntos)"
+      quest_daily_streak_target: "Reto diario «Mantén tu racha»: cantidad requerida"
+      quest_daily_streak_reward: "Reto diario «Mantén tu racha»: recompensa (puntos)"
+      quest_weekly_post15_target: "Reto semanal «Publica 15 veces»: cantidad requerida"
+      quest_weekly_post15_reward: "Reto semanal «Publica 15 veces»: recompensa (puntos)"
+      quest_weekly_thread1_target: "Reto semanal «Inicia un hilo»: cantidad requerida"
+      quest_weekly_thread1_reward: "Reto semanal «Inicia un hilo»: recompensa (puntos)"
+      quest_weekly_reactions25_target: "Reto semanal «Recibe 25 reacciones»: cantidad requerida"
+      quest_weekly_reactions25_reward: "Reto semanal «Recibe 25 reacciones»: recompensa (puntos)"
+      quest_weekly_streak7_target: "Reto semanal «Racha de 7 días»: cantidad requerida"
+      quest_weekly_streak7_reward: "Reto semanal «Racha de 7 días»: recompensa (puntos)"
 
   forum:
     widget:
@@ -93,5 +113,34 @@ local-looksmax-economy:
       top_rank: Rango máximo alcanzado
       goal_posts: Publicaciones hoy
       goal_reactions: Reacciones recibidas hoy
+      next_badge: "Te faltan {count} para «{badge}»"
       celebrate_streak: "¡Racha de {count} días! Sigue así."
       celebrate_rank: "¡Alcanzaste {rank}!"
+      celebrate_achievement: "¡Lograste «{name}»!"
+
+    quests:
+      daily: Diarios
+      weekly: Semanales
+      claim: Reclamar
+      claimed: Reclamado
+      celebrate: "¡Reto completado! +{count} puntos"
+      post3:
+        name: Publica 3 veces
+      give3:
+        name: Da 3 reacciones
+      received1:
+        name: Recibe una reacción
+      streak:
+        name: Mantén tu racha de hoy
+      post15:
+        name: Publica 15 veces esta semana
+      thread1:
+        name: Inicia un hilo
+      reactions25:
+        name: Recibe 25 reacciones esta semana
+      streak7:
+        name: Sostén una racha de 7 días
+      error:
+        guest: Inicia sesión para reclamar retos.
+        failed: No se pudo procesar el reto. Intenta de nuevo.
+        not_claimable: Este reto no está listo para reclamarse.

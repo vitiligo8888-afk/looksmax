@@ -8,6 +8,7 @@ use Illuminate\Database\ConnectionInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Local\Economy\Config;
 use Local\Economy\Ledger;
+use Local\Economy\Quests;
 use Local\Economy\Streaks;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -32,6 +33,7 @@ class SummaryController implements RequestHandlerInterface
         protected ConnectionInterface $db,
         protected Ledger $ledger,
         protected Streaks $streaks,
+        protected Quests $quests,
         protected SettingsRepositoryInterface $settings
     ) {
     }
@@ -69,13 +71,61 @@ class SummaryController implements RequestHandlerInterface
             'data' => [
                 'points' => $points,
                 'lifetimePoints' => $lifetime,
+                // The paid balance, alongside the earned one, so the wallet UI
+                // can show both from a single request.
+                'oro' => $this->ledger->oroBalance((int) $actor->id),
+                'oroHistory' => $this->ledger->oroHistory((int) $actor->id, 20),
                 'rank' => $this->ledger->progress($lifetime),
                 'streak' => $this->streaks->of((int) $actor->id),
                 'goals' => [
                     'postsToday' => ['count' => $postsToday, 'cap' => (int) Config::get($this->settings, 'cap.postCreated')],
                     'reactionsToday' => ['count' => $reactionsToday, 'cap' => (int) Config::get($this->settings, 'cap.reactionReceived')],
                 ],
+                'quests' => $this->quests->state((int) $actor->id),
+                'nextBadge' => $this->nextBadge((int) $actor->id),
+                'recentBadges' => $this->recentBadges((int) $actor->id),
             ],
         ]);
+    }
+
+    /**
+     * "You are 1,204 reactions from Consensus" — the number the gamification
+     * brief asked for by name, rather than leaving next-badge progress
+     * implicit. Read through looksmax-ranks' Standing, guarded the same way
+     * Ledger::tierModifiers() already reads looksmax-store's Entitlements:
+     * this widget must keep rendering with ranks disabled, and a neighbour's
+     * broken query must cost a missing line, never the whole panel.
+     */
+    private function nextBadge(int $userId): ?array
+    {
+        if (!class_exists(\Local\Ranks\Standing::class)) {
+            return null;
+        }
+
+        try {
+            /** @var \Local\Ranks\Standing $standing */
+            $standing = \Illuminate\Container\Container::getInstance()->make(\Local\Ranks\Standing::class);
+
+            return $standing->nearestMeasurableBadge($userId);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /** Feeds the widget's "new achievement" celebration — see forum.js checkCelebrations(). */
+    private function recentBadges(int $userId): array
+    {
+        if (!class_exists(\Local\Ranks\Standing::class)) {
+            return [];
+        }
+
+        try {
+            /** @var \Local\Ranks\Standing $standing */
+            $standing = \Illuminate\Container\Container::getInstance()->make(\Local\Ranks\Standing::class);
+
+            return $standing->recentBadges($userId, 3);
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }

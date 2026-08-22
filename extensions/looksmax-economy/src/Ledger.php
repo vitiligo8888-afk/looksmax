@@ -307,6 +307,107 @@ class Ledger
             ->map(fn ($r) => (array) $r)->all();
     }
 
+    // ---------------------------------------------------------------- Oro
+    //
+    // The paid currency. Everything below is deliberately the SIMPLE half of
+    // this class: no award table, no tier multiplier, no daily cap, no rank.
+    // Oro is bought and spent at face value and touches nothing the ladder
+    // reads. The only invariants carried over from the points ledger are the
+    // two that make money safe: every movement is a signed row, and the row is
+    // idempotent on (user, reason, ref), so a retried purchase-webhook or a
+    // double-clicked refund moves a balance once or not at all.
+
+    public function oroBalance(int $userId): int
+    {
+        return (int) $this->db->table('users')->where('id', $userId)->value('oro');
+    }
+
+    /**
+     * Credit oro (a purchase landing, a refund, a gift). Signed: a negative
+     * amount is a clawback, and it is allowed to push a balance below zero —
+     * the correct outcome for a chargeback on already-spent oro, exactly as the
+     * points clawback in CreditsGrant reasons about it.
+     */
+    public function oroCredit(int $userId, int $amount, string $reason, ?string $ref = null, ?int $actorId = null): int
+    {
+        $amount = (int) $amount;
+        if ($amount === 0 || $userId <= 0) {
+            return 0;
+        }
+
+        try {
+            $this->db->table('economy_oro_transactions')->insert([
+                'user_id' => $userId,
+                'delta' => $amount,
+                'reason' => $reason,
+                'ref' => $ref,
+                'actor_id' => $actorId,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            return 0; // already credited for this ref
+        }
+
+        $this->db->table('users')->where('id', $userId)
+            ->update(['oro' => $this->db->raw("oro + {$amount}")]);
+
+        return $amount;
+    }
+
+    /**
+     * Debit oro. Returns the negative delta written, or 0 if the user could not
+     * afford it. Balance is locked FOR UPDATE before it is compared, so two
+     * tabs cannot spend the same oro twice — the same guarantee spend() gives
+     * the points balance.
+     */
+    public function oroSpend(int $userId, int $amount, string $reason, ?string $ref = null): int
+    {
+        $amount = (int) abs($amount);
+        if ($amount === 0 || $userId <= 0) {
+            return 0;
+        }
+
+        return (int) $this->db->transaction(function () use ($userId, $amount, $reason, $ref) {
+            $balance = (int) $this->db->table('users')->where('id', $userId)
+                ->lockForUpdate()->value('oro');
+
+            if ($balance < $amount) {
+                return 0;
+            }
+
+            try {
+                $this->db->table('economy_oro_transactions')->insert([
+                    'user_id' => $userId,
+                    'delta' => -$amount,
+                    'reason' => $reason,
+                    'ref' => $ref,
+                    'actor_id' => null,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Throwable $e) {
+                // Reused ref hits the unique index — a "spend once" caller gets a
+                // clean refusal instead of a 500, and no oro moves. A caller that
+                // means "again" must vary the ref.
+                return 0;
+            }
+
+            $this->db->table('users')->where('id', $userId)
+                ->update(['oro' => $this->db->raw("oro - {$amount}")]);
+
+            return -$amount;
+        });
+    }
+
+    /** Recent oro movements, newest first. */
+    public function oroHistory(int $userId, int $limit = 40): array
+    {
+        return $this->db->table('economy_oro_transactions')
+            ->where('user_id', $userId)
+            ->orderByDesc('id')->limit($limit)
+            ->get(['delta', 'reason', 'ref', 'created_at'])
+            ->map(fn ($r) => (array) $r)->all();
+    }
+
     /**
      * The ladder, resolved once per worker process rather than once per call.
      *
@@ -521,6 +622,27 @@ class Ledger
                 $cap *= (float) ($boost['capBoost'] ?? 1.0);
             } catch (\Throwable $e) {
                 // A broken neighbour must not stop somebody earning.
+            }
+        }
+
+        // Early-adopter boost. A launch-window multiplier that stacks on top of
+        // the tier and store boosts above, on the same reasoning as the store
+        // boost: two things an account qualified for both apply, and the daily
+        // cap remains the real ceiling. The guard keeps this FREE when the
+        // feature is off — the default multiplier is 1.0 and the default
+        // `until` is empty, so the extra users-row read below never happens
+        // until an operator turns it on, which matters because tierModifiers()
+        // runs once per award (and once per serialized user on a leaderboard).
+        $eaMult = (float) Config::get($this->settings, 'earlyAdopter.multiplier');
+        $eaUntil = (string) Config::get($this->settings, 'earlyAdopter.until');
+        if ($eaMult != 1.0 && $eaUntil !== '') {
+            $u = $this->db->table('users')->where('id', $userId)->first(['joined_at']);
+            $joined = ($u && $u->joined_at) ? strtotime((string) $u->joined_at) : null;
+            if ($joined !== null && $joined <= strtotime($eaUntil . ' 23:59:59')) {
+                $windowDays = (int) Config::get($this->settings, 'earlyAdopter.windowDays');
+                if ($windowDays <= 0 || time() <= $joined + $windowDays * 86400) {
+                    $earn *= $eaMult;
+                }
             }
         }
 

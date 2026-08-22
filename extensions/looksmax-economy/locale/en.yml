@@ -60,6 +60,11 @@ local-looksmax-economy:
       # Ledger::refreshRank() for why it does not go through award().
       rank:
         milestone: Rank-up bonus
+      # New — paid by Quests::claim() via Ledger::credit(countsForRank:true).
+      # See src/Quests.php for why a quest reward counts toward rank.
+      quest:
+        daily: Daily quest
+        weekly: Weekly quest
 
     # Shown when a ledger row carries a reason this pack does not name yet —
     # better than printing the code, and it keeps the raw-key sentinel quiet.
@@ -100,6 +105,23 @@ local-looksmax-economy:
       post_min_multiplier: "Post effort weighting: minimum multiplier"
       post_max_multiplier: "Post effort weighting: maximum multiplier"
       post_multiplier_divisor: "Post effort weighting: characters per 1.0x"
+      quest_enabled: "Quests: turn the daily/weekly quest system on"
+      quest_daily_post3_target: "Daily quest “Post 3 times”: amount required"
+      quest_daily_post3_reward: "Daily quest “Post 3 times”: reward (points)"
+      quest_daily_give3_target: "Daily quest “Give 3 reactions”: amount required"
+      quest_daily_give3_reward: "Daily quest “Give 3 reactions”: reward (points)"
+      quest_daily_received1_target: "Daily quest “Receive a reaction”: amount required"
+      quest_daily_received1_reward: "Daily quest “Receive a reaction”: reward (points)"
+      quest_daily_streak_target: "Daily quest “Hold your streak”: amount required"
+      quest_daily_streak_reward: "Daily quest “Hold your streak”: reward (points)"
+      quest_weekly_post15_target: "Weekly quest “Post 15 times”: amount required"
+      quest_weekly_post15_reward: "Weekly quest “Post 15 times”: reward (points)"
+      quest_weekly_thread1_target: "Weekly quest “Start a thread”: amount required"
+      quest_weekly_thread1_reward: "Weekly quest “Start a thread”: reward (points)"
+      quest_weekly_reactions25_target: "Weekly quest “Receive 25 reactions”: amount required"
+      quest_weekly_reactions25_reward: "Weekly quest “Receive 25 reactions”: reward (points)"
+      quest_weekly_streak7_target: "Weekly quest “7 day streak”: amount required"
+      quest_weekly_streak7_reward: "Weekly quest “7 day streak”: reward (points)"
 
   # ── the streak/progress widget (js/dist/forum.js) ───────────────────────────
   forum:
@@ -112,5 +134,34 @@ local-looksmax-economy:
       top_rank: Top rank reached
       goal_posts: Posts today
       goal_reactions: Reactions received today
+      next_badge: "{count} to go for “{badge}”"
       celebrate_streak: "{count} day streak! Keep it going."
       celebrate_rank: "You reached {rank}!"
+      celebrate_achievement: "You earned “{name}”!"
+
+    quests:
+      daily: Daily
+      weekly: Weekly
+      claim: Claim
+      claimed: Claimed
+      celebrate: "Quest complete! +{count} points"
+      post3:
+        name: Post 3 times
+      give3:
+        name: Give 3 reactions
+      received1:
+        name: Receive a reaction
+      streak:
+        name: Hold today's streak
+      post15:
+        name: Post 15 times this week
+      thread1:
+        name: Start a thread
+      reactions25:
+        name: Receive 25 reactions this week
+      streak7:
+        name: Hold a 7 day streak
+      error:
+        guest: Sign in to claim quests.
+        failed: Could not process the quest. Try again.
+        not_claimable: This quest is not ready to claim yet.
