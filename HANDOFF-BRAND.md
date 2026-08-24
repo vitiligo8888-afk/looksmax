@@ -9,6 +9,51 @@ The brand itself is documented in `extensions/looksmax-brand/BRAND.md`.
 
 ---
 
+## 2026-08-14 — palette replaced: violet-on-black → navy-on-white
+
+The identity was replaced wholesale, not recoloured in place: navy `#273c75`
+primary / teal `#026055` secondary on white surfaces, flat (0-radius)
+structural shapes, a solid-navy header band. `BRAND.md` §1-2 (the mark, the
+lockup) and §5 (Archivo type) are still accurate; §3 (colour) and its measured
+contrast tables in §4 describe the superseded violet palette and need
+regenerating — `tools/palette.py` itself still targets a dark default (see the
+note at the top of `less/brand.less`) and was not retargeted, for scope
+reasons, so the new numbers in `less/brand.less` and
+`looksmax-theme/less/tokens.less` were computed and copied by hand this time.
+
+Three items measured and found broken, not fixed here, because the fix belongs
+in another lane or is a taste call rather than a value swap:
+
+1. **Every rank, tier, and front-page-section colour fails 4.5:1 on the new
+   white `--brand-surface`.** They were pastels tuned for `#12161c`-class dark
+   surfaces (measured 1.0-3.7:1 on white; `python3 tools/palette.py` will
+   reproduce these once it targets a light default). The six front-page
+   section colours were re-solved for white (see `less/brand.less`,
+   `--brand-section-*`) using the same method `tune_sections()` already uses —
+   floor lands at 0.0418 OKLab, short of this file's own 0.070, because
+   mejores-guias' fixed hue (262°, "reference, authority, ink-on-paper blue")
+   now sits 4° from the new navy accent (266°). Ranks and tiers were left
+   entirely alone: their source is `looksmax-ranks/src/Catalog.php`, which
+   `less/brand.less` only mirrors, so redarkening the mirror without touching
+   the source would drift on the next `palette.py --write`.
+2. **`.lmx-name.ns-obsidian` (`looksmax-ranks/less/styles.less:225`) stops
+   working as designed.** The style is a near-black fill (`#15181f`) with a
+   gold stroke, legible only because it used to sit on a near-black page — the
+   fill vanishing into the page was the point. On white it now reads as
+   ordinary bold dark text with a thin gold edge: not broken, but not the
+   effect the name implies either. A redesign is a taste call for whoever owns
+   name styles, not a contrast fix.
+3. **`logo_path` (admin setting) likely still points at the dark-surface
+   lockup.** `assets/lockup-light.svg` already exists and is correct for a
+   white page (built for print/e-mail, `BRAND.md` §1), but nothing in this
+   pass changed the admin setting or regenerated `favicon.ico` /
+   `og.png` / the OG card — that pipeline is `tools/build-assets.ts`, which
+   needs bun + Chromium on the build host, not available from where this pass
+   ran. Until it's rerun, the header logo file and social-share cards may
+   still show the violet lockup even though the page around them is navy.
+
+---
+
 ## P0 — must be fixed before this forum is public
 
 ### 1. `debug` is on, and a 404 returns a PHP stack trace
