@@ -48,7 +48,7 @@ $WANT = [
     // Header lockup and browser icon. Both resolve through the assets
     // filesystem, so these are paths relative to public/assets, which is where
     // the extension's assets/ directory is published to.
-    'logo_path' => ASSETS.'/lockup.svg',
+    'logo_path' => ASSETS.'/mark-lmx-v3.svg',
     'favicon_path' => ASSETS.'/favicon.ico',
 
     // The brass, and the surface behind the header. theme_primary_color is
