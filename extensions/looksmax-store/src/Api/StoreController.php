@@ -74,10 +74,11 @@ class StoreController implements RequestHandlerInterface
                 'guest' => $guest,
                 'id' => $userId,
                 'username' => $guest ? null : $actor->username,
-                // The store spends Oro now, so the balance bar shows the oro
-                // balance (the number the buy dialog checks against). Points
-                // stay the earned/rank currency, surfaced elsewhere.
-                'balance' => $guest ? 0 : (int) ($actor->oro ?? 0),
+                // Back to points. The store spends the EARNED balance again now
+                // that the paid currency is parked; `balance` is the number the
+                // buy dialog checks against, so it has to be the one the items
+                // are actually priced in or every card lies about affordability.
+                'balance' => $guest ? 0 : (int) $actor->points,
                 'oro' => $guest ? 0 : (int) ($actor->oro ?? 0),
                 'points' => $guest ? 0 : (int) $actor->points,
                 'lifetime' => $guest ? 0 : (int) $actor->lifetime_points,

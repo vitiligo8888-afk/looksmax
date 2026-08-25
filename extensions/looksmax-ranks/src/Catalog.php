@@ -42,7 +42,7 @@ class Catalog
         ['slug' => 'diamond',  'name' => 'Diamond',  'min' => 45000,   'color' => '#7ee0d3', 'icon' => 'ph:diamond-fill',              'blurb' => 'Rare. Earned over years.'],
         ['slug' => 'master',   'name' => 'Master',   'min' => 90000,   'color' => '#a78bfa', 'icon' => 'game-icons:laurel-crown',      'blurb' => 'Shapes how the board thinks.'],
         ['slug' => 'luminary', 'name' => 'Luminary', 'min' => 125000,  'color' => '#f0a5d0', 'icon' => 'ph:sparkle-fill',              'blurb' => 'Top of the ladder.'],
-        ['slug' => 'ascended', 'name' => 'Ascended', 'min' => 250000,  'color' => '#ffffff', 'icon' => 'game-icons:winged-emblem',     'blurb' => 'The ladder ran out.'],
+        ['slug' => 'ascended', 'name' => 'Ascended', 'min' => 250000,  'color' => '#ffffff', 'icon' => 'lmx:ascended',     'blurb' => 'The ladder ran out.'],
     ];
 
     /**

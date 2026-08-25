@@ -22,7 +22,7 @@ local-looksmax-store:
 
     head:
       title: Tienda
-      sub: Tu Oro. Cómpralo en la pestaña Oro y gástalo en todo lo demás.
+      sub: Los puntos se ganan participando. Aquí los gastas.
 
     title:
       catalogue: Tienda
@@ -38,7 +38,7 @@ local-looksmax-store:
 
     bar:
       guest: Inicia sesión para ver tu saldo y comprar aquí.
-      credits_unit: "{count, plural, one {Oro} other {Oro}}"
+      credits_unit: "{count, plural, one {punto} other {puntos}}"
       membership: Membresía
       discount: Tu descuento
       discount_sub: aplicado a los precios de abajo
@@ -114,13 +114,13 @@ local-looksmax-store:
     card:
       owned: ya lo tienes
       working: un momento…
-      short: "{count, plural, one {te falta # de Oro} other {te faltan # de Oro}}"
+      short: "{count, plural, one {te falta # punto} other {te faltan # puntos}}"
 
     buy:
       buy: Comprar
       renew: Renovar
       upgrade: Mejorar
-      credits: Comprar Oro
+      credits: Puntos
 
     dialog:
       price: Precio
@@ -129,7 +129,7 @@ local-looksmax-store:
       you_pay: Pagas
       balance_after: Saldo después
       lasts: Dura
-      credits_amount: "{count, plural, one {# de Oro} other {# de Oro}}"
+      credits_amount: "{count, plural, one {# punto} other {# puntos}}"
       gift_label: Regálaselo a alguien
       gift_placeholder: su nombre de usuario, o déjalo vacío
       card_label: Número de tarjeta

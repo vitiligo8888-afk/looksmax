@@ -45,11 +45,12 @@ return [
         ->route('/store/inventory', 'store.inventory')
         ->route('/store/orders', 'store.orders')
         ->route('/store/admin', 'store.admin')
-        ->content(Listeners\InjectStore::class)
-        // The Oro wallet: a self-contained launcher + buy/spend modal for the
-        // paid currency. See Listeners/InjectOroWallet.php for why it is inline
-        // rather than a component in the (source-less) dist bundle.
-        ->content(Listeners\InjectOroWallet::class),
+        ->content(Listeners\InjectStore::class),
+        // The Oro wallet injector is deliberately NOT registered. Operator put
+        // the paid currency on ice ("that can wait a lot"), so the launcher and
+        // its buy/spend modal are off the page. Listeners/InjectOroWallet.php is
+        // kept, and so are the oro column, its ledger and the balances — turning
+        // the currency back on is re-adding this one line, not rebuilding it.
 
     (new Extend\Frontend('admin'))
         ->content(Listeners\InjectAdminLink::class)

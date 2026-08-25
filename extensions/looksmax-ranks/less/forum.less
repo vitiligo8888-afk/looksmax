@@ -54,10 +54,28 @@
   // vocabulary as the rest of the theme (25% vs 22% is not perceptible).
   background: var(--black-a25);
 
+  // CIRCULAR MEDALLION, 2026-08-25. Operator: "make all the icons circle".
+  // The glyph gets its own round backing inside the chip, so rank, tier and
+  // badge all read as the same coin-shaped mark regardless of which icon set
+  // the glyph came from — the sets draw at different weights and optical sizes,
+  // and the ring is what makes them look like one system anyway.
+  //
+  // color-mix, never fade(): the note further down records that fade() on a
+  // keyword like currentColor throws in wikimedia/less.php and 500s every page
+  // on the forum. Same reason applies here.
   iconify-icon,
   .lmx-chip-icon {
     font-size: 11px;
     line-height: 1;
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 32%, transparent);
   }
 }
 
@@ -132,7 +150,10 @@
   justify-content: center;
   width: 15px;
   height: 15px;
-  border-radius: 3px;
+  // Round, with the chip glyphs. It was already a 15x15 square, so 50% is the
+  // whole change — the box was square by construction, which is why this can be
+  // a circle and the text chips around it cannot.
+  border-radius: 50%;
   font-size: 11px;
   color: var(--lmx-badge-color, var(--ink-dim, #aab5c6));
   background: fade(#000, 30%);
