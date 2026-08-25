@@ -3,7 +3,7 @@ slug: area-de-los-ojos-guia
 seo_title: "Área de los ojos: ojeras, bolsas y qué de verdad funciona — Looksmax.lat"
 meta_description: "Qué causa las ojeras (pigmento, vascular, hueco), cómo saber cuál tienes y qué opciones tienen evidencia real. Guía honesta, con lo que NO sirve."
 canonical: /d/350-area-de-los-ojos-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original, replaces translated /d/350)
 sources:

@@ -3,7 +3,7 @@ slug: estres-apariencia
 seo_title: "Estrés y apariencia: cómo afecta tu piel, cara y cabello (y qué hacer) — Looksmax.lat"
 meta_description: "El estrés crónico se ve: piel, ojeras, caída de cabello, tensión facial. Qué pasa, qué ayuda de verdad y cuándo buscar apoyo. Guía honesta."
 canonical: /d/estres-apariencia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

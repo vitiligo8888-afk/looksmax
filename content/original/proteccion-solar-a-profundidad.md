@@ -3,7 +3,7 @@ slug: proteccion-solar-guia
 seo_title: "Protección solar a fondo: SPF, tipos, cuánto y cada cuánto — Looksmax.lat"
 meta_description: "El mejor 'anti-edad' que existe: cómo elegir protector solar, cuánta cantidad, reaplicación y mitos. Guía a profundidad para clima de LatAm."
 canonical: /d/proteccion-solar-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

@@ -3,7 +3,7 @@ slug: lenguaje-corporal-guia
 seo_title: "Lenguaje corporal: cómo proyectar presencia (sin actuar) — Looksmax.lat"
 meta_description: "Postura, manos, contacto visual y ocupar tu espacio: qué comunica tu cuerpo y cómo mejorarlo de forma natural. Guía práctica y honesta."
 canonical: /d/lenguaje-corporal-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:

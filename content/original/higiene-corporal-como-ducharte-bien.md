@@ -3,7 +3,7 @@ slug: higiene-corporal-guia
 seo_title: "Higiene corporal: cómo ducharte bien (guía práctica) — Looksmax.lat"
 meta_description: "Cómo ducharte de forma que la piel lo agradezca: frecuencia, agua templada, zonas que sí necesitan jabón y errores comunes. Guía práctica para clima de LatAm."
 canonical: /d/334-higiene-corporal-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original, replaces translated /d/334)
 sources:

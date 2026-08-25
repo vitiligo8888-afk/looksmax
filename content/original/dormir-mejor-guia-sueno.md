@@ -3,7 +3,7 @@ slug: dormir-mejor-guia
 seo_title: "Dormir mejor: la guía de sueño que sí mueve la aguja — Looksmax.lat"
 meta_description: "Horario fijo, luz, temperatura y cafeína: lo que de verdad mejora el sueño (y la cara, la piel y el ánimo). Guía práctica basada en evidencia."
 canonical: /d/18298-dormir-mejor-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

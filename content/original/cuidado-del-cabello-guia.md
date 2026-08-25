@@ -3,7 +3,7 @@ slug: cuidado-cabello-guia
 seo_title: "Cuidado del cabello: lo básico que sí funciona — Looksmax.lat"
 meta_description: "Cada cuánto lavar, cómo secar, corte según tu cara y cómo detectar caída temprano. Guía honesta de cabello para clima de LatAm, sin humo."
 canonical: /d/cuidado-cabello-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

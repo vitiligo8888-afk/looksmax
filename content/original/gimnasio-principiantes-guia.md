@@ -3,7 +3,7 @@ slug: gimnasio-principiantes
 seo_title: "Gimnasio para principiantes: empezar bien (guía natural, sin humo) — Looksmax.lat"
 meta_description: "Cómo empezar en el gym: sobrecarga progresiva, básicos, cuánto entrenar, comer para tu objetivo y descanso. Guía natural para principiantes."
 canonical: /d/gimnasio-principiantes
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:

@@ -3,7 +3,7 @@ slug: cejas-guia
 seo_title: "Cejas: cómo mejorarlas sin arruinarlas (guía práctica) — Looksmax.lat"
 meta_description: "Forma según tu cara, cómo dejarlas crecer, qué depilar y qué no, y por qué las cejas cambian tanto la mirada. Guía honesta para hombres y mujeres."
 canonical: /d/33106-cejas-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

@@ -3,7 +3,7 @@ slug: cuello-neckmaxxing-guia
 seo_title: "Neckmaxxing: cuello más definido, con expectativas reales — Looksmax.lat"
 meta_description: "Qué de verdad mejora el cuello: grasa corporal, postura y entrenamiento del cuello. Papada, 'cuello de texto' y qué NO promete la ciencia."
 canonical: /d/17963-cuello-neckmaxxing-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

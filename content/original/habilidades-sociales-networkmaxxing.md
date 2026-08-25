@@ -3,7 +3,7 @@ slug: habilidades-sociales-guia
 seo_title: "Habilidades sociales: cómo caer bien y construir tu red (guía real) — Looksmax.lat"
 meta_description: "Cómo mejorar tu presencia social sin ser falso: escuchar, lenguaje corporal, iniciar conversaciones y construir una red de verdad. Guía práctica."
 canonical: /d/habilidades-sociales-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:

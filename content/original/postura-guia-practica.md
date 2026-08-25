@@ -3,7 +3,7 @@ slug: postura-guia
 seo_title: "Postura: cómo corregirla de verdad (y por qué cambia tu apariencia) — Looksmax.lat"
 meta_description: "La mala postura no se arregla 'echando los hombros atrás'. Qué la causa, ejercicios que sí ayudan y cuándo ver a un profesional. Guía práctica."
 canonical: /d/17221-postura-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

@@ -3,7 +3,7 @@ slug: higiene-bucal-sonrisa
 seo_title: "Higiene bucal y sonrisa: dientes más sanos y blancos (sin dañarlos) — Looksmax.lat"
 meta_description: "Técnica de cepillado, hilo, mal aliento y blanqueamiento seguro vs. mitos que dañan el esmalte. Guía honesta para una sonrisa sana."
 canonical: /d/higiene-bucal-sonrisa
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

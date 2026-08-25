@@ -3,7 +3,7 @@ slug: rutina-cuidado-piel
 seo_title: "Rutina de cuidado de piel: lo básico que sí funciona — Looksmax.lat"
 meta_description: "Limpiador, protector solar e hidratante: la rutina mínima con evidencia, cómo introducir retinoides y qué ignorar. Guía honesta para piel real."
 canonical: /d/900-rutina-cuidado-piel
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

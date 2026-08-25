@@ -3,7 +3,7 @@ slug: fragancia-presencia
 seo_title: "Fragancia y olor personal: cómo oler bien (guía práctica) — Looksmax.lat"
 meta_description: "Higiene primero, luego fragancia: tipos, dónde y cuánto aplicar, cuánto dura y errores que arruinan el efecto. Guía honesta para clima cálido."
 canonical: /d/fragancia-presencia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

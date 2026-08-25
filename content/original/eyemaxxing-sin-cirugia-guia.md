@@ -3,7 +3,7 @@ slug: eyemaxxing-sin-cirugia
 seo_title: "Eyemaxxing sin cirugía: mejorar la mirada con lo que sí funciona — Looksmax.lat"
 meta_description: "Sueño, ojeras, pestañas, cejas y descanso visual: cómo mejorar la zona de los ojos sin procedimientos. Expectativas reales y qué evitar."
 canonical: /d/eyemaxxing-sin-cirugia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

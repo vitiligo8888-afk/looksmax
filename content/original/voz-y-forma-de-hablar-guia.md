@@ -3,7 +3,7 @@ slug: voz-forma-de-hablar
 seo_title: "Voz y forma de hablar: cómo sonar más seguro (guía práctica) — Looksmax.lat"
 meta_description: "Ritmo, pausas, volumen y respiración: cómo mejorar tu voz y tu forma de hablar sin fingir. Ejercicios simples y errores que restan presencia."
 canonical: /d/voz-forma-de-hablar
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:

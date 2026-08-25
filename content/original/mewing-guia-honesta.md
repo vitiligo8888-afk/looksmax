@@ -3,7 +3,7 @@ slug: mewing-guia
 seo_title: "Mewing: qué es, qué dice la evidencia y qué esperar (honesto) — Looksmax.lat"
 meta_description: "Mewing explicado sin humo: qué es la postura lingual, qué evidencia real existe, expectativas honestas por edad y cuándo ver a un ortodoncista."
 canonical: /d/mewing-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

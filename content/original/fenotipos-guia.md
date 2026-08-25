@@ -3,7 +3,7 @@ slug: fenotipos-guia
 seo_title: "Fenotipos faciales: qué son y cómo usarlos a tu favor — Looksmax.lat"
 meta_description: "Qué es un fenotipo, por qué ciertos rasgos 'combinan' y cómo elegir corte, barba y estilo que armonicen con tu cara. Guía sin pseudociencia."
 canonical: /d/fenotipos-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:

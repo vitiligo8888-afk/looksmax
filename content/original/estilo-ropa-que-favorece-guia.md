@@ -3,7 +3,7 @@ slug: estilo-ropa-guia
 seo_title: "Estilo básico: ropa que favorece (el ajuste importa más que la marca) — Looksmax.lat"
 meta_description: "El fit lo es casi todo: cómo debe quedar la ropa, una base de prendas que combinan y errores que arruinan el look. Guía práctica y barata."
 canonical: /d/estilo-ropa-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:

@@ -3,7 +3,7 @@ slug: manos-unas-guia
 seo_title: "Manos y uñas: cómo cuidarlas (detalle que la gente sí nota) — Looksmax.lat"
 meta_description: "Uñas limpias y parejas, cutícula, manos hidratadas y errores comunes. Un detalle barato de grooming que mejora tu presencia. Guía práctica."
 canonical: /d/manos-unas-guia
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

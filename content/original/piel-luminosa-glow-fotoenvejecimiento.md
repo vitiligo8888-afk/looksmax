@@ -3,7 +3,7 @@ slug: piel-luminosa-glow
 seo_title: "Piel luminosa (glow): qué la da de verdad y cómo prevenir el fotoenvejecimiento — Looksmax.lat"
 meta_description: "El 'glow' no viene de una crema: hidratación, sueño, sol y hábitos. Qué funciona, qué es marketing y cómo frenar el fotoenvejecimiento. Guía honesta."
 canonical: /d/piel-luminosa-glow
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

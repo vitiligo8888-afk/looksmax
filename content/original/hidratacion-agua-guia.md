@@ -3,7 +3,7 @@ slug: hidratacion-agua
 seo_title: "Hidratación: cuánta agua necesitas de verdad (sin mitos) — Looksmax.lat"
 meta_description: "Cuánta agua tomar según tu cuerpo y clima, señales de deshidratación, y cómo afecta piel, energía y rendimiento. Guía honesta para clima cálido."
 canonical: /d/hidratacion-agua
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
 sources:

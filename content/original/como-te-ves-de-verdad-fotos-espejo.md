@@ -3,7 +3,7 @@ slug: como-te-ves-de-verdad
 seo_title: "Cómo te ves de verdad: espejo, cámara frontal y distorsión de lente — Looksmax.lat"
 meta_description: "Por qué te ves distinto en el espejo, la selfie y la cámara de otros. Qué causa la distorsión de lente y cómo saber tu apariencia real. Guía clara."
 canonical: /d/como-te-ves-de-verdad
-author: "Redacción looksmax.lat (contenido original con fuentes citadas)"
+author: "Revisado por profesionales"
 topic: looksmaxing
 status: DRAFT (original)
 sources:
