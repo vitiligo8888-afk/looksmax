@@ -84,11 +84,24 @@
 // landing on those measured values. Note the direction of travel: the page is
 // no longer true black, so every card now sits ABOVE the page rather than a
 // hair off it, which is the visual difference that reads as "the other board".
-@c-bg:         #1f1f1f;   // the page — neutral charcoal, not black
-@c-surface-0:  #1a1a1a;   // wells, insets, code — the only step below the page
-@c-surface-1:  #232323;   // cards, posts, list rows
-@c-surface-2:  #282828;   // raised: inputs, chips
-@c-surface-3:  #303030;   // hover / pressed
+// 70 / 30 as of 2026-08-25, operator's split: mostly a dark grey with a little
+// white mixed into it, over black. The two roles are assigned by AREA, which is
+// what makes the ratio land: on a forum the cards, rows and panels cover most
+// of the viewport, so they carry the grey, and the page behind them carries the
+// black. Roughly seven parts grey to three parts black without measuring
+// pixels.
+//
+// This also widens a gap that was too tight to do its job. At #1f1f1f page and
+// #232323 card the two were 0.02 apart in lightness, so a card was identified
+// almost entirely by its hairline; the earlier note in this file about cards
+// being hard to see came from exactly that. Grey-on-black separates them by
+// fill again, and the hairline goes back to reinforcing an edge rather than
+// being the edge.
+@c-bg:         #0f0f0f;   // the page — near black, the 30
+@c-surface-0:  #171717;   // wells, insets, code — between page and card
+@c-surface-1:  #2e2e2e;   // cards, posts, list rows — the dominant grey, the 70
+@c-surface-2:  #363636;   // raised: inputs, chips
+@c-surface-3:  #404040;   // hover / pressed
 // A card cannot be identified by fill at 1.10:1. It never is here: every card
 // carries this hairline AND an elevation, and the sweep asserts both, because
 // "the post tiles can't be seen" was a real operator report caused by relying
@@ -117,7 +130,11 @@
 // near-black card; on a #232323 card it is DARKER than the card and the edge
 // disappears. #414141 is the value the reference board rules its own panels
 // with, and it clears surface-2 by enough to draw an edge without boxing it.
-@c-line:       #414141;   // panel rule — above surface-2, not a white box
+// Lifted with the ramp again: on a #363636 raised surface a #414141 rule is
+// barely a shade apart and stops reading as an edge. #4d4d4d clears surface-2
+// while staying well under the ink, so it draws a boundary without becoming a
+// light box around every panel.
+@c-line:       #4d4d4d;   // panel rule — above surface-2, not a white box
 @c-line-strong:#6f6f6f;   // control boundaries (1.4.11 wants 3:1)
 // Text, from the same capture. Slightly warmer/neutral than the violet-tinted
 // set they replace, which suits a neutral grey page; both still clear 4.5:1 on
@@ -139,7 +156,12 @@
 // and chroma family lifted to 5.4:1, so links read as purple and are still
 // legible. The saturated originals stay available below for filled chips,
 // which is the way that board actually uses them.
-@c-accent:     #b57ae8;   // purple — house colour, readable on charcoal
+// Nudged once more with the 70/30 ramp. A link is read on a CARD, not on the
+// page, and the card is now #2e2e2e rather than #232323 — which drops #b57ae8
+// to 4.47:1, a hair under 1.4.3. #bd88ec restores the margin (5.1:1 on a card,
+// 7.2:1 on the page) at the same hue. The card is the surface that governs
+// this token, not the darkest thing on screen.
+@c-accent:     #bd88ec;   // purple — house colour, readable on the grey card
 @c-accent-2:   #8dc7f7;   // light blue, secondary / links (from the same capture)
 // The saturated pair, for FILLED surfaces only (badges, chips), where the
 // contrast comes from the fill and the label sits on top of it.
