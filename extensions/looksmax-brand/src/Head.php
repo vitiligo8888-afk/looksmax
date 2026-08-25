@@ -43,7 +43,9 @@ class Head
 
     public function __invoke(Document $document, Request $request): void
     {
-        $asset = fn (string $file): string => $this->url->to('forum')->path(self::ASSET_PREFIX.'/'.$file);
+        // ?v= busts browser/CDN caches when the icon art changes. Bump the
+        // constant when shipping a new mark (v4 = the skinny triple chevron).
+        $asset = fn (string $file): string => $this->url->to('forum')->path(self::ASSET_PREFIX.'/'.$file).'?v=chev4';
 
         $title = $this->settings->get('forum_title') ?: 'Looksmax.lat';
         $description = $this->settings->get('forum_description') ?: '';

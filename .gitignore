@@ -10,3 +10,23 @@ extensions/*/vendor/
 look-audit/
 shots*/
 visual-base/
+
+# Working data from the SEO/pruning audit and the translation runs. Regenerated
+# on demand and multi-megabyte; the reviewed deliverables (inventory.csv,
+# actions.csv, REPORT.md, rewrite-queue.csv ...) ARE tracked.
+audit/discussions.jsonl
+audit/url_hits_all.tsv
+audit/searchbot_hits.tsv
+audit/index_section_counts.tsv
+audit/index_sections_schema.txt
+audit/tags.tsv
+audit/shards/
+audit/work/
+audit/gsc/
+backups/
+
+# Per-batch translation scratch (content/original/ is the tracked source).
+content/tw*/
+content/g[0-9]*/
+content/held/
+content/redo/
