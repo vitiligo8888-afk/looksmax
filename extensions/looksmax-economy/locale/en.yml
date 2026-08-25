@@ -139,6 +139,13 @@ local-looksmax-economy:
       celebrate_rank: "You reached {rank}!"
       celebrate_achievement: "You earned “{name}”!"
 
+    wheel:
+      title: Daily wheel
+      spin: Spin
+      error:
+        guest: Log in to spin.
+        already: You already spun today. Come back tomorrow.
+        failed: Could not spin. Try again in a moment.
     quests:
       daily: Daily
       weekly: Weekly

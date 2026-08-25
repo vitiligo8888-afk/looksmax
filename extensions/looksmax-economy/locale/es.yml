@@ -118,6 +118,13 @@ local-looksmax-economy:
       celebrate_rank: "¡Alcanzaste {rank}!"
       celebrate_achievement: "¡Lograste «{name}»!"
 
+    wheel:
+      title: Ruleta diaria
+      spin: Girar
+      error:
+        guest: Inicia sesión para girar.
+        already: Ya giraste hoy. Vuelve mañana.
+        failed: No se pudo girar. Inténtalo en un momento.
     quests:
       daily: Diarios
       weekly: Semanales

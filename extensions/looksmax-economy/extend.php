@@ -8,12 +8,16 @@ use Flarum\User\User;
 use Local\Economy\Api\QuestsActionController;
 use Local\Economy\Api\QuestsController;
 use Local\Economy\Api\SummaryController;
+use Local\Economy\Api\WheelController;
+use Local\Economy\Api\WheelLibController;
+use Local\Economy\Api\WheelSpinController;
 use Local\Economy\Config;
 use Local\Economy\InjectAdminScript;
 use Local\Economy\InjectInviteWidget;
 use Local\Economy\InjectQuests;
 use Local\Economy\InjectRefCapture;
 use Local\Economy\InjectScript;
+use Local\Economy\InjectWheel;
 use Local\Economy\Ledger;
 use Local\Economy\Listeners;
 use Illuminate\Database\ConnectionInterface;
@@ -33,7 +37,10 @@ return [
         // The daily-quest panel, opened from the nav's "Misiones diarias" entry.
         // The engine and its endpoints already existed; this is the surface that
         // did not. See InjectQuests.php.
-        ->content(InjectQuests::class),
+        ->content(InjectQuests::class)
+        // La ruleta diaria. La libreria de terceros no viaja aqui: se pide a
+        // /api/economy/wheel/lib.js la primera vez que alguien la abre.
+        ->content(InjectWheel::class),
 
     // The settings screen. Every control here writes an `economy.*` setting
     // that Config.php reads — the direct fix for "every award amount, daily
@@ -170,7 +177,12 @@ return [
         // shape as looksmax-cosmetics' equip endpoint and looksmax-ranks'
         // identity endpoints.
         ->get('/economy/quests', 'economy.quests', QuestsController::class)
-        ->post('/economy/quests/claim', 'economy.quests.claim', QuestsActionController::class),
+        ->post('/economy/quests/claim', 'economy.quests.claim', QuestsActionController::class)
+        // Ruleta: estado, giro, y la libreria. El premio se sortea en
+        // Wheel::spin() y el cliente solo anima hacia el indice devuelto.
+        ->get('/economy/wheel', 'economy.wheel', WheelController::class)
+        ->post('/economy/wheel/spin', 'economy.wheel.spin', WheelSpinController::class)
+        ->get('/economy/wheel/lib.js', 'economy.wheel.lib', WheelLibController::class),
 
     (new Extend\Event())
         ->listen(\Flarum\Post\Event\Posted::class, Listeners\AwardPost::class)

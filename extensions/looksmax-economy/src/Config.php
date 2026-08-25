@@ -124,6 +124,12 @@ class Config
         // `quest.enabled` is the kill switch: false hides the whole feature
         // (State::state() returns an empty list) without touching any other
         // award path.
+        // --- ruleta -----------------------------------------------------------
+        // Un giro por cuenta y dia. Ver src/Wheel.php: los premios y sus pesos
+        // viven en codigo porque cambiarlos altera el valor esperado de la
+        // economia entera, y eso no debe poder hacerse desde un formulario.
+        'wheel.enabled'                    => [true, 'bool'],
+
         'quest.enabled'                    => [true, 'bool'],
         'quest.daily.post3.target'         => [3, 'int'],
         'quest.daily.post3.reward'         => [8, 'int'],
