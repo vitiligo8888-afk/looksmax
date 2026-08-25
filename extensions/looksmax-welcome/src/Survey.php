@@ -59,12 +59,23 @@ class Survey
     public const OPTIONS = [
         // --- sections: what content you're here for -------------------------
         // Order matches Local\Index\Sections::SECTIONS exactly.
-        'section_mejores_guias' => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:book-open-text', 'color' => '#bea7ff'],
-        'section_looksmaxing'   => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:sparkle',         'color' => '#f8ae00'],
-        'section_softmaxing'    => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:drop',             'color' => '#59dc7f'],
-        'section_hardmaxing'    => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:warning',          'color' => '#ff89c3'],
-        'section_peptides'      => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:syringe',          'color' => '#00dfe0'],
-        'section_anabolicos'    => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:barbell',          'color' => '#ff8b83'],
+        // Colours nulled 2026-08-25 along with Sections::C. These six hexes were
+        // a hand-copy of the palette that Local\Index\Sections derives, and a
+        // copy is exactly why they survived that change: zeroing the chroma at
+        // the source neutralised the section cards and the nav, and these chips
+        // kept painting the old rainbow — including the two pinks the operator
+        // had already had removed everywhere else.
+        //
+        // `null` is the same value the intent rows below use, so the chip falls
+        // back to the scheme's own neutral instead of carrying a hue of its own.
+        // If section colour ever comes back, derive it from Sections::color()
+        // here rather than restoring literals, so there is one source of truth.
+        'section_mejores_guias' => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:book-open-text', 'color' => null],
+        'section_looksmaxing'   => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:sparkle',         'color' => null],
+        'section_softmaxing'    => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:drop',             'color' => null],
+        'section_hardmaxing'    => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:warning',          'color' => null],
+        'section_peptides'      => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:syringe',          'color' => null],
+        'section_anabolicos'    => ['category' => self::CATEGORY_SECTION, 'icon' => 'ph:barbell',          'color' => null],
 
         // --- intent: why you're actually here --------------------------------
         'intent_learn'     => ['category' => self::CATEGORY_INTENT, 'icon' => 'ph:graduation-cap-fill', 'color' => null],

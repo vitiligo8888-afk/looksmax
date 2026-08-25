@@ -340,6 +340,18 @@
 .drawer-backdrop { background: var(--scrim); }
 
 // ============================================================ page nav column
+// Breathing room under the nav row. Operator asked for it, and the 70/30 ramp
+// is why it became noticeable: on the old black page the nav and the content
+// under it were separated by a fill difference of almost nothing, so the gap
+// read as "one block". Now the cards are a distinctly lighter grey, the nav
+// sits directly against the first card edge and the two crowd each other.
+// Applied to the nav container, not the buttons, so the spacing survives any
+// change to the item styling.
+.IndexPage-nav,
+.App-nav {
+  margin-bottom: var(--gap-md, 16px);
+}
+
 // The index/discussion side nav is chrome too: same ghost treatment, so the
 // left column and the header speak the same language.
 .IndexPage-nav .item-nav .Button,

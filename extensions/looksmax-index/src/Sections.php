@@ -54,7 +54,22 @@ class Sections
 {
     /** The lightness and chroma every section colour is generated at. */
     public const L = 0.80;
-    public const C = 0.175;
+    // CHROMA ZERO, 2026-08-25. Operator: "arregla los tags el color".
+    //
+    // The six hues below were a deliberate system on the old scheme, but the
+    // palette the operator has since asked for is dark grey, a little white and
+    // black — and the accent was pulled off purple in the same breath for
+    // reading as pink. Two of these sections landed on #ff89c3 and #ff8b83,
+    // which is exactly the colour that was just removed everywhere else, so the
+    // set was contradicting the rest of the UI.
+    //
+    // Zeroing the chroma rather than hand-editing six hex values keeps this
+    // file's own rule intact: one lightness and one chroma for the whole set,
+    // hue assigned per section. At C=0 every hue resolves to the same neutral,
+    // so the sections stay a system instead of becoming six arbitrary greys,
+    // the hue table below is preserved as documentation, and restoring colour
+    // later is this one number — not a rewrite.
+    public const C = 0;
 
     /**
      * key      the classifier's id and the i18n key fragment

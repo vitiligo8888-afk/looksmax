@@ -249,8 +249,19 @@
 .TagLabel--colored,
 .TagLabel--colored.text-contrast--dark,
 .TagLabel--colored.text-contrast--light {
-  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 12%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 28%, transparent);
+  // RAISED FOR THE GREY RAMP, 2026-08-25. Operator: "los tags que casi no se
+  // ven". 12/28 was measured against a TRUE BLACK page, where a 12% tint still
+  // had the full depth of the page to separate from. The cards are #2e2e2e now,
+  // so that tint lands a couple of percent off its own background and the chip
+  // dissolves — the same failure the --line token had one step earlier, and the
+  // same fix: the mix has to be restated whenever the surface under it moves.
+  //
+  // 22/45 is the smallest pair that reads as a chip on a #2e2e2e card without
+  // going back to the "bag of stickers" the restraint pass below was written to
+  // avoid: the fill is still a tint rather than a fill, and the ring still does
+  // most of the identifying.
+  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 45%, transparent);
   // The tag hue, lifted toward the scheme's TEXT colour until it is readable.
   // Doing this in one place is what makes an arbitrary imported palette safe.
   //
@@ -258,7 +269,13 @@
   // exactly wrong on the light one, where it washes an already-pale imported
   // hue into the page. --ink is light on dark schemes and near-black on the
   // light scheme, so one rule stays legible in all three.
-  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 58%, var(--ink));
+  //
+  // Lifted with the fill, 58% -> 68%. On a black page the extra --ink was doing
+  // real work; against a #2e2e2e card that ink share flattened every hue toward
+  // the same pale near-white, so six different sections read as six identical
+  // chips. Every hue in the live set is bright, so the higher tag share stays
+  // well clear of the card.
+  color: color-mix(in srgb, var(--tag-bg, var(--accent)) 68%, var(--ink));
 }
 
 // core sets these on the chip and on its children; both have to be neutralised
