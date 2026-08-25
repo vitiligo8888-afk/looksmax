@@ -49,6 +49,12 @@ class WheelSpinController implements RequestHandlerInterface
             // el neto en vez de un "ganaste 5" que oculta que costó 25.
             'paid' => (bool) ($result['paid'] ?? false),
             'cost' => (int) ($result['cost'] ?? 0),
+            // Que se ganó exactamente: puntos, un marco nuevo, o un marco que
+            // ya se tenía y por eso pagó la compensación.
+            'kind' => (string) ($result['kind'] ?? 'points'),
+            'frame' => $result['frame'] ?? null,
+            'frameName' => $result['frameName'] ?? null,
+            'already' => (bool) ($result['already'] ?? false),
             'state' => $this->wheel->state((int) $actor->id),
         ]);
     }

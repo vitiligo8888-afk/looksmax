@@ -16,17 +16,29 @@ use Illuminate\Database\ConnectionInterface;
  * decidió. Una ruleta que sortea en el navegador se gana con la consola
  * abierta.
  *
- * ── La forma de los premios: pocos aciertos, premios gordos ─────────────────
+ * ── La forma de los premios ─────────────────────────────────────────────────
  *
- * 62% de los giros no dan nada. A cambio el bote son 2500 puntos: cincuenta
- * veces lo que cuesta el giro, 1 de cada 200. Esa es la petición explícita del
- * operador, y es también lo que hace que la ruleta valga la pena mirarla — una
- * que siempre paga algo pequeño no emociona a nadie y además drena poco.
+ *   1%   super premio: el marco Vacío
+ *   5%   cosmético:    el marco Sangre
+ *  44.5% nada
+ *  49.5% relleno en puntos (10 / 25 / 50 / 150 / 500)
  *
- * Valor esperado 33.25 sobre un coste de 50: devuelve el 66%. La economía
- * reparte puntos por publicar, por reaccionar, por rachas y por misiones, y no
- * tenía casi nada que los sacara de circulación; esto es el SUMIDERO. Al 100%
- * no drenaría nada y al 30% se sentiría a estafa.
+ * Los dos marcos son de concesión pura en cosmetic_defs ({"type":"never"}):
+ * hoy no hay NINGUNA vía para conseguirlos, ni comprando ni subiendo de nivel.
+ * Por eso son los correctos para la ruleta — repartir un marco de un tier de
+ * pago devaluaría ese tier, y repartir uno de la tienda competiría con ella.
+ * Aquí la ruleta pasa a ser la única puerta a esos dos, que es lo que convierte
+ * el 1% en algo que se persigue.
+ *
+ * Un marco solo se puede tener una vez. Si ya lo tienes, el segmento paga
+ * puntos en su lugar (2500 el super, 500 el otro): un segmento que se vuelve
+ * inerte cuando ya ganaste es peor que no tenerlo.
+ *
+ * Valor esperado en PUNTOS 31.7 sobre un coste de 50: devuelve el 63%. Los
+ * cosméticos no inflan la economía —no son puntos— así que suman deseo sin
+ * romper el sumidero, que es lo que esta economía necesitaba: reparte por
+ * publicar, reaccionar, rachas y misiones, y casi nada sacaba puntos de
+ * circulación.
  *
  * ── Por qué existe wheel.roll ───────────────────────────────────────────────
  *
@@ -56,23 +68,24 @@ class Wheel
      * Eso no debe poder tocarse desde un formulario sin rehacer la cuenta.
      */
     public const PRIZES = [
-        ['points' => 0,    'weight' => 104],
-        ['points' => 10,   'weight' => 150],
-        ['points' => 0,    'weight' => 104],
-        ['points' => 150,  'weight' => 40],
-        ['points' => 0,    'weight' => 103],
-        ['points' => 25,   'weight' => 110],
-        ['points' => 0,    'weight' => 103],
-        ['points' => 500,  'weight' => 15],
-        ['points' => 0,    'weight' => 103],
-        ['points' => 50,   'weight' => 60],
-        ['points' => 0,    'weight' => 103],
-        ['points' => 2500, 'weight' => 5],
+        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 10,  'weight' => 170, 'label' => '10'],
+        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 150, 'weight' => 60,  'label' => '150'],
+        ['kind' => 'frame',  'frame' => 'blood', 'points' => 500, 'weight' => 50, 'label' => 'Sangre'],
+        ['kind' => 'points', 'points' => 25,  'weight' => 140, 'label' => '25'],
+        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 500, 'weight' => 25,  'label' => '500'],
+        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 50,  'weight' => 100, 'label' => '50'],
+        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'frame',  'frame' => 'void', 'points' => 2500, 'weight' => 10, 'label' => 'Vacío'],
     ];
 
     public const REASON = 'wheel.spin';
     public const REASON_COST = 'wheel.cost';
     public const REASON_ROLL = 'wheel.roll';
+    public const REASON_FRAME = 'wheel.frame';
 
     public function __construct(
         protected ConnectionInterface $db,
@@ -176,7 +189,7 @@ class Wheel
      * un giro sin premio no tiene fila en `wheel.spin`, y mirar solo los
      * premios devolvería el de hace tres giros como si fuera el último.
      */
-    private function lastResult(int $userId): ?int
+    private function lastResult(int $userId): ?array
     {
         $roll = $this->db->table('economy_transactions')
             ->where('user_id', $userId)
@@ -189,13 +202,24 @@ class Wheel
             return null;
         }
 
+        // ¿Ese giro dio un marco? El slug viaja pegado al ref.
+        $frameRow = $this->db->table('economy_transactions')
+            ->where('user_id', $userId)
+            ->where('reason', self::REASON_FRAME)
+            ->where('ref', 'like', $roll->ref . ':%')
+            ->value('ref');
+
+        if ($frameRow) {
+            return ['kind' => 'frame', 'points' => 0, 'frame' => substr((string) $frameRow, strlen($roll->ref) + 1)];
+        }
+
         $prize = $this->db->table('economy_transactions')
             ->where('user_id', $userId)
             ->where('reason', self::REASON)
             ->where('ref', $roll->ref)
             ->value('delta');
 
-        return (int) ($prize ?? 0);
+        return ['kind' => 'points', 'points' => (int) ($prize ?? 0), 'frame' => null];
     }
 
     /**
@@ -205,7 +229,11 @@ class Wheel
      */
     public function state(int $userId): array
     {
-        $prizes = array_map(fn ($p) => ['points' => (int) $p['points']], self::PRIZES);
+        $prizes = array_map(fn ($p) => [
+            'points' => (int) ($p['points'] ?? 0),
+            'kind' => (string) $p['kind'],
+            'label' => (string) $p['label'],
+        ], self::PRIZES);
         $cost = $this->cost();
         $max = $this->paidMax();
 
@@ -232,7 +260,7 @@ class Wheel
         $free = ! $this->freeUsed($userId);
         $paid = $this->paidCount($userId);
         $balance = $this->balance($userId);
-        $won = $this->lastResult($userId);
+        $last = $this->lastResult($userId);
 
         $canPaid = ! $free && $paid < $max && $cost > 0 && $balance >= $cost;
 
@@ -242,20 +270,42 @@ class Wheel
             'canSpin' => $free || $canPaid,
             'paidToday' => $paid,
             'balance' => $balance,
-            'won' => $won,
-            'wonIndex' => $won === null ? null : $this->indexOfPoints($won),
+            'won' => $last === null ? null : $last['points'],
+            'wonFrame' => $last === null ? null : $last['frame'],
+            'wonIndex' => $last === null ? null : $this->indexOfLast($last),
         ]);
     }
 
-    /** El premio mayor de la tabla, para poder anunciarlo sin repetir el número. */
-    public function jackpot(): int
+    /**
+     * El super premio: el segmento cosmético más raro. Se anuncia por nombre
+     * porque ya no es una cifra, y porque un marco que solo sale aquí es
+     * justamente la razón por la que alguien gira.
+     */
+    public function jackpot(): array
     {
-        $max = 0;
+        $mejor = null;
         foreach (self::PRIZES as $p) {
-            $max = max($max, (int) $p['points']);
+            if ($p['kind'] !== 'frame') {
+                continue;
+            }
+            if ($mejor === null || $p['weight'] < $mejor['weight']) {
+                $mejor = $p;
+            }
         }
 
-        return $max;
+        if ($mejor === null) {
+            return ['label' => '', 'chance' => 0.0];
+        }
+
+        $total = 0;
+        foreach (self::PRIZES as $p) {
+            $total += (int) $p['weight'];
+        }
+
+        return [
+            'label' => (string) $mejor['label'],
+            'chance' => round(100 * $mejor['weight'] / max(1, $total), 1),
+        ];
     }
 
     /** Segundos hasta la próxima medianoche UTC. */
@@ -269,9 +319,29 @@ class Wheel
      * señalar un resultado ya conocido; con seis segmentos a cero, un giro sin
      * premio apunta al primero de ellos, que es indistinguible del resto.
      */
+    /** El segmento del último resultado: por marco si lo hubo, si no por cantidad. */
+    private function indexOfLast(array $last): ?int
+    {
+        if (($last['frame'] ?? null) !== null) {
+            foreach (self::PRIZES as $i => $p) {
+                if (($p['frame'] ?? null) === $last['frame']) {
+                    return $i;
+                }
+            }
+        }
+
+        return $this->indexOfPoints((int) $last['points']);
+    }
+
     private function indexOfPoints(int $points): ?int
     {
         foreach (self::PRIZES as $i => $p) {
+            // Los segmentos de marco tienen 'points' como COMPENSACION, no como
+            // premio del segmento; señalarlos por esa cifra apuntaría al marco
+            // cuando lo que tocó fueron puntos sueltos.
+            if ($p['kind'] !== 'points') {
+                continue;
+            }
             if ((int) $p['points'] === $points) {
                 return $i;
             }
@@ -324,11 +394,33 @@ class Wheel
         return $this->settle($userId, $this->paidRef($n), true, $cost);
     }
 
-    /** Sortea y paga, si hay algo que pagar. */
+    /** Sortea y reparte segun el tipo de premio. */
     private function settle(int $userId, string $ref, bool $paid, int $cost): array
     {
         $index = $this->draw();
-        $points = (int) self::PRIZES[$index]['points'];
+        $def = self::PRIZES[$index];
+
+        $out = ['index' => $index, 'paid' => $paid, 'cost' => $cost,
+                'kind' => $def['kind'], 'frame' => null, 'frameName' => null, 'already' => false];
+
+        if ($def['kind'] === 'frame') {
+            $slug = (string) $def['frame'];
+
+            if ($this->grantFrame($userId, $slug, $ref)) {
+                $out['frame'] = $slug;
+                $out['frameName'] = (string) $def['label'];
+                $out['points'] = 0;
+
+                return $out;
+            }
+
+            // Ya lo tenia. Un segmento que se vuelve inerte cuando ya ganaste es
+            // peor que no tenerlo, asi que paga la compensacion en puntos.
+            $out['already'] = true;
+            $out['frameName'] = (string) $def['label'];
+        }
+
+        $points = (int) ($def['points'] ?? 0);
 
         if ($points > 0) {
             // countsForRank: false. Los puntos de la ruleta gastan pero NO suben
@@ -337,7 +429,66 @@ class Wheel
             $this->ledger->credit($userId, $points, self::REASON, $ref, false);
         }
 
-        return ['index' => $index, 'points' => $points, 'paid' => $paid, 'cost' => $cost];
+        $out['points'] = $points;
+
+        return $out;
+    }
+
+    /**
+     * Concede un marco. Devuelve false si el usuario ya lo tenia.
+     *
+     * identity_inventory es la via que el propio Ownership.php define para los
+     * cosmeticos de tipo "solo por concesion" — la misma por la que se otorgo
+     * el marco Ascendido. No se toca cosmetic_loadout: conceder no es equipar,
+     * y cambiarle a alguien el marco que lleva puesto sin pedirselo seria
+     * decidir por el.
+     *
+     * El registro de QUE se gano va en una fila `wheel.frame` cuyo ref lleva el
+     * slug pegado. Suena raro, pero la alternativa era guardar el indice del
+     * segmento en `delta`, y esa columna se SUMA para reconciliar saldos: un
+     * numero que no es dinero ahi dentro corrompe la contabilidad.
+     */
+    private function grantFrame(int $userId, string $slug, string $ref): bool
+    {
+        $tiene = $this->db->table('identity_inventory')
+            ->where('user_id', $userId)
+            ->where('type', 'frame')
+            ->where('item', $slug)
+            ->exists();
+
+        if ($tiene) {
+            return false;
+        }
+
+        try {
+            $this->db->table('identity_inventory')->insert([
+                'user_id' => $userId,
+                'type' => 'frame',
+                'item' => $slug,
+                'source' => 'wheel',
+                'paid' => 0,
+                'acquired_at' => date('Y-m-d H:i:s'),
+                'expires_at' => null,
+            ]);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        try {
+            $this->db->table('economy_transactions')->insert([
+                'user_id' => $userId,
+                'delta' => 0,
+                'reason' => self::REASON_FRAME,
+                'ref' => $ref . ':' . $slug,
+                'actor_id' => null,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        } catch (\Throwable $e) {
+            // El marco ya se concedio; no poder anotarlo solo cuesta que la
+            // pantalla no lo recuerde al recargar.
+        }
+
+        return true;
     }
 
     /** Sorteo ponderado sobre PRIZES. */

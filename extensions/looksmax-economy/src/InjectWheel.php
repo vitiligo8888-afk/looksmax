@@ -35,16 +35,25 @@ function sesion(){try{return app.session.user||null;}catch(e){return null;}}
 
 // Paleta: gris para lo comun, oro para lo gordo. El salto de color hace legible
 // de un vistazo que segmentos valen la pena, sin leer un numero.
-function colorDe(p){
-  if(p<=0)    return '#242424';   // los vacios, casi el fondo: no compiten con nada
-  if(p>=2500) return '#e8c07d';   // el bote
-  if(p>=500)  return '#c8a05f';
-  if(p>=150)  return '#8a7350';
-  if(p>=50)   return '#5a5a5a';
-  return '#454545';
+// El color separa las TRES cosas que puede haber en un segmento: nada, puntos,
+// y cosmetico. Sin ese salto, el 1% se pierde entre cifras.
+function colorDe(q){
+  if(q.kind==='frame') return q.label==='Vacío' ? '#e8c07d' : '#8c2f2f';
+  var p=q.points||0;
+  if(p<=0)   return '#242424';   // los vacios, casi el fondo: no compiten con nada
+  if(p>=500) return '#7a6743';
+  if(p>=150) return '#5f5f5f';
+  if(p>=50)  return '#4d4d4d';
+  return '#3d3d3d';
 }
-function tintaDe(p){ if(p<=0) return '#6e6e6e'; return p>=500 ? '#12161c' : '#f9f9f9'; }
-function etiqueta(p){ return p<=0 ? '—' : String(p); }
+function tintaDe(q){
+  if(q.kind==='frame') return q.label==='Vacío' ? '#12161c' : '#ffe9e9';
+  return (q.points||0)<=0 ? '#6e6e6e' : '#f9f9f9';
+}
+function etiqueta(q){
+  if(q.kind==='frame') return q.label;
+  return (q.points||0)<=0 ? '—' : String(q.points);
+}
 
 function cargarLib(){
   return new Promise(function(res,rej){
@@ -107,13 +116,14 @@ function pintar(){
   // ruleta se dibujaba centrada en una caja rectangular, desperdiciando
   // ancho. max-width + aspect-ratio deja los dos lados iguales.
   b.innerHTML='<div data-lienzo style="width:100%;max-width:300px;aspect-ratio:1/1;margin:0 auto 14px"></div>'
-    +'<div style="text-align:center;font-size:12.5px;opacity:.7;margin-bottom:10px">Bote: <b style="color:#e8c07d">'
-    +(estado.jackpot||0)+' puntos</b></div>'
+    +'<div style="text-align:center;font-size:12.5px;opacity:.72;margin-bottom:10px">Premio mayor: '
+    +'<b style="color:#e8c07d">marco '+((estado.jackpot&&estado.jackpot.label)||'')+'</b>'
+    +' &middot; '+((estado.jackpot&&estado.jackpot.chance)||0)+'%</div>'
     +'<div data-msj style="min-height:22px;text-align:center;margin-bottom:12px;opacity:.85"></div>'
     +'<div data-pie></div>';
 
   var items=(estado.prizes||[]).map(function(p){
-    return {label:etiqueta(p.points), backgroundColor:colorDe(p.points), labelColor:tintaDe(p.points)};
+    return {label:etiqueta(p), backgroundColor:colorDe(p), labelColor:tintaDe(p)};
   });
 
   wheel=new window.spinWheel.Wheel(b.querySelector('[data-lienzo]'),{
@@ -140,8 +150,12 @@ function pintar(){
   // toco, que es justo el trabajo que la interfaz deberia ahorrar.
   if(estado.won!=null && estado.wonIndex!=null){
     try{ wheel.spinToItem(estado.wonIndex, 0, true, 0, 1, null); }catch(e){}
-    msj(estado.won>0 ? ('Hoy ganaste '+estado.won+' puntos') : 'Tu ultimo giro no sacó nada.',
-        estado.won>0 ? '#e8c07d' : '#c0c0c0');
+    if(estado.wonFrame){
+      msj('Tu último giro te dio un marco nuevo', '#e8c07d');
+    } else {
+      msj(estado.won>0 ? ('Tu último giro dio '+estado.won+' puntos') : 'Tu último giro no sacó nada.',
+          estado.won>0 ? '#e8c07d' : '#c0c0c0');
+    }
   }
 
   if(!yo){ msj('Inicia sesion para girar.'); }
@@ -237,15 +251,24 @@ function girar(){
      setTimeout(function(){
        girando=false;
        var neto = res.d.paid ? (pts - (res.d.cost||0)) : pts;
-       var texto;
-       if(pts<=0){
+       var texto, tono='#c0c0c0';
+       if(res.d.kind==='frame' && res.d.frame){
+         texto='¡Ganaste el marco '+res.d.frameName+'! Ya está en tu vestuario.';
+         tono='#e8c07d';
+       } else if(res.d.already){
+         // Repetido: decirlo, no disimularlo con un premio en puntos a secas.
+         texto='Salió el marco '+res.d.frameName+', pero ya lo tenías: '+pts+' puntos en su lugar.';
+         tono='#e8c07d';
+       } else if(pts<=0){
          texto = res.d.paid ? ('Nada esta vez. −'+res.d.cost+' puntos.') : 'Nada esta vez.';
        } else if(res.d.paid){
          texto = 'Ganaste '+pts+' puntos (neto '+(neto>=0?'+':'')+neto+')';
+         tono = neto>0 ? '#e8c07d' : '#c0c0c0';
        } else {
          texto = 'Ganaste '+pts+' puntos';
+         tono = '#e8c07d';
        }
-       msj(texto, neto>0 ? '#e8c07d' : '#c0c0c0');
+       msj(texto, tono);
        sincronizarPie();
        refrescarPuntos(neto);
      }, 4350);

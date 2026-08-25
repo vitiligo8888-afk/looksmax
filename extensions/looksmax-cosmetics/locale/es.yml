@@ -171,10 +171,10 @@ local-looksmax-cosmetics:
         blurb: Anillo doble en sentidos opuestos. Diez mil reacciones recibidas.
       blood:
         name: Sangre
-        blurb: Degradado carmesí. Ya no se puede conseguir.
+        blurb: Degradado carmesí. Solo sale en la ruleta.
       void:
         name: Vacío
-        blurb: Anillo doble y oscuro. Ya no se puede conseguir.
+        blurb: Anillo doble y oscuro. El premio gordo de la ruleta.
 
       # --- los que se ganan con historial real del foro ------------------
       elder:
