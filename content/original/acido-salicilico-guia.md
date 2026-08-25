@@ -57,4 +57,4 @@ Suele tomar varias semanas de uso constante y moderado. La paciencia gana a la f
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

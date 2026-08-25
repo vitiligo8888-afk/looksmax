@@ -57,4 +57,4 @@ Un bálsamo o crema calmante sin alcohol suele ser mejor que el aftershave clás
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

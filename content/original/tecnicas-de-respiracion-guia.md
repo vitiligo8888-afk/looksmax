@@ -77,4 +77,4 @@ Sí. Son discretas y no requieren nada. Puedes practicar sentado en el transport
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, OMS.*
+*Contenido original de Looksmax.lat.*

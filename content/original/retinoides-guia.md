@@ -59,4 +59,4 @@ Sí, pero más despacio aún: una vez por semana, mucho hidratante y vigilando l
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

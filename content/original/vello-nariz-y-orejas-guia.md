@@ -52,4 +52,4 @@ Sí: ayuda a filtrar partículas del aire. Por eso conviene recortar lo que sobr
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

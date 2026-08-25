@@ -53,4 +53,4 @@ Si el problema es constante pese a mejorar los hábitos, consúltalo con un méd
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Organización Mundial de la Salud, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

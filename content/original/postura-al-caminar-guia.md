@@ -62,4 +62,4 @@ Depende, pero suele hablarse de semanas de práctica constante para que la nueva
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, consenso en actividad física.*
+*Contenido original de Looksmax.lat.*

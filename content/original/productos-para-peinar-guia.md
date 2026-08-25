@@ -58,4 +58,4 @@ Los acabados mate (arcilla, cera mate) dan sensación de volumen; los brillantes
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, consenso de peluquería profesional.*
+*Contenido original de Looksmax.lat.*

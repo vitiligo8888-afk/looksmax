@@ -62,4 +62,4 @@ Un poco de gas al subir la fibra rápido es común. Baja el ritmo, sube gradual 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

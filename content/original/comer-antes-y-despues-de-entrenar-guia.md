@@ -62,4 +62,4 @@ Ninguno por separado. Tu alimentación de todo el día y tu constancia importan 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

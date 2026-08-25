@@ -57,4 +57,4 @@ No. Un limpiador suave, un hidratante ligero y protector solar constante son la 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

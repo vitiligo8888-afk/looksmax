@@ -65,4 +65,4 @@ Sí, elige productos "no comedogénicos" y desmaquíllate bien de noche.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

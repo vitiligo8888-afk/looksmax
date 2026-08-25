@@ -56,4 +56,4 @@ La cafeína te despierta un rato, pero no crea energía nueva ni sustituye dormi
 **¿Y si como bien y sigo agotado?**
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

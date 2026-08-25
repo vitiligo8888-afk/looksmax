@@ -58,4 +58,4 @@ Ayuda a sellar humedad y reducir roce, pero no reemplaza al acondicionador ni a 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -53,4 +53,4 @@ La evidencia actual es limitada. Los descansos, la distancia y parpadear más ay
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Ophthalmology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

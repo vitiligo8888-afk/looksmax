@@ -64,4 +64,4 @@ Cada 3–4 usos y que seque bien entre uso y uso; una toalla húmeda cría bacte
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, OMS, Mayo Clinic. *
+*Contenido original de Looksmax.lat.*

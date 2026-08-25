@@ -53,4 +53,4 @@ Ayuda a suavizar, pero si no corriges el calzado que causa la presión, vuelven.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

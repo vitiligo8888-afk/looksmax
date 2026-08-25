@@ -61,4 +61,4 @@ No pasa nada. Retoma tus hábitos normales en la siguiente comida. Una comida no
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

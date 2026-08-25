@@ -64,4 +64,4 @@ Tres o cuatro sesiones son un buen punto para la mayoría, dejando descanso entr
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de entrenamiento de fuerza, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

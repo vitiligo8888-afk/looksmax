@@ -52,4 +52,4 @@ Ayuda a reducir el daño cuando usas calor. No es magia, pero es una capa de def
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, consenso de peluquería profesional.*
+*Contenido original de Looksmax.lat.*

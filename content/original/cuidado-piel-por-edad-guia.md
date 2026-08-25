@@ -73,4 +73,4 @@ En gran medida, sí. Dormir bien, no fumar, cuidar la alimentación y proteger d
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

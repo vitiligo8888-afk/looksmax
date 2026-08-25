@@ -56,4 +56,4 @@ Idealmente sí. De día acompáñalo siempre con protector solar.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -58,4 +58,4 @@ Sí para la apariencia inmediata: una cabeza bien alineada mejora el contorno al
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

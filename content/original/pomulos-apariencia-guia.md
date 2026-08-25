@@ -57,4 +57,4 @@ No más que peinarte. Es una herramienta reversible y legítima para las fotos o
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

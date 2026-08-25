@@ -66,4 +66,4 @@ Ajustar brillo o recorte es normal. Deformar rasgos o alisar hasta lo irreal ya 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de fotografía de retrato, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

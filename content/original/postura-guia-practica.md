@@ -62,4 +62,4 @@ Alivio y conciencia en 1–2 semanas; cambio de postura en reposo, 1–3 meses d
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Harvard Health, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

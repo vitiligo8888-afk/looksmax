@@ -58,4 +58,4 @@ Puedes tener grasa y deshidratación a la vez. Usa un hidratante algo más rico 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

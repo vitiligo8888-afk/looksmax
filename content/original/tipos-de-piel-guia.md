@@ -63,4 +63,4 @@ Solo si tu piel es muy mixta. Para la mayoría, una rutina base bien elegida bas
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

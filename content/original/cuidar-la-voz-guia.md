@@ -53,4 +53,4 @@ Lo importante es estar hidratado. A temperatura ambiente suele ser cómodo; evit
 **¿Cuándo debo preocuparme?**
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, American Academy of Otolaryngology.*
+*Contenido original de Looksmax.lat.*

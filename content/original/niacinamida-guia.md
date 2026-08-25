@@ -59,4 +59,4 @@ Generalmente varias semanas de uso constante. La constancia importa más que la 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -60,4 +60,4 @@ Muchísimo. Registrar lo que hiciste es la herramienta más subestimada para pro
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de entrenamiento de fuerza, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

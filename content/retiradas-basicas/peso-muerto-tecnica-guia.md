@@ -57,4 +57,4 @@ Con el que te permita ejecutar el patrón perfecto, aunque sea muy ligero o solo
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

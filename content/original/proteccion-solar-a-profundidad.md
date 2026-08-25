@@ -65,4 +65,4 @@ La diferencia real es pequeña; la cantidad y la reaplicación importan más que
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, OMS. *
+*Contenido original de Looksmax.lat.*

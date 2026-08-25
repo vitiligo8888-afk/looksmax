@@ -57,4 +57,4 @@ Con cuidado y sobre piel húmeda, ayuda a suavizar callosidad. Sin exagerar y nu
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -54,4 +54,4 @@ Con horario fijo, la mayoría nota mejor energía en 1–2 semanas.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Sleep Foundation, CDC, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

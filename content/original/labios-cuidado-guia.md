@@ -57,4 +57,4 @@ Ayuda a la hidratación general, pero por sí sola no basta: necesitas también 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

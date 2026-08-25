@@ -64,4 +64,4 @@ No necesariamente. Más exámenes no es mejor; lo correcto es hacer los que apli
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Organización Mundial de la Salud, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

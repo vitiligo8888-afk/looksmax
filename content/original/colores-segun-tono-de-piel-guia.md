@@ -70,4 +70,4 @@ Claro. Estas son guías para favorecerte sin esfuerzo, no prohibiciones. Lléval
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de teoría del color y estilismo.*
+*Contenido original de Looksmax.lat.*

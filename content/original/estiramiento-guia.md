@@ -57,4 +57,4 @@ Tener rango suficiente para tus actividades es lo que cuenta. No necesitas conto
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Organización Mundial de la Salud, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -59,4 +59,4 @@ Dormir, no fumar, hidratarte y proteger del sol pesan más que cualquier "supera
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -56,4 +56,4 @@ Puede revelar la línea si había grasa cubriéndola, pero no crea estructura ó
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso odontológico (American Dental Association), Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -52,4 +52,4 @@ Puede influir en brotes de caspa y picazón en personas propensas. Dormir bien y
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

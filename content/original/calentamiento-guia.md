@@ -57,4 +57,4 @@ Movilidad dinámica antes; los estiramientos estáticos sostenidos encajan mejor
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Organización Mundial de la Salud, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

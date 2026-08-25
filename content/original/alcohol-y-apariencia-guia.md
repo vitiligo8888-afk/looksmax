@@ -59,4 +59,4 @@ Alterna con agua, evita mezcladores muy azucarados y modera la cantidad. Hidrata
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: OMS, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

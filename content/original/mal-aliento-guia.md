@@ -55,4 +55,4 @@ Ve al dentista. Podría haber caries, enfermedad de encías o boca seca que nece
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso odontológico, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

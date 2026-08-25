@@ -54,4 +54,4 @@ Una llaga o herida que no cicatriza en semanas, sangra o cambia debe verla un pr
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

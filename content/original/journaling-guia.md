@@ -56,4 +56,4 @@ Empieza describiendo tu día o responde un disparador simple. Las ideas suelen a
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

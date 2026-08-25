@@ -56,4 +56,4 @@ Se controlan y se reducen, pero como el poro sigue produciendo grasa, el manteni
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

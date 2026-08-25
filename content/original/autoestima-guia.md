@@ -54,4 +54,4 @@ No hay plazo fijo; es un proceso de hábitos, con altibajos. La dirección impor
 **¿Cuándo busco ayuda profesional?**
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

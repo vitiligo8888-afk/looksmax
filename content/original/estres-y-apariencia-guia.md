@@ -56,4 +56,4 @@ Sueño y piel responden en semanas al bajar el estrés; la caída por estrés se
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Mayo Clinic. *
+*Contenido original de Looksmax.lat.*

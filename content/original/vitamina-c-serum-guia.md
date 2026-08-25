@@ -56,4 +56,4 @@ No. El protector solar sigue siendo el paso más importante para prevenir mancha
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

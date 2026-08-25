@@ -57,4 +57,4 @@ Sueño y hábitos: días a un par de semanas. Ojeras pigmentarias: meses.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: AAD, American Academy of Ophthalmology.*
+*Contenido original de Looksmax.lat.*

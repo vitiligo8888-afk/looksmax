@@ -58,4 +58,4 @@ Eso podría ser algo más que sequedad. Vale la pena que lo revise un dermatólo
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

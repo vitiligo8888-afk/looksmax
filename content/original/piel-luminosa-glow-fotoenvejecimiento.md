@@ -58,4 +58,4 @@ Ayer. Es prevención: cuanto antes, menos fotoenvejecimiento después.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

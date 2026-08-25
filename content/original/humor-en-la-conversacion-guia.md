@@ -55,4 +55,4 @@ Con gente de confianza y en dosis chicas, sí. Con desconocidos se malinterpreta
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, consenso en habilidades de comunicación.*
+*Contenido original de Looksmax.lat.*

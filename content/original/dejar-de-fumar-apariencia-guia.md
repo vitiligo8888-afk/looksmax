@@ -62,4 +62,4 @@ No. Las recaídas son parte del proceso para muchas personas. Retoma tu plan y, 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: OMS, American Academy of Dermatology.*
+*Contenido original de Looksmax.lat.*

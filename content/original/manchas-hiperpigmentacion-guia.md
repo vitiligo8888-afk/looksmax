@@ -58,4 +58,4 @@ Pueden ayudar en manos expertas, pero mal aplicados empeoran la pigmentación en
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

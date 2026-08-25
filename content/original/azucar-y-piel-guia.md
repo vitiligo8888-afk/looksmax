@@ -56,4 +56,4 @@ La fruta entera aporta fibra, agua y nutrientes; no se compara con los refrescos
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

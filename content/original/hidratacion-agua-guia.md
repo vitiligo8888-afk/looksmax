@@ -63,4 +63,4 @@ Aporta líquido; en exceso es diurético leve. Con moderación, suma a tu total.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, OMS.*
+*Contenido original de Looksmax.lat.*

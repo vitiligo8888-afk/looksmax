@@ -60,4 +60,4 @@ El mejor es el que **alternas**. Estar parado todo el día también cansa y carg
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

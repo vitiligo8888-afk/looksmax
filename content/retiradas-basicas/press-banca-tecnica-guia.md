@@ -60,4 +60,4 @@ Suele deberse a codos demasiado abiertos, falta de retracción escapular o exces
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

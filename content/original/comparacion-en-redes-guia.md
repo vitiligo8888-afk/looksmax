@@ -54,4 +54,4 @@ A menudo por comparación al alza con contenido editado. Notar el patrón y ajus
 **¿Cuándo busco ayuda?**
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

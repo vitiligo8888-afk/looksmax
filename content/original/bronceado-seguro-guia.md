@@ -68,4 +68,4 @@ Se puede obtener con muy poca exposición o por alimentación. Si te preocupa un
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

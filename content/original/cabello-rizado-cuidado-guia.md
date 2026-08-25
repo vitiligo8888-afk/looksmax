@@ -58,4 +58,4 @@ Suele ser falta de hidratación, exceso de calor o demasiada manipulación en se
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

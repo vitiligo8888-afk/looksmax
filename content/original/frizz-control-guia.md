@@ -57,4 +57,4 @@ Pueden reducir frizz, pero varían mucho en calidad y algunos dañan la fibra. I
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

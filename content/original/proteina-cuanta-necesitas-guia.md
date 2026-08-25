@@ -58,4 +58,4 @@ Sí. Combina leguminosas, granos, lácteos, huevo, soya y frutos secos a lo larg
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: OMS, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -55,4 +55,4 @@ No reventar granos y usar protector solar a diario. La prevención pesa más que
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

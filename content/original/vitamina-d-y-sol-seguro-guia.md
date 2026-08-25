@@ -67,4 +67,4 @@ Con un análisis de sangre indicado por tu médico. No lo adivines ni te supleme
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: OMS, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

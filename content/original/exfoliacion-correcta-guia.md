@@ -64,4 +64,4 @@ Sí, pero con cuidado: separa los días o reduce la frecuencia. Si tu piel se ir
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

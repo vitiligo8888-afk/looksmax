@@ -55,4 +55,4 @@ Ayudan a la fuerza de cierre, que es una parte del agarre. Combínalos con colga
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de entrenamiento de fuerza, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

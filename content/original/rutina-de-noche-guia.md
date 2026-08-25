@@ -63,4 +63,4 @@ Un día no es tragedia, pero como hábito, quitar el protector solar y la grasa 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

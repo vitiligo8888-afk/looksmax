@@ -65,4 +65,4 @@ Fruta primero. Y si a veces quieres un dulce de verdad, cabe con moderación den
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

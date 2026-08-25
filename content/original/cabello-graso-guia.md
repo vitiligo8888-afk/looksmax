@@ -57,4 +57,4 @@ Es normal. El sebo no llega bien a las puntas. Por eso el acondicionador va de m
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

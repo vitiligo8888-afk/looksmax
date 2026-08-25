@@ -65,4 +65,4 @@ Casi nadie. Ergonomía, pausas y actividad rinden más. Un corrector solo bajo i
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

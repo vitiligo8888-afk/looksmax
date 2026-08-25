@@ -54,4 +54,4 @@ Como despiertan y activan, muchos las prefieren por la mañana. Prueba y quédat
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, OMS.*
+*Contenido original de Looksmax.lat.*

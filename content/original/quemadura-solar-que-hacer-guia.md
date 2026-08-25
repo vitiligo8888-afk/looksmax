@@ -59,4 +59,4 @@ Busca sombra en las horas de más sol, usa ropa que cubra y aplica protector sol
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Organización Mundial de la Salud, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

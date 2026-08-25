@@ -69,4 +69,4 @@ La piel responde en semanas, no días. Dale 6 a 12 semanas de constancia antes d
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

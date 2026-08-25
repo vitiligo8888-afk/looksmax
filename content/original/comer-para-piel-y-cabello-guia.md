@@ -59,4 +59,4 @@ La piel puede mejorar en semanas; el cabello crece lento, así que los cambios s
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -55,4 +55,4 @@ Sí. Una banda elástica, remos invertidos en una mesa firme y estiramientos de 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de entrenamiento de fuerza, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

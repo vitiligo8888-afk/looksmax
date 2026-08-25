@@ -56,4 +56,4 @@ Pueden ayudar como guía para empezar. Lo que importa es la constancia, con o si
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

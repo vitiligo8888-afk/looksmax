@@ -58,4 +58,4 @@ Sí. Es de las habilidades no verbales que más responde a la práctica constant
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, consenso en comunicación no verbal.*
+*Contenido original de Looksmax.lat.*

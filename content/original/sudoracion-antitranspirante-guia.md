@@ -55,4 +55,4 @@ Podría ser hiperhidrosis. Existen opciones médicas; lo correcto es que un prof
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

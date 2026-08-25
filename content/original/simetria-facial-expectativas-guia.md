@@ -58,4 +58,4 @@ Si te consume tiempo y ánimo, busca a un profesional de salud mental. La preocu
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

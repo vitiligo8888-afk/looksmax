@@ -54,4 +54,4 @@ Es común, sobre todo tras comidas grandes o muy azucaradas. Porciones más equi
 **¿Cuándo el cansancio es para preocuparse?**
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

@@ -56,4 +56,4 @@ Mejor 2-3 veces por semana con descanso entre sesiones. El músculo crece al rec
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: consenso de entrenamiento de fuerza, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

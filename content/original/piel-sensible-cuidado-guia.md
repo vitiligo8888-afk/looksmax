@@ -55,4 +55,4 @@ Para piel sensible suele serlo, porque las fragancias son un irritante común.
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

@@ -66,4 +66,4 @@ No necesariamente. Hay opciones accesibles con buenos ingredientes. Revisa la f√
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

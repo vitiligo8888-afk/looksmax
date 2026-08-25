@@ -58,4 +58,4 @@ Lo aburrido y comprobado: comida variada, suficiente proteína y verdura, modera
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Organización Mundial de la Salud, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

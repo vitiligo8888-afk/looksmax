@@ -62,4 +62,4 @@ No. Cualquier recipiente con tapa sirve. El meal prep es un hábito, no un kit q
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

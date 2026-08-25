@@ -55,4 +55,4 @@ Para muchos da igual; si te cae pesado en ayunas, tómalo con algo de comida. Es
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*

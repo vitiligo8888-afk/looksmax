@@ -53,4 +53,4 @@ Sí, aunque sean unos minutos. Es de lo que mejor rinde para prevenir, y no nece
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, consenso de entrenamiento de fuerza.*
+*Contenido original de Looksmax.lat.*

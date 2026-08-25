@@ -62,4 +62,4 @@ Sí puede ayudar al enfoque y a la percepción del esfuerzo, pero no sustituye d
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: Mayo Clinic, Organización Mundial de la Salud.*
+*Contenido original de Looksmax.lat.*

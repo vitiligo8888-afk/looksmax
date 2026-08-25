@@ -59,4 +59,4 @@ Puedes tomar conciencia durante el día, pero si la nariz se tapa o no logras ha
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Otolaryngology, Mayo Clinic.*
+*Contenido original de Looksmax.lat.*
