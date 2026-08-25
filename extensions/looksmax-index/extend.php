@@ -3,6 +3,7 @@
 use Flarum\Extend;
 use Local\Index\Console\PaletteCommand;
 use Local\Index\Console\SectionsCommand;
+use Local\Index\Console\SitemapCommand;
 use Local\Index\Console\TagColourCommand;
 use Local\Index\RenderIndex;
 // Fully qualified, not `Api\FragmentController::class`. This file declares no
@@ -88,5 +89,15 @@ return [
         // Gives every OTHER tag a measured colour. Before it ran, 40 of 47 tags
         // shared one blue, so "per category colour" rendered as no colour at
         // all. Reversible: --restore.
-        ->command(TagColourCommand::class),
+        ->command(TagColourCommand::class)
+        // Rebuilds public/sitemap.xml from what is visible. It used to be a
+        // static file that nothing regenerated, so it drifted into advertising
+        // URLs that had become 404s. See SitemapCommand.
+        ->command(SitemapCommand::class)
+        ->schedule(SitemapCommand::class, function (\Illuminate\Console\Scheduling\Event $event) {
+            // Daily is the right cadence: the sitemap only has to be true, not
+            // instant, and rewriting it on every post would churn a file the
+            // crawler reads a few times a week at most.
+            $event->dailyAt('04:10');
+        }),
 ];
