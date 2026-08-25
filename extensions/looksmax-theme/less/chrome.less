@@ -347,9 +347,16 @@
 // sits directly against the first card edge and the two crowd each other.
 // Applied to the nav container, not the buttons, so the spacing survives any
 // change to the item styling.
+// A literal, not a --gap token, and deliberately so. That scale is
+// 3/5/8/12 and its comment says it exists to keep the page DENSE — it is for
+// gaps inside a component, and the largest step in it is 12px. This is the
+// opposite job: separating the nav block from the content block under it. The
+// first attempt reached for `var(--gap-md, 16px)`, and since --gap-md does not
+// exist in the scale it silently resolved to the 16px fallback, which is how a
+// value nobody chose ended up shipping.
 .IndexPage-nav,
-.App-nav {
-  margin-bottom: var(--gap-md, 16px);
+.sideNav {
+  margin-bottom: 28px;
 }
 
 // The index/discussion side nav is chrome too: same ghost treatment, so the
