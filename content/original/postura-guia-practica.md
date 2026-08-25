@@ -13,8 +13,6 @@ sources:
 
 # Postura: cómo corregirla de verdad
 
-> **Aviso.** Información general. Si tienes dolor persistente, hormigueo, o una curvatura marcada (posible escoliosis), consulta a un fisioterapeuta o médico antes de hacer ejercicios por tu cuenta.
-
 La postura cambia cómo te ves más que casi cualquier "hack": afecta estatura aparente, línea de la mandíbula y presencia. Pero "párate derecho" no funciona porque el problema casi nunca es voluntad — es que unos músculos están cortos y tensos y otros débiles, por horas de celular y silla.
 
 ## Por qué se encorva la gente (no es flojera)

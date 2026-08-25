@@ -12,8 +12,6 @@ sources:
 
 # Habilidades sociales: caer bien y construir tu red (sin ser falso)
 
-> **Aviso.** Guía de desarrollo personal. Si la ansiedad social te limita seriamente (evitas trabajo, estudio o relaciones), un psicólogo ayuda muchísimo y no es señal de debilidad.
-
 La apariencia abre puertas; las habilidades sociales deciden qué pasa después. La buena noticia: **se entrenan**, no naces con ellas. La mala: no hay atajo, se practican en persona.
 
 ## La base: interés genuino > técnica

@@ -12,8 +12,6 @@ sources:
 
 # Estilo básico: ropa que favorece (el ajuste lo es casi todo)
 
-> **Aviso.** Guía de estilo, sin promesas médicas. La idea no es gastar más, es elegir mejor.
-
 La gente cree que vestir bien es cuestión de dinero o marcas. No: es sobre todo **ajuste (fit)** y **coherencia**. Una prenda barata que te queda perfecta se ve mejor que una cara que te queda mal.
 
 ## La regla #1: el fit

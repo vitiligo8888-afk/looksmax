@@ -13,8 +13,6 @@ sources:
 
 # Higiene bucal y sonrisa: sana primero, blanca después
 
-> **Aviso.** Guía informativa; no reemplaza al dentista. Encías que sangran mucho, dolor o manchas que cambian requieren consulta. **No** hagas blanqueamientos caseros agresivos ni "hacks" abrasivos: dañan el esmalte de forma permanente.
-
 Una sonrisa sana cambia la cara entera, y a diferencia de casi todo en looksmaxing, la base es barata y con evidencia sólida. El error común es querer **blanquear** antes de **cuidar**.
 
 ## Lo que de verdad importa (base)
@@ -58,4 +56,3 @@ Revisión/limpieza según indique tu dentista (muchas personas, cada 6–12 mese
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Dental Association, Mayo Clinic. Para blanqueamiento u ortodoncia, acude a un dentista.*

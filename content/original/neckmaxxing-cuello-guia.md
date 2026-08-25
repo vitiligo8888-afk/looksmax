@@ -13,8 +13,6 @@ sources:
 
 # Neckmaxxing: cuello más definido (con expectativas reales)
 
-> **Aviso.** Guía informativa. Entrena el cuello con cuidado y progresión lenta; si tienes dolor cervical, hernias o mareos, consulta a un profesional antes. La grasa localizada del cuello o la "papada" a veces es estructural o genética y no cede solo con ejercicio: eso lo valora un médico.
-
 El cuello sostiene la cara y marca la línea mandibular, así que sí vale la pena cuidarlo. Pero está lleno de mitos: separemos lo que funciona de lo que no.
 
 ## Las tres palancas reales
@@ -53,4 +51,3 @@ Grosor por entrenamiento: meses. Definición por bajar grasa: depende de tu punt
 
 ---
 
-*Contenido original de Looksmax.lat. Entrena el cuello con progresión lenta; ante dolor, consulta a un profesional.*

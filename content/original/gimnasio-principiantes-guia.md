@@ -13,8 +13,6 @@ sources:
 
 # Gimnasio para principiantes: empezar bien
 
-> **Aviso.** Guía informativa, no un plan médico. Si tienes una condición de salud, lesión previa o dudas, consulta a un médico antes de empezar. Esta guía es **100% natural**: aquí no hay atajos con sustancias, y cualquiera que te venda "resultados rápidos" con químicos te está vendiendo riesgos.
-
 Cambiar tu físico es de lo que más mejora la apariencia general, y es de lo más democrático: solo necesitas constancia, técnica y paciencia. La mayoría falla no por el plan, sino por rendirse pronto o entrenar sin progresión.
 
 ## Los 3 principios que importan
@@ -68,4 +66,3 @@ No para empezar. Comida real primero; a lo sumo, cosas básicas y con evidencia 
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: OMS, consenso en fisiología del ejercicio. Consulta a un médico antes de empezar si tienes dudas de salud.*

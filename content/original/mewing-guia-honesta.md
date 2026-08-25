@@ -13,8 +13,6 @@ sources:
 
 # Mewing: la guía honesta (qué dice la evidencia)
 
-> **Aviso.** Esta guía es informativa. El "mewing" **no** es un tratamiento médico ni sustituye la ortodoncia. Para maloclusión, apiñamiento, dolor de mandíbula o problemas de mordida, acude a un ortodoncista u odontólogo. No fuerces la mandíbula ni uses objetos para "entrenarla".
-
 El mewing es de lo más buscado en looksmaxing y también de lo más exagerado. Aquí va sin humo: qué es, qué se puede esperar de verdad y dónde la promesa se cae.
 
 ## Qué es
@@ -36,7 +34,6 @@ El mewing es de lo más buscado en looksmaxing y también de lo más exagerado. 
 
 - No **fuerces** ni empujes con fuerza el paladar; puedes causar dolor o problemas de mordida.
 - Nada de objetos, "chewing" agresivo con aparatos duros, ni técnicas de "romper/hueso" en casa: eso es riesgo real, no looksmaxing.
-- Dolor de mandíbula, chasquidos o cambios de mordida → para y ve a un profesional.
 
 ## Lo que sí mueve la aguja (y es gratis)
 
@@ -55,4 +52,3 @@ La postura suave no; forzar la mandíbula o usar "aparatos" caseros sí. Ante du
 
 ---
 
-*Contenido original de Looksmax.lat. Para mordida, desarrollo o dolor mandibular, consulta a un ortodoncista (AAO). Este contenido reencuadra un tema con mucho mito hacia expectativas realistas y seguras.*

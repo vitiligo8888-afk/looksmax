@@ -13,8 +13,6 @@ sources:
 
 # Rutina de cuidado de piel: lo mínimo que de verdad funciona
 
-> **Aviso.** Guía general; no reemplaza a un dermatólogo. Acné severo, rosácea, manchas que cambian o reacciones fuertes requieren valoración profesional. Introduce un activo nuevo a la vez.
-
 La industria vende rutinas de 10 pasos; la dermatología dice que **tres** cubren el 90% del resultado. Empieza simple, sé constante meses, y agrega solo si hace falta.
 
 ## La rutina de 3 pasos (mañana y noche)

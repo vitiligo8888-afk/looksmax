@@ -13,8 +13,6 @@ sources:
 
 # Protección solar a fondo: el mejor "anti-edad" que existe
 
-> **Aviso.** Guía informativa; no reemplaza a un dermatólogo. Lunares que cambian de forma/color/tamaño o lesiones nuevas: revísalos cuanto antes. El protector solar es prevención, no un permiso para exponerte sin límite.
-
 Si solo pudieras adoptar **un** hábito de cuidado de la piel, sería este. La mayor parte del envejecimiento visible de la piel —manchas, textura, líneas, opacidad— es daño solar acumulado, y es **evitable**. Es barato y funciona.
 
 ## Qué significan SPF y "amplio espectro"
@@ -67,4 +65,4 @@ La diferencia real es pequeña; la cantidad y la reaplicación importan más que
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, OMS. Revisa lunares que cambien con un dermatólogo.*
+*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, OMS. *

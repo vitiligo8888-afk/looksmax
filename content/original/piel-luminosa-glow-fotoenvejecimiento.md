@@ -13,8 +13,6 @@ sources:
 
 # Piel luminosa (glow): qué la da de verdad
 
-> **Aviso.** Guía informativa; no reemplaza a un dermatólogo. Manchas que cambian, lesiones nuevas o reacciones fuertes: consulta. El daño solar es acumulativo y el principal factor de envejecimiento evitable de la piel.
-
 El "glow" se vende en frascos, pero en realidad es el resultado visible de **piel sana e hidratada con buena microcirculación**. Se construye con hábitos, no con un highlighter en crema.
 
 ## De dónde viene el glow real

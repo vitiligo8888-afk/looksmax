@@ -12,8 +12,6 @@ sources:
 
 # Fenotipos faciales: qué son y cómo usarlos a tu favor
 
-> **Aviso.** Guía informativa y de estilo. "Fenotipo" aquí se usa de forma descriptiva, no como jerarquía de valor: ningún tipo de cara es "mejor". Si tu apariencia te causa angustia intensa, un psicólogo ayuda.
-
 En looksmaxing se habla mucho de "fenotipos". Quitando el humo, la idea útil es simple: **ciertos rasgos armonizan entre sí**, y peinarte, arreglarte la barba y vestirte de forma coherente con tu cara se ve mejor que copiar el look de alguien con una estructura distinta.
 
 ## Qué es (y qué no) un fenotipo

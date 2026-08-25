@@ -13,8 +13,6 @@ sources:
 
 # Eyemaxxing sin cirugía: mejorar la mirada de forma realista
 
-> **Aviso.** Guía informativa; no reemplaza a un oftalmólogo o dermatólogo. No uses productos "de crecimiento de pestañas" ni gotas para "aclarar el ojo" sin indicación médica: algunos tienen efectos secundarios reales. Nada de intervenciones caseras.
-
 La mirada es de lo primero que registra la gente. Sin cirugía no cambias la estructura ósea de la órbita, pero **sí** puedes mejorar mucho lo que rodea al ojo y cómo se percibe. Aquí lo que de verdad ayuda.
 
 ## Lo que más mueve la aguja (gratis)

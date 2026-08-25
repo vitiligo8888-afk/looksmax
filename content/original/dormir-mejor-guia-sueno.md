@@ -14,8 +14,6 @@ sources:
 
 # Dormir mejor: la guía que sí mueve la aguja
 
-> **Aviso.** Información general, no reemplaza atención médica. Si roncas fuerte, te despiertas ahogado, o tienes somnolencia diurna severa pese a dormir suficiente, consulta a un médico: puede ser apnea del sueño, que es tratable.
-
 El sueño es el "producto gratis" más subestimado: mejora piel, ojeras, ánimo, recuperación y concentración a la vez, y no cuesta nada. La mayoría no necesita trucos raros, necesita arreglar cuatro cosas.
 
 ## Cuánto necesitas de verdad

@@ -13,8 +13,6 @@ sources:
 
 # Estrés y apariencia: cómo se ve y qué hacer
 
-> **Aviso.** Guía informativa, no reemplaza atención en salud mental. Si el estrés o la ansiedad te desbordan, afectan tu sueño, ánimo o vida diaria, hablar con un profesional de salud mental es de lo más efectivo que puedes hacer —por tu bienestar y también por tu apariencia—.
-
 El estrés crónico no solo se siente: **se ve**. Y como afecta sueño, piel, cabello y expresión a la vez, gestionarlo es de las cosas con mejor retorno "estético" que existen, aunque nadie la venda en un frasco.
 
 ## Cómo se nota el estrés en la cara y el cuerpo
@@ -58,4 +56,4 @@ Sueño y piel responden en semanas al bajar el estrés; la caída por estrés se
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Mayo Clinic. Para estrés o ansiedad persistentes, busca apoyo profesional.*
+*Contenido original de Looksmax.lat. Fuentes: American Psychological Association, Mayo Clinic. *

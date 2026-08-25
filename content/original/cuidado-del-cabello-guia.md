@@ -12,8 +12,6 @@ sources:
 
 # Cuidado del cabello: lo básico que sí funciona
 
-> **Aviso.** Guía informativa. La caída de cabello puede tener causas tratables (hormonal, nutricional, dermatológica). Si notas retroceso de entradas, coronilla que clarea o caída súbita, ve con un dermatólogo temprano: cuanto antes, más opciones.
-
 El buen pelo es 80% salud, corte y hábitos, y 20% producto. La mayoría gasta en shampoos caros y descuida lo que de verdad importa.
 
 ## Lavado: menos de lo que crees
@@ -58,4 +56,3 @@ No, salvo que esté tan apretada que dañe; la calvicie de patrón es genética/
 
 ---
 
-*Contenido original de Looksmax.lat. Fuente: American Academy of Dermatology. Ante caída, consulta a un dermatólogo cuanto antes.*

@@ -13,8 +13,6 @@ sources:
 
 # Hidratación: cuánta agua necesitas (sin mitos)
 
-> **Aviso.** Guía general. Necesidades muy distintas en embarazo, enfermedad renal/cardíaca o con ciertos medicamentos: sigue la indicación de tu médico. Beber cantidades excesivas de golpe también es riesgoso (hiponatremia); el objetivo es constante, no exagerado.
-
 La hidratación se rodea de mitos ("8 vasos exactos", "más agua = más glow"). La realidad es más simple y más útil, sobre todo en climas cálidos de LatAm donde se suda más.
 
 ## Cuánta agua de verdad

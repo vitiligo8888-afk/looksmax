@@ -14,8 +14,6 @@ sources:
 
 # Área de los ojos: ojeras y bolsas, qué funciona y qué no
 
-> **Aviso.** Guía informativa; no reemplaza a un dermatólogo u oftalmólogo. Cualquier procedimiento (rellenos, láser, cirugía) debe hacerlo un profesional colegiado. No intentes intervenciones en casa.
-
 La zona de los ojos es lo primero que la gente mira y de lo más difícil de "arreglar" porque **no todas las ojeras son iguales**. Antes de comprar nada, identifica cuál tienes: la mitad de los productos fallan porque atacan el tipo equivocado.
 
 ## Los tres tipos de ojera (haz esta prueba)
@@ -61,4 +59,3 @@ Cuando quieras; los hábitos (sol, sueño, no frotar) previenen más de lo que c
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: AAD, American Academy of Ophthalmology, Mayo Clinic. Para procedimientos, acude siempre a un profesional colegiado.*

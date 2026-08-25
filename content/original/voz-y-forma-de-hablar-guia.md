@@ -12,8 +12,6 @@ sources:
 
 # Voz y forma de hablar: sonar más seguro sin fingir
 
-> **Aviso.** Guía informativa. Si tienes ronquera persistente, dolor al hablar o pérdida de voz, consulta a un otorrino/foniatra. No fuerces la voz para "hacerla más grave": puede lesionar las cuerdas.
-
 Cómo hablas transmite tanta seguridad como qué dices. Y a diferencia del tono de voz "de nacimiento", el **ritmo, las pausas y la claridad** se entrenan y cambian mucho la percepción.
 
 ## Lo que más suma (y es entrenable)
@@ -57,4 +55,3 @@ Ritmo y pausas, en días de práctica consciente; proyección y control de aire,
 
 ---
 
-*Contenido original de Looksmax.lat. Ante problemas de voz, consulta a un foniatra/otorrino.*

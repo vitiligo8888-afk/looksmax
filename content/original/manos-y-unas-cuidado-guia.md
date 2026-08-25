@@ -12,8 +12,6 @@ sources:
 
 # Manos y uñas: el detalle de grooming que la gente sí nota
 
-> **Aviso.** Guía informativa. Uñas que cambian de color/forma, dolor, inflamación alrededor (posible infección) o manchas persistentes: consulta a un dermatólogo. No te cortes ni empujes la cutícula de forma agresiva; es una barrera contra infecciones.
-
 Las manos están a la vista todo el tiempo —al saludar, al hablar, al pagar— y son de lo más fácil y barato de mejorar. Nadie espera manos "perfectas"; solo **limpias y cuidadas**.
 
 ## Uñas: lo básico

@@ -12,8 +12,6 @@ sources:
 
 # Cejas: cómo mejorarlas sin arruinarlas
 
-> **Aviso.** Guía informativa. Para caída marcada de cejas, alopecia o reacciones a productos, consulta a un dermatólogo. No uses productos de crecimiento sin leer sus advertencias.
-
 Las cejas enmarcan la mirada y son de lo que más "arregla" una cara con menos esfuerzo. También de lo más fácil de arruinar: casi todo el daño viene de **depilar de más**.
 
 ## Regla de oro: menos es más
@@ -39,7 +37,7 @@ Depila **solo** los pelos claramente fuera de esa zona y el entrecejo. Todo lo d
 
 - Dales tiempo (dejar de depilar) antes de gastar en productos.
 - Rellenar con lápiz/sombra a tono, con trazos tipo pelo, se ve natural.
-- Productos con evidencia real para crecimiento son limitados y con advertencias; consúltalo con un dermatólogo antes de usar nada "milagro".
+- Productos con evidencia real
 
 ## Errores comunes
 

@@ -12,8 +12,6 @@ sources:
 
 # Fragancia y olor personal: cómo oler bien de verdad
 
-> **Aviso.** Guía informativa. Si tienes sudoración excesiva (hiperhidrosis) o mal olor que no cede con higiene correcta, un dermatólogo tiene soluciones clínicas. Suspende cualquier producto que te irrite la piel.
-
 Oler bien es de los "upgrades" más rentables: barato, inmediato y de los que más impresión deja. Pero el orden importa: **la fragancia no tapa mala higiene, la potencia**.
 
 ## Primero lo primero: higiene

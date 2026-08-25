@@ -12,8 +12,6 @@ sources:
 
 # Lenguaje corporal: proyectar presencia sin actuar
 
-> **Aviso.** Guía de desarrollo personal. El objetivo es verte cómodo y seguro, no fingir un personaje ni "dominar" a nadie. Si la ansiedad te tensa en lo social, un psicólogo ayuda.
-
 El cuerpo habla antes que la boca. La buena noticia: no necesitas "poses de poder" forzadas; necesitas **quitar** señales de nervios y dejar que la calma se vea.
 
 ## Lo esencial (en orden de impacto)

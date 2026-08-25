@@ -12,8 +12,6 @@ sources:
 
 # Cómo te ves de verdad: espejo, selfie y distorsión de lente
 
-> **Aviso.** Guía informativa. Si la preocupación por tu apariencia te causa angustia intensa o evitas salir/verte, habla con un psicólogo: la dismorfia corporal es común y tratable.
-
 "Me veo bien en el espejo pero horrible en fotos" es de las quejas más repetidas. No estás loco: **el espejo, tu selfie y la cámara de otra persona te muestran tres caras distintas**, y ninguna es exactamente la que ven los demás. Entender por qué te ahorra mucha angustia.
 
 ## Por qué cada superficie te muestra algo distinto

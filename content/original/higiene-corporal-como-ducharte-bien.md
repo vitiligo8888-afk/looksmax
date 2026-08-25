@@ -14,8 +14,6 @@ sources:
 
 # Higiene corporal: cómo ducharte bien (sin resecarte la piel)
 
-> **Aviso.** Esta guía es informativa y no sustituye la consulta con un dermatólogo o médico. Si tienes acné severo, dermatitis, picazón persistente o mal olor que no cede con higiene normal, consulta a un profesional: puede ser una condición tratable.
-
 Ducharse parece obvio, pero la mayoría de la gente comete dos o tres errores que se pagan en piel reseca, olor que vuelve a las pocas horas, o dermatitis. Esta guía va al grano: qué hacer, con qué frecuencia y por qué, adaptado al calor y la humedad de buena parte de Latinoamérica.
 
 ## Cuántas veces al día conviene ducharse
@@ -66,4 +64,4 @@ Cada 3–4 usos y que seque bien entre uso y uso; una toalla húmeda cría bacte
 
 ---
 
-*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, OMS, Mayo Clinic. Revisa siempre con un profesional ante síntomas persistentes.*
+*Contenido original de Looksmax.lat. Fuentes: American Academy of Dermatology, OMS, Mayo Clinic. *
