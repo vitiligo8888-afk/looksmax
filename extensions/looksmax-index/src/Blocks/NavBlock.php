@@ -54,12 +54,19 @@ class NavBlock extends AbstractBlock
             return null;
         }
 
+        $alwaysShow = SectionsBlock::alwaysShow($ctx);
+
         $items = '';
         foreach (Sections::SECTIONS as $key => $def) {
-            // Same rule as the section cards: a nav chip for an empty section
-            // is a dead end. It comes back on its own once the section has a
-            // visible thread. See SectionsBlock::sectionRows().
-            if (! isset($counts[$def['slug']]) || (int) $counts[$def['slug']] < 1) {
+            // Same rule as the section cards, including the exception: a nav
+            // chip for an empty section is a dead end, unless the operator
+            // listed that slug in `looksmax-index.always_show_sections`. The
+            // two surfaces must agree — a chip that leads to a card that is not
+            // there reads as a broken page. See SectionsBlock::sectionRows().
+            if (! isset($counts[$def['slug']])) {
+                continue;
+            }
+            if ((int) $counts[$def['slug']] < 1 && ! in_array($def['slug'], $alwaysShow, true)) {
                 continue;
             }
             $items .= '<li><a class="LmxNav-link" href="/t/' . Html::esc($def['slug']) . '"'

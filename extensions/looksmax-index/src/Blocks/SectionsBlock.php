@@ -145,6 +145,8 @@ class SectionsBlock extends AbstractBlock
                 $latest[$r->tag_id][] = $r;
             }
 
+            $alwaysShow = self::alwaysShow($ctx);
+
             $out = [];
             foreach (Sections::SECTIONS as $key => $def) {
                 $tag = $tags[$def['slug']] ?? null;
@@ -158,7 +160,13 @@ class SectionsBlock extends AbstractBlock
                 // self-healing rather than a decision — the section reappears
                 // by itself the moment it holds a visible thread, so nothing
                 // has to be remembered and re-enabled by hand later.
-                if ((int) $tag->discussion_count < 1) {
+                //
+                // The one exception is deliberate: a slug listed in
+                // `looksmax-index.always_show_sections` renders even while it
+                // is empty, for when a category should be announced before it
+                // has content. It is a setting rather than a constant so that
+                // adding or dropping one is an admin change, not a deploy.
+                if ((int) $tag->discussion_count < 1 && ! in_array($def['slug'], $alwaysShow, true)) {
                     continue;
                 }
                 $out[] = (object) [
@@ -172,6 +180,29 @@ class SectionsBlock extends AbstractBlock
             }
 
             return $out;
+        });
+    }
+
+    /**
+     * Section slugs that render even while they hold nothing.
+     *
+     * Read from `looksmax-index.always_show_sections` as a comma-separated list
+     * of slugs. Empty by default, so the ordinary rule — an empty section is
+     * hidden until it has a thread — is what a fresh install gets.
+     *
+     * This exists because "hide what is empty" and "announce a category before
+     * it has content" are both legitimate, and only the operator knows which
+     * one applies to a given section on a given week. Resolved once per request
+     * through Context::once(), because both this block and NavBlock ask for it.
+     *
+     * @return string[]
+     */
+    public static function alwaysShow(Context $ctx): array
+    {
+        return $ctx->once('sections.alwaysShow', function () use ($ctx) {
+            $raw = (string) $ctx->settings->get('looksmax-index.always_show_sections');
+
+            return array_values(array_filter(array_map('trim', explode(',', $raw))));
         });
     }
 

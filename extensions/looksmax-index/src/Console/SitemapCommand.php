@@ -117,18 +117,29 @@ class SitemapCommand extends AbstractCommand
             @copy($target, $target . '.bak');
         }
 
-        // Write-then-rename: a crawler mid-write gets the old file, never half
-        // of the new one.
+        // Write-then-rename is preferred: a crawler mid-write gets the old file
+        // rather than half of the new one. It needs write permission on the
+        // DIRECTORY, though, and `public/` is root-owned here while the
+        // scheduled run is www-data — so the strict version failed every night
+        // in silence. `sitemap.xml` itself IS www-data-owned, so fall back to
+        // rewriting it in place under a lock. A torn read is possible on that
+        // path in theory; for a ~19KB file written once a day it is a far
+        // smaller problem than the task never running at all, and it avoids
+        // loosening the permissions on public/ just to publish one file.
         $tmp = $target . '.tmp';
-        if (@file_put_contents($tmp, $xml) === false) {
-            $this->error('could not write ' . $tmp);
+        $wrote = false;
 
-            return;
+        if (@file_put_contents($tmp, $xml) !== false) {
+            @chmod($tmp, 0644);
+            if (@rename($tmp, $target)) {
+                $wrote = true;
+            } else {
+                @unlink($tmp);
+            }
         }
-        @chmod($tmp, 0644);
-        if (! @rename($tmp, $target)) {
-            @unlink($tmp);
-            $this->error('could not move the new sitemap into place');
+
+        if (! $wrote && @file_put_contents($target, $xml, LOCK_EX) === false) {
+            $this->error('could not write ' . $target . ' (check it is writable by the user running this)');
 
             return;
         }
