@@ -274,6 +274,14 @@
   // Measured for the neutral case now live: fill lands ~rgb(86,88,90), which is
   // 6.8:1 against --ink and still 1.9:1 against the card, so the chip reads as
   // a shape AND its label reads as text.
+  // --tag-color, not just `color`, because core paints the inner span from
+  // that variable and does it with !important:
+  //   .TagLabel.colored .TagLabel-text{color:var(--tag-color) !important}
+  // No plain colour declaration can beat that, so the only way to control the
+  // label is to control what --tag-color resolves to. Core sets it to
+  // `var(--contrast-color, var(--body-bg))` and, in the hero, to the raw
+  // --tag-bg — which for a near-white imported hue is a near-white label.
+  --tag-color: var(--ink);
   background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 18%, var(--surface-2));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 40%, var(--line));
   // The tag hue, lifted toward the scheme's TEXT colour until it is readable.
@@ -317,6 +325,70 @@
   // have kept the ghost label even though the parent was already fixed —
   // exactly the trap the comment above records from the previous round.
   color: var(--ink);
+}
+
+// ------------------------------------------------- the hero's chips
+//
+// THE ONE PLACE THE RULE ABOVE LOSES. flarum/tags ships, and the compiled
+// bundle emits AFTER this file:
+//
+//   .DiscussionHero .TagsLabel .TagLabel.colored,
+//   .DiscussionHero .TagsLabel .TagLabel--colored {
+//     --tag-color: var(--tag-bg);
+//     background-color: var(--contrast-color, var(--body-bg));
+//   }
+//
+// That is (0,3,0) — exactly the weight of `.TagLabel.colored.text-contrast--dark`
+// above — so specificity ties and SOURCE ORDER decides, and core is later.
+// Both of its declarations then land on the retargeting this file does
+// elsewhere and invert it:
+//
+//   * `--contrast-color` is var(--ink) here (set on `.TagLabel`, so core's own
+//     YIQ verdict stops fighting us), and core paints the FILL from it — a
+//     chip filled with the theme's TEXT colour;
+//   * `--tag-color` is forced back to the raw hue, and core paints the label
+//     from it with !important.
+//
+// Measured on /d/67983 before this block: fill rgb(249,249,249), label
+// rgb(234,240,255). A white chip with white text on it, 1.02:1 — the tags were
+// two blank rectangles above the title. Operator: "the contrast is non
+// existent there, it's white bg and light text".
+//
+// `.Hero` is on the same element core matches (core renders
+// `<header class="Hero DiscussionHero">`), so chaining it costs nothing in
+// markup and makes this (0,4,0): it wins on WEIGHT rather than on being later
+// in a bundle whose order we do not control.
+//
+// The values are the ordinary chip's, restated rather than reached for through
+// a mixin, because the whole point is that this selector must carry them.
+.Hero.DiscussionHero .TagsLabel .TagLabel.colored,
+.Hero.DiscussionHero .TagsLabel .TagLabel--colored,
+.Hero.DiscussionHero .TagsLabel .TagLabel.colored.text-contrast--dark,
+.Hero.DiscussionHero .TagsLabel .TagLabel.colored.text-contrast--light {
+  background-color: color-mix(in srgb, var(--tag-bg, var(--accent)) 18%, var(--surface-2));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tag-bg, var(--accent)) 40%, var(--line));
+  color: var(--ink);
+  --tag-color: var(--ink);
+}
+
+// The hero also has an uncoloured case (a tag with no colour set). Core's fill
+// rule above does not match it; the enclosing `.DiscussionHero .TagsLabel &`
+// block sets `background: transparent`, which on the hero's near-black gradient
+// is a label floating with no chip at all. Give it what the uncoloured chip
+// gets everywhere else.
+.Hero.DiscussionHero .TagsLabel .TagLabel:not(.colored):not(.TagLabel--colored) {
+  background-color: var(--white-a06);
+  box-shadow: inset 0 0 0 1px var(--line);
+  --tag-color: var(--ink-dim);
+}
+
+// The pill radius discussion.less asks for, which has never actually applied:
+// the same core block ends with `border-radius: @border-radius !important`, and
+// !important is not beatable by weight — only by !important. Kept here beside
+// the rest of the hero-chip overrides rather than back in discussion.less, so
+// the whole of what core does to these chips is answered in one place.
+.Hero.DiscussionHero .TagsLabel .TagLabel {
+  border-radius: var(--r-pill) !important;
 }
 
 // An uncoloured chip has no hue to mix, so its children follow the chip's own

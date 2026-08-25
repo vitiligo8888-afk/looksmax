@@ -14,6 +14,20 @@
 
 // ============================================================ the rail
 .App-header {
+  // Core ships `padding: 8px` on a bar whose height is fixed at 56px, which
+  // leaves a 40px content box for a 42px logo. The container then overflows
+  // the bar by 5px, and because it is the flex parent of the nav, every
+  // control centres against the OVERFLOWING box rather than against the rail:
+  // measured logged out at 1440px, the logo sat 8px from the top and 6px from
+  // the bottom while "Regístrate"/"Acceder" sat 13.5px from the top and 0.5px
+  // from the bottom — the buttons hard against the header's own bottom border,
+  // and 5.5px lower than the logo they are supposed to line up with.
+  //
+  // Zero vertical padding and a full-height container instead: the rail's
+  // 56px IS the content box, so `align-items: center` centres the logo and the
+  // controls on the same axis and the bottom gap stops being whatever is left
+  // over. Horizontal padding is core's and is left alone.
+  padding-block: 0;
   background: color-mix(in srgb, var(--bg) 72%, transparent);
   backdrop-filter: saturate(1.6) blur(16px);
   -webkit-backdrop-filter: saturate(1.6) blur(16px);
@@ -47,11 +61,22 @@
   align-items: center;
   display: flex;
   gap: var(--gap);
+  // Fill the rail rather than being sized by the tallest child's line box.
+  // Without this the container is 53px tall (the logo's 42px image plus the
+  // leading of a 34px line box) and centres its items inside THAT, which is
+  // how the nav ended up below the logo.
+  height: 100%;
   max-width: var(--shell);
 }
 
 // ============================================================ wordmark
 .Header-title {
+  // The logo is an <img> in an inline formatting context, so the line box adds
+  // descender leading under it: a 42px image measured 53px tall here. Flexing
+  // the wrapper drops the line box entirely, which is what lets the image's
+  // own 42px be what the row centres.
+  align-items: center;
+  display: flex;
   margin: 0;
   // NEVER shrink or clip the wordmark. `min-width: 0` here let the logo lane
   // collapse whenever the header got crowded — logged in, the nav plus the
@@ -65,6 +90,9 @@
 // The lockup is an <img>; keep it at natural size so a squeezed row can never
 // clip it. Whatever has to give in a tight header, it is not the logo.
 .Header-logo {
+  // block, for the same reason: an inline <img> sits on a baseline and drags
+  // the leading back in even inside a flex parent, if it is wrapped in one.
+  display: block;
   flex: none;
   max-width: none;
 }
