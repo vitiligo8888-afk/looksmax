@@ -12,6 +12,7 @@ use Local\Welcome\Api\SurveyController;
 use Local\Welcome\Config;
 use Local\Welcome\InjectAdminScript;
 use Local\Welcome\InjectScript;
+use Local\Welcome\Listeners\AutoConfirmEmail;
 use Local\Welcome\Listeners\SeedSurveyState;
 use Local\Welcome\Survey;
 
@@ -60,7 +61,12 @@ return [
         ->content(InjectAdminScript::class),
 
     (new Extend\Event())
-        ->listen(Registered::class, SeedSurveyState::class),
+        ->listen(Registered::class, SeedSurveyState::class)
+        // No-op unless `welcome.autoConfirm` is on. It exists because outbound
+        // mail on this install cannot be delivered, so the confirmation link
+        // never arrives and an unconfirmed account can never post. See
+        // Listeners/AutoConfirmEmail and the setting's comment in Config.
+        ->listen(Registered::class, AutoConfirmEmail::class),
 
     // Actor-only, on purpose. `email`, `preferences` and every other private
     // field on core's own UserSerializer follow exactly this shape — a value

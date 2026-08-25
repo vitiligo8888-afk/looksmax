@@ -32,6 +32,31 @@ class Config
         // admin stats endpoint keeps working — historical answers stay
         // queryable even while collection is paused.
         'enabled' => [true, 'bool'],
+
+        // Confirm a new account's email address at registration instead of
+        // waiting for the click in a mail nobody receives.
+        //
+        // Measured on this install 2026-08-25: `mail_driver` is `mail`, and
+        // PHP's sendmail_path points at /usr/sbin/sendmail, which here is a
+        // symlink to busybox. Busybox's sendmail relays to 127.0.0.1:25 and
+        // nothing listens there, so every message Flarum has ever sent failed
+        // with "Connection refused" — silently, because mail() only returns a
+        // boolean nobody checks. Confirmation mail is therefore not late, it
+        // is impossible, and an account that cannot confirm never reaches the
+        // Member group and so cannot post. Registration was open and
+        // completely non-functional.
+        //
+        // This is the stopgap for that, and it is deliberately a SETTING and
+        // not a code change: the day a real SMTP relay exists, turning this off
+        // restores ordinary verification with no deploy. Default is false so
+        // that a correctly-configured install never silently skips
+        // verification — it is switched on per-install, on purpose.
+        //
+        // Understand the trade before leaving it on: nothing proves the address
+        // belongs to the person, so throwaway signups get in, and password
+        // reset stays broken regardless (that mail cannot be delivered either).
+        // It buys a working front door, not a working mailbox.
+        'autoConfirm' => [false, 'bool'],
     ];
 
     public static function all(SettingsRepositoryInterface $settings): array
