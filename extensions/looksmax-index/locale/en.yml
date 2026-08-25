@@ -85,7 +85,7 @@ local-looksmax-index:
 
       sections:
         heading: Where to start
-        lede: Six sections, built from what the board actually discusses.
+        lede: The forum sections, built from what the board actually discusses.
         threads: threads
         empty: Nothing here yet.
 

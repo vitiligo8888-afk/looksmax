@@ -56,7 +56,10 @@ class NavBlock extends AbstractBlock
 
         $items = '';
         foreach (Sections::SECTIONS as $key => $def) {
-            if (! isset($counts[$def['slug']])) {
+            // Same rule as the section cards: a nav chip for an empty section
+            // is a dead end. It comes back on its own once the section has a
+            // visible thread. See SectionsBlock::sectionRows().
+            if (! isset($counts[$def['slug']]) || (int) $counts[$def['slug']] < 1) {
                 continue;
             }
             $items .= '<li><a class="LmxNav-link" href="/t/' . Html::esc($def['slug']) . '"'

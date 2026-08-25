@@ -79,7 +79,7 @@ local-looksmax-index:
 
       sections:
         heading: Por dónde empezar
-        lede: Seis secciones, armadas a partir de lo que el foro realmente discute.
+        lede: Las secciones del foro, armadas a partir de lo que realmente se discute.
         threads: discusiones
         empty: Todavía no hay nada aquí.
 

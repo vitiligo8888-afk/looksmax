@@ -123,6 +123,17 @@ class SecurityHeaders implements MiddlewareInterface
 
         return $response
             ->withHeader('Referrer-Policy', 'no-referrer')
-            ->withHeader('Content-Security-Policy', $csp);
+            // Clickjacking: nothing on this forum is meant to be framed by a
+            // third party. CSP frame-ancestors is the modern spelling and
+            // X-Frame-Options the fallback for older engines; both say the same
+            // thing so there is no daylight between them to exploit.
+            ->withHeader('X-Frame-Options', 'SAMEORIGIN')
+            // HSTS. The site is HTTPS-only behind the Cloudflare tunnel, so a
+            // plain-http request is always a mistake or an attack; telling the
+            // browser to remember that for a year removes the first-request
+            // downgrade window. No `preload` and no `includeSubDomains`: those
+            // are commitments about hostnames this file does not own.
+            ->withHeader('Strict-Transport-Security', 'max-age=31536000')
+            ->withHeader('Content-Security-Policy', $csp . "; frame-ancestors 'self'");
     }
 }

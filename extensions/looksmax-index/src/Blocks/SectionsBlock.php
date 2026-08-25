@@ -120,17 +120,26 @@ class SectionsBlock extends AbstractBlock
             $tagIds = $tags->pluck('id')->all();
 
             $latest = [];
-            $rows = $ctx->db->table('discussion_tag')
-                ->join('discussions', 'discussions.id', '=', 'discussion_tag.discussion_id')
-                ->leftJoin('users', 'users.id', '=', 'discussions.last_posted_user_id')
-                ->whereIn('discussion_tag.tag_id', $tagIds)
-                ->whereNull('discussions.hidden_at')
-                ->orderByDesc('discussions.last_posted_at')
-                ->limit(count($tagIds) * 14)
-                ->get([
-                    'discussion_tag.tag_id', 'discussions.id', 'discussions.title', 'discussions.slug',
-                    'discussions.comment_count', 'discussions.last_posted_at', 'users.username',
-                ]);
+            // Rank WITHIN each tag, not globally.
+            //
+            // The previous version took one date-ordered pass over every section
+            // and cut it at `count * 14`. That silently starves small sections:
+            // measured live, the 151 threads in Softmaxing/Looksmaxing filled the
+            // whole window, so Mejores Guías rendered "6 threads" next to
+            // "Nothing here yet" — a count and a preview disagreeing on the same
+            // card. ROW_NUMBER() partitions by tag so each section always gets
+            // its own newest three, and it stays one round trip.
+            $in = implode(',', array_map('intval', $tagIds));
+            $rows = collect($ctx->db->select(
+                "SELECT tag_id, id, title, slug, comment_count, last_posted_at, username FROM (
+                    SELECT dt.tag_id, d.id, d.title, d.slug, d.comment_count, d.last_posted_at, u.username,
+                           ROW_NUMBER() OVER (PARTITION BY dt.tag_id ORDER BY d.last_posted_at DESC, d.id DESC) rn
+                    FROM discussion_tag dt
+                    JOIN discussions d ON d.id = dt.discussion_id
+                    LEFT JOIN users u ON u.id = d.last_posted_user_id
+                    WHERE dt.tag_id IN ($in) AND d.hidden_at IS NULL AND d.is_private = 0
+                 ) ranked WHERE rn <= 3"
+            ));
 
             foreach ($rows as $r) {
                 $latest[$r->tag_id][] = $r;
@@ -140,6 +149,16 @@ class SectionsBlock extends AbstractBlock
             foreach (Sections::SECTIONS as $key => $def) {
                 $tag = $tags[$def['slug']] ?? null;
                 if (! $tag) {
+                    continue;
+                }
+                // An empty section is worse than a missing one: a front page of
+                // cards reading "0 threads / nothing here yet" is what an
+                // abandoned board looks like, and three of the six were empty
+                // after the translated content came down. Hiding them is
+                // self-healing rather than a decision — the section reappears
+                // by itself the moment it holds a visible thread, so nothing
+                // has to be remembered and re-enabled by hand later.
+                if ((int) $tag->discussion_count < 1) {
                     continue;
                 }
                 $out[] = (object) [
