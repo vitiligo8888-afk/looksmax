@@ -75,6 +75,26 @@
   unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20CF, U+2C60-2C7F, U+A720-A7FF;
 }
 
+// GILROY, from the Gilroy-FREE package the operator supplied. That package
+// ships TWO weights — Light 300 and ExtraBold 800 — with no regular or medium
+// in between, and that constraint decides where the face is allowed to appear:
+// ExtraBold carries display and headings, body copy stays on the UI stack.
+// 300-weight thin strokes on a dark surface is the worst case for legibility,
+// and "I want the forum to be easily readable" is already recorded in the
+// theme's own type comments; setting body in Light would undo it.
+//
+// Served as .otf, not .woff2: there is no converter in this stack, and at ~54KB
+// each behind font-display:swap that is an acceptable cost for two faces.
+// Converting later roughly halves it and needs no CSS change beyond the format.
+@font-face {
+  font-family: 'Gilroy'; font-style: normal; font-weight: 300; font-display: swap;
+  src: url('extensions/local-looksmax-brand/font/gilroy-light.otf') format('opentype');
+}
+@font-face {
+  font-family: 'Gilroy'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('extensions/local-looksmax-brand/font/gilroy-extrabold.otf') format('opentype');
+}
+
 @font-face {
   font-family: 'Archivo';
   font-style: normal;

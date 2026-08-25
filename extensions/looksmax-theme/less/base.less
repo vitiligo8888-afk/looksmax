@@ -199,8 +199,15 @@ body,
   -moz-osx-font-smoothing: grayscale;
 }
 
+// Headings take the display face; running text does not. The Gilroy package on
+// this install is the free two-weight one (300 / 800), so 800 is the only
+// weight it can honestly render here — asking for 600 would have the browser
+// synthesise a fake bold off Light, which looks worse than not using the face
+// at all. Pinning the weight keeps that from happening.
 h1, h2, h3, h4, h5, h6 {
   color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
   letter-spacing: -0.018em;
   line-height: var(--lh-tight);
 }

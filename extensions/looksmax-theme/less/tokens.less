@@ -364,6 +364,11 @@
   // Windows, San Francisco on macOS/iOS, Roboto on Android). Titles stay
   // uppercase (title rules in chrome.less).
   --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  // Display face for headings and section titles. Gilroy ExtraBold only — the
+  // free package has no regular or medium, so this token must never be used for
+  // running text; --font-ui stays the body face. Falls back to the same UI
+  // stack, so a missing font file costs weight, never layout.
+  --font-display: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   // Poppins kept, sizes raised for readability. The reference's 13px body was
   // faithful to it but too small once live — operator: "I want the forum to be
