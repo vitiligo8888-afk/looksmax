@@ -156,12 +156,19 @@
 // and chroma family lifted to 5.4:1, so links read as purple and are still
 // legible. The saturated originals stay available below for filled chips,
 // which is the way that board actually uses them.
-// Nudged once more with the 70/30 ramp. A link is read on a CARD, not on the
-// page, and the card is now #2e2e2e rather than #232323 — which drops #b57ae8
-// to 4.47:1, a hair under 1.4.3. #bd88ec restores the margin (5.1:1 on a card,
-// 7.2:1 on the page) at the same hue. The card is the surface that governs
-// this token, not the darkest thing on screen.
-@c-accent:     #bd88ec;   // purple — house colour, readable on the grey card
+// BACK TO NEUTRAL. Operator: "tiene rosa esto arreglalo". The purple lifted for
+// contrast (#bd88ec) landed in lavender-pink territory once it was bright
+// enough to read on a #2e2e2e card — most visibly on the filled "Crear
+// discusión" button, which is the largest painted area of the accent on the
+// page. Chroma and legibility were pulling against each other and legibility
+// had to win, so the hue goes rather than the contrast.
+//
+// A near-white accent also suits the palette the operator actually asked for:
+// dark grey, a little white, black. Not pure #ffffff — at 14.4:1 it would be
+// indistinguishable from --ink and a link, a button label and body copy would
+// all read as one material. The faint cool cast keeps it separable while still
+// reading as white.
+@c-accent:     #eaf0ff;   // near-white — house colour, no chroma to clash
 @c-accent-2:   #8dc7f7;   // light blue, secondary / links (from the same capture)
 // The saturated pair, for FILLED surfaces only (badges, chips), where the
 // contrast comes from the fill and the label sits on top of it.
