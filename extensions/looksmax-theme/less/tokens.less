@@ -72,11 +72,23 @@
 // grey experiment is reverted; the page is true black again and cards sit just
 // off it. Text tokens are the lighter set from the grey pass, which on black
 // only gains contrast (safe direction), so no pair regresses.
-@c-bg:         #000000;   // the page — true black
-@c-surface-0:  #0a0a0a;   // wells, insets, code
-@c-surface-1:  #101010;   // cards, posts, list rows
-@c-surface-2:  #181818;   // raised: inputs, chips
-@c-surface-3:  #232323;   // hover / pressed
+// NEUTRAL CHARCOAL as of 2026-08-25. Operator supplied a capture of
+// looksmax.org and asked for the same UI. That board is XenForo, so none of its
+// theme can be reused here — Flarum emits different markup entirely — but its
+// palette is a measurement, and these are the values its stylesheet actually
+// uses, by frequency: #282828 dominant, #232323 under it, #1f1f1f as the page,
+// #414141 for rules, #f9f9f9 / #c0c0c0 for text.
+//
+// The ramp below keeps this file's own rule — each step is a real lightness
+// increment so a card, an input and a hover state stay distinguishable — while
+// landing on those measured values. Note the direction of travel: the page is
+// no longer true black, so every card now sits ABOVE the page rather than a
+// hair off it, which is the visual difference that reads as "the other board".
+@c-bg:         #1f1f1f;   // the page — neutral charcoal, not black
+@c-surface-0:  #1a1a1a;   // wells, insets, code — the only step below the page
+@c-surface-1:  #232323;   // cards, posts, list rows
+@c-surface-2:  #282828;   // raised: inputs, chips
+@c-surface-3:  #303030;   // hover / pressed
 // A card cannot be identified by fill at 1.10:1. It never is here: every card
 // carries this hairline AND an elevation, and the sweep asserts both, because
 // "the post tiles can't be seen" was a real operator report caused by relying
@@ -101,10 +113,17 @@
 // card fill itself carried the boundary). On charcoal cards a #14 line is
 // darker than the card and vanishes, so the hairline now sits just ABOVE
 // surface-2 — present enough to draw a card edge, quiet enough not to box it.
-@c-line:       #2a2a2a;   // square outline on black — visible, not stark white
+// Lifted again with the charcoal ramp. #2a2a2a was tuned to sit just above a
+// near-black card; on a #232323 card it is DARKER than the card and the edge
+// disappears. #414141 is the value the reference board rules its own panels
+// with, and it clears surface-2 by enough to draw an edge without boxing it.
+@c-line:       #414141;   // panel rule — above surface-2, not a white box
 @c-line-strong:#6f6f6f;   // control boundaries (1.4.11 wants 3:1)
-@c-ink:        #f2f1f5;
-@c-ink-dim:    #c3c2cb;
+// Text, from the same capture. Slightly warmer/neutral than the violet-tinted
+// set they replace, which suits a neutral grey page; both still clear 4.5:1 on
+// every surface in the ramp (#f9f9f9 is 14.4:1 on the page, #c0c0c0 is 7.6:1).
+@c-ink:        #f9f9f9;
+@c-ink-dim:    #c0c0c0;
 @c-ink-faint:  #a6a5b0;   // 4.7:1 on surface-3 — nudged lighter for the grey ramp
 // HEAVENLY WHITE is the house colour as of 2026-08-14, replacing violet 500
 // on operator instruction ("replace all the purple for a heavenly white").
@@ -112,8 +131,23 @@
 // at 17.3:1, so a link, a filled button and body copy would all read as the
 // same material. The faint cool cast keeps it separable from the ink while
 // still reading as white, and it measures 18.6:1 on the true-black page.
-@c-accent:     #eaf0ff;   // heavenly white — the house colour
-@c-accent-2:   #4ecee5;   // cyan 500, secondary / links
+// PURPLE, from the reference board, at a lightness that can carry text.
+// Its own accents are #6f0aff and #9d4edd; both are picked for filled badges,
+// where the fill supplies the contrast. This token is different — it colours
+// links and button labels ON the page — and #9d4edd measures only 3.59:1
+// against #1f1f1f, which fails 1.4.3 for body text. #b57ae8 is the same hue
+// and chroma family lifted to 5.4:1, so links read as purple and are still
+// legible. The saturated originals stay available below for filled chips,
+// which is the way that board actually uses them.
+@c-accent:     #b57ae8;   // purple — house colour, readable on charcoal
+@c-accent-2:   #8dc7f7;   // light blue, secondary / links (from the same capture)
+// The saturated pair, for FILLED surfaces only (badges, chips), where the
+// contrast comes from the fill and the label sits on top of it.
+// Named for the hue, NOT `accent-deep` — that name is already taken further
+// down by a dark neutral panel fill (#1b1d26), and two tokens a letter apart
+// meaning different things is how the wrong one ends up in a rule.
+@c-purple-vivid: #6f0aff;
+@c-purple-deep:  #4c2882;
 // Gold is NOT deleted. It was the brand for a day and it is what the source
 // board's whole cosmetic economy is denominated in — VIP, gold laurel frames,
 // the Gold rank, the credit balance. Demoting it to a third, semantic accent
