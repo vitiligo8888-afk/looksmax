@@ -1,0 +1,123 @@
+<?php
+
+namespace Local\Economy;
+
+use Flarum\Frontend\Document;
+use Psr\Http\Message\ServerRequestInterface;
+
+/**
+ * The daily-quest panel, client side.
+ *
+ * The quest engine has been complete and paying out since it shipped — four
+ * daily and four weekly definitions, a claim endpoint, idempotent rewards — and
+ * nothing on the forum ever pointed at it. A member could only discover it by
+ * calling the API by hand. This is the surface that was missing, plus the nav
+ * entry in looksmax-index that opens it.
+ *
+ * Why an injected script rather than a component: this extension ships a BUILT
+ * js/dist with no source tree in the repo, the same constraint that produced the
+ * invite card and the (now parked) Oro wallet. So the panel appends its own
+ * element to <body>, outside Mithril's managed tree, and touches none of
+ * Flarum's DOM, routing or components. Worst case on any failure is a logged
+ * warning and no panel.
+ *
+ * It reads GET /economy/quests and posts to /economy/quests/claim — both already
+ * existed; nothing about the reward rules is reimplemented here, because the
+ * server is the only thing allowed to decide what a quest pays.
+ */
+class InjectQuests
+{
+    public function __invoke(Document $document, ServerRequestInterface $request): void
+    {
+        $js = <<<'JS'
+(function(){
+function csrf(){try{return app.session.csrfToken||'';}catch(e){return '';}}
+// Titles live here rather than in the locale file because the panel is injected
+// markup, not a translated component tree; the keys are the four daily
+// definitions in Quests::DEFS and they change only when those do.
+var T={post3:'Publica 3 veces',give3:'Da 3 reacciones',received1:'Recibe 1 reacción',streak:'Mantén tu racha de hoy'};
+var GOLD='#eaf0ff', INK='#12161c', LINE='#4d4d4d', TXT='#f9f9f9';
+var host=null;
+
+function open(){
+  if(document.querySelector('[data-lmx-quests]'))return;
+  host=document.createElement('div'); host.setAttribute('data-lmx-quests','');
+  host.style.cssText='position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.6);display:flex;'
+    +'align-items:flex-start;justify-content:center;padding:48px 14px;overflow:auto;'
+    +'font:14px/1.45 system-ui,-apple-system,sans-serif';
+  host.innerHTML='<div style="max-width:460px;width:100%;background:#2e2e2e;color:'+TXT+';border:1px solid '+LINE
+    +';border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-bottom:1px solid '+LINE+'">'
+    +'<b style="font-size:16px">Misiones diarias</b>'
+    +'<span data-x style="cursor:pointer;opacity:.6;padding:2px 6px;font-size:18px">&#10005;</span></div>'
+    +'<div data-body style="padding:14px 18px 18px"><div style="opacity:.7">Cargando&hellip;</div></div></div>';
+  document.body.appendChild(host);
+  host.addEventListener('click',function(e){if(e.target===host)close();});
+  host.querySelector('[data-x]').onclick=close;
+  load();
+}
+function close(){ if(host){host.remove();host=null;}
+  if(location.hash==='#misiones'){ history.replaceState(null,'',location.pathname+location.search); } }
+
+function esc(s){var d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+
+function load(){
+  var b=host&&host.querySelector('[data-body]'); if(!b)return;
+  fetch('/api/economy/quests',{credentials:'same-origin',headers:{'X-CSRF-Token':csrf()}})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      var d=(j&&j.data)||{};
+      if(!d.enabled){ b.innerHTML='<div style="opacity:.75">Las misiones están desactivadas ahora mismo.</div>'; return; }
+      var q=(d.quests||[]).filter(function(x){return x.scope==='daily';});
+      if(!q.length){ b.innerHTML='<div style="opacity:.75">Inicia sesión para ver tus misiones de hoy.</div>'; return; }
+      var h='<div style="opacity:.7;font-size:12px;margin-bottom:12px">Se reinician cada día. Completa y reclama para sumar puntos.</div>';
+      q.forEach(function(x){
+        var pct=Math.min(100,Math.round(100*(x.progress||0)/Math.max(1,x.target||1)));
+        var done=x.claimed, can=x.claimable;
+        h+='<div style="border:1px solid '+LINE+';border-radius:11px;padding:11px 12px;margin-bottom:9px'+(done?';opacity:.55':'')+'">'
+          +'<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">'
+          +'<span style="flex:1;font-weight:600">'+esc(T[x.key]||x.key)+'</span>'
+          +'<span style="font-size:12px;opacity:.8">'+(x.progress||0)+'/'+(x.target||0)+'</span></div>'
+          +'<div style="height:6px;border-radius:99px;background:rgba(255,255,255,.10);overflow:hidden;margin-bottom:9px">'
+          +'<div style="height:100%;width:'+pct+'%;background:'+GOLD+'"></div></div>'
+          +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<span style="flex:1;font-size:12px;opacity:.8">+'+(x.reward||0)+' puntos</span>'
+          +(done?'<span style="font-size:12px;opacity:.8">Reclamado</span>'
+                :'<button data-claim="'+esc(x.key)+'"'+(can?'':' disabled')
+                 +' style="background:'+(can?GOLD:'#3a3a3a')+';color:'+(can?INK:'#8a8a8a')
+                 +';border:0;border-radius:8px;padding:6px 12px;font-weight:700;cursor:'+(can?'pointer':'not-allowed')+'">'
+                 +(can?'Reclamar':'En progreso')+'</button>')
+          +'</div></div>';
+      });
+      b.innerHTML=h;
+      b.querySelectorAll('[data-claim]').forEach(function(btn){
+        btn.onclick=function(){ claim(btn.getAttribute('data-claim'),btn); };
+      });
+    })
+    .catch(function(){ b.innerHTML='<div style="opacity:.75">No se pudieron cargar las misiones.</div>'; });
+}
+
+function claim(key,btn){
+  if(btn){btn.disabled=true;btn.textContent='…';}
+  fetch('/api/economy/quests/claim',{method:'POST',credentials:'same-origin',
+    headers:{'Content-Type':'application/json','X-CSRF-Token':csrf()},
+    body:JSON.stringify({key:key})})
+    .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
+    .then(function(){ load(); })
+    .catch(function(){ load(); });
+}
+
+// The nav entry is a plain <a href="#misiones">, so it works with no JS at all
+// (it just does nothing); this upgrades it in place rather than replacing it.
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a[href="#misiones"]'):null;
+  if(a){ e.preventDefault(); open(); }
+},true);
+if(location.hash==='#misiones'){ setTimeout(open,400); }
+window.addEventListener('hashchange',function(){ if(location.hash==='#misiones') open(); });
+})();
+JS;
+
+        $document->head[] = '<script data-lmx-quests-panel>try{' . $js . '}catch(e){console.warn("quests:",e)}</script>';
+    }
+}

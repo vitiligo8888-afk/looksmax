@@ -11,6 +11,7 @@ use Local\Economy\Api\SummaryController;
 use Local\Economy\Config;
 use Local\Economy\InjectAdminScript;
 use Local\Economy\InjectInviteWidget;
+use Local\Economy\InjectQuests;
 use Local\Economy\InjectRefCapture;
 use Local\Economy\InjectScript;
 use Local\Economy\Ledger;
@@ -28,7 +29,11 @@ return [
         ->content(InjectRefCapture::class)
         // The dismissible "Invita y gana" card for logged-in members; also
         // emitted only when referral is on. See InjectInviteWidget.php.
-        ->content(InjectInviteWidget::class),
+        ->content(InjectInviteWidget::class)
+        // The daily-quest panel, opened from the nav's "Misiones diarias" entry.
+        // The engine and its endpoints already existed; this is the surface that
+        // did not. See InjectQuests.php.
+        ->content(InjectQuests::class),
 
     // The settings screen. Every control here writes an `economy.*` setting
     // that Config.php reads — the direct fix for "every award amount, daily

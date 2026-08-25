@@ -95,6 +95,8 @@ local-looksmax-index:
 
       nav:
         heading: Ir a
+        store: Tienda
+        quests: Misiones diarias
         all: Todas las discusiones
         newest: Lo más reciente
         best: Mejores guías

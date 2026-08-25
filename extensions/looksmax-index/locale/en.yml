@@ -100,6 +100,8 @@ local-looksmax-index:
 
       nav:
         heading: Go to
+        store: Store
+        quests: Daily quests
         all: All discussions
         newest: Newest first
         best: Best guides

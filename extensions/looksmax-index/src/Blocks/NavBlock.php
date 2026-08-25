@@ -83,6 +83,12 @@ class NavBlock extends AbstractBlock
             ['/all?sort=newest', 'ph:clock-fill', 'newest'],
             ['/t/f-9', 'ph:trophy-fill', 'best'],
             ['/tags', 'ph:tag-fill', 'tags'],
+            // The store and the daily quests. Both were reachable only by typing
+            // the URL or by finding the credits chip in the header, which is why
+            // neither was being used: the quest engine has been running and
+            // paying out since it shipped, with no surface that pointed at it.
+            ['/store', 'ph:storefront-fill', 'store'],
+            ['#misiones', 'ph:target-fill', 'quests'],
         ] as [$href, $icon, $key]) {
             $extra .= '<li><a class="LmxNav-link LmxNav-link--quiet" href="' . $href . '">'
                 . '<span class="LmxNav-icon">' . Html::icon($icon) . '</span>'

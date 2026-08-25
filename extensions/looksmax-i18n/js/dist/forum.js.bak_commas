@@ -185,29 +185,6 @@
         misses[key] = (misses[key] || 0) + 1;
         return fallback == null ? key : fallback;
       }
-      // Flarum's translator returns an ARRAY of parts whenever a parameter is
-      // substituted, not a string. Callers that put the result straight into
-      // textContent therefore stringified the array, and Array.toString()
-      // joins on commas — which is where "11, de ,23", ",2500" and
-      // "Requiere la insignia ,Consenso" came from.
-      //
-      // Only collapse when every part is text. If any part is a Mithril vnode
-      // the translation contains real tags, and the caller wants the array;
-      // joining it there would print [object Object].
-      if (Array.isArray(out)) {
-        var flat = [];
-        (function walk(v) {
-          for (var i = 0; i < v.length; i++) {
-            if (Array.isArray(v[i])) walk(v[i]); else flat.push(v[i]);
-          }
-        })(out);
-        var plain = true;
-        for (var j = 0; j < flat.length; j++) {
-          var ty = typeof flat[j];
-          if (ty !== 'string' && ty !== 'number') { plain = false; break; }
-        }
-        if (plain) return flat.join('');
-      }
       return out;
     },
   };

@@ -144,6 +144,38 @@ local-looksmax-cosmetics:
         name: Ascendente
         blurb: Se otorga. Anillo doble que gira en sentidos opuestos.
 
+      # --- los del set elemental (Defs.php); sin estas claves salían en crudo
+      blaze:
+        name: Llamarada
+        blurb: Barrido cónico de fuego, girando.
+      frost:
+        name: Escarcha
+        blurb: Degradado de hielo que se desplaza despacio.
+      glitch:
+        name: Interferencia
+        blurb: Trazo discontinuo que salta a tirones.
+      storm:
+        name: Tormenta
+        blurb: Trazo discontinuo que restalla.
+      venom:
+        name: Veneno
+        blurb: Barrido cónico verde ácido, girando.
+      nature:
+        name: Naturaleza
+        blurb: Aro verde, sin movimiento.
+      royal:
+        name: Realeza
+        blurb: Degradado de púrpura y oro.
+      cosmic:
+        name: Cosmos
+        blurb: Anillo doble en sentidos opuestos. Diez mil reacciones recibidas.
+      blood:
+        name: Sangre
+        blurb: Degradado carmesí. Ya no se puede conseguir.
+      void:
+        name: Vacío
+        blurb: Anillo doble y oscuro. Ya no se puede conseguir.
+
       # --- los que se ganan con historial real del foro ------------------
       elder:
         name: Vieja guardia
