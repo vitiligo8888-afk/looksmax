@@ -129,6 +129,12 @@ class Config
         // viven en codigo porque cambiarlos altera el valor esperado de la
         // economia entera, y eso no debe poder hacerse desde un formulario.
         'wheel.enabled'                    => [true, 'bool'],
+        // Giros de pago, despues del gratuito del dia. 25 puntos por giro
+        // contra un valor esperado de ~21.6 devuelve el 86%: es un sumidero
+        // suave, no un impuesto. El tope diario existe para que nadie se
+        // funda el saldo entero en una sesion.
+        'wheel.cost'                       => [25, 'int'],
+        'wheel.paid_max'                   => [5, 'int'],
 
         'quest.enabled'                    => [true, 'bool'],
         'quest.daily.post3.target'         => [3, 'int'],

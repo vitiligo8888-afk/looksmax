@@ -123,7 +123,7 @@ local-looksmax-economy:
       spin: Girar
       error:
         guest: Inicia sesión para girar.
-        already: Ya giraste hoy. Vuelve mañana.
+        already: No puedes girar ahora. Revisa tu saldo y tus giros de hoy.
         failed: No se pudo girar. Inténtalo en un momento.
     quests:
       daily: Diarios

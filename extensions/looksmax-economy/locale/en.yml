@@ -144,7 +144,7 @@ local-looksmax-economy:
       spin: Spin
       error:
         guest: Log in to spin.
-        already: You already spun today. Come back tomorrow.
+        already: You cannot spin right now. Check your balance and today’s spins.
         failed: Could not spin. Try again in a moment.
     quests:
       daily: Daily

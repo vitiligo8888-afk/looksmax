@@ -45,6 +45,10 @@ class WheelSpinController implements RequestHandlerInterface
             'ok' => true,
             'index' => $result['index'],
             'points' => $result['points'],
+            // El cliente necesita saber si este giro se cobró, para poder decir
+            // el neto en vez de un "ganaste 5" que oculta que costó 25.
+            'paid' => (bool) ($result['paid'] ?? false),
+            'cost' => (int) ($result['cost'] ?? 0),
             'state' => $this->wheel->state((int) $actor->id),
         ]);
     }

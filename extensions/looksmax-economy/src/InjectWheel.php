@@ -149,6 +149,13 @@ function msj(t,color){
   if(m){ m.textContent=t||''; m.style.color=color||'inherit'; }
 }
 
+var BTN='width:100%;border:0;padding:11px;font-weight:800;font-size:15px;cursor:pointer;';
+var NOTA='text-align:center;opacity:.72;font-size:12.5px;margin-top:9px';
+
+function boton(texto,fn){
+  return '<button data-girar style="'+BTN+'background:#eaf0ff;color:#12161c">'+texto+'</button>';
+}
+
 function sincronizarPie(){
   var pie=host&&host.querySelector('[data-pie]'); if(!pie) return;
   var yo=sesion();
@@ -159,18 +166,38 @@ function sincronizarPie(){
     return;
   }
   if(girando){
-    pie.innerHTML='<button disabled style="width:100%;background:#3a3a3a;color:#8a8a8a;border:0;'
-      +'padding:11px;font-weight:800;font-size:15px">Girando&hellip;</button>';
+    pie.innerHTML='<button disabled style="'+BTN+'background:#3a3a3a;color:#8a8a8a;cursor:default">Girando&hellip;</button>';
     return;
   }
-  if(estado.canSpin){
-    pie.innerHTML='<button data-girar style="width:100%;background:#eaf0ff;color:#12161c;border:0;'
-      +'padding:11px;font-weight:800;font-size:15px;cursor:pointer">Girar</button>';
+
+  // El gratuito del dia manda: nunca se cobra mientras quede uno gratis.
+  if(estado.freeAvailable){
+    pie.innerHTML=boton('Girar gratis')
+      +'<div style="'+NOTA+'">Tu giro diario. Despues puedes pagar '+estado.cost+' puntos por otro.</div>';
     pie.querySelector('[data-girar]').onclick=girar;
     return;
   }
-  pie.innerHTML='<div style="text-align:center;opacity:.75;font-size:13px">'
-    +'Vuelve en '+cuenta(estado.resetsIn||0)+' para el siguiente giro.</div>';
+
+  // De pago. El boton DICE el precio: cobrar sin que se lea el numero antes de
+  // pulsar seria lo peor que podria hacer esta pantalla.
+  if(estado.canSpinPaid){
+    pie.innerHTML=boton('Girar por '+estado.cost+' puntos')
+      +'<div style="'+NOTA+'">Llevas '+estado.paidToday+' de '+estado.paidMax
+      +' giros de pago hoy &middot; Saldo: '+estado.balance+' puntos</div>';
+    pie.querySelector('[data-girar]').onclick=girar;
+    return;
+  }
+
+  // No puede: decir POR QUE, no solo que no.
+  var motivo;
+  if(estado.paidToday>=estado.paidMax){
+    motivo='Ya gastaste tus '+estado.paidMax+' giros de pago de hoy. Vuelve en '+cuenta(estado.resetsIn||0)+'.';
+  } else if(estado.balance<estado.cost){
+    motivo='Te faltan '+(estado.cost-estado.balance)+' puntos para otro giro. Saldo: '+estado.balance+'.';
+  } else {
+    motivo='Vuelve en '+cuenta(estado.resetsIn||0)+' para tu giro gratis.';
+  }
+  pie.innerHTML='<div style="text-align:center;opacity:.75;font-size:13px">'+motivo+'</div>';
 }
 
 function cuenta(seg){
@@ -205,9 +232,13 @@ function girar(){
 
      setTimeout(function(){
        girando=false;
-       msj('Ganaste '+pts+' puntos', '#e8c07d');
+       var neto = res.d.paid ? (pts - (res.d.cost||0)) : pts;
+       msj(res.d.paid
+             ? ('Ganaste '+pts+' puntos (neto '+(neto>=0?'+':'')+neto+')')
+             : ('Ganaste '+pts+' puntos'),
+           neto>=0 ? '#e8c07d' : '#c0c0c0');
        sincronizarPie();
-       refrescarPuntos(pts);
+       refrescarPuntos(neto);
      }, 4350);
    })
    .catch(function(){ girando=false; msj('No se pudo girar.','#ffb4a8'); sincronizarPie(); });
