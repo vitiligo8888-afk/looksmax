@@ -996,3 +996,28 @@
   margin-top: var(--gap-sm);
   padding: 4px 0;
 }
+
+// ------------------------------------------------ frame previews are AVATARS
+// Operator, twice: the avatar frames render square in the store grid. The ring
+// geometry in looksmax-ranks IS circular — `.lmx-frame::before/::after` carry
+// border-radius:50% and that survives minification (verified in the served
+// forum.css) — but a 50% radius only draws a CIRCLE on a SQUARE box. The
+// preview wrapper is `display:inline-block` with no dimensions, so it takes the
+// size of whatever the card happened to render inside it; on a non-square box
+// the same rule produces an ellipse or, with the rotating frames, a shape whose
+// corners read as a rotating diamond. That is exactly what the screenshot shows.
+//
+// Pinning the wrapper to a square is the fix at the cause: the pseudo-elements
+// inherit a square box and can only ever resolve to a circle. The swatch is
+// pinned with it so the frame and the thing it frames stay concentric.
+.StorePreview-frame {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  .StorePreview-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+}
