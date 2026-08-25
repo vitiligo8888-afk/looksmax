@@ -1,54 +1,54 @@
 ---
 slug: mewing-guia
-seo_title: "Mewing: qué es, qué dice la evidencia y qué esperar (honesto) — Looksmax.lat"
-meta_description: "Mewing explicado sin humo: qué es la postura lingual, qué evidencia real existe, expectativas honestas por edad y cuándo ver a un ortodoncista."
+seo_title: "Mewing: qué es y qué esperar de verdad — Looksmax.lat"
+meta_description: "Mewing sin humo: qué es, por qué sí importa mientras creces, por qué no remodela hueso adulto y qué sí te marca la mandíbula."
 canonical: /d/mewing-guia
 author: "Revisado por profesionales"
 topic: softmaxing
 status: DRAFT (original)
-sources:
-  - Consenso ortodóncico general y literatura sobre postura lingual
-  - American Association of Orthodontists (AAO)
 ---
 
-# Mewing: la guía honesta (qué dice la evidencia)
+# Mewing: la guía honesta
 
-El mewing es de lo más buscado en looksmaxing y también de lo más exagerado. Aquí va sin humo: qué es, qué se puede esperar de verdad y dónde la promesa se cae.
+El mewing es lo más buscado del looksmaxing y también lo más inflado. Vamos por partes: qué es, qué aguanta la evidencia, y en qué punto exacto se cae la promesa.
 
 ## Qué es
 
-"Mewing" popularizó la idea de mantener una **postura correcta de la lengua**: lengua apoyada en el paladar (no contra los dientes), labios juntos y respiración nasal. La postura lingual y la respiración nasal **sí importan** para el desarrollo orofacial —eso es reconocido en odontología— sobre todo **en la infancia y adolescencia**, mientras los huesos aún crecen.
+Lengua pegada al paladar —toda, no nada más la punta—, labios cerrados y respirar por la nariz. Ya. Esa es la postura, y de hecho es la posición de reposo que la boca debería tener de todos modos.
 
-## Lo que la evidencia realmente respalda
+## Dónde sí hay algo
 
-- **Respiración nasal y postura lingual de reposo:** hábitos razonables y saludables; la respiración bucal crónica sí se asocia a problemas de desarrollo y conviene corregirla (idealmente con un profesional, porque muchas veces hay una causa nasal tratable).
-- **En niños/adolescentes en crecimiento:** la postura y hábitos orofaciales pueden influir en el desarrollo; por eso existe la ortodoncia y la terapia miofuncional **supervisada**.
-- **En adultos:** **no hay evidencia sólida** de que apoyar la lengua reestructure el hueso facial ni "defina la mandíbula". Las fotos de "antes/después" suelen ser cambios de ángulo, luz, grasa corporal o postura del cuello, no remodelación ósea.
+Mientras los huesos de la cara siguen creciendo, o sea en la infancia y la adolescencia, la respiración nasal y dónde descansa la lengua sí influyen. Eso no lo inventó internet: es la razón de que exista la terapia miofuncional. Un niño que respira por la boca de forma crónica termina con una cara desarrollada distinto, y eso lleva décadas documentado.
 
-## Expectativas honestas por edad
+## Dónde se cae
 
-- **Adolescente en crecimiento:** buenos hábitos (nariz, lengua, postura) valen la pena; si hay mordida o apiñamiento, un ortodoncista hace más que cualquier técnica de internet.
-- **Adulto:** trata el mewing como higiene postural, no como cirugía gratis. Lo que **sí** define visualmente la mandíbula en un adulto es bajar grasa corporal, buena postura de cuello y salud general — no la lengua.
+En adultos no hay nada que sostenga que apoyar la lengua remodele hueso. A los 25 las suturas del cráneo ya no se van a mover porque traigas la lengua arriba ocho horas al día.
 
-## Seguridad: lo que NO hacer
+Los "antes y después" que circulan son casi siempre la misma cara con otro ángulo: cámara más alta, barbilla adelantada, mejor luz, menos grasa, cuello estirado. Junta esos cinco cambios y cualquiera parece otra persona sin que se haya movido un solo hueso.
 
-- No **fuerces** ni empujes con fuerza el paladar; puedes causar dolor o problemas de mordida.
-- Nada de objetos, "chewing" agresivo con aparatos duros, ni técnicas de "romper/hueso" en casa: eso es riesgo real, no looksmaxing.
+## Qué esperar según tu edad
 
-## Lo que sí mueve la aguja (y es gratis)
+Si todavía estás creciendo, respirar por la nariz y mantener la boca cerrada vale la pena por razones que van más allá de la cara: duermes mejor, no amaneces con la garganta seca y no te levantas cinco veces en la noche. Si además traes la mordida encimada o cruzada, eso se corrige con aparatos, no con la lengua.
 
-Respirar por la nariz, postura de cuello y espalda, dormir bien, y bajar grasa corporal si es el caso. Aburrido, pero es lo que de verdad cambia el tercio inferior de la cara.
+Si ya eres adulto, trátalo como higiene postural y ya. Lo que de verdad te marca la mandíbula a esta edad es bajar el porcentaje de grasa, dejar de sacar la cabeza hacia adelante todo el día y dormir. Aburrido y gratis, pero es lo que sí se nota en una foto.
+
+## Lo que no debes hacer
+
+Forzar. La postura es apoyo, no presión. Empujar el paladar con fuerza mueve dientes, y puedes acabar con una mordida peor de la que tenías: eso ya cuesta dinero y meses de aparato.
+
+Y nada de mordederas duras, "bone smashing" ni golpearte la cara para engrosar el hueso. No engrosa nada. Lo que hace es inflamarte y, si le pegas suficiente, fracturarte algo.
 
 ## Preguntas frecuentes
 
-**¿El mewing funciona en adultos?**
-Como hábito de postura/respiración, está bien; como método para reestructurar hueso facial adulto, no hay evidencia que lo respalde.
+**¿Funciona en adultos?**
+Como hábito de respiración y postura, sirve. Como método para reestructurar el hueso de la cara, no.
 
-**¿Cuánto tarda en "verse"?**
-Si esperas remodelación ósea, no llegará. Los cambios visibles reales vienen de postura, grasa corporal y salud, en meses.
+**¿En cuánto se ve?**
+Si esperas cambio óseo, nunca. Lo que sí se ve en tres a seis meses es lo otro: grasa abajo, cuello alineado y dormir bien.
 
-**¿Es peligroso?**
-La postura suave no; forzar la mandíbula o usar "aparatos" caseros sí. Ante duda o dolor, ortodoncista.
+**¿Duele?**
+No debería. Si te duele la mandíbula o te truena al abrir, estás apretando en lugar de apoyar. Suelta y vuelve a apoyar sin fuerza.
 
 ---
 
+*Contenido original de Looksmax.lat.*

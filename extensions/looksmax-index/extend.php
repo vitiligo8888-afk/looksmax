@@ -2,6 +2,7 @@
 
 use Flarum\Extend;
 use Local\Index\Console\PaletteCommand;
+use Local\Index\Console\RepostCommand;
 use Local\Index\Console\SectionsCommand;
 use Local\Index\Console\SitemapCommand;
 use Local\Index\Console\TagColourCommand;
@@ -85,6 +86,9 @@ return [
         // Creates the six section tags and files the board into them. Additive
         // and idempotent; the class docblock says exactly what it will and will
         // not touch.
+        // Republish a guide's first post from its markdown source. Posts are
+        // stored as parsed XML, so this has to go through the Formatter.
+        ->command(RepostCommand::class)
         ->command(SectionsCommand::class)
         // Gives every OTHER tag a measured colour. Before it ran, 40 of 47 tags
         // shared one blue, so "per category colour" rendered as no colour at
