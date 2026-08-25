@@ -491,7 +491,7 @@
   &-avatar {
     align-items: center;
     background: var(--surface-2);
-    border-radius: 50%;
+    border-radius: var(--r-pill);
     color: var(--ink-faint);
     display: flex;
     font-size: 20px;
@@ -1013,11 +1013,13 @@
 .StorePreview-frame {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  // Misma forma que el avatar real, vía el token del tema: la vista previa de
+  // la tienda tiene que enseñar lo que el usuario va a ver de verdad.
+  border-radius: var(--r-pill);
 
   .StorePreview-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--r-pill);
   }
 }

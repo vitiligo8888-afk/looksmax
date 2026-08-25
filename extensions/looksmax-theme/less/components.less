@@ -451,7 +451,12 @@ input[aria-invalid='true'] {
 // a deterministic colour from the same OKLCH ramp as the forum palette; see
 // paintAvatars() there. Everything that is NOT the fill lives here.
 .Avatar {
-  border-radius: 50%;
+  // Token, no 50% fijo. Todo el resto del tema es cuadrado (--r-* = 0) y el
+  // avatar del rail del post ya salía cuadrado por var(--r-md) en
+  // looksmax-userinfo: el 50% de aquí era la única pieza redonda, y contra un
+  // marco cuadrado se leía como un error. Ahora avatar y decoración salen del
+  // mismo token y cambian juntos.
+  border-radius: var(--r-pill);
   color: var(--ink-on-light);
   font-weight: 500;
   // Core sizes the glyph at exactly half the avatar. That is too big to sit
@@ -467,6 +472,22 @@ input[aria-invalid='true'] {
 
 // The rim: a hairline of the avatar's own colour plus a dark edge, so a light
 // generated circle does not float on the dark page as a bare disc.
+// Core trae `.Avatar img{border-radius:100%}` y `.AvatarEditor .Dropdown-toggle
+// {border-radius:100%}`. `.Avatar img` es MÁS específico que la regla de
+// `.Avatar` de arriba, así que la imagen interior se quedaba redonda por su
+// cuenta aunque el contenedor y el marco ya fueran cuadrados — el defecto que
+// se reportó: decoración y foto con formas distintas.
+//
+// `inherit` en vez de un valor: la imagen copia la forma de su contenedor, así
+// que sigue al token igual que todo lo demás y no puede volver a discrepar.
+.Avatar img {
+  border-radius: inherit;
+}
+
+.AvatarEditor .Dropdown-toggle {
+  border-radius: var(--r-pill);
+}
+
 .Avatar[data-lmx-av='1'] {
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--lmx-av, var(--accent)) 55%, #000),

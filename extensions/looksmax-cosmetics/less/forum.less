@@ -281,11 +281,15 @@
   isolation: isolate;
   vertical-align: middle;
   line-height: 0;
-  // 50% literal, NO var(--r-pill): el tema define --r-pill: 0 y eso aplanaba
-  // todos los marcos a cuadrados. El operador pidió que TODOS vayan en
-  // círculo, así que la forma no puede depender de un token del tema que
-  // otro rediseño vuelva a poner en 0.
-  border-radius: 50%;
+  // LA FORMA LA MANDA EL TEMA, no este fichero. Todos los tokens de radio del
+  // tema valen 0 (el UI cuadrado que se clonó a propósito), y el avatar del
+  // rail del post ya sale cuadrado por var(--r-md) en looksmax-userinfo. Un
+  // marco con opinión propia de forma produce exactamente el defecto que se
+  // reportó: anillo redondo alrededor de una imagen cuadrada.
+  //
+  // Atado al mismo token que el avatar, así que si el tema vuelve a redondear,
+  // decoración e imagen se redondean JUNTAS. No se puede volver a desincronizar.
+  border-radius: var(--r-pill);
   // The bloom. It lives on the WRAPPER rather than on the ring because the
   // gradient renderers mask their pseudo-element, and a mask clips the
   // element's box-shadow with it.
@@ -348,7 +352,7 @@
   content: '';
   position: absolute;
   inset: var(--cf-inset, -3px);
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   pointer-events: none;
   z-index: var(--z-behind);
   display: none;
@@ -990,7 +994,7 @@
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   border: 1px solid var(--white-a10);
   background: var(--black-a40);
   color: #fff;
@@ -1239,7 +1243,7 @@
   right: 8px;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   background: var(--ok);
 }
 
@@ -1328,7 +1332,7 @@
 .LmxCosTile-swatch {
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   background: var(--surface-3);
   display: inline-block;
 }
