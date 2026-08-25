@@ -127,3 +127,51 @@ Once verified, flipping it on is two settings:
 UPDATE settings SET value='smtp' WHERE `key`='mail_driver';
 UPDATE settings SET value='0'    WHERE `key`='welcome.autoConfirm';
 ```
+
+---
+
+## LIVE 2026-08-25: email is working
+
+`looksmax.lat` was verified in Resend, and the forum was switched onto it.
+
+| Setting | Value |
+|---|---|
+| `mail_driver` | `smtp` |
+| `mail_host` / `mail_port` | `smtp.resend.com` / `587` (tls) |
+| `mail_from` | `noreply@looksmax.lat` |
+| `welcome.autoConfirm` | `0` — real email verification restored |
+
+Verified end to end:
+
+- `POST /emails` from `noreply@looksmax.lat` now returns an id where it
+  previously returned 403.
+- Flarum's own mailer sends over SMTP without throwing.
+- A registration through the real path completes with **no exception** and
+  leaves the account `is_email_confirmed = 0`, awaiting its confirmation mail —
+  which is the correct behaviour now that mail can actually be delivered.
+
+The auto-confirm stopgap is off. It stays in the codebase (default `false`) as a
+switch for the next time delivery breaks.
+
+### One gotcha found while testing
+
+Writing a setting straight into the `settings` table is **not** enough — Flarum
+caches settings, so the running process keeps serving the old value. A test
+registration auto-confirmed even with `autoConfirm = 0` in the database, purely
+because the cached `1` was still live. Always follow a direct settings write
+with `php flarum cache:clear`, or the change silently does nothing.
+
+### Outstanding: the domain cannot receive mail
+
+There are **no MX records** on `looksmax.lat`, so `admin@`, `chris@` and
+`equipo@looksmax.lat` can send but never receive. Members are unaffected — they
+register with real mailboxes — but a password reset for a staff account would go
+nowhere. Two ways to close it:
+
+- Point the staff accounts at a mailbox that exists (a personal address), or
+- Turn on Cloudflare Email Routing (free) and forward `@looksmax.lat` to one.
+
+### Still to do
+
+Rotate the API key that was pasted into a chat transcript, then put the
+replacement in `looksmax.lat/admin` → Email rather than in a message.
