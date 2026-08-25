@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Ascendido">
+  <title>Ascendido</title>
+  <defs>
+    <linearGradient id="oro" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#ffffff"/>
+      <stop offset="0.45" stop-color="#e8c07d"/>
+      <stop offset="1"   stop-color="#c8a05f"/>
+    </linearGradient>
+    <linearGradient id="anillo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#ffffff"/>
+      <stop offset="0.5" stop-color="#dfe6f5"/>
+      <stop offset="1"   stop-color="#e8c07d"/>
+    </linearGradient>
+    <radialGradient id="nucleo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"   stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#f2e2c2"/>
+      <stop offset="1"   stop-color="#e8c07d"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Los dos anillos que giran en sentidos opuestos en el marco animado.
+       Aquí quietos, que es como se ve un icono. -->
+  <g fill="none" stroke="url(#anillo)" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="256" cy="256" r="218" stroke-width="14"/>
+    <circle cx="256" cy="256" r="141" stroke-width="12"/>
+  </g>
+
+  <!-- El ojo central: la vesica, dos arcos que se cruzan. -->
+  <path d="M181 256c40-53 110-53 150 0c-40 53-110 53-150 0Z"
+        fill="none" stroke="url(#oro)" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="256" cy="256" r="25" fill="url(#nucleo)"/>
+
+  <!-- Los seis ojos del anillo exterior. -->
+  <g fill="url(#oro)">
+    <circle cx="256" cy="77"  r="21"/>
+    <circle cx="411" cy="166" r="21"/>
+    <circle cx="411" cy="346" r="21"/>
+    <circle cx="256" cy="435" r="21"/>
+    <circle cx="101" cy="346" r="21"/>
+    <circle cx="101" cy="166" r="21"/>
+  </g>
+</svg>
