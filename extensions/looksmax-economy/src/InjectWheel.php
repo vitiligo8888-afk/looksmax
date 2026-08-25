@@ -36,14 +36,15 @@ function sesion(){try{return app.session.user||null;}catch(e){return null;}}
 // Paleta: gris para lo comun, oro para lo gordo. El salto de color hace legible
 // de un vistazo que segmentos valen la pena, sin leer un numero.
 function colorDe(p){
-  if(p>=250) return '#e8c07d';
-  if(p>=100) return '#c8a05f';
-  if(p>=50)  return '#6b6b6b';
-  if(p>=30)  return '#4d4d4d';
-  if(p>=20)  return '#3d3d3d';
-  return '#2e2e2e';
+  if(p<=0)    return '#242424';   // los vacios, casi el fondo: no compiten con nada
+  if(p>=2500) return '#e8c07d';   // el bote
+  if(p>=500)  return '#c8a05f';
+  if(p>=150)  return '#8a7350';
+  if(p>=50)   return '#5a5a5a';
+  return '#454545';
 }
-function tintaDe(p){ return p>=100 ? '#12161c' : '#f9f9f9'; }
+function tintaDe(p){ if(p<=0) return '#6e6e6e'; return p>=500 ? '#12161c' : '#f9f9f9'; }
+function etiqueta(p){ return p<=0 ? '—' : String(p); }
 
 function cargarLib(){
   return new Promise(function(res,rej){
@@ -106,11 +107,13 @@ function pintar(){
   // ruleta se dibujaba centrada en una caja rectangular, desperdiciando
   // ancho. max-width + aspect-ratio deja los dos lados iguales.
   b.innerHTML='<div data-lienzo style="width:100%;max-width:300px;aspect-ratio:1/1;margin:0 auto 14px"></div>'
+    +'<div style="text-align:center;font-size:12.5px;opacity:.7;margin-bottom:10px">Bote: <b style="color:#e8c07d">'
+    +(estado.jackpot||0)+' puntos</b></div>'
     +'<div data-msj style="min-height:22px;text-align:center;margin-bottom:12px;opacity:.85"></div>'
     +'<div data-pie></div>';
 
   var items=(estado.prizes||[]).map(function(p){
-    return {label:String(p.points), backgroundColor:colorDe(p.points), labelColor:tintaDe(p.points)};
+    return {label:etiqueta(p.points), backgroundColor:colorDe(p.points), labelColor:tintaDe(p.points)};
   });
 
   wheel=new window.spinWheel.Wheel(b.querySelector('[data-lienzo]'),{
@@ -137,7 +140,8 @@ function pintar(){
   // toco, que es justo el trabajo que la interfaz deberia ahorrar.
   if(estado.won!=null && estado.wonIndex!=null){
     try{ wheel.spinToItem(estado.wonIndex, 0, true, 0, 1, null); }catch(e){}
-    msj('Hoy ganaste '+estado.won+' puntos', '#e8c07d');
+    msj(estado.won>0 ? ('Hoy ganaste '+estado.won+' puntos') : 'Tu ultimo giro no sacó nada.',
+        estado.won>0 ? '#e8c07d' : '#c0c0c0');
   }
 
   if(!yo){ msj('Inicia sesion para girar.'); }
@@ -233,10 +237,15 @@ function girar(){
      setTimeout(function(){
        girando=false;
        var neto = res.d.paid ? (pts - (res.d.cost||0)) : pts;
-       msj(res.d.paid
-             ? ('Ganaste '+pts+' puntos (neto '+(neto>=0?'+':'')+neto+')')
-             : ('Ganaste '+pts+' puntos'),
-           neto>=0 ? '#e8c07d' : '#c0c0c0');
+       var texto;
+       if(pts<=0){
+         texto = res.d.paid ? ('Nada esta vez. −'+res.d.cost+' puntos.') : 'Nada esta vez.';
+       } else if(res.d.paid){
+         texto = 'Ganaste '+pts+' puntos (neto '+(neto>=0?'+':'')+neto+')';
+       } else {
+         texto = 'Ganaste '+pts+' puntos';
+       }
+       msj(texto, neto>0 ? '#e8c07d' : '#c0c0c0');
        sincronizarPie();
        refrescarPuntos(neto);
      }, 4350);
