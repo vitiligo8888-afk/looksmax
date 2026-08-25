@@ -87,3 +87,43 @@ harshly. It still needs the same SPF/DKIM records plus a PTR record set in the
 Contabo panel, so it trades a three-minute signup for more setup, ongoing
 maintenance, and unreliable delivery to Gmail and Outlook. Only worth it if
 using a third-party relay is genuinely off the table.
+
+---
+
+## Verified 2026-08-25: the Resend key works, the account is still gated
+
+Tested directly against the live API from the server.
+
+| Test | Result |
+|---|---|
+| `POST /emails`, from `onboarding@resend.dev` → owner's inbox | **accepted and delivered** (id `88832a3d…`) |
+| `POST /emails` → `delivered@resend.dev` | accepted (id `f7cc6dad…`) |
+| `POST /emails`, from `noreply@looksmax.lat` | **403** — domain not verified |
+| `POST /emails` → any non-owner mailbox | **403** — "You can only send testing emails to your own email address" |
+| SMTP `smtp.resend.com:587` auth | **succeeded** (rejection was 550 domain, not 535 auth) |
+
+So the credential and both transports are proven. The account is in Resend's
+testing mode, which permits mail only to the account owner. **Forum mail to
+members is impossible until `looksmax.lat` is verified** — that gate is on
+Resend's side and no transport or code change gets around it.
+
+The credentials are stored in settings, but `mail_driver` is deliberately left
+on `log`. Switching it to `smtp` now would make every member-facing send return
+403 and throw, which is exactly the failure that used to break registration.
+
+**Remaining steps (both need dashboard access):**
+
+1. resend.com/domains → Add Domain → `looksmax.lat`.
+2. Copy the SPF / DKIM / DMARC records it shows into Cloudflare DNS, then press
+   Verify. Those records are public by design — unlike the API key, they are
+   safe to share.
+
+There is no Cloudflare API credential on this host (only a tunnel-scoped
+`/etc/cloudflared/looksmax.env`), so the DNS records cannot be added from here.
+
+Once verified, flipping it on is two settings:
+
+```sql
+UPDATE settings SET value='smtp' WHERE `key`='mail_driver';
+UPDATE settings SET value='0'    WHERE `key`='welcome.autoConfirm';
+```
