@@ -257,7 +257,16 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'blaze', 'sku' => null, 'sort' => 300,
                 'spec' => [
-                    'render' => 'conic',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='blaze']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'blaze' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    'render' => 'blaze',
                     'colors' => ['#ff6a00', '#ffb346', '#f75d59'],   // INVENTED (fire orange) core, --brand-warn, --brand-danger
                     'width' => 3, 'inset' => 4,
                     'spin' => 5,
@@ -268,7 +277,16 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'frost', 'sku' => null, 'sort' => 310,
                 'spec' => [
-                    'render' => 'gradient',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='frost']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'frost' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    'render' => 'frost',
                     // INVENTED (ice-white core, brand has no near-white cyan), --brand-cyan-400, --brand-cyan-700
                     'colors' => ['#eafcff', '#69dff6', '#1f96a9'],
                     'width' => 3, 'inset' => 4,
@@ -280,7 +298,16 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'storm', 'sku' => null, 'sort' => 320,
                 'spec' => [
-                    'render' => 'dashed',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='storm']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'storm' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    'render' => 'storm',
                     // --brand-rank-ascended (base ring), --brand-cyan-300 (bolts, --cf-c2)
                     'colors' => ['#ffffff', '#85ebff'],
                     'width' => 2, 'inset' => 4,
@@ -292,7 +319,16 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'venom', 'sku' => null, 'sort' => 330,
                 'spec' => [
-                    'render' => 'conic',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='venom']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'venom' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    'render' => 'venom',
                     'colors' => ['#c8ff5e', '#6dd88e'],   // INVENTED (acid yellow-green, deliberately off the violet/cyan family), --brand-ok
                     'width' => 2, 'inset' => 3,
                     'drift' => 5.5,
@@ -303,7 +339,19 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'royal', 'sku' => null, 'sort' => 340,
                 'spec' => [
-                    'render' => 'gradient', 'shape' => 'ornate',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='royal']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'royal' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    // shape dropped 2026-08-25: 'ornate' clip-paths the WRAPPER,
+                    // and this theme's frames are square with the ring drawn outside the
+                    // padding box, so the clip removed the ring instead of shaping it.
+                    'render' => 'royal',
                     'angle' => 135,
                     // --brand-rank-ascended, --brand-rank-gold, --brand-rank-bronze
                     'colors' => ['#ffffff', '#e8c07d', '#c98b5e'],
@@ -316,7 +364,19 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'void', 'sku' => null, 'sort' => 350,
                 'spec' => [
-                    'render' => 'dual', 'shape' => 'hex',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='void']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'void' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    // shape dropped 2026-08-25: 'hex' clip-paths the WRAPPER,
+                    // and this theme's frames are square with the ring drawn outside the
+                    // padding box, so the clip removed the ring instead of shaping it.
+                    'render' => 'void',
                     // --brand-bg, --brand-violet-900, --brand-violet-800
                     'colors' => ['#0e0c17', '#270e56', '#4a3289'],
                     'width' => 3, 'inset' => 5,
@@ -328,7 +388,19 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'nature', 'sku' => null, 'sort' => 360,
                 'spec' => [
-                    'render' => 'ring', 'shape' => 'laurel',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='nature']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'nature' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    // shape dropped 2026-08-25: 'laurel' clip-paths the WRAPPER,
+                    // and this theme's frames are square with the ring drawn outside the
+                    // padding box, so the clip removed the ring instead of shaping it.
+                    'render' => 'nature',
                     // INVENTED (forest green, bracketing the one green brand.less has), --brand-ok
                     'colors' => ['#1f963a', '#6dd88e'],
                     'width' => 2, 'inset' => 4,
@@ -342,7 +414,19 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'blood', 'sku' => null, 'sort' => 370,
                 'spec' => [
-                    'render' => 'gradient', 'shape' => 'notched',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='blood']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'blood' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    // shape dropped 2026-08-25: 'notched' clip-paths the WRAPPER,
+                    // and this theme's frames are square with the ring drawn outside the
+                    // padding box, so the clip removed the ring instead of shaping it.
+                    'render' => 'blood',
                     'colors' => ['#8a0303', '#f75d59'],   // INVENTED (near-black red brand has no token for), --brand-danger
                     'width' => 2, 'inset' => 4,
                     'drift' => 3.2,
@@ -353,7 +437,16 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'cosmic', 'sku' => null, 'sort' => 380,
                 'spec' => [
-                    'render' => 'dual',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='cosmic']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'cosmic' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    'render' => 'cosmic',
                     // --brand-violet-900, --brand-violet-500, --brand-rank-luminary (--cf-c2 star accent)
                     'colors' => ['#270e56', '#9b7dfb', '#f0a5d0'],
                     'width' => 2, 'inset' => 4,
@@ -365,7 +458,16 @@ final class Defs
             [
                 'kind' => 'frame', 'slug' => 'glitch', 'sku' => null, 'sort' => 390,
                 'spec' => [
-                    'render' => 'dashed',
+                    // WIRED 2026-08-25. less/forum.less has carried a renderer named
+                    // after this frame since it was written — the flame silhouette, the
+                    // ice facets, the bolts, the ooze, the starfield — and NOTHING ever
+                    // selected it: every one of these specs asked for one of the five
+                    // generic renderers instead, so `[data-cf-render='glitch']` matched no
+                    // element on the site and the whole elemental lane was dead code.
+                    // js/dist/forum.js has had 'glitch' in its ANIMATED map the entire
+                    // time, which is the tell that this was a wiring slip and not a
+                    // decision.
+                    'render' => 'glitch',
                     // --brand-cyan-500, --brand-tier-founder — --cf-linear blends both for the base
                     // ring, colors[1] alone (--cf-c2) is the offset ghost channel on ::after
                     'colors' => ['#4ecee5', '#f7768e'],
@@ -376,6 +478,133 @@ final class Defs
                 ],
             ],
 
+
+            // ------------------------------------------- the effect set, 2026-08-25
+            // Ten frames on the six engines added to less/forum.less the same
+            // day. The bar for a new entry here is MOTION, not palette: every
+            // one of these moves in a way nothing above it does — water flows,
+            // rain falls, sparks travel, crust breathes, petals drop, hue
+            // walks. Recolouring an existing engine is not a new frame, which
+            // is why 'phoenix', 'abyss', 'thunder' and 'moss' are the only four
+            // reskins in the set and each one re-times its engine rather than
+            // only restating its colours.
+            [
+                'kind' => 'frame', 'slug' => 'tsunami', 'sku' => null, 'sort' => 400,
+                'spec' => [
+                    'render' => 'aqua',
+                    'colors' => ['#0b3d91', '#4ecee5', '#85ebff'],
+                    'width' => 3, 'inset' => 4,
+                    'drift' => 6, 'spin' => 3.4,
+                    'glow' => ['color' => '#4ecee5', 'size' => 12, 'alpha' => 0.45],
+                    'obtain' => ['type' => 'tier', 'tier' => 'vip'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'prisma', 'sku' => null, 'sort' => 410,
+                'spec' => [
+                    'render' => 'holo',
+                    'colors' => ['#ff5f6d', '#7afcff'],
+                    'width' => 3, 'inset' => 4,
+                    'drift' => 7, 'spin' => 4.5,
+                    'glow' => ['color' => '#b06ab3', 'size' => 14, 'alpha' => 0.5],
+                    'obtain' => ['type' => 'tier', 'tier' => 'elite'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'matrix', 'sku' => null, 'sort' => 420,
+                'spec' => [
+                    'render' => 'matrix',
+                    'colors' => ['#0b3d1f', '#6dd88e'],
+                    'width' => 3, 'inset' => 3,
+                    'drift' => 2.4,
+                    'glow' => ['color' => '#6dd88e', 'size' => 10, 'alpha' => 0.45],
+                    'obtain' => ['type' => 'tier', 'tier' => 'plus'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'starfall', 'sku' => null, 'sort' => 430,
+                'spec' => [
+                    'render' => 'spark',
+                    'colors' => ['#4a3289', '#e6e2fe'],
+                    'width' => 2, 'inset' => 4,
+                    'drift' => 4, 'pulse' => 2.6,
+                    'glow' => ['color' => '#9b7dfb', 'size' => 12, 'alpha' => 0.5],
+                    'obtain' => ['type' => 'tier', 'tier' => 'vip'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'magma', 'sku' => null, 'sort' => 440,
+                'spec' => [
+                    'render' => 'magma',
+                    'colors' => ['#ff6a00', '#ffb346'],
+                    'width' => 4, 'inset' => 4,
+                    'pulse' => 3.2, 'spin' => 9,
+                    'glow' => ['color' => '#ff6a00', 'size' => 13, 'alpha' => 0.5],
+                    'obtain' => ['type' => 'tier', 'tier' => 'elite'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'sakura', 'sku' => null, 'sort' => 450,
+                'spec' => [
+                    'render' => 'sakura',
+                    'colors' => ['#e75fa5', '#ffe3f1'],
+                    'width' => 2, 'inset' => 4,
+                    'drift' => 7, 'pulse' => 4,
+                    'glow' => ['color' => '#f0a5d0', 'size' => 10, 'alpha' => 0.4],
+                    'obtain' => ['type' => 'tier', 'tier' => 'plus'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'phoenix', 'sku' => null, 'sort' => 460,
+                'spec' => [
+                    // blaze's engine, but white-hot and twice as fast: embers
+                    // that climb quickly read as a bird, embers that idle read
+                    // as a campfire.
+                    'render' => 'blaze',
+                    'colors' => ['#c94b00', '#ffd166'],
+                    'width' => 3, 'inset' => 5,
+                    'drift' => 2.2, 'pulse' => 1.6,
+                    'glow' => ['color' => '#ffb346', 'size' => 16, 'alpha' => 0.55],
+                    'obtain' => ['type' => 'tier', 'tier' => 'founder'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'abyss', 'sku' => null, 'sort' => 470,
+                'spec' => [
+                    // aqua slowed right down and drained of light: the same
+                    // current, at depth.
+                    'render' => 'aqua',
+                    'colors' => ['#04121f', '#1f96a9'],
+                    'width' => 3, 'inset' => 4,
+                    'drift' => 9, 'spin' => 6,
+                    'glow' => ['color' => '#1f96a9', 'size' => 12, 'alpha' => 0.5],
+                    'obtain' => ['type' => 'tier', 'tier' => 'founder'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'thunder', 'sku' => null, 'sort' => 480,
+                'spec' => [
+                    // storm's bolts on a shorter fuse and in gold rather than
+                    // cyan: less rain, more strike.
+                    'render' => 'storm',
+                    'colors' => ['#2b2f63', '#ffe66d'],
+                    'width' => 2, 'inset' => 4,
+                    'pulse' => 1.9,
+                    'glow' => ['color' => '#ffe66d', 'size' => 14, 'alpha' => 0.55],
+                    'obtain' => ['type' => 'tier', 'tier' => 'elite'],
+                ],
+            ],
+            [
+                'kind' => 'frame', 'slug' => 'moss', 'sku' => null, 'sort' => 490,
+                'spec' => [
+                    'render' => 'nature',
+                    'colors' => ['#1f963a', '#c8ff5e'],
+                    'width' => 3, 'inset' => 3,
+                    'drift' => 7,
+                    'glow' => ['color' => '#6dd88e', 'size' => 8, 'alpha' => 0.35],
+                    'obtain' => ['type' => 'tier', 'tier' => 'plus'],
+                ],
+            ],
             // ------------------------------------------- earned from real history
             // Nothing below needs a catalogue row, a price or a purchase: the
             // ownership already exists in this forum's imported data. These are

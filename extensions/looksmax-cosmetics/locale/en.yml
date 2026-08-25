@@ -138,6 +138,38 @@ local-looksmax-cosmetics:
         name: Staff
         blurb: Double ring. Not for sale.
 
+      # --- the effect set (2026-08-25) ----------------------------------
+      tsunami:
+        name: Tsunami
+        blurb: Two crossing currents; the crest runs faster than the body.
+      prisma:
+        name: Prism
+        blurb: Full spectrum turning one way, hue walking the other.
+      matrix:
+        name: Code rain
+        blurb: Columns falling, none of them in step.
+      starfall:
+        name: Starfall
+        blurb: Points of light travelling the band at two speeds.
+      magma:
+        name: Magma
+        blurb: Black crust, cracks breathing, one seam running hot.
+      sakura:
+        name: Sakura
+        blurb: Petals falling slowly. Four of them, never more.
+      phoenix:
+        name: Phoenix
+        blurb: White-hot embers, climbing at twice the speed.
+      abyss:
+        name: Abyss
+        blurb: The same current, at depth, with the light gone.
+      thunder:
+        name: Thunder
+        blurb: Bolts in gold, on a shorter fuse.
+      moss:
+        name: Moss
+        blurb: Leaves in the band, swaying.
+
     banner:
       nebula:
         name: Nebula

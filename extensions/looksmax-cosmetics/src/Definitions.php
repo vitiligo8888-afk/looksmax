@@ -274,12 +274,22 @@ class Definitions
         // the same two properties (--cf-sweep for the moving/gradient layer and
         // --cf-flat for the plain one) is what keeps this to five rules.
         $stops = implode(', ', $colors);
-        $props['--cf-sweep'] = 'conic-gradient(from 0deg, ' . $stops . ')';
+        // `from var(--cf-turn)`, not `from 0deg`: the moving layers animate that
+        // registered angle instead of spinning the pseudo-element, because a
+        // frame is square on this theme and a spinning square reads as a
+        // tumbling box rather than as light moving around a frame. --cf-turn is
+        // registered in less/forum.less and only ever set by the keyframes, so
+        // a static layer using this same property still paints at 0deg.
+        $props['--cf-sweep'] = 'conic-gradient(from var(--cf-turn, 0deg), ' . $stops . ')';
+        // The counter-rotating twin, for `dual`'s inner ring. Same stops in
+        // reverse so the two rings do not read as one gradient at two speeds.
+        $props['--cf-sweep-rev'] = 'conic-gradient(from var(--cf-turn2, 360deg), '
+            . implode(', ', array_reverse($colors)) . ')';
         $props['--cf-linear'] = 'linear-gradient(' . $angle . 'deg, ' . $stops . ')';
 
         if (($spec['render'] ?? '') === 'dashed') {
             $dash = max(2, (int) ($spec['dash'] ?? 12));
-            $props['--cf-sweep'] = 'repeating-conic-gradient(from 0deg, ' . $colors[0]
+            $props['--cf-sweep'] = 'repeating-conic-gradient(from var(--cf-turn, 0deg), ' . $colors[0]
                 . ' 0deg ' . $dash . 'deg, transparent ' . $dash . 'deg ' . ($dash * 2) . 'deg)';
         }
 

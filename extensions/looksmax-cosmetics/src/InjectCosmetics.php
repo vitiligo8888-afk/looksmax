@@ -66,6 +66,26 @@ class InjectCosmetics
         $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $safe = str_replace(['</', '<!--'], ['<\\/', '<\\!--'], (string) $json);
 
+        // The two angles the frame gradients rotate on. INHERITING, on
+        // purpose: the effect engines declare their conic gradients on
+        // ::before/::after, the animation runs on the wrapper, and a
+        // non-inheriting custom property animated on the parent is simply not
+        // visible to the child's own declarations. They have to be
+        // REGISTERED or they animate as opaque strings — a registered
+        // <angle> interpolates, an unregistered custom property snaps from
+        // 0deg to 360deg in one discrete step and the frame just sits there.
+        //
+        // This is here and not in less/forum.less because Flarum's LESS
+        // compiler (wikimedia/less.php) cannot parse `@property` and fails the
+        // whole stylesheet on it, which is a 500 on every page rather than a
+        // frame that does not spin. Same rule as the <script> below: a
+        // separate element degrades to absence, never to a broken forum.
+        $document->head[] = '<style data-lmx-cosmetics-props>'
+            . '@property --cf-turn{syntax:"<angle>";inherits:true;initial-value:0deg}'
+            . '@property --cf-turn2{syntax:"<angle>";inherits:true;initial-value:360deg}'
+            . '@property --cf-bloom{syntax:"<number>";inherits:false;initial-value:1}'
+            . '</style>';
+
         $document->head[] = '<script data-lmx-cosmetics-defs>try{window.__lmxCosDefs=' . $safe . ';}'
             . 'catch(e){console.warn("cosmetics: defs",e)}</script>';
 

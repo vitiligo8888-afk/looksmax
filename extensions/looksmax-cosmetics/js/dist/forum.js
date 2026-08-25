@@ -299,6 +299,11 @@
   var ANIMATED = {
     conic: 1, dashed: 1, dual: 1,
     blaze: 1, frost: 1, storm: 1, venom: 1, royal: 1, void: 1, blood: 1, cosmic: 1, glitch: 1,
+    // 'nature' joined this list on 2026-08-25: its leaves used to be a static
+    // wreath and are now a layer that breathes, so it does have a keyframe to
+    // pause. The six after it are the new engines added the same day.
+    nature: 1,
+    aqua: 1, holo: 1, matrix: 1, spark: 1, magma: 1, sakura: 1,
   };
 
   function applyFrame(av, slug) {

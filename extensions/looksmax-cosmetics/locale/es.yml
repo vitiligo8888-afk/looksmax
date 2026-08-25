@@ -193,6 +193,38 @@ local-looksmax-cosmetics:
         name: Staff
         blurb: Doble anillo. No se compra.
 
+      # --- el set de efectos (2026-08-25) -------------------------------
+      tsunami:
+        name: Tsunami
+        blurb: Dos corrientes cruzadas; la cresta va más rápido que el cuerpo.
+      prisma:
+        name: Prisma
+        blurb: Espectro completo que gira mientras el tono camina al revés.
+      matrix:
+        name: Lluvia de código
+        blurb: Columnas que caen, ninguna en el mismo compás.
+      starfall:
+        name: Lluvia de estrellas
+        blurb: Puntos de luz recorriendo el borde a dos velocidades.
+      magma:
+        name: Magma
+        blurb: Costra negra con grietas que respiran y una veta al rojo.
+      sakura:
+        name: Sakura
+        blurb: Pétalos cayendo despacio. Cuatro, nunca más.
+      phoenix:
+        name: Fénix
+        blurb: Brasas al blanco, subiendo al doble de velocidad.
+      abyss:
+        name: Abismo
+        blurb: La misma corriente, a profundidad y sin luz.
+      thunder:
+        name: Trueno
+        blurb: Rayos en oro y con la mecha más corta.
+      moss:
+        name: Musgo
+        blurb: Hojas en el aro, meciéndose.
+
     banner:
       nebula:
         name: Nebulosa
