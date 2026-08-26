@@ -304,7 +304,7 @@ function item(){
   var li=document.createElement('li');
   li.className='item-lmxWheel'; li.setAttribute('data-lmx-wheel-nav','');
   li.innerHTML='<a href="#ruleta" class="Button Button--link lmxHdr-link" title="Ruleta diaria" aria-label="Ruleta diaria">'
-    +'<iconify-icon icon="ph:pie-slice-fill" aria-hidden="true"></iconify-icon></a>';
+    +'<iconify-icon icon="lmx:wheel" aria-hidden="true"></iconify-icon></a>';
   var q=ul.querySelector('.item-lmxQuests');
   if(q&&q.nextSibling) ul.insertBefore(li,q.nextSibling);
   else if(q) ul.appendChild(li);

@@ -160,7 +160,7 @@ class FeedBlock extends AbstractBlock
             . ' aria-expanded="false"'
             . ' aria-label="' . Html::esc($ctx->t('local-looksmax-index.forum.index.feed.collapse')) . '"'
             . ' title="' . Html::esc($ctx->t('local-looksmax-index.forum.index.feed.collapse')) . '">'
-            . Html::icon('ph:caret-down-bold') . '</button>'
+            . Html::icon('ph:caret-down-fill') . '</button>'
             . '<div class="LmxFeed-tabs" role="tablist"'
             . ' aria-label="' . Html::esc($ctx->t('local-looksmax-index.forum.index.feed.heading')) . '">'
             . $tabs . '</div>'

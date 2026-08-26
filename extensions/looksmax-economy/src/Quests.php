@@ -59,7 +59,7 @@ class Quests
      */
     public const DEFS = [
         // --- daily, reset every UTC day -------------------------------------
-        ['key' => 'post3', 'scope' => 'daily', 'kind' => 'ledger_count', 'reason' => 'post.created', 'icon' => 'ph:chat-circle-text-fill'],
+        ['key' => 'post3', 'scope' => 'daily', 'kind' => 'ledger_count', 'reason' => 'post.created', 'icon' => 'ph:chat-circle-dots-fill'],
         ['key' => 'give3', 'scope' => 'daily', 'kind' => 'ledger_count', 'reason' => 'reaction.given', 'icon' => 'ph:hand-heart-fill'],
         ['key' => 'received1', 'scope' => 'daily', 'kind' => 'ledger_count', 'reason' => 'reaction.received', 'icon' => 'ph:heart-fill'],
         ['key' => 'streak', 'scope' => 'daily', 'kind' => 'streak_held', 'reason' => null, 'icon' => 'ph:fire-fill'],
