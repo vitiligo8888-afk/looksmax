@@ -31,6 +31,55 @@ var LIB='/api/economy/wheel/lib.js';
 var host=null, wheel=null, girando=false, estado=null;
 
 function csrf(){try{return app.session.csrfToken||'';}catch(e){return '';}}
+
+// ---------------------------------------------------------------- sonido
+// Sintetizado con Web Audio, no ficheros: esta web no carga nada de otro
+// origen, y un .mp3 seria una peticion mas y un asset que versionar. El
+// AudioContext se crea en el primer clic de "Girar", que es un gesto del
+// usuario: creado antes, el navegador lo dejaria suspendido y no sonaria.
+var ac=null;
+var mudo=false;
+try{ mudo = localStorage.getItem('lmxWheelMudo')==='1'; }catch(e){}
+
+function audio(){
+  if(mudo) return null;
+  try{
+    if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended') ac.resume();
+    return ac;
+  }catch(e){ return null; }
+}
+function tono(freq,dur,tipo,vol,retraso){
+  var a=audio(); if(!a) return;
+  var t=a.currentTime+(retraso||0);
+  var o=a.createOscillator(), g=a.createGain();
+  o.type=tipo||'triangle';
+  o.frequency.setValueAtTime(freq,t);
+  // Rampa en vez de valor seco: un gain que salta de 0 a 1 produce un chasquido
+  // que se oye por encima del propio tono.
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol||0.06,t+0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.06));
+  o.connect(g); g.connect(a.destination);
+  o.start(t); o.stop(t+(dur||0.06)+0.03);
+}
+function sTick(){ tono(1180,0.03,'square',0.03); }
+function sPremio(){ [660,880,1320].forEach(function(f,i){ tono(f,0.26,'triangle',0.075,i*0.11); }); }
+function sBote(){ [523,659,784,1047,1319].forEach(function(f,i){ tono(f,0.5,'triangle',0.085,i*0.1); }); }
+function sNada(){ tono(200,0.2,'sine',0.05); tono(150,0.26,'sine',0.04,0.05); }
+
+function alternarMudo(){
+  mudo = !mudo;
+  try{ localStorage.setItem('lmxWheelMudo', mudo?'1':'0'); }catch(e){}
+  pintarMudo();
+}
+function pintarMudo(){
+  var b=host&&host.querySelector('[data-mudo]');
+  if(!b) return;
+  b.style.opacity = mudo ? '0.32' : '0.75';
+  b.style.textDecoration = mudo ? 'line-through' : 'none';
+  b.title = mudo ? 'Activar sonido' : 'Silenciar';
+}
 function sesion(){try{return app.session.user||null;}catch(e){return null;}}
 
 // Paleta: gris para lo comun, oro para lo gordo. El salto de color hace legible
@@ -77,11 +126,15 @@ function abrir(){
     +'border:1px solid #4d4d4d;box-shadow:0 20px 60px rgba(0,0,0,.55)">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-bottom:1px solid #4d4d4d">'
     +'<b style="font-size:16px">Ruleta diaria</b>'
-    +'<span data-x style="cursor:pointer;opacity:.6;padding:2px 8px;font-size:18px">&#10005;</span></div>'
+    +'<span style="display:flex;align-items:center;gap:2px">'
+    +'<span data-mudo style="cursor:pointer;padding:2px 7px;font-size:16px;line-height:1">&#9835;</span>'
+    +'<span data-x style="cursor:pointer;opacity:.6;padding:2px 8px;font-size:18px">&#10005;</span></span></div>'
     +'<div data-cuerpo style="padding:16px 18px 20px"><div style="opacity:.7">Cargando&hellip;</div></div></div>';
   document.body.appendChild(host);
   host.addEventListener('click',function(e){ if(e.target===host) cerrar(); });
   host.querySelector('[data-x]').onclick=cerrar;
+  host.querySelector('[data-mudo]').onclick=alternarMudo;
+  pintarMudo();
   cargar();
 }
 
@@ -115,7 +168,17 @@ function pintar(){
   // Cuadrado de verdad: con max-height el contenedor salia 383x320 y la
   // ruleta se dibujaba centrada en una caja rectangular, desperdiciando
   // ancho. max-width + aspect-ratio deja los dos lados iguales.
-  b.innerHTML='<div data-lienzo style="width:100%;max-width:300px;aspect-ratio:1/1;margin:0 auto 14px"></div>'
+  // La flecha va FUERA del canvas, en una capa encima: dibujarla dentro
+  // obligaria a repintarla en cada fotograma, y el puntero es lo unico de la
+  // ruleta que nunca se mueve. pointerAngle: 0 lo pone arriba, asi que la
+  // flecha vive en el centro superior y apunta hacia dentro.
+  b.innerHTML='<div style="position:relative;width:100%;max-width:300px;margin:0 auto 14px">'
+    +'<div data-lienzo style="width:100%;aspect-ratio:1/1"></div>'
+    +'<div style="position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:0;height:0;'
+    +'border-left:11px solid transparent;border-right:11px solid transparent;'
+    +'border-top:19px solid #eaf0ff;pointer-events:none;z-index:2;'
+    +'filter:drop-shadow(0 2px 3px rgba(0,0,0,.65))"></div>'
+    +'</div>'
     +'<div style="text-align:center;font-size:12.5px;opacity:.72;margin-bottom:10px">Premio mayor: '
     +'<b style="color:#e8c07d">marco '+((estado.jackpot&&estado.jackpot.label)||'')+'</b>'
     +' &middot; '+((estado.jackpot&&estado.jackpot.chance)||0)+'%</div>'
@@ -142,6 +205,9 @@ function pintar(){
     itemLabelAlign: 'right',
     pointerAngle: 0,
     rotationResistance: -40,
+    // Un tic cada vez que el puntero cruza a otro segmento. Como la ruleta
+    // frena sola, los tics se separan al final y el oido lee la deceleracion.
+    onCurrentIndexChange: function(){ if(girando) sTick(); },
     onRest: function(){ girando=false; sincronizarPie(); }
   });
 
@@ -269,6 +335,12 @@ function girar(){
          tono = '#e8c07d';
        }
        msj(texto, tono);
+       // El sonido despues del mensaje, y distinto segun lo que salio: el bote
+       // suena a fanfarria larga, un premio normal a fanfarria corta, y nada a
+       // un tono grave. Si todo sonara igual, el 0.3% no se sentiria distinto.
+       if(res.d.kind==='frame' && res.d.frame) sBote();
+       else if(pts>0) sPremio();
+       else sNada();
        sincronizarPie();
        refrescarPuntos(neto);
      }, 4350);
@@ -310,7 +382,22 @@ function item(){
   else if(q) ul.appendChild(li);
   else ul.insertBefore(li, ul.firstChild);
 }
+function estilo(){
+  if(document.getElementById('lmx-wheel-css')) return;
+  var st=document.createElement('style'); st.id='lmx-wheel-css';
+  // Mas grande que el resto de la cabecera a proposito: es el acceso que el
+  // operador no encontraba. El color de acento lo separa de los iconos
+  // monocromos de al lado sin necesidad de etiqueta.
+  // El color va sobre el ICONO, no sobre el enlace: el tema pinta
+  // .Button--link con la misma especificidad y mas abajo en la cascada, asi
+  // que el enlace siempre gana. El icono usa currentColor, de modo que
+  // fijarselo aqui es lo unico que se respeta. Medido: salia #c0c0c0.
+  st.textContent='.item-lmxWheel .lmxHdr-link iconify-icon{font-size:27px;color:#e8c07d}'
+    +'.item-lmxWheel .lmxHdr-link:hover iconify-icon{color:#f4d9a8}';
+  document.head.appendChild(st);
+}
 function boot(){
+  estilo();
   item();
   var h=document.querySelector('.Header-secondary');
   if(!h) return false;

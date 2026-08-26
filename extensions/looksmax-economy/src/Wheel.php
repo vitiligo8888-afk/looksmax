@@ -18,9 +18,9 @@ use Illuminate\Database\ConnectionInterface;
  *
  * ── La forma de los premios ─────────────────────────────────────────────────
  *
- *   1%   super premio: el marco Vacío
+ *   0.3% super premio: el marco Vacío  (1 de cada 333)
  *   5%   cosmético:    el marco Sangre
- *  44.5% nada
+ *  45.2% nada
  *  49.5% relleno en puntos (10 / 25 / 50 / 150 / 500)
  *
  * Los dos marcos son de concesión pura en cosmetic_defs ({"type":"never"}):
@@ -68,18 +68,18 @@ class Wheel
      * Eso no debe poder tocarse desde un formulario sin rehacer la cuenta.
      */
     public const PRIZES = [
-        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 0,   'weight' => 91,  'label' => ''],
         ['kind' => 'points', 'points' => 10,  'weight' => 170, 'label' => '10'],
-        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 0,   'weight' => 91,  'label' => ''],
         ['kind' => 'points', 'points' => 150, 'weight' => 60,  'label' => '150'],
         ['kind' => 'frame',  'frame' => 'blood', 'points' => 500, 'weight' => 50, 'label' => 'Sangre'],
         ['kind' => 'points', 'points' => 25,  'weight' => 140, 'label' => '25'],
-        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 0,   'weight' => 90,  'label' => ''],
         ['kind' => 'points', 'points' => 500, 'weight' => 25,  'label' => '500'],
-        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
+        ['kind' => 'points', 'points' => 0,   'weight' => 90,  'label' => ''],
         ['kind' => 'points', 'points' => 50,  'weight' => 100, 'label' => '50'],
-        ['kind' => 'points', 'points' => 0,   'weight' => 89,  'label' => ''],
-        ['kind' => 'frame',  'frame' => 'void', 'points' => 2500, 'weight' => 10, 'label' => 'Vacío'],
+        ['kind' => 'points', 'points' => 0,   'weight' => 90,  'label' => ''],
+        ['kind' => 'frame',  'frame' => 'void', 'points' => 2500, 'weight' => 3,  'label' => 'Vacío'],
     ];
 
     public const REASON = 'wheel.spin';
