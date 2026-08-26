@@ -112,13 +112,18 @@ return [
         })
         // rank_score carries a recency term that decays; without a refresh the
         // tie-break freezes at whatever it was when the document was written.
+        //
+        // El flag va como VALOR POSICIONAL, no como ['--scores' => true]: esa
+        // forma se compila a --scores='1' y Symfony rechaza un valor en una
+        // opcion VALUE_NONE, asi que la tarea moria cada hora antes de empezar.
+        // Encontrado en el log de produccion, una excepcion por hora.
         ->schedule(Console\SyncCommand::class, function (\Illuminate\Console\Scheduling\Event $event) {
             $event->hourly()->withoutOverlapping(30);
-        }, ['--scores' => true])
+        }, ['--scores'])
         // Post documents denormalise their discussion's title and tags.
         ->schedule(Console\SyncCommand::class, function (\Illuminate\Console\Scheduling\Event $event) {
             $event->hourly()->withoutOverlapping(30);
-        }, ['--reconcile' => true]),
+        }, ['--reconcile']),
 
     // ---------------------------------------------------------------- settings
     (new Extend\Settings())
