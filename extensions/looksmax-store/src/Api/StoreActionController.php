@@ -55,6 +55,19 @@ class StoreActionController implements RequestHandlerInterface
                 default => new JsonResponse(['error' => resolve('translator')->trans('local-looksmax-store.forum.error.unknown_action')], 404),
             };
         } catch (\Throwable $e) {
+            // Un catch mudo que devuelve 500 deja ciego a quien tenga que
+            // arreglarlo: el mensaje viaja al navegador en 'detail' y no queda
+            // en ningun log, asi que el unico rastro era una linea de nginx sin
+            // contexto. Se registra antes de responder.
+            try {
+                resolve(\Psr\Log\LoggerInterface::class)->error(
+                    'store.' . $action . ' failed: ' . $e->getMessage(),
+                    ['actor' => (int) $actor->id, 'exception' => $e]
+                );
+            } catch (\Throwable $ignored) {
+                // Registrar no puede tumbar la respuesta.
+            }
+
             return new JsonResponse([
                 'error' => resolve('translator')->trans('local-looksmax-store.forum.error.generic'),
                 'detail' => $e->getMessage(),

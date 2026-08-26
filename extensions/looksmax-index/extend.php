@@ -2,6 +2,7 @@
 
 use Flarum\Extend;
 use Local\Index\Console\PaletteCommand;
+use Local\Index\GoneForHidden;
 use Local\Index\Console\RepostCommand;
 use Local\Index\Console\SectionsCommand;
 use Local\Index\Console\SitemapCommand;
@@ -77,6 +78,17 @@ return [
         ->serializeToForum('lmxIndexDefaultView', 'looksmax-index.default_view', null, 'cards')
         ->serializeToForum('lmxIndexNewsTag', 'looksmax-index.news_tag', null, 'f-11')
         ->serializeToForum('lmxIndexNewsLimit', 'looksmax-index.news_limit', 'intval', 4),
+
+    // 410 en vez de 404 para los hilos ocultos, para que los rastreadores
+    // desindexen las 62.381 URLs de la purga en vez de reintentarlas. Ver
+    // src/GoneForHidden.php: una consulta, y solo sobre un 404 de /d/<id>.
+    // insertBefore(HandleErrors), no add(): Flarum construye el 404 desde una
+    // excepcion, y HandleErrors es quien la convierte en respuesta. Con add()
+    // esta capa queda POR DENTRO de ese manejador, la excepcion la atraviesa
+    // sin respuesta y nunca ve el 404 — medido, seguia devolviendo 404.
+    // Por delante, recibe la respuesta ya construida.
+    (new Extend\Middleware('forum'))
+        ->insertBefore(\Flarum\Http\Middleware\HandleErrors::class, GoneForHidden::class),
 
     (new Extend\Console())
         // Mirrors src/Palette.php into tags.color / tags.icon, so CORE surfaces —

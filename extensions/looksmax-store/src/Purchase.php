@@ -283,10 +283,40 @@ class Purchase
         } catch (\Throwable $e) {
             // The transaction rolled back, so the debit rolled back with it.
             // The order stays as evidence that it was attempted.
-            $this->db->table('store_orders')->where('id', $orderId)
-                ->update(['state' => 'failed', 'error' => substr($e->getMessage(), 0, 255)]);
+            //
+            // NO todo lo que llega aqui es un fallo del servidor. Los handlers de
+            // grant lanzan RuntimeException para condiciones de negocio normales
+            // —"ya tienes todo lo que puede salir de esta caja", "ya estas en un
+            // nivel superior"— y devolverlas como 500 es mentir sobre lo que
+            // paso: el comprador ve el mensaje correcto, pero queda registrado
+            // como caida del servidor y el pedido como 'failed'.
+            //
+            // Medido en produccion: de 16 pedidos en estado failed, los tres
+            // ultimos eran cajas sorpresa cuyo contenido el comprador ya tenia
+            // entero, y aparecian como 500 en el log de nginx.
+            $negocio = $this->isRefusal($e->getMessage());
 
-            return $this->fail(500, 'failed', $this->humanise($e->getMessage()))
+            $this->db->table('store_orders')->where('id', $orderId)
+                ->update([
+                    'state' => $negocio ? 'refused' : 'failed',
+                    'error' => substr($e->getMessage(), 0, 255),
+                ]);
+
+            // Solo se registra lo que de verdad es inesperado. Un catch mudo que
+            // devuelve 500 deja ciego a quien tenga que arreglarlo despues: esta
+            // linea es la que faltaba para no tener que deducirlo del access.log.
+            if (! $negocio) {
+                try {
+                    resolve(\Psr\Log\LoggerInterface::class)->error(
+                        'store.purchase failed: ' . $e->getMessage(),
+                        ['order' => $orderId, 'exception' => $e]
+                    );
+                } catch (\Throwable $ignored) {
+                    // Registrar no puede tumbar una compra.
+                }
+            }
+
+            return $this->fail($negocio ? 409 : 500, $negocio ? 'refused' : 'failed', $this->humanise($e->getMessage()))
                 + ['order' => $this->orderPayload($this->db->table('store_orders')->find($orderId))];
         }
 
@@ -448,6 +478,26 @@ class Purchase
         }
     }
 
+    /**
+     * ¿Es una negativa de negocio y no un fallo del servidor?
+     *
+     * Misma lista que humanise(), y por el mismo motivo: los handlers de grant
+     * comunican estas condiciones lanzando RuntimeException con texto en ingles
+     * que nunca ve nadie. 'injected fault' queda FUERA a proposito: es el fallo
+     * que un admin inyecta para probar el rollback, y tiene que seguir contando
+     * como fallo de verdad o la prueba no prueba nada.
+     */
+    private function isRefusal(string $message): bool
+    {
+        foreach (['already owned', 'already own everything', 'you are already on'] as $probe) {
+            if (str_contains($message, $probe)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function humanise(string $message): string
     {
         // The str_contains() probes stay in English on purpose: they match
@@ -460,6 +510,11 @@ class Purchase
             return resolve('translator')->trans(str_contains($message, 'bundle')
                 ? 'local-looksmax-store.forum.error.own_everything_bundle'
                 : 'local-looksmax-store.forum.error.own_everything_box');
+        }
+        if (str_contains($message, 'you are already on')) {
+            // El handler ya compone la frase con los dos niveles; traducirla
+             // aqui exigiria volver a resolverlos, asi que se pasa tal cual.
+            return $message;
         }
         if (str_contains($message, 'injected fault')) {
             return resolve('translator')->trans('local-looksmax-store.forum.error.injected_fault', ['detail' => $message]);

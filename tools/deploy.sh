@@ -80,9 +80,25 @@ mkdir -p "\$ROLLBACK"
 for e in \$EXTS; do cp -a "\$APP/extensions/\$e" "\$ROLLBACK/" 2>/dev/null; done
 
 echo "==> swapping in"
+# rm -rf seguido de cp -a deja la extension AUSENTE durante toda la copia, y una
+# peticion que caiga en esa ventana se encuentra el arbol a medias. Medido en
+# produccion: "DirectoryIterator(.../locale): Permission denied" y un 500 al
+# usuario, al segundo exacto de un despliegue.
+#
+# Se copia a un lado y se intercambia con dos renames, que son instantaneos y
+# atomicos dentro del mismo sistema de ficheros. El area de paso vive FUERA de
+# extensions/ porque Flarum escanea ese directorio para descubrir extensiones y
+# no debe ver un arbol a medio copiar.
+mkdir -p "\$APP/.deploy-swap"
 for e in \$EXTS; do
-  rm -rf "\$APP/extensions/\$e"
-  cp -a "\$STAGE/extensions/\$e" "\$APP/extensions/"
+  rm -rf "\$APP/.deploy-swap/\$e" "\$APP/.deploy-swap/\$e.old"
+  cp -a "\$STAGE/extensions/\$e" "\$APP/.deploy-swap/\$e"
+  chown -R root:root "\$APP/.deploy-swap/\$e"
+  if [ -d "\$APP/extensions/\$e" ]; then
+    mv "\$APP/extensions/\$e" "\$APP/.deploy-swap/\$e.old"
+  fi
+  mv "\$APP/.deploy-swap/\$e" "\$APP/extensions/\$e"
+  rm -rf "\$APP/.deploy-swap/\$e.old"
 done
 chown -R root:root "\$APP/extensions"
 
